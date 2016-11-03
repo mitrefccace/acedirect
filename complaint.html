@@ -1,0 +1,105 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Complaints Form</title>   
+        <!-- Bootstrap 3.3.5 -->
+        <link rel="stylesheet" href="bower_components/AdminLTE/bootstrap/css/bootstrap.css">
+        <!-- Bootstrap Toggle v2.2.0 -->
+        <link rel="stylesheet" href="bower_components/bootstrap-toggle/css/bootstrap-toggle.css">
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
+
+		<link rel="stylesheet" href="css/fcc.css">
+
+    </head>
+    <body>
+		<div class="container-fluid header">
+			<div class="row">
+				<div class="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1">
+					<h3> Consumer Help Center - Access for People with Disabilities </h3>
+				</div>
+			</div>
+		</div>
+        <div class="container">
+			<div class="row" align="center">
+				<h4>  </h4>		
+				<br>
+			</div>
+
+			<div class="row">
+				<div class="col-sm-6 col-md-4 col-md-offset-4">
+					<div class="account-wall">						
+						<form class="form-login" id="form-login">
+							<div class="alert alert-danger" id="message" hidden></div>
+							<label>Please Enter your VRS Number: </label>							
+							<div id="input-group" class="input-group">
+								<div class="input-group-addon">
+									<i class="fa fa-phone"></i>
+								</div>
+								<input type="text" class="form-control input-lg" id="vrs_number" placeholder="VRS Number" data-inputmask="'mask': '(999) 999-9999'" data-mask required>
+							</div>
+							<br>
+							</div>
+							<div align="center">
+								<button class="btn btn-lg btn-primary" type="submit">
+									Continue
+								</button>
+							</div>
+						</form>
+					</div>					
+				</div>
+			</div>
+		</div> <!-- end of container -->
+
+		<!-- jQuery v2.1.4 -->
+		<script src="bower_components/AdminLTE/plugins/jQuery/jquery-2.2.3.min.js"></script>
+		<!-- Bootstrap 3.3.5 -->
+		<script type="text/javascript" src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+
+		<script type="text/javascript" src="bower_components/AdminLTE/plugins/input-mask/jquery.inputmask.js"></script>
+
+        <script type="text/javascript">
+	    $(window).load(function () {
+			$("[data-mask]").inputmask();
+		    $('#form-login').submit(function (evt) {
+			    evt.preventDefault();
+
+			    var vrsnumber = $('#vrs_number').val().replace(/^1|[^\d]/g, '');;
+				$('#message').hide();
+				$('#message').text('');
+				$('#input-group').removeClass('has-error');
+				if (vrsnumber.length === 10) {
+					$.ajax({
+						url: './consumer_login',
+						data: {
+							vrsnumber: vrsnumber
+						},
+						type: 'POST',
+						dataType: 'json',
+						success: function (data) {
+							//alert(JSON.stringify(data));
+							if (data.message === "success") {
+								sessionStorage.accesstoken = data.token;
+								window.location.replace("complaint_form.html");
+							} else {
+								$('#message').text(data.message);
+								$('#message').show();
+							}
+						},
+						error: function (xhr, status, error) {
+							//alert('Error');
+							$('#message').text('An Error Occured.');
+							$('#message').show();
+						}
+					});
+				} else {					
+						$('#input-group').addClass('has-error');
+						$('#message').text('Invalid phone number format');
+						$('#message').show();
+					}
+		    });
+	    });
+
+        </script>
+    </body>
+</html>

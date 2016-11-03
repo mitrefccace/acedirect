@@ -1,0 +1,153 @@
+/* ----- Text Elements ----- */
+
+a.nav-link {
+  margin: 11px 0 11px 2%;
+  padding-top: 0;
+  padding-right: 0;
+  width: auto;
+  color: #fff;
+  font-weight: 700;
+}
+
+.footer-addr{
+	font-size: 10px;
+}
+
+.ticket-label{
+	padding-left: 10px;
+}
+
+.page-subheader{
+  color: #fff;
+  font-weight: 700;
+}
+
+.text-req{
+  color:#ff0808;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* ----- Common Elements ----- */
+
+/* ----- Interaction Elements ----- */
+
+.user-btn{
+  margin-top: 14px;
+  margin-left: 1%;
+  background-color: #1770af;
+  font-weight: 700;
+  font-size: 14px;
+  color:#fff;
+
+}
+
+.contact-btn{
+  margin-left: 2%;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.error{
+  display: none;
+  margin-left: 10px;
+}   
+    
+.error_show{
+  color: red;
+  margin-left: 10px;
+}
+
+input.invalid, textarea.invalid{
+  border: 2px solid red;
+}
+
+input.valid, textarea.valid{
+  border: 2px solid green;
+}
+
+/* ----- Layout Elements ----- */
+
+.drop-files{
+  outline-style: dashed;
+  outline-width: 1px;
+  outline-color: #999;
+  padding-top: 30px;
+  padding-bottom: 20px;
+}
+
+img.logo.temp-logo-1 {
+  /*float: left;*/
+  clear: none;
+  margin-top: 13px;
+  margin-bottom: 13px;
+  max-width: 24px;
+}
+
+.callBtns{
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.header{
+	background-color: #1770af;
+}
+
+.nav-header{
+  margin-bottom: 10px;
+}
+
+.footer{
+  position: absolute;
+  bottom: 0;
+  z-index: 150;
+}
+
+.no-gutter > [class*='col-'] {
+  padding-left:0;
+  padding-right:0;
+}
+
+.row-eq-height {
+      display: -webkit-box;
+      display: -webkit-flex;
+      display: -ms-flexbox;
+      display: flex;
+}
+
+.sub-header{
+	min-height: 180px;
+  max-height: 200px;
+  background-color: #2d8ece;
+  background-image: linear-gradient(45deg, #1770af, #2d8ece, #1770af);
+}
+
+.instruction{
+  margin-top: 30px;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+#ticket-sum{
+	margin-top: 100px;
+	box-shadow: #777 2px 2px 5px 0;
+}
+
+#callOptions{
+  margin-right: auto;
+  margin-left: auto;
+}
+
+#rtcpanel{
+	margin-top: 20 px;
+	z-index: 110;
+}
+
+#tdVideo{
+	z-index: 115;
+}
+
+#divVideo{
+	margin-top: 25px;
+}
+

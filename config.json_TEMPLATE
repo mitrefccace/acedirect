@@ -1,0 +1,111 @@
+{
+"debuglevel": "ERROR",
+"dialaroundnums": "|1112223333|",
+"http": {
+	"aclport": 8004,
+    "adport": 8005,
+	"port-dashboard" : 9081,
+	"port-user" : 9082
+},
+"zendesk": {
+    "ticket": "yes",
+	"apiurl": "host:9090/api/v2",
+	"userid": "user@email.com",
+	"token": "xxxxZenDeskTokenxxxxxxxxxxxxxxxxxxxxxxxx",
+	"proxy" : {
+		"host" : "proxyhost",
+		"port" : 80,
+		"tunnel" : "true"
+		}
+},
+"asterisk": {
+    "sip": {
+		"host" : "asteriskhost",
+		"realm" : "asteriskhost",
+		"stun" : "[]",
+		"wsport" : 443,
+		"outboundurl_host": "",
+		"outboundurl_port": "",
+		"disable_3gpp_early_ims": false,
+		"disable_debug_message": false,
+		"cache_media_stream": true,
+		"disable_call_button_options": false,
+		"disable_video": false,
+		"enable_rtcweb_breaker": false,
+		"channel": "SIP",
+		"websocket": "wss://asteriskhost:443/ws"
+	},
+	"ami" : {
+		"id" : "user",
+		"passwd" : "password",
+		"port" : 5038
+	}
+},
+"asteriskAD": {
+    "sip": {
+		"host" : "host",
+		"realm" : "host",
+		"stun" : "[]",
+		"wsport" : 8088,
+		"outboundurl_host": "",
+		"outboundurl_port": "",
+		"disable_3gpp_early_ims": false,
+		"disable_debug_message": false,
+		"cache_media_stream": true,
+		"disable_call_button_options": false,
+		"disable_video": false,
+		"enable_rtcweb_breaker": false,
+		"channel": "SIP",
+		"websocket": "ws://host:8088/ws"
+	},
+	"ami" : {
+		"id" : "user",
+		"passwd" : "password",
+		"port" : 5038
+	}
+},
+"extensions": {
+	    "startnumber" : 90001,
+            "endnumber" : 90003,
+            "secret" : "password"
+},
+"queues": {
+    "inbound" : {
+		"name" : "InboundQueue"
+		},
+	"complaint" : {
+	    "number" : "575791"
+	},
+	"information" : {
+	    "number" : "575781"
+	}
+},
+"vrscheck": {
+		"verify" : "yes",
+        "url" : "http://host",
+        "port" : 8082
+},
+"agentservice": {
+		"verify" : "yes",
+        "url" : "http://host",
+        "port" : 8085
+},
+"scriptservice": {
+        "verify" : "yes",
+        "url" : "http://host",
+        "port" : 8085
+},
+"managementportal": {
+        "url" : "http://host:8081/dashboard.html",
+		"assistance" : "http://host:8081/agentassist"
+},
+"cdrportal": {
+        "url" : "http://host:8081/cdr.html"
+},
+"jsonwebtoken": {
+	"encoding" : "base64",
+    "secretkey" : "AceConnectLiteKey",
+	"timeout" : 15000,
+	"handshake" : true
+}
+}

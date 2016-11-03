@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+<html>
+
+
+<head>
+  <title></title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="Author" content="José Luis Millán, Iñaki Baz Castillo" />
+  <meta name="description" content="Tryit JsSIP is a SIP+WebRTC demo application. For commercial support please refer to the Versatica website (http://www.versatica.com) or send an email to info@versatica.com." />
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+</head>
+
+
+<body id="body" style="background-color:#87CEFA" >
+  <!-- Enable debug module -->
+  <script>
+    localStorage.setItem("debug", "*");
+  </script>
+
+  <!-- React.js Sessions rendering -->
+  <script src="js/react-with-addons.js"></script>
+  <script src="js/JSXTransformer.js"></script>
+  <script src="js/sessions.jsx" type="text/jsx"></script>
+
+  <script src="js/jquery-2.1.4.min.js" type="text/javascript"></script>
+  <script src="js/jquery.balloon.min.js" type="text/javascript"></script>
+  <script src="js/parseuri.js" type="text/javascript"></script>
+  <script src="js/init.js" type="text/javascript"></script>
+  <script src="js/gui.js" type="text/javascript"></script>
+  <script src="js/iscomposing.js" type="text/javascript"></script>
+ 
+  <!-- Try to load js/custom.js file -->
+  <script src="js/custom.js" type="text/javascript"></script>
+  <script src="js/jssip.js" type="text/javascript"></script>
+
+  <script src="js/rtcninja-temasys.min.js" type="text/javascript"></script>
+  <!-- If CustomJsSIP is set in js/custom.js file then load JsSIP from the URL in CustomJsSIP variable. -->
+  <script>
+    if (window.rtcninjaTemasys) {
+	rtcninjaTemasys({}, {},
+        // alreadyInstalledCb
+        function() {
+          JsSIP.rtcninja({plugin: rtcninjaTemasys});
+        },
+        // needInstallCb
+        function(data) {
+          alert('WebRTC plugin required');
+        },
+        // notRequiredCb
+        null
+      );
+    }
+  </script>
+
+  <div id="login-full-background" style="background-color:#87CEFA" ></div>
+
+  <div id="login-box">
+
+    <form id="login-form" action="/">
+	  <label>Name</label>
+      <input id="display_name" tabindex="1" type="text" value="90001" />
+
+      <label>SIP URI</label>
+      <input id="sip_uri" tabindex="2" type="text" value="sip:90001@host" />
+
+      <label>SIP password</label>
+      <input id="sip_password" tabindex="3" type="password" value="password" />
+
+      <label>WS URI</label>
+      <input id="ws_servers" tabindex="4" type="text" value="ws://host:port/ws" />
+
+      <input type="submit" value="Register" />
+    </form>
+
+    <form id="login-form-from-invitation" action="/">
+      <label>Write your name and press Enter</label>
+      <input class="display_name" type="text" value="90001" />
+      <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/>
+    </form>
+
+    <div id="advanced-settings-link">
+      <a href="#">advanced settings</a>
+    </div>
+
+    <div id="advanced-settings">
+      <div class="close"></div>
+
+      <form id="advanced-settings-form" action="/">
+        <table>
+          <tr>
+		    <td>&nbsp;</td>
+			<td>&nbsp;</td>
+          </tr>		
+          <tr>
+            <td class="label"><label>authorization_user</label></td>
+            <td class="value"><input type="text" name="authorization_user" value="90001" /></td>
+          </tr>
+          <tr>
+            <td class="label"><label>register</label></td>
+            <td class="value"><input type="checkbox" name="register" checked></td>
+          </tr>
+          <tr>
+            <td class="label"><label>register_expires</label></td>
+            <td class="value"><input type="text" name="register_expires" value="600"></td>
+          </tr>
+          <tr>
+            <td class="label"><label>registrar_server</label></td>
+            <td class="value"><input type="text" name="registrar_server"></td>
+          </tr>
+          <tr>
+            <td class="label"><label>no_answer_timeout</label></td>
+            <td class="value"><input type="text" name="no_answer_timeout" value="60"></td>
+          </tr>
+          <tr>
+            <td class="label"><label>session_timers</label></td>
+            <td class="value"><input type="checkbox" name="session_timers" checked/></td>
+          </tr>
+          <tr>
+            <td class="label"><label>peerconnection_config (use JSON)</label></td>
+            <td class="value"><input type="text" name="peerconnection_config" value='{ "iceServers": [ {"urls": ["stun:host:port"]} ], "gatheringTimeout": 9000 }'></td>
+          </tr>
+          <tr>
+            <td class="label"><label>use_preloaded_route</label></td>
+            <td class="value"><input type="checkbox" name="use_preloaded_route"></td>
+          </tr>
+          <tr>
+            <td class="label"><label>connection_recovery_min_interval</label></td>
+            <td class="value"><input type="text" name="connection_recovery_min_interval" value="2"></td>
+          </tr>
+          <tr>
+            <td class="label"><label>connection_recovery_max_interval</label></td>
+            <td class="value"><input type="text" name="connection_recovery_max_interval" value="30"></td>
+          </tr>
+          <tr>
+            <td class="label"><label>hack_via_tcp</label></td>
+            <td class="value"><input type="checkbox" name="hack_via_tcp"></td>
+          </tr>
+          <tr>
+            <td class="label"><label>hack_via_ws</label></td>
+            <td class="value"><input type="checkbox" name="hack_via_ws"></td>
+          </tr>
+          <tr>
+            <td class="label"><label>hack_ip_in_contact</label></td>
+            <td class="value"><input type="checkbox" name="hack_ip_in_contact"></td>
+          </tr>
+        </table>
+        <input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;"/>
+      </form>
+    </div>
+  </div>
+
+  <div id="phone-page">
+
+    <div id="phone">
+
+      <div class="status">
+        <div id="conn-status">
+          <span class="field">status: </span>
+          <span class="value"></span>
+        </div>
+        <div>
+          <span class="field">enable video: </span>
+          <input type="checkbox" id="enableVideo" checked disabled/>
+        </div>
+        <div>
+          <span class="field">user: </span>
+          <span class="value user"></span>
+        </div>
+      </div>
+
+      <div class="controls">
+
+        <div class="ws-disconnected"></div>
+
+        <div class="dialbox">
+          <input type="text" class="destination" style="color: black !important; " value="575791"/>
+          <div class="to" style="color: black !important; ">To:</div>
+          <div class="dial-buttons">
+            <div class="button call"  style="color: black !important; background-color: lightblue !important;" >call</div>
+            <div class="line-separator" ></div>
+            <div class="button chat" style="color: black !important; background-color: lightblue !important;" >chat</div>
+          </div>
+        </div>
+
+        <div class="dialpad">
+          <div class="line">
+            <div class="button digit-1"  style="color: black !important; ">1</div>
+            <div class="button digit-2" style="color: black !important; ">2</div>
+            <div class="button digit-3" style="color: black !important; ">3</div>
+          </div>
+          <div class="line-separator" style="color: black !important; "></div>
+          <div class="line">
+            <div class="button digit-4" style="color: black !important; ">4</div>
+            <div class="button digit-5" style="color: black !important; ">5</div>
+            <div class="button digit-6" style="color: black !important; ">6</div>
+          </div>
+          <div class="line-separator" style="color: black !important; "></div>
+          <div class="line">
+            <div class="button digit-7" style="color: black !important; ">7</div>
+            <div class="button digit-8" style="color: black !important; ">8</div>
+            <div class="button digit-9" style="color: black !important; ">9</div>
+          </div>
+          <div class="line-separator" style="color: black !important; "></div>
+          <div class="line" style="color: black !important; ">
+            <div class="button digit-asterisk" style="color: black !important; ">*</div>
+            <div class="button digit-0" style="color: black !important; ">0</div>
+            <div class="button digit-pound" style="color: black !important; ">#</div>
+          </div>
+        </div><!-- .dialpad -->
+      </div><!-- .controls -->
+    </div><!-- #phone -->
+
+
+    <div id="sessions"></div>
+
+    <div id="webcam">
+      <video id="remoteView" autoplay _hidden=true poster="images/logo.png"></video>
+      <!--<video id="remoteView" autoplay
+        src="http://shapeshed.com/examples/HTML5-video-element/video/320x240.ogg">
+      </video>-->
+
+      <video id="selfView" autoplay muted="true" _hidden=true></video>
+      <!--<video id="selfView" autoplay
+        src="http://shapeshed.com/examples/HTML5-video-element/video/320x240.ogg">
+      </video>-->
+    </div>
+
+    <div id="ws_reconnect"></div>
+    <div id="unregister_all"></div>
+  </div><!-- phone-page -->
+
+</body>
+</html>
