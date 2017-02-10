@@ -1,111 +1,91 @@
 {
-"debuglevel": "ERROR",
-"dialaroundnums": "|1112223333|",
-"http": {
-	"aclport": 8004,
-    "adport": 8005,
-	"port-dashboard" : 9081,
-	"port-user" : 9082
-},
-"zendesk": {
-    "ticket": "yes",
-	"apiurl": "host:9090/api/v2",
-	"userid": "user@email.com",
-	"token": "xxxxZenDeskTokenxxxxxxxxxxxxxxxxxxxxxxxx",
-	"proxy" : {
-		"host" : "proxyhost",
-		"port" : 80,
-		"tunnel" : "true"
+	"debuglevel": "ERROR",
+	"dialaroundnums": "|1234567890|",
+	"https": {
+		"adport": 1000,
+		"port-user": 1000,
+                "certificate": "path_to_cert",
+                "private_key": "path_to_key"
+	},
+	"zendesk": {
+		"ticket": "yes",
+		"apiurl": "http://esbhost:1000/api/v2",
+		"userid": "user@email.com",
+		"token": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+		"proxy": {
+			"host": "host",
+			"port": 1000,
+			"tunnel": "true"
 		}
-},
-"asterisk": {
-    "sip": {
-		"host" : "asteriskhost",
-		"realm" : "asteriskhost",
-		"stun" : "[]",
-		"wsport" : 443,
-		"outboundurl_host": "",
-		"outboundurl_port": "",
-		"disable_3gpp_early_ims": false,
-		"disable_debug_message": false,
-		"cache_media_stream": true,
-		"disable_call_button_options": false,
-		"disable_video": false,
-		"enable_rtcweb_breaker": false,
-		"channel": "SIP",
-		"websocket": "wss://asteriskhost:443/ws"
 	},
-	"ami" : {
-		"id" : "user",
-		"passwd" : "password",
-		"port" : 5038
-	}
-},
-"asteriskAD": {
-    "sip": {
-		"host" : "host",
-		"realm" : "host",
-		"stun" : "[]",
-		"wsport" : 8088,
-		"outboundurl_host": "",
-		"outboundurl_port": "",
-		"disable_3gpp_early_ims": false,
-		"disable_debug_message": false,
-		"cache_media_stream": true,
-		"disable_call_button_options": false,
-		"disable_video": false,
-		"enable_rtcweb_breaker": false,
-		"channel": "SIP",
-		"websocket": "ws://host:8088/ws"
-	},
-	"ami" : {
-		"id" : "user",
-		"passwd" : "password",
-		"port" : 5038
-	}
-},
-"extensions": {
-	    "startnumber" : 90001,
-            "endnumber" : 90003,
-            "secret" : "password"
-},
-"queues": {
-    "inbound" : {
-		"name" : "InboundQueue"
+	"asteriskAD": {
+		"sip": {
+            "public": "publichostname",
+            "local": "privatehostname",
+			"stun": "turn:1000",
+			"wsport": 1000,
+			"outboundurl_host": "",
+			"outboundurl_port": "",
+			"disable_3gpp_early_ims": false,
+			"disable_debug_message": false,
+			"cache_media_stream": true,
+			"disable_call_button_options": false,
+			"disable_video": false,
+			"enable_rtcweb_breaker": false,
+			"channel": "SIP"
 		},
-	"complaint" : {
-	    "number" : "575791"
+		"ami": {
+			"id": "user",
+			"passwd": "password",
+			"port": 1000
+		},
+		"ari": {
+			"id": "user",
+			"passwd": "password"
+		}
 	},
-	"information" : {
-	    "number" : "575781"
+	"extensions": {
+		"startnumber": 1,
+		"endnumber": 3,
+		"secret": "password"
+	},
+	"queues": {
+		"inbound": {
+			"name": "inbqueue"
+		},
+		"complaint": {
+			"number": "111111"
+		},
+		"information": {
+			"number": "111111"
+		}
+	},
+	"vrscheck": {
+		"verify": "yes",
+		"url": "http://host",
+		"port": 1000
+	},
+	"agentservice": {
+		"verify": "yes",
+		"url": "http://host",
+		"port": 1111
+	},
+	"scriptservice": {
+		"verify": "yes",
+		"url": "http://host",
+		"port": 1111
+	},
+	"managementportal": {
+		"url": "http://host/dashboard.html",
+		"assistance": "http://host:1111/agentassist"
+	},
+	"cdrportal": {
+		"url": "http://host:111/cdr.html"
+	},
+	"jsonwebtoken": {
+		"encoding": "base64",
+		"secretkey": "somekey",
+		"timeout": 15000,
+		"handshake": true
 	}
-},
-"vrscheck": {
-		"verify" : "yes",
-        "url" : "http://host",
-        "port" : 8082
-},
-"agentservice": {
-		"verify" : "yes",
-        "url" : "http://host",
-        "port" : 8085
-},
-"scriptservice": {
-        "verify" : "yes",
-        "url" : "http://host",
-        "port" : 8085
-},
-"managementportal": {
-        "url" : "http://host:8081/dashboard.html",
-		"assistance" : "http://host:8081/agentassist"
-},
-"cdrportal": {
-        "url" : "http://host:8081/cdr.html"
-},
-"jsonwebtoken": {
-	"encoding" : "base64",
-    "secretkey" : "AceConnectLiteKey",
-	"timeout" : 15000,
-	"handshake" : true
-}
 }

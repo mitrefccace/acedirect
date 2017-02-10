@@ -1,6 +1,4 @@
-JSSIP Client Proof of Concept
-
-Here is a sample JSSIP Client that can make a WebRTC call to an ACE Direct CSR (agent).
+This is the JSSIP Client Library used for ACE Direct. There is no longer a working demo page (HTML). We just use the JSSIP Client libraries.
 
 Note:
 Consumer WebRTC Clients use extensions: 90001 - 9000x

@@ -1,3 +1,6 @@
+Release Tag: v0.0
+* The version of code just before creating the develop branch.
+
 Release Tag: 20161102qa
 * Implemented Zphone consumer Option #4 logic
 * Implemented Zphone consumer Option #5 logic
@@ -60,14 +63,14 @@ Complaint Form
 
 Release Tag: 20161019qa
 
-Complaint Form: subject is bounded at length 80
-Complaint Form: new character counter for Complaint Description
-Complaint Form: chat message is bounded at length 140
-Complaint Form: new phone and email icons
-Complaint Form: fixed general button style that was conflicting with AdminLTE style
-Complaint Form: disable Submit button after consumer creates a ticket
-Complaint Form: disable Call button after consumer makes a call
-Complaint Form: enable Call button after ticket creation
-Complaint_form: added error class for invalid phone number format
-Complaint_form: phone number validation
-CSR Portal: new script logic function
+* Complaint Form: subject is bounded at length 80
+* Complaint Form: new character counter for Complaint Description
+* Complaint Form: chat message is bounded at length 140
+* Complaint Form: new phone and email icons
+* Complaint Form: fixed general button style that was conflicting with AdminLTE style
+* Complaint Form: disable Submit button after consumer creates a ticket
+* Complaint Form: disable Call button after consumer makes a call
+* Complaint Form: enable Call button after ticket creation
+* Complaint_form: added error class for invalid phone number format
+* Complaint_form: phone number validation
+* CSR Portal: new script logic function

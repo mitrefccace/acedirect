@@ -115,3 +115,7 @@ body{
   margin-right: 200px;
   margin-top: 8px;
 }
+
+.bg-pink{
+    background-color: pink;
+}

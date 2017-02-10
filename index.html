@@ -35,8 +35,8 @@
 			}   
 		</style>
 		<script>
-		if (sessionStorage.getItem('accesstoken') === null)
-			window.location.replace("/login.html");
+			if (sessionStorage.getItem('accesstoken') === null)
+				window.location.replace("/login.html");
 		</script>
 
     </head>
@@ -59,11 +59,11 @@
                     <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
                         <span class="sr-only">Toggle navigation</span>
                     </a>
-                    <div id="agentStatusInfo" class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-4 col-md-offset-4" style="white-space:nowrap;">
+                    <div id="agentStatusInfo" class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-2 col-md-offset-2" style="white-space:nowrap;">
                         <label class="control-label">Call Duration: </label>&nbsp;&nbsp;<span id="duration" class="text-gray">0 sec</span>
                     </div>
-                    <div class="col-lg-1 col-md-1 col-sm-1 col-lg-offset-2 col-md-offset-2">
-                        <button id="assistanceBtn" type="button" class="btn btn-danger" style="width: 100%;" onclick="requestAssistance()">Assistance</button>
+                    <div class="col-lg-1 col-md-1 col-sm-1 col-lg-offset-1 col-md-offset-1">
+                        <button id="assistanceBtn" type="button" class="btn btn-danger" style="overflow: hidden;text-overflow:ellipsis;" onclick="requestAssistance()">Assistance</button>
                     </div>
                     <!-- Navbar Right Menu -->
                     <div class="navbar-custom-menu">
@@ -152,7 +152,7 @@
 								</span>
 							</a>
 						</li>
-                        
+
                     </ul>
                 </section>
                 <!-- /.sidebar -->
@@ -273,33 +273,33 @@
                                 <div class="nav-tabs-custom">
                                     <!-- Tabs within a box -->
                                     <ul class="nav nav-tabs pull-right">
-                                        <li id="ticketTab"><a href="#ticketinfo" data-toggle="tab" aria-expanded="true">Ticket Info.</a></li>
+                                        <li id="ticketTab"><a id="ticketTabTitle" href="#ticketinfo" data-toggle="tab" aria-expanded="true">Ticket Info.</a></li>
                                         <li class="active"><a href="#vrsinfo" data-toggle="tab" aria-expanded="false">VRS Info.</a></li>
-                                        <li class="pull-left header"><i class="fa fa-info-circle"></i>Call Details</li>
+                                        <li class="pull-left header"><i class="fa fa-info-circle"></i>Call Details  <small id="notickettxt" class="text-danger" hidden>(no ticket)</small></li>
                                     </ul>
 
                                     <div class="tab-content">
                                         <div class="tab-pane active" id="vrsinfo">
-                                            <form name="userform" id="userform">
+                                            <form name="userform" id="userform" autocomplete="off">
                                                 <div class="row">
                                                     <div class="col-lg-4">
                                                         <div class="form-group">
                                                             <label class="control-label">First Name</label>
                                                             <div>
-                                                                <input type="text" class="form-control" id="callerFirstName" name="fname" />
+                                                                <input type="text" class="form-control" id="callerFirstName" name="fname"autocomplete="off"/>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-4">
                                                         <div class="form-group">
                                                             <label class="control-label">Last Name</label>
-                                                            <input type="text" class="form-control" id="callerLastName"/>
+                                                            <input type="text" class="form-control" id="callerLastName" autocomplete="off"/>
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-4">
                                                         <label class="control-label">Phone</label>
                                                         <div>
-                                                            <input type="text" class="form-control" id="callerPhone" name="phone"/>
+                                                            <input type="text" class="form-control" id="callerPhone" name="phone" autocomplete="off"/>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -308,7 +308,7 @@
                                                     <div class="col-lg-12">
                                                         <div class="form-group">
                                                             <label class="control-label">Address</label>
-                                                            <input type="text" class="form-control" id="callerAddress1"/>
+                                                            <input type="text" class="form-control" id="callerAddress1" autocomplete="off"/>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -317,19 +317,19 @@
                                                     <div class="col-lg-4">
                                                         <div class="form-group">
                                                             <label class="control-label">City/Town</label>
-                                                            <input type="text" class="form-control" id="callerCity"/>
+                                                            <input type="text" class="form-control" id="callerCity" autocomplete="off"/>
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-4">
                                                         <div class="form-group">
                                                             <label class="control-label">State</label>
-                                                            <input type="text" class="form-control" id="callerState"/>
+                                                            <input type="text" class="form-control" id="callerState" autocomplete="off"/>
                                                         </div>
                                                     </div>
                                                     <div class="col-lg-4">
                                                         <div class="form-group">
                                                             <label class="control-label">Zip Code</label>
-                                                            <input type="text" class="form-control" id="callerZipcode"/>
+                                                            <input type="text" class="form-control" id="callerZipcode" autocomplete="off"/>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -339,51 +339,51 @@
                                                         <div class="form-group">
                                                             <label class="control-label">Email</label>
                                                             <div>
-                                                                <input type="email" class="form-control" id="callerEmail" name="email" required/>
+                                                                <input type="email" class="form-control" id="callerEmail" name="email" autocomplete="off" required/>
                                                             </div>
                                                         </div>
                                                     </div>
-    											</div>
+												</div>
                                                 <div class="row">
                                                     <div class="form-group text-center">
                                                         <input type="button" class="btn btn-warning"  id="btnClear" value="Finished" onclick="finished();" />
-    													<!--input type="button" class="btn btn-success"  id="btnTest" value="TEST BUTTON" /-->
+														<!--input type="button" class="btn btn-success"  id="btnTest" value="TEST BUTTON" /-->
                                                     </div>
                                                 </div>
                                             </form>
                                         </div>
-                                    
+
 
                                         <div class="tab-pane" id="ticketinfo">
-                                            <form name="ticketForm" id="ticketForm">
+                                            <form name="ticketForm" id="ticketForm" autocomplete="off">
                                                 <div class="row">
                                                     <div class="col-lg-4 form-group">
                                                         <label class="control-label">Assignee</label>                                                        
-                                                        <input type="text" class="form-control"  id="assignee" />                                                                   
+                                                        <input type="text" class="form-control"  id="assignee" autocomplete="off"/>                                                                   
                                                     </div>
                                                     <div class="col-lg-4 form-group"> 
                                                         <label class="control-label">Requester</label>
-                                                        <input type="text" class="form-control" id="requester"  />
+                                                        <input type="text" class="form-control" id="requester"  autocomplete="off"/>
                                                     </div>
                                                     <div class="col-lg-4 form-group">
                                                         <label class="control-label">Last Updated</label>
-                                                        <input type="text" id="lastupdated" class="form-control" />                                                    
+                                                        <input type="text" id="lastupdated" class="form-control" autocomplete="off" disabled/>                                                    
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-lg-8 form-group">
                                                         <label class="control-label">Subject</label>            
-                                                        <input type="text" id="subject" class="form-control" name="subject" required/>
+                                                        <input type="text" id="subject" class="form-control" name="subject" autocomplete="off" required/>
                                                     </div>
                                                     <div class="col-lg-4 form-group">
                                                         <label class="control-label">Ticket ID</label>
-                                                        <input type="text" id="ticketId" class="form-control"  />
+                                                        <input type="text" id="ticketId" class="form-control"  autocomplete="off" disabled/>
                                                     </div>
                                                 </div>
                                                 <div class="row">
                                                     <div class="col-lg-12 form-group">
                                                         <label class="control-label text-left">Problem Description</label>                                                       
-                                                        <textarea rows="3" id="problemdesc" class="form-control" name="desc" required ></textarea>                                                                                                            
+                                                        <textarea rows="3" id="problemdesc" class="form-control" name="desc"  required ></textarea>                                                                                                            
                                                     </div>
                                                 </div>
                                                 <div class="row">
@@ -430,7 +430,7 @@
             <aside class="control-sidebar control-sidebar-dark" style="width: 400px; right:-400px">
                 <!-- Create the tabs -->
                 <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
-                    <li id="scriptstab"><a href="#control-sidebar-scripts-tab" data-toggle="tab"><i class="fa fa-file-text-o"></i>&nbsp;&nbsp;Scripts</a></li>
+                    <li class="active"><a href="#control-sidebar-agents-tab" data-toggle="tab"><i class="fa fa-users"></i>&nbsp;&nbsp;Agents</a></li>
                     <li><a href="#control-sidebar-videomail-tab" data-toggle="tab"><i class="fa fa-envelope-o"></i>&nbsp;&nbsp;Video Mail</a></li>
                     <li><a href="#control-sidebar-settings-tab" data-toggle="tab"><i class="fa fa-gears"></i>&nbsp;&nbsp;Settings</a></li>
                     <li id="debugtab"><a href="#control-sidebar-debug-tab" data-toggle="tab"><i class="fa fa-bug"></i></a></li>
@@ -438,37 +438,26 @@
                 <!-- Tab panes -->
                 <div class="tab-content">
                     <!-- Home tab content -->
-					<div class="tab-pane" id="control-sidebar-home-tab"></div>
+					<div class="tab-pane active" id="control-sidebar-agents-tab">
+						<div class="form-group">
+                            <table id='agenttable' class="table table-hover">
+								<thead>
+									<tr>
+										<th>Status&nbsp;&nbsp;&nbsp;</th>
+										<th>Agent</th>
+										<th>Ext</th>
+										<th>Queues</th>
+									</tr>
+								</thead>          
+                            </table>
+						</div>
+					</div>
 					<!-- Debug tab content -->
                     <div class="tab-pane" id="control-sidebar-debug-tab">
 						<input type="button" class="btn btn-danger" id="btndbgclear" value="Clear Debug Text" onclick='cleardbgtxt();' />
 						<br>
 						<div id="dbgtxt" style='height:400px;max-height: 400px;overflow-y:scroll;'></div>
                     </div><!-- /.tab-pane -->
-
-                    <!-- Scripts tab content -->
-                    <div class="tab-pane" id="control-sidebar-scripts-tab">
-                        <ul class="nav nav-tabs control-sidebar-tabs">
-                            <li id="complaintstab"><a id="complaintsanchor" href="#complaints-scripts-tab" data-toggle="tab">Complaints</a></li>
-                            <li id="geninfotab"><a id="geninfoanchor" href="#general-info-scripts-tab" data-toggle="tab">General Info.</a></li>
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="complaints-scripts-tab">
-                                <h3 class="text-center">Complaints Scripts</h3>
-                                <div class="form-group">
-                                    <label>Script Content</label>
-                                    <textarea id="complaints_script_content" class="form-control" rows="20" placeholder="Enter ..."></textarea>
-                                </div>
-                            </div> 
-                            <div class="tab-pane" id="general-info-scripts-tab">
-                                <h3 class="text-center">General Info. Scripts</h3>
-                                <div class="form-group">
-                                    <label>Script Content</label>
-                                    <textarea id="info_script_content" class="form-control" rows="20" placeholder="Enter ..."></textarea>
-                                </div>
-                            </div> <!-- ./General Info scripts tab -->
-                        </div>
-                    </div><!-- /.Scripts tab content -->
 
                     <!-- Mail tab content -->
                     <div class="tab-pane" id="control-sidebar-videomail-tab" >
@@ -601,25 +590,26 @@
 
 		<!-- VRS Input Modal -->
 		<div class="modal fade" id="myVrsModal" role="dialog">
-		<div class="modal-dialog">
-		<div class="modal-content">
-		<div class="modal-header">
-		<h4 class="modal-title">What is your VRS Number?</h4>
-		</div>
-		<div class="modal-body">
-		<div class="form-group">
-		<label for="usr">VRS number:</label>
-		<input type="text" class="form-control" id="ivrsnum">
-		</div>
-		</div>
-		<div class="modal-footer">
-		<button type="button" class="btn btn-default" data-dismiss="modal" id="submitvrs" >Submit</button>
-		</div>
-		</div>
-		</div>
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">What is your VRS Number?</h4>
+					</div>
+					<div class="modal-body">
+						<div class="alert alert-danger" id="ivrsmessage" hidden></div>
+						<div class="form-group">
+							<label for="usr">VRS number:</label>
+							<input type="text" class="form-control input-lg" id="ivrsnum" placeholder="VRS Number" data-inputmask="'mask': '(999) 999-9999'" data-mask >
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default"  id="submitvrs" >Submit</button>
+					</div>
+				</div>
+			</div>
 		</div>
 
-		
+
 
 		<!-- ==================Le javascript ================================ -->
 		<!-- jQuery v2.1.4 -->
@@ -634,527 +624,585 @@
 		<script type="text/javascript" src='bower_components/timer.jquery/dist/timer.jquery.min.js'></script>
 		<!-- moment.js 2.15.1 -->
         <script type="text/javascript" src='bower_components/moment/moment.js'></script>
-		<!--script type="text/javascript" src="bower_components/bootstrap/js/bootstrap-modal.js"></script-->
-		<!--script type="text/javascript" src="bower_components/bootstrap/js/bootstrap-tooltip.js"></script-->
+		<script type="text/javascript" src="bower_components/AdminLTE/plugins/input-mask/jquery.inputmask.js"></script>
 		<!-- AdminLTE App -->
 		<script src="bower_components/AdminLTE/dist/js/app.min.js"></script>
+		<!-- DataTables 1.10.12 -->
+		<script type="text/javascript" src="./bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
 
 		<script>
-						var socket;
-						var extensionMe;
-						var queueNameMe;
-						var channelMe;
-						var assistanceURL = "";
+		var socket;
+		var extensionMe;
+		var queueNameMe;
+		var channelMe;
+		var assistanceURL = "";
+		var ticketTabFade;
 
-						function connect_socket() {
-							if (sessionStorage.getItem('accesstoken') === null)
-								logout();
-							console.log('connect_socket');
-							socket = io.connect('http://' + window.location.host, {
-								query: 'token=' + sessionStorage.accesstoken,
-								forceNew: true
-							});
+		function connect_socket() {
+			if (sessionStorage.getItem('accesstoken') === null)
+				logout();
+			console.log('connect_socket');
+			socket = io.connect('https://' + window.location.host, {
+				query: 'token=' + sessionStorage.accesstoken,
+				forceNew: true
+			});
 
-							socket.on('connect', function () {
-								console.log('authenticated');
+			socket.on('connect', function () {
+				debugtxt('connect', {"no": "data"});
+				console.log('authenticated');
 
-								//get the payload form the token
-								var payload = jwt_decode(sessionStorage.accesstoken);
-								$('#loginModal').modal('hide');
-								$('#statusmsg').text(""); //clear status text
+				//get the payload form the token
+				var payload = jwt_decode(sessionStorage.accesstoken);
+				$('#loginModal').modal('hide');
+				$('#statusmsg').text(""); //clear status text
 
-								//populate call agent information
-								$('#txtAgentDisplayName').val(payload.username);
-								$('#txtAgentFirstname').val(payload.first_name);
-								$('#txtAgentLastname').val(payload.last_name);
-								$('#txtAgentRole').val(payload.role);
-								$('#txtAgentEmail').val(payload.email);
-								$('#txtAgentPhone').val(payload.phone);
+				//populate call agent information
+				$('#txtAgentDisplayName').val(payload.username);
+				$('#txtAgentFirstname').val(payload.first_name);
+				$('#txtAgentLastname').val(payload.last_name);
+				$('#txtAgentRole').val(payload.role);
+				$('#txtAgentEmail').val(payload.email);
+				$('#txtAgentPhone').val(payload.phone);
 
-								if (payload.role === "AD Agent") {
-									document.title = 'ACE Direct';
-									$('#ticketInfo').show();
-									$('#userchat').show();
-                                    $('#scriptscontainer').show();
-									$('#displayname').val(payload.first_name + ' ' + payload.role);
-									$('#call-info-box').remove();
-									$('#nav-desktop').text('AD Desktop');
-									$('#section-header').text('AD Desktop');
-									$('#breadcrumb-header').text('AD Desktop');
-									$('#logo-text').text('Direct')
-									if(payload.queue_name === "ComplaintsQueue" || payload.queue_name === "GeneralQuestionsQueue"){										
-										$('#sidebar-queues').show();
-										$('#scriptstab').show();
-									}
-									if(payload.queue_name === "ComplaintsQueue" || payload.queue2_name === "ComplaintsQueue" ){
-										$('#sidebar-complaints').show();		
-										$("#complaintstab").show();											
-										$('#complaintsanchor').click();	
-									}
-									if(payload.queue_name === "GeneralQuestionsQueue" || payload.queue2_name === "GeneralQuestionsQueue" ){
-										$('#sidebar-geninfo').show();				
-										$('#geninfotab').show();												
-										$('#geninfoanchor').click();	
-									}
-								} else {
-									document.title = 'ACE Connect Lite';
-									$('#ticketInfo').remove();
-									$('#userchat').remove();
-                                    $('#scriptscontainer').remove();
-									$('#call-info-box').show();
-									$('#nav-desktop').text('CA Desktop');
-									$('#section-header').text('CA Desktop');
-									$('#breadcrumb-header').text('CA Desktop');
-									$('#logo-text').text('Connect Lite')									
-								}
+				if (payload.role === "AD Agent") {
+					document.title = 'ACE Direct';
+					$('#ticketInfo').show();
+					$('#userchat').show();
+					$('#scriptscontainer').show();
+					$('#displayname').val(payload.first_name + ' ' + payload.role);
+					$('#call-info-box').remove();
+					$('#nav-desktop').text('AD Desktop');
+					$('#section-header').text('AD Desktop');
+					$('#breadcrumb-header').text('AD Desktop');
+					$('#logo-text').text('Direct')
+					if (payload.queue_name === "ComplaintsQueue" || payload.queue_name === "GeneralQuestionsQueue") {
+						$('#sidebar-queues').show();
+						$('#scriptstab').show();
+					}
+					if (payload.queue_name === "ComplaintsQueue" || payload.queue2_name === "ComplaintsQueue") {
+						$('#sidebar-complaints').show();
+					}
+					if (payload.queue_name === "GeneralQuestionsQueue" || payload.queue2_name === "GeneralQuestionsQueue") {
+						$('#sidebar-geninfo').show();
+					}
+				} else {
+					document.title = 'ACE Connect Lite';
+					$('#ticketInfo').remove();
+					$('#userchat').remove();
+					$('#scriptscontainer').remove();
+					$('#call-info-box').show();
+					$('#nav-desktop').text('CA Desktop');
+					$('#section-header').text('CA Desktop');
+					$('#breadcrumb-header').text('CA Desktop');
+					$('#logo-text').text('Connect Lite')
+				}
 
-								$('#agentname-sidebar').html(payload.first_name + " " + payload.last_name);
-								$('#agentname-header').html(payload.first_name + " " + payload.last_name);
-								$('#agentname-headerdropdown').html(payload.first_name + " " + payload.last_name);
-								$('#agentrole-headerdropdown').html("<small>" + payload.role + "</small>");
+				$('#agentname-sidebar').html(payload.first_name + " " + payload.last_name);
+				$('#agentname-header').html(payload.first_name + " " + payload.last_name);
+				$('#agentname-headerdropdown').html(payload.first_name + " " + payload.last_name);
+				$('#agentrole-headerdropdown').html("<small>" + payload.role + "</small>");
 
-								socket.emit('register-client', {"hello": "hello"});
-								socket.emit('register-agent', {"hello": "hello"}); //for AD
+				socket.emit('register-client', {"hello": "hello"});
+				socket.emit('register-agent', {"hello": "hello"}); //for AD
 
-								//TODO: get settings from SQL
-								extensionMe = payload.extension; //e.g. 6001
-								queueNameMe = payload.queue_name; //e.g. InboundQueue
-								channelMe = payload.channel; //e.g. SIP/7001
-								pauseQueues();
+				//TODO: get settings from SQL
+				extensionMe = payload.extension; //e.g. 6001
+				queueNameMe = payload.queue_name; //e.g. InboundQueue
+				channelMe = payload.channel; //e.g. SIP/7001
+				pauseQueues();
 
-							}).on('typing', function (data) {
-								if ($("#txtAgentDisplayName").val() !== data.displayname) {
-									$('#rtt-typing').html(data.displayname+": "+data.rttmsg);
-								}
-							}).on('typing-clear', function (data) {
-								if ($("#txtAgentDisplayName").val() !== data.displayname) {
-									$('#rtt-typing').html('');
-								}
-							}).on('disconnect', function () {
-								console.log('disconnected');
-								logout("disconnected");
-							}).on("unauthorized", function (error) {
-								if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
-									logout("Session has expired");
-								}
-							}).on('error', function (reason) {
-								if (reason.code === "invalid_token") {
-									logout("Session has expired");
-								} else {
-									logout("An Error Occurred: " + JSON.stringify(reason));
-								}
-							});
+			}).on('disconnect', function () {
+				debugtxt('disconnect');
+				console.log('disconnected');
+				logout("disconnected");
+			}).on("unauthorized", function (error) {
+				debugtxt('unauthorized', error);
+				if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
+					logout("Session has expired");
+				}
+			}).on('error', function (reason) {
+				debugtxt('error', reason);
 
-							// a new caller has connected
-							socket.on('new-caller', function (data) {
+				if (reason.code === "invalid_token") {
+					logout("Session has expired");
+				} else {
+					logout("An Error Occurred: " + JSON.stringify(reason));
+				}
+			}).on('typing', function (data) {
+				debugtxt('typing', data);
+				if ($("#txtAgentDisplayName").val() !== data.displayname) {
+					$('#rtt-typing').html(data.displayname + ": " + data.rttmsg);
+				}
+			}).on('typing-clear', function (data) {
+				debugtxt('typing-clear', data);
+				if ($("#txtAgentDisplayName").val() !== data.displayname) {
+					$('#rtt-typing').html('');
+				}
+			}).on('new-caller', function (data) { // a new caller has connected
+				debugtxt('new-caller', data);
+				
+				//filter out messages not destined for me
+				if (data.id != extensionMe) {
+					return;
+				}
+				
+				clearScreen();
 
-								$('#dbgtxt').html('<span style="color:green">populate-destexten</span><br>' + JSON.stringify(data) + '<br>----------------<br>' + $('#dbgtxt').html());
-								//filter out messages not destined for me
-								if (data.id != extensionMe) {
-									$('#dbgtxt').html('<br><span style="color:red">IGNORED -> new-caller: ' + data.id + ', ' + extensionMe + '</span><br>' + $('#dbgtxt').html());
-									return;
-								}
-								clearScreen();
+				$('#callerFirstName').val(data.data[0].first_name);
+				$('#callerLastName').val(data.data[0].last_name);
+				$('#callerAddress1').val(data.data[0].address);
+				$('#callerCity').val(data.data[0].city);
+				$('#callerState').val(data.data[0].state);
+				$('#callerZipcode').val(data.data[0].zip_code);
+				$('#callerPhone').val(data.data[0].vrs);
+				$('#callerEmail').val(data.data[0].email);
 
-								//alert(data);
-								console.log("Received new-caller message");
-								$('#callerFirstName').val(data.data[0].first_name);
-								$('#callerLastName').val(data.data[0].last_name);
-								//$('#callerUniqueID').val(''); //set to blank for now
-								$('#callerAddress1').val(data.data[0].address);
-								$('#callerCity').val(data.data[0].city);
-								$('#callerState').val(data.data[0].state);
-								$('#callerZipcode').val(data.data[0].zip_code);
-								$('#callerPhone').val(data.data[0].vrs);
-								$('#callerEmail').val(data.data[0].email);
+				$('#inboundnumber').text(data.srcPhoneNum);
+				$('#outboundnumber').text($('#destexten').val());
 
-								$('#inboundnumber').text(data.srcPhoneNum);
-								$('#outboundnumber').text($('#destexten').val());
+				if (data.vrscaller) {
+					$('#inbounddhohlabel').show();
+				} else {
+					$('#outbounddhohlabel').show();
+				}
 
-								if (data.vrscaller) {
-									$('#inbounddhohlabel').show();
-								} else {
-									$('#outbounddhohlabel').show();
-								}
+				$('#duration').timer('reset');
+				inCall();
+			}).on('new-caller-general', function (data) { // a new general caller has connected
+				debugtxt('new-caller-general', data);
+				$('#duration').timer('reset');
+				inCallADGeneral();
+			}).on('new-caller-complaints', function (data) {
+				// a new complaints caller has connected
+				debugtxt('new-caller-complaints', data);
+				$('#duration').timer('reset');
+				inCallADComplaints();
+			}).on('new-ticket', function (data) {
+				debugtxt('new-ticket', data);
+				if (data.message === "success") {
+					clearScreen();
+					$('#callerFirstName').val(data.first_name);
+					$('#callerLastName').val(data.last_name);
+					$('#callerUniqueID').val('');
+					$('#callerAddress1').val(data.address);
+					$('#callerCity').val(data.city);
+					$('#callerState').val(data.state);
+					$('#callerZipcode').val(data.zip_code);
+					$('#callerPhone').val(data.vrs);
+					$('#callerEmail').val(data.email);
+					$('#ticketId').val(data.zendesk_ticket);
+					$('#subject').val(data.subject);
+					$('#problemdesc').val(data.description);
+					$('#duration').timer('reset');
 
-								$('#duration').timer('reset');
-								inCall();
-							});
-
-							// a new general caller has connected
-							socket.on('new-caller-general', function (data) {
-								//clearScreen();
-								$('#duration').timer('reset');
-								inCallADGeneral();
-							});	
-
-							// a new complaints caller has connected
-							socket.on('new-caller-complaints', function (data) {
-								//clearScreen();
-								$('#duration').timer('reset');
-								inCallADComplaints();
-							});							
-							
-							socket.on('new-ticket', function (data) {
-								if (data.message === "success") {
-									clearScreen();
-									$('#callerFirstName').val(data.first_name);
-									$('#callerLastName').val(data.last_name);
-									$('#callerUniqueID').val('');
-									$('#callerAddress1').val(data.address);
-									$('#callerCity').val(data.city);
-									$('#callerState').val(data.state);
-									$('#callerZipcode').val(data.zip_code);
-									$('#callerPhone').val(data.vrs);
-									$('#callerEmail').val(data.email);
-									$('#ticketId').val(data.zendesk_ticket);
-									$('#subject').val(data.subject);
-									$('#problemdesc').val(data.description);
-									$('#duration').timer('reset');
-
-									// Registers the agent to a private room with the vrs user.
-									socket.emit('register-vrs', {"vrs": data.vrs});
-								}
+					// Registers the agent to a private room with the vrs user.
+					socket.emit('register-vrs', {"vrs": data.vrs});
+				}
 
 
-							});
+			}).on('no-ticket-info', function (data) {
+				debugtxt('no-ticket-info', data);
+				$('#notickettxt').show();
+				$('#ticketTab').addClass("bg-pink");
+				ticketTabFade = setInterval(function () {
+					$('#ticketTab').fadeTo("slow", 0.1).fadeTo("slow", 1.0);
+				}, 1000);
+			}).on('chat-leave', function (data) {
+				debugtxt('chat-leave', data);
+				$('#duration').timer('pause');
+				$('#user-status').text('Wrap Up');
+				$('#status-icon').removeClass("text-green");
+				$('#status-icon').removeClass("text-yellow");
+				$('#status-icon').addClass("text-red");
+				$('#complaintsInCall').hide();
+				$('#geninfoInCall').hide();
+				socket.emit('wrapup', null);
+				socket.emit('chat-leave-ack', data);
+			}).on('populate-destexten', function (data) { // Node is populating the out number hidden field
+				debugtxt('populate-destexten', data);
+				//filter out messages not destined for me
+				if (data.id != extensionMe) {
+					return;
+				}
 
-							socket.on('chat-leave', function (data) {
-								$('#duration').timer('pause');
-								$('#user-status').text('Wrap Up');	
-								$('#complaintsInCall').hide();
-								$('#geninfoInCall').hide();
-								socket.emit('chat-leave-ack', data);
-							});
+				$('#destexten').val(data.destexten);
+				$('#outboundnumber').text(data.destexten);
+			}).on('call-ended', function (data) {
+				debugtxt('call-ended', data);
+				//END TIMER
+				$('#duration').timer('pause');
+				pauseQueues();
+			}).on('chat-message-new', function (data) {
+				debugtxt('chat-message-new', data);
+				var msg = data.message;
+				var displayname = data.displayname;
+				var timestamp = data.timestamp;
 
-							// Node is populating the out number hidden field
-							socket.on('populate-destexten', function (data) {
-								//alert(data);
+				msg = msg.replace(/:\)/, '<i class="fa fa-smile-o fa-2x"></i>');
+				msg = msg.replace(/:\(/, '<i class="fa fa-frown-o fa-2x"></i>');
 
-								$('#dbgtxt').html('<span style="color:green">populate-destexten</span><br>' + JSON.stringify(data) + '<br>----------------<br>' + $('#dbgtxt').html());
-								//filter out messages not destined for me
-								if (data.id != extensionMe) {
-									$('#dbgtxt').html('<br><span style="color:red">IGNORED -> populate-destexten: ' + data.id + '</span><br>' + $('#dbgtxt').html());
-									return;
-								}
+				var msgblock = document.createElement('div');
+				var msginfo = document.createElement('div');
+				var msgsender = document.createElement('span');
+				var msgtime = document.createElement('span');
+				var msgtext = document.createElement('div');
 
+				if ($("#txtAgentDisplayName").val() === displayname) {
+					$(msgsender).addClass("direct-chat-name pull-right").html(displayname).appendTo(msginfo);
+					$(msgtime).addClass("direct-chat-timestamp pull-left").html(timestamp).appendTo(msginfo);
+					$(msginfo).addClass("direct-chat-info clearfix").appendTo(msgblock);
+					$(msgtext).addClass("direct-chat-text").html(msg).appendTo(msgblock);
+					$(msgblock).addClass("direct-chat-msg right").appendTo($("#chat-messages"));
+				} else {
+					$('#rtt-typing').html('');
+					$(msgsender).addClass("direct-chat-name pull-left").html(displayname).appendTo(msginfo);
+					$(msgtime).addClass("direct-chat-timestamp pull-right").html(timestamp).appendTo(msginfo);
+					$(msginfo).addClass("direct-chat-info clearfix").appendTo(msgblock);
+					$(msgtext).addClass("direct-chat-text").html(msg).appendTo(msgblock);
+					$(msgblock).addClass("direct-chat-msg").appendTo($("#chat-messages"));
+				}
+				$("#chat-messages").scrollTop($("#chat-messages")[0].scrollHeight);
+			}).on('script-data', function (data) {
+				debugtxt('script-data', data);
+				assistanceURL = data.assistance;
+				for (var i in data.data) {
+					if (data.data[i].id === 1)
+						$('#info_script_content').val(data.data[i].text);
+					if (data.data[i].id === 2)
+						$('#complaints_script_content').val(data.data[i].text);
+				}
+			}).on('ad-zendesk', function (data) {
+				debugtxt('ad-zendesk', data);
+				//Place holders
+				//$('#assignee').val('');
+				//$('#requester').val('');
+				//$('#resolution').val('');
+				$('#ticketId').val(data.id);
+				$('#lastupdated').val(data.updated_at);
+				$('#subject').val(data.subject);
+				$('#problemdesc').val(data.description);
+			}).on('ad-vrs', function (data) {
+				debugtxt('ad-vrs', data);
+				$('#callerFirstName').val(data.data[0].first_name);
+				$('#callerLastName').val(data.data[0].last_name);
+				$('#callerPhone').val(data.data[0].vrs);
+				$('#callerAddress1').val(data.data[0].address);
+				$('#callerCity').val(data.data[0].city);
+				$('#callerState').val(data.data[0].state);
+				$('#callerZipcode').val(data.data[0].zip_code);
+				$('#callerEmail').val(data.data[0].email);
 
-								$('#destexten').val(data.destexten);
-								$('#outboundnumber').text(data.destexten);
-							});
-
-							socket.on('call-ended', function (data) {
-
-								$('#dbgtxt').html('<span style="color:green">call-ended</span><br>' + JSON.stringify(data) + '<br>----------------<br>' + $('#dbgtxt').html());
-								//filter out messages not destined for me
-								if (data.id != extensionMe) {
-									$('#dbgtxt').html('<br><span style="color:red">IGNORED -> call-ended: ' + data.id + '</span><br>' + $('#dbgtxt').html());
-									return;
-								}
-
-
-								console.log("Received call-ended message");
-								//END TIMER
-								$('#duration').timer('pause');
-								pauseQueues();
-							});
-
-							socket.on('chat-message-new', function (data) {
-								var msg = data.message;
-								var displayname = data.displayname;
-								var timestamp = data.timestamp;
-
-								msg = msg.replace(/:\)/, '<i class="fa fa-smile-o fa-2x"></i>');
-								msg = msg.replace(/:\(/, '<i class="fa fa-frown-o fa-2x"></i>');
-
-								var msgblock = document.createElement('div');
-								var msginfo = document.createElement('div');
-								var msgsender = document.createElement('span');
-								var msgtime = document.createElement('span');
-								var msgtext = document.createElement('div');
-
-								if ($("#txtAgentDisplayName").val() === displayname) {
-									$(msgsender).addClass("direct-chat-name pull-right").html(displayname).appendTo(msginfo);
-									$(msgtime).addClass("direct-chat-timestamp pull-left").html(timestamp).appendTo(msginfo);
-									$(msginfo).addClass("direct-chat-info clearfix").appendTo(msgblock);
-									$(msgtext).addClass("direct-chat-text").html(msg).appendTo(msgblock);
-									$(msgblock).addClass("direct-chat-msg right").appendTo($("#chat-messages"));
-								} else {
-									$('#rtt-typing').html('');
-
-									$(msgsender).addClass("direct-chat-name pull-left").html(displayname).appendTo(msginfo);
-									$(msgtime).addClass("direct-chat-timestamp pull-right").html(timestamp).appendTo(msginfo);
-									$(msginfo).addClass("direct-chat-info clearfix").appendTo(msgblock);
-									$(msgtext).addClass("direct-chat-text").html(msg).appendTo(msgblock);
-									$(msgblock).addClass("direct-chat-msg").appendTo($("#chat-messages"));
-								}
-								$("#chat-messages").scrollTop($("#chat-messages")[0].scrollHeight);
-							});
-
-							socket.on('script-data', function (data) {
-								assistanceURL = data.assistance;
-								for (var i in data.data) {
-									if (data.data[i].id === 1)
-										$('#info_script_content').val(data.data[i].text);
-									if (data.data[i].id === 2)
-										$('#complaints_script_content').val(data.data[i].text);
-								}
-							});
-
-							socket.on('ad-zendesk', function (data) {
-								//NOT READY
-								//$('#assignee').val('');
-								//$('#requester').val('');
-								//$('#resolution').val('');
-								$('#ticketId').val(data.id);
-								$('#lastupdated').val(data.updated_at);
-								$('#subject').val(data.subject);
-								$('#problemdesc').val(data.description);
-							});
-							
-							socket.on('ad-vrs', function (data) {
-								$('#callerFirstName').val(data.data[0].first_name);
-								$('#callerLastName').val(data.data[0].last_name);
-								$('#callerPhone').val(data.data[0].vrs);
-								$('#callerAddress1').val(data.data[0].address);
-								$('#callerCity').val(data.data[0].city);
-								$('#callerState').val(data.data[0].state);
-								$('#callerZipcode').val(data.data[0].zip_code);
-								$('#callerEmail').val(data.data[0].email);
-
-								$('#duration').timer('reset');
-								//inCallADComplaints();
-								
-								socket.emit('register-vrs', {"vrs": data.data[0].vrs});
-							});
-							
-							socket.on('missing-vrs', function (data) {
-								var userVrs = "";
-								//show modal to get VRS from user
-								$(".modal-backdrop").remove();
-								$('#myVrsModal').modal({ show:true, backdrop: 'static', keyboard: false });
-							});
-							
-							$('#submitvrs').on('click', function(event) {
-								event.preventDefault(); // To prevent following the link (optional)
-								$(".modal-backdrop").remove();
-								var ivrsnum = $('#ivrsnum').val();
-								socket.emit('input-vrs', {"vrs": ivrsnum, "extension" : extensionMe});
-							});
-						
-							socket.on('ad-zendesk-update-success', function (data) {
-								$('#alertPlaceholder').html('<div id="saveAlert" class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>Success!</div>');
-								$('#lastupdated').val(data.updated_at);
-								//$('#subject').val(data.subject);
-								//$('#problemdesc').val(data.description); 
-							});		
-
-							socket.on('ad-ticket-created', function (data) {
-								$('#alertPlaceholder').html('<div id="saveAlert" class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>Success!</div>');
-								$('#lastupdated').val("");
-								$('#subject').val(data.subject);
-								$('#problemdesc').val(data.description); 
-								$('#ticketId').val(data.zendesk_ticket); 
-							});								
-
-						}
-
-						$("#newchatmessage").on('change keydown paste input', function () {
-							var value = $("#newchatmessage").val();
-							var displayname = $('#txtAgentDisplayName').val();
-							var vrs = $('#callerPhone').val();
-
-							if (value.length > 0) {
-								socket.emit('chat-typing', {"displayname": displayname, "vrs": vrs, rttmsg: value});
-							} else {
-								socket.emit('chat-typing-clear', {"displayname": displayname, "vrs": vrs});
-							}
-						});			
-						
-						$('#chatsend').submit(function (evt) {
-							evt.preventDefault();
-
-							var msg = $('#newchatmessage').val();
-							var displayname = $('#txtAgentDisplayName').val();
-							var vrs = $('#callerPhone').val();
-							var date = moment();
-							var timestamp = date.format("D MMM h:mm a");
-
-							$('#newchatmessage').val('');
-							socket.emit('chat-message', {"message": msg, "timestamp": timestamp, "displayname": displayname, "vrs": vrs});
-						});
-						
-						function requestAssistance() {
-							$.ajax({
-								url: assistanceURL,
-								data: {
-									extension: extensionMe
-								},
-								type: 'GET',
-								dataType: 'json',
-								success: function (data) {
-									;
-								},
-								error: function (xhr, status, error) {
-									console.log('Error');
-								}
-							});							
-						}						
-						
-						function logout(msg) {
-							//clear the token from session storage
-							sessionStorage.clear();
-							//disconnect socket.io connection
-							if (socket)
-								socket.disconnect();
-							//display the login screen to the user.
-							if (msg) {
-								window.location.replace("/login.html?message=" + msg);
-							} else {
-								window.location.replace("/login.html");
-							}
-
+				$('#duration').timer('reset');
+				socket.emit('register-vrs', {"vrs": data.data[0].vrs});
+			}).on('missing-vrs', function (data) {
+				debugtxt('missing-vrs', data);
+				//show modal to get VRS from user
+				$(".modal-backdrop").remove();
+				if (data.message) {
+					$('#ivrsmessage').text(data.message);
+					$('#ivrsmessage').show();
+				}
+				$('#myVrsModal').modal({show: true, backdrop: 'static', keyboard: false});
+			}).on('ad-zendesk-update-success', function (data) {
+				debugtxt('ad-zendesk-update-success', data);
+				$('#alertPlaceholder').html('<div id="saveAlert" class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>Success!</div>');
+				$('#lastupdated').val(data.updated_at);
+			}).on('ad-ticket-created', function (data) {
+				debugtxt('ad-ticket-created', data);
+				$('#alertPlaceholder').html('<div id="saveAlert" class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>Success!</div>');
+				$('#lastupdated').val("");
+				$('#subject').val(data.subject);
+				$('#problemdesc').val(data.description);
+				$('#ticketId').val(data.zendesk_ticket);
+			}).on('agent-status-list', function (data) {
+				//debugtxt('agent-status-list', data);
+				var name, status, extension, queues, tabledata;
+				if(data.message === "success"){
+					tabledata = {data:[]};
+					for(var i = 0; i < data.agents.length; i++ ){
+						var name, status, extension, queues = "";
+						name = data.agents[i].name;
+						status = data.agents[i].status;
+						if(status === "READY"){
+							status = "<div style='display:inline-block'><i class='fa fa-circle text-green'></i>&nbsp;&nbsp;Ready</div>";
+						}else if(status === "AWAY"){
+							status = "<div style='display:inline-block'><i class='fa fa-circle text-yellow'></i>&nbsp;&nbsp;Away</div>";
+						}else if(status === "INCALL"){
+							status = "<div style='display:inline-block'><i class='fa fa-circle text-red'></i>&nbsp;&nbsp;In Call</div>";
+						}else if(status === "WRAPUP"){
+							status = "<div style='display:inline-block'><i class='fa fa-circle text-red'></i>&nbsp;&nbsp;Wrap Up</div>";
+						}else{
+							status = "<div style='display:inline-block'><i class='fa fa-circle text-white'></i>&nbsp;&nbsp;Unknown</div>";
 						}
 						
-						function modifyTicket() {
-							var id = $('#ticketId').val();
-							var subject = $('#subject').val();
-							var description = $('#problemdesc').val();
-							var resolution = $('#resolution').val();
-							var fname = $('#callerFirstName').val();
-							var email = $('#callerEmail').val(); //
-							var phone = $('#callerPhone').val();
-							var lname = $('#callerLastName').val();
-							
-							if (id.trim() === "") {
-								socket.emit('ad-ticket', {"destexten": extensionMe, "vrs" : phone, "status" : "new", "ticketId": id, "subject": subject, "description": description, "name" : fname, "email" : email, "phone" : phone, "last_name" : lname , "resolution" : resolution, "comment": {"public": true,"body": description}});	
-							} else {
-								socket.emit('modify-ticket', {"destexten": extensionMe, "vrs" : phone, "status" : "new", "ticketId": id, "subject": subject, "description": description, "name" : fname, "email" : email, "phone" : phone, "last_name" : lname , "resolution" : resolution, "comment": {"public": true,"body": description}});	
-							}
-
+						extension = data.agents[i].extension;
+						for(var j = 0; j < data.agents[i].queues.length; j++){
+							queues += data.agents[i].queues[j].queuename + "<br>";
 						}
+						queues = queues.replace(/<br>\s*$/, "");
+						tabledata['data'].push({"status":status,"name":name,"extension":extension,"queues":queues});					
+					}
+					
+					$('#agenttable').dataTable().fnClearTable();
+					$('#agenttable').dataTable().fnAddData(tabledata.data);													
+				}
+			});
 
-						function inCall() {
-							$('#user-status').text('In Call');
-							$('#status-icon').removeClass("text-green");
-							$('#status-icon').addClass("text-red");
-							var param1 = [{"Interface": "SIP/" + extensionMe, "Queue": ""}, {"Interface": "", "Queue": ""}];
-							socket.emit('pause-queues', param1);
-						}
 
-						function inCallADComplaints() {
-							pauseQueues();
-							$('#user-status').text('In Call');
-							$('#status-icon').removeClass("text-green");
-							$('#status-icon').removeClass("text-yellow");
-							$('#status-icon').addClass("text-red");
-							$('#complaintsInCall').show();
-						}	
+		}
+		
+		$('#agenttable').DataTable( {
+			aaData: null,
+			aoColumns: [
+				{ "mDataProp": "status" },
+				{ "mDataProp": "name" },
+				{ "mDataProp": "extension" },
+				{ "mDataProp": "queues" }
+			],
+			searching: false,
+			paging: false,
+			scrollY: 600,
+			order: []					
+		} );
 
-						function inCallADGeneral() {
-							pauseQueues();
-							$('#user-status').text('In Call');
-							$('#status-icon').removeClass("text-green");
-							$('#status-icon').removeClass("text-yellow");
-							$('#status-icon').addClass("text-red");
-							$('#geninfoInCall').show();
-						}						
+		$("#ivrsnum").keyup(function (event) {
+			if (event.keyCode == 13) {
+				$("#submitvrs").click();
+			}
+		});
 
-						function pauseQueues() {
-							$('#user-status').text('Away');
-							$('#status-icon').removeClass("text-green");
-							$('#status-icon').addClass("text-yellow");
+		$('#submitvrs').on('click', function (event) {
+			event.preventDefault(); // To prevent following the link (optional)
+			var ivrsnum = $('#ivrsnum').val().replace(/^1|[^\d]/g, '');
+			if (ivrsnum.length === 10) {
+				$(".modal-backdrop").remove();
+				socket.emit('input-vrs', {"vrs": ivrsnum, "extension": extensionMe});
+				$('#ivrsnum').removeClass('has-error');
+				$('#ivrsmessage').text('');
+				$('#ivrsmessage').hide();
+				$('#myVrsModal').modal('hide');
+			} else {
+				$('#ivrsnum').addClass('has-error');
+				$('#ivrsmessage').text('Invalid phone number format');
+				$('#ivrsmessage').show();
+			}
+		});
 
-							socket.emit('pause-queues', null);
-							socket.emit('away', null);
-						}
 
-						function unpauseQueues() {
-							$('#user-status').text('Ready');
-							$('#status-icon').removeClass("text-yellow");
-							$('#status-icon').addClass("text-green");
+		$("#newchatmessage").on('change keydown paste input', function () {
+			var value = $("#newchatmessage").val();
+			var displayname = $('#txtAgentDisplayName').val();
+			var vrs = $('#callerPhone').val();
 
-							socket.emit('unpause-queues', null);
-							socket.emit('ready', null);
-						}
+			if (value.length > 0) {
+				socket.emit('chat-typing', {"displayname": displayname, "vrs": vrs, rttmsg: value});
+			} else {
+				socket.emit('chat-typing-clear', {"displayname": displayname, "vrs": vrs});
+			}
+		});
 
-						function finished() {
-							$('#destexten').val('');
-							clearScreen();
-							unpauseQueues();
-							  $('#alertPlaceholder').html('');
-						}
+		$('#chatsend').submit(function (evt) {
+			evt.preventDefault();
 
-						function clearScreen() {
-							$('#userform').find('input:text').val('');
-							$('#callerEmail').val('');
+			var msg = $('#newchatmessage').val();
+			var displayname = $('#txtAgentDisplayName').val();
+			var vrs = $('#callerPhone').val();
+			var date = moment();
+			var timestamp = date.format("D MMM h:mm a");
 
-							$('#callinfodiv').find('input:text').val('');
+			$('#newchatmessage').val('');
+			socket.emit('chat-message', {"message": msg, "timestamp": timestamp, "displayname": displayname, "vrs": vrs});
+		});
 
-							$('#inbounddhohlabel').hide();
-							$('#outbounddhohlabel').hide();
+		$('#ticketTabTitle').click(function () {
+			$('#ticketTab').removeClass("bg-pink");
+			clearInterval(ticketTabFade);
+		});
 
-							$('#outboundnumber').text('');
-							$('#inboundnumber').text('');
+		function requestAssistance() {
+			$.ajax({
+				url: assistanceURL,
+				data: {
+					extension: extensionMe
+				},
+				type: 'GET',
+				dataType: 'json',
+				success: function (data) {
+					;
+				},
+				error: function (xhr, status, error) {
+					console.log('Error');
+				}
+			});
+		}
 
-							$('#duration').timer('reset');
-							$('#duration').timer('pause');
+		function logout(msg) {
+			//clear the token from session storage
+			sessionStorage.clear();
+			//disconnect socket.io connection
+			if (socket)
+				socket.disconnect();
+			//display the login screen to the user.
+			if (msg) {
+				window.location.replace("/login.html?message=" + msg);
+			} else {
+				window.location.replace("/login.html");
+			}
 
-							$('#chat-messages').html('');
-							$('#newchatmessage').val('');
+		}
 
-							$('#ticketForm').find('input:text').val('');
-							$('#ticketForm').find('textarea').val('');
+		function modifyTicket() {
+			$('#notickettxt').hide();
+			var id = $('#ticketId').val();
+			var subject = $('#subject').val();
+			var description = $('#problemdesc').val();
+			var resolution = $('#resolution').val();
+			var fname = $('#callerFirstName').val();
+			var email = $('#callerEmail').val(); //
+			var phone = $('#callerPhone').val();
+			var lname = $('#callerLastName').val();
 
-							$('#complaintsInCall').hide();
-							$('#geninfoInCall').hide();
+			if (id.trim() === "") {
+				var ticket = {"destexten": extensionMe, "vrs": phone, "status": "new", "ticketId": id, "subject": subject, "description": description, "name": fname, "email": email, "phone": phone, "last_name": lname, "resolution": resolution, "comment": {"public": true, "body": description}};				
+				socket.emit('ad-ticket', ticket);
+			} else {
+				socket.emit('modify-ticket', {"destexten": extensionMe, "vrs": phone, "status": "new", "ticketId": id, "subject": subject, "description": description, "name": fname, "email": email, "phone": phone, "last_name": lname, "resolution": resolution, "comment": {"public": true, "body": description}});
+			}
 
-						}
+		}
 
-						function originate() {
-							//send username and number to call
-							console.log(" ******************* Connecting Call *******************");
-							socket.emit('outbound-call', {"username": $('#loginusername').val(), "exten": $('#destexten').val()}); //TODO: hard-coded exten for now
-						}
+		function inCall() {
+			$('#user-status').text('In Call');
+			$('#status-icon').removeClass("text-green");
+			$('#status-icon').addClass("text-red");
+			var param1 = [{"Interface": "SIP/" + extensionMe, "Queue": ""}, {"Interface": "", "Queue": ""}];
+			socket.emit('pause-queues', param1);
+		}
 
-						function cleardbgtxt() {
-							$('#dbgtxt').html('');
-							//$('#dbgtxt').html('<span style="color:green">call-ended</span><br>kjfsad fdlf sdlk jdslf lasf slfsdal slk skldjfsalfj alkfjsa lfj<br>----------------' + $('#dbgtxt').html());
-							//$('#dbgtxt').html('<br><span style="color:red">IGNORED -> new-caller: </span><br>' + $('#dbgtxt').html());
-						}
+		function inCallADComplaints() {
+			pauseQueues();
+			$('#user-status').text('In Call');
+			$('#status-icon').removeClass("text-green");
+			$('#status-icon').removeClass("text-yellow");
+			$('#status-icon').addClass("text-red");
+			$('#complaintsInCall').show();
+			socket.emit('incall', null);
+		}
 
-						$(document).ready(function () {
-							connect_socket();
+		function inCallADGeneral() {
+			pauseQueues();
+			$('#user-status').text('In Call');
+			$('#status-icon').removeClass("text-green");
+			$('#status-icon').removeClass("text-yellow");
+			$('#status-icon').addClass("text-red");
+			$('#geninfoInCall').show();
+			socket.emit('incall', null);
+		}
 
-							$("#debugtab").hide();
-							$('#scriptstab').hide();
-							$("#geninfotab").hide();
-							$("#complaintstab").hide();
-							
-							//$('#myVrsModal').modal({ show:true, backdrop: 'static', keyboard: false });	//TESTING							
-							
-							clearScreen();
+		function pauseQueues() {
+			$('#user-status').text('Away');
+			$('#status-icon').removeClass("text-green");
+			$('#status-icon').addClass("text-yellow");
 
-							$.getJSON("licenses.json", function (data) {
-								$.each(data.license, function (i) {
-									$("#licModalBody").append("<h3>" + data.license[i].name + "<h3><pre>" + data.license[i].pre + "</pre>");
-								});
-							});
+			socket.emit('pause-queues', null);
+			socket.emit('away', null);
+		}
 
-							if (window.addEventListener) {
-								var state = 0, theCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
-								window.addEventListener("keydown", function (e) {
-									if (e.keyCode === theCode[state]) {
-										state++;
-									} else {
-										state = 0;
-									}
-									if (state === 10) {
-										$("#debugtab").show();
-									}
-								}, true);
-							}
-						});
+		function unpauseQueues() {
+			$('#user-status').text('Ready');
+			$('#status-icon').removeClass("text-yellow");
+			$('#status-icon').addClass("text-green");
+
+			socket.emit('unpause-queues', null);
+			socket.emit('ready', null);
+		}
+
+		function finished() {
+			$('#destexten').val('');
+			clearScreen();
+			unpauseQueues();
+			$('#alertPlaceholder').html('');
+		}
+
+		function clearScreen() {
+			$('#userform').find('input:text').val('');
+			$('#callerEmail').val('');
+
+			$('#callinfodiv').find('input:text').val('');
+
+			$('#inbounddhohlabel').hide();
+			$('#outbounddhohlabel').hide();
+
+			$('#outboundnumber').text('');
+			$('#inboundnumber').text('');
+
+			$('#duration').timer('reset');
+			$('#duration').timer('pause');
+
+			$('#chat-messages').html('');
+			$('#newchatmessage').val('');
+
+			$('#ticketForm').find('input:text').val('');
+			$('#ticketForm').find('textarea').val('');
+
+			$('#complaintsInCall').hide();
+			$('#geninfoInCall').hide();
+
+			$('#ivrsnum').val('');
+			$('#ivrsmessage').hide();
+
+			$('#notickettxt').hide();
+			$('#ticketTab').removeClass("bg-pink");
+			clearInterval(ticketTabFade);
+		}
+
+		function originate() {
+			//send username and number to call
+			console.log(" ******************* Connecting Call *******************");
+			socket.emit('outbound-call', {"username": $('#loginusername').val(), "exten": $('#destexten').val()}); //TODO: hard-coded exten for now
+		}
+		
+		$(document).ready(function () {
+			connect_socket();
+						
+			$("#debugtab").hide();
+			$('#scriptstab').hide();
+			$("#geninfotab").hide();
+			$("#complaintstab").hide();
+			$("[data-mask]").inputmask();				
+
+			clearScreen();
+
+			$.getJSON("licenses.json", function (data) {
+				$.each(data.license, function (i) {
+					$("#licModalBody").append("<h3>" + data.license[i].name + "<h3><pre>" + data.license[i].pre + "</pre>");
+				});
+			});
+
+			if (window.addEventListener) {
+				var state = 0, theCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+				window.addEventListener("keydown", function (e) {
+					if (e.keyCode === theCode[state]) {
+						state++;
+					} else {
+						state = 0;
+					}
+					if (state === 10) {
+						$("#debugtab").show();
+					}
+				}, true);
+			}
+		});
+		
+		// Debug Functions for sidebar.
+		function cleardbgtxt() {
+			$('#dbgtxt').html('');
+		}
+		function debugtxt(title, data) {
+			var dt = new Date();
+			var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+			$('#dbgtxt').html('<span style="color:green">' + time + ": " + title + '</span><br>' + JSON.stringify(data) + '<br>----------------<br>' + $('#dbgtxt').html());
+		}
         </script>
     </body>
 </html>

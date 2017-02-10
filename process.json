@@ -1,10 +1,5 @@
 {
 	"apps": [{
-			"name": "ACE Connect Lite: 8004",
-			"script": "./aclserver.js",
-			"error_file": "./logs/aclserver.log",
-			"out_file": "./logs/aclserver.log"
-		},{
 			"name": "ACE Direct: 8005",
 			"script": "./adserver.js",
 			"error_file": "./logs/adserver.log",

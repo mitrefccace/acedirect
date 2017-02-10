@@ -119,7 +119,7 @@
 											<div class="col-lg-12">
 												<div class="form-group">
 													<label class="control-label">Subject</label>
-													<input type="text" class="form-control" id="subject" autocomplete="off" maxlength="80" placeholder="Max of 80 characters" required/>
+													<input type="text" class="form-control" id="subject" autocomplete="off" maxlength="150" placeholder="Max of 150 characters" required/>
 												</div>
 											</div>
 										</div>
@@ -127,7 +127,7 @@
 											<div class="col-lg-12">
 												<div class="form-group">
 													<label class="control-label">Description of Complaint</label>
-													<textarea class="form-control" id="complaint" rows="10" maxlength="500" required></textarea>
+													<textarea class="form-control" id="complaint" rows="10" maxlength="2000" required></textarea>
 													<p>You have <span id="complaintcounter"></span> characters left.</p>
 												</div>
 											</div>
@@ -191,7 +191,7 @@
 									<form name="chatsend" id="chatsend">
 										<div class="input-group">
 											<input type="hidden" id="displayname">
-											<input type="text" id="newchatmessage" placeholder="Type Message ..." class="form-control" maxlength="140" autocomplete="off" required>
+											<input type="text" id="newchatmessage" placeholder="Type Message ..." class="form-control" maxlength="500" autocomplete="off" required>
 											<span class="input-group-btn">
 												<button  class="btn btn-primary btn-flat" type="submit">Send</button>
 											</span>																						
@@ -291,7 +291,7 @@
 					<input id="sip_uri" tabindex="2" type="text"  />
 
 					<label>SIP password</label>
-					<input id="sip_password" tabindex="3" type="password"  />
+					<input id="sip_password" tabindex="3" type="password" autocomplete="off" />
 
 					<label>WS URI</label>
 					<input id="ws_servers" tabindex="4" type="text"  />
@@ -471,7 +471,7 @@
 					    logout();
 				    console.log('connect_socket to ');
 				    console.log(window.location.host);
-				    socket = io.connect('http://' + window.location.host, {
+				    socket = io.connect('https://' + window.location.host, {
 					    query: 'token=' + sessionStorage.accesstoken,
 					    forceNew: true
 				    });
@@ -496,7 +496,7 @@
 
 
 
-				    }).on('ad-ticket-created', function (data) { //NEW CASE TODO
+				    }).on('ad-ticket-created', function (data) { 
 					    console.log("got ad-ticket-created");						
 						$('#userformoverlay').removeClass("overlay").hide();
 						if(data.zendesk_ticket){
@@ -513,10 +513,10 @@
 							$('#authorization_user').val(data.extension);
 							$('#login_display_name').val(data.extension);
 							$('#display_name').val(data.extension);
-							$('#sip_uri').val("sip:" + data.extension + "@" + data.asterisk_ip);
+							$('#sip_uri').val("sip:" + data.extension + "@" + data.asterisk_public_hostname);
 
 							$('#sip_password').val(data.password);
-							$('#ws_servers').val("wss://" + data.asterisk_ip + ":" + data.ws_port + "/ws");
+							$('#ws_servers').val("wss://" + data.asterisk_public_hostname +"/ws");
 							$('#peerconnection_config').val('{ "iceServers": [ {"urls": ["stun:' + data.stun_server + '"]} ], "gatheringTimeout": 9000 }');
 							$('#dialboxnumber').val(data.queues_complaint_number);
 
@@ -637,7 +637,7 @@
 				    var timestamp = date.format("D MMM h:mm a");
 
 				    $('#newchatmessage').val('');
-				    $('#chatcounter').text('140');
+				    $('#chatcounter').text('500');
 				    console.log("sent message");
 				    isTyping = false;
 				    socket.emit('chat-message', {"message": msg, "timestamp": timestamp, "displayname": displayname});
@@ -656,11 +656,12 @@
 				    
 					$('#complaint').simplyCountable({
 					    counter: '#complaintcounter',
-					    maxCount: 500,
+					    maxCount: 2000,
 					    strictMax: true
 				    });
 				    $('#newchatmessage').simplyCountable({
 					    counter: '#chatcounter',
+						maxCount: 500,
 					    strictMax: true
 				    });
 				    connect_socket();
