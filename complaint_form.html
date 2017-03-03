@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Consumer Complaint Form</title>
+	<!-- Tell the browser to be responsive to screen width -->
+	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+	<!-- Bootstrap 3.3.5 -->
+	<link rel="stylesheet" href="./bower_components/AdminLTE/bootstrap/css/bootstrap.css">
+	<!-- Bootstrap Toggle v2.2.0 -->
+	<link rel="stylesheet" href="./bower_components/bootstrap-toggle/css/bootstrap-toggle.css">
+	<!-- Font Awesome -->
+	<link rel="stylesheet" href="./bower_components/font-awesome/css/font-awesome.min.css">
+	<!-- Ionicons -->
+	<link rel="stylesheet" href="./bower_components/Ionicons/css/ionicons.min.css">
+	<!-- Theme style -->
+	<link rel="stylesheet" href="./bower_components/AdminLTE/dist/css/AdminLTE.css">
+	<!-- AdminLTE Skins  -->
+	<link rel="stylesheet" href="./bower_components/AdminLTE/dist/css/skins/_all-skins.min.css">
+	<!-- JSSIP CLIENT -->
+	<link rel="stylesheet" href="./jssipclient/css/style.css" type="text/css" />
+	<!-- Custom Portal stylesheet -->
+	<link rel="stylesheet" href="./css/ca-portal.css">
+
+	<style>
+
+	</style>
+	<script>
+		if (sessionStorage.getItem('accesstoken') === null)
+			window.location.replace("/complaint.html");
+	</script>
+
+
+</head>
+
+<body class="hold-transition skin-blue-light layout-top-nav">
+
+	<div class="wrapper">
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper">
+			<!-- Content Header (Page header) -->
+			<section class="content-header">
+				<h1>Consumer Complaint Form</h1>
+
+			</section>
+			<!-- Main content -->
+			<section class="content">
+				<!-- Main Row -->
+				<div class="row">
+					<section class="col-lg-12">
+						<div class="box">
+							<div class="box-header with-border">
+								<h3 class="box-title">VRS Information</h3>
+								<div class="box-tools pull-right">
+									<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+								</div>
+							</div>
+							<!-- /.box-header -->
+							<div class="box-body">
+								<div class="row">
+									<div class="col-lg-3">
+										<div class="form-group">
+											<label class="control-label">First Name</label>
+											<div>
+												<input type="text" class="form-control" id="firstName" name="fname" readonly/>
+											</div>
+										</div>
+									</div>
+									<div class="col-lg-3">
+										<div class="form-group">
+											<label class="control-label">Last Name</label>
+											<input type="text" class="form-control" id="lastName" readonly/>
+										</div>
+									</div>
+									<div class="col-lg-3">
+										<div class="form-group">
+											<label class="control-label">Phone</label>
+											<div id="input-group" class="input-group">
+												<div class="input-group-addon">
+													<i class="fa fa-phone"></i>
+												</div>
+												<input type="text" class="form-control" id="callerPhone" name="phone" data-inputmask="'mask': '(999) 999-9999'" data-mask
+													readonly/>
+											</div>
+										</div>
+									</div>
+									<div class="col-lg-3">
+										<div class="form-group">
+											<label class="control-label">Email</label>
+											<div id="input-group" class="input-group">
+												<div class="input-group-addon">
+													<i class="fa fa-envelope"></i>
+												</div>
+												<input type="email" class="form-control" id="callerEmail" name="email" required readonly/>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</section>
+				</div>
+				<div class="row">
+					<!-- Left Col -->
+					<section class="col-lg-4">
+						<div class="box">
+							<div class="box-header with-border">
+								<i class="fa fa-exclamation-triangle"></i>
+								<h3 class="box-title">Complaint Ticket: </h3>
+								<span class="box-title" id="ticketNumber"></span>
+								<div class="box-tools pull-right">
+									<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+								</div>
+							</div>
+							<!-- /.box-header -->
+							<div class="box-body">
+								<form name="userform" id="userform">
+									<div class="row">
+										<div class="col-lg-12">
+											<div class="form-group">
+												<label class="control-label">Subject</label>
+												<input type="text" class="form-control" id="subject" autocomplete="off" maxlength="150" placeholder="Max of 150 characters"
+													required/>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-lg-12">
+											<div class="form-group">
+												<label class="control-label">Description of Complaint</label>
+												<textarea class="form-control" id="complaint" rows="10" maxlength="2000" required></textarea>
+												<p>You have <span id="complaintcounter"></span> characters left.</p>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="form-group text-center">
+											<button id='userformbtn' class="btn btn-success" type="submit">
+													Submit
+												</button>
+											<button class="btn btn-primary" id="callbutton" type="button" disabled>
+													Call
+												</button>
+										</div>
+									</div>
+								</form>
+							</div>
+							<div id="userformoverlay" hidden>
+								<i class="fa fa-refresh fa-spin"></i>
+							</div>
+						</div>
+					</section>
+					<!-- Middle Col -->
+					<section class="col-lg-5">
+						<div class="box">
+							<div class="box-header with-border">
+								<i class="fa fa-video-camera"></i>
+								<h3 class="box-title">Video</h3>
+								<div class="box-tools pull-right">
+									<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+										</button>
+								</div>
+							</div>
+							<div class="box-body">
+								<div id="webcam" hidden>
+									<video id="remoteView" autoplay poster="jssipclient/images/AD-logo.png"></video>
+									<video id="selfView" autoplay muted="true"></video>
+								</div>
+								<div id="sessions"></div>
+								<div id="ws_reconnect"></div>
+								<div id="unregister_all"></div>
+							</div>
+						</div>
+					</section>
+					<!-- Right Col -->
+					<section class="col-lg-3">
+						<div class="box direct-chat direct-chat-primary">
+							<div class="box-header with-border">
+								<i class="fa fa-comments"></i>
+								<h3 class="box-title">Agent Chat</h3>
+								<div class="box-tools pull-right">
+									<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+										</button>
+								</div>
+							</div>
+							<div class="box-body">
+								<!-- Conversations are loaded here -->
+								<div class="direct-chat-messages" id="chat-messages"></div>
+								<div class="direct-chat-timestamp text-bold" id="rtt-typing" style="margin-left: 10px; min-height: 20px"></div>
+							</div>
+							<div class="box-footer">
+								<form name="chatsend" id="chatsend">
+									<div class="input-group">
+										<input type="hidden" id="displayname">
+										<input type="text" id="newchatmessage" placeholder="Type Message ..." class="form-control" maxlength="500" autocomplete="off"
+											required>
+											<span class="input-group-btn">
+												<button  class="btn btn-primary btn-flat" type="submit">Send</button>
+											</span>
+									</div>
+								</form>
+								<p>You have <span id="chatcounter"></span> characters left.</p>
+							</div>
+						</div>
+					</section>
+				</div>
+				<!-- /.row -->
+			</section>
+			<!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+
+		<footer class="main-footer">
+			<div class="pull-right hidden-xs">
+				<b>Version</b> 1.0
+			</div>
+			<strong>Copyright &copy; 2016.</strong> All rights reserved.
+		</footer>
+
+		<!-- Control Sidebar -->
+
+		<!-- Add the sidebar's background. This div must be placed
+			     immediately after the control sidebar -->
+		<div class="control-sidebar-bg" style="width:400px; right:-400px"></div>
+
+	</div>
+	<!-- ./wrapper -->
+
+	<!-- Glass Panel -->
+	<div id='divGlassPanel' class='glass-panel' style='visibility:hidden'></div>
+
+	<!-- License Modal -->
+	<div class="modal fade" id="licModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					<h4 class="modal-title" id="licModalLabel">Copyright Notices</h4>
+				</div>
+				<div class="modal-body">
+					<div id="licModalBody"></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+	<!--Call Ended Modal -->
+	<div class="modal fade" id="callEndedModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body" style="text-align: center">
+					<h1>CALL HAS ENDED</h1>
+					<h4> Redirecting to FCC.gov ...</h4>
+				</div>
+				<div class="modal-footer">
+					<p>If not redirected, <a href="http://www.fcc.gov"><span>CLICK HERE</span></a></p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--Zen Desk Outage Modal -->
+	<div class="modal fade" id="ZenDeskOutageModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body" style="text-align: center">
+					<h1>Ticketing System Outage</h1>
+					<h4>The complaint ticketing system is currently experiencing an outage.<br>Please try again in a few minutes.</h4>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+	<div hidden>
+		<div id="login-full-background" style="background-color:#87CEFA" hidden></div>
+
+		<div id="login-box" hidden>
+
+			<form id="login-form" action="/">
+				<label>Name</label>
+				<input id="display_name" tabindex="1" type="text" />
+
+				<label>SIP URI</label>
+				<input id="sip_uri" tabindex="2" type="text" />
+
+				<label>SIP password</label>
+				<input id="sip_password" tabindex="3" type="password" autocomplete="off" />
+
+				<label>WS URI</label>
+				<input id="ws_servers" tabindex="4" type="text" />
+
+				<input type="submit" value="Register" />
+			</form>
+
+			<form id="login-form-from-invitation" action="/">
+				<label>Write your name and press Enter</label>
+				<input class="display_name" id="login_display_name" type="text" />
+				<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" />
+			</form>
+
+			<div id="advanced-settings-link">
+				<a href="#">advanced settings</a>
+			</div>
+
+			<div id="advanced-settings">
+				<div class="close"></div>
+
+				<form id="advanced-settings-form" action="/">
+					<table>
+						<tr>
+							<td>&nbsp;</td>
+							<td>&nbsp;</td>
+						</tr>
+						<tr>
+							<td class="label"><label>authorization_user</label></td>
+							<td class="value"><input type="text" id='authorization_user' name="authorization_user" /></td>
+						</tr>
+						<tr>
+							<td class="label"><label>register</label></td>
+							<td class="value"><input type="checkbox" name="register" checked></td>
+						</tr>
+						<tr>
+							<td class="label"><label>register_expires</label></td>
+							<td class="value"><input type="text" name="register_expires" value="600"></td>
+						</tr>
+						<tr>
+							<td class="label"><label>registrar_server</label></td>
+							<td class="value"><input type="text" name="registrar_server"></td>
+						</tr>
+						<tr>
+							<td class="label"><label>no_answer_timeout</label></td>
+							<td class="value"><input type="text" name="no_answer_timeout" value="60"></td>
+						</tr>
+						<tr>
+							<td class="label"><label>session_timers</label></td>
+							<td class="value"><input type="checkbox" name="session_timers" checked/></td>
+						</tr>
+						<tr>
+							<td class="label"><label>peerconnection_config (use JSON)</label></td>
+							<td class="value"><input type="text" id="peerconnection_config" name="peerconnection_config" /></td>
+						</tr>
+						<tr>
+							<td class="label"><label>use_preloaded_route</label></td>
+							<td class="value"><input type="checkbox" name="use_preloaded_route" /></td>
+						</tr>
+						<tr>
+							<td class="label"><label>connection_recovery_min_interval</label></td>
+							<td class="value"><input type="text" name="connection_recovery_min_interval" value="2"></td>
+						</tr>
+						<tr>
+							<td class="label"><label>connection_recovery_max_interval</label></td>
+							<td class="value"><input type="text" name="connection_recovery_max_interval" value="30"></td>
+						</tr>
+						<tr>
+							<td class="label"><label>hack_via_tcp</label></td>
+							<td class="value"><input type="checkbox" name="hack_via_tcp"></td>
+						</tr>
+						<tr>
+							<td class="label"><label>hack_via_ws</label></td>
+							<td class="value"><input type="checkbox" name="hack_via_ws"></td>
+						</tr>
+						<tr>
+							<td class="label"><label>hack_ip_in_contact</label></td>
+							<td class="value"><input type="checkbox" name="hack_ip_in_contact"></td>
+						</tr>
+					</table>
+					<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" />
+				</form>
+			</div>
+		</div>
+
+		<div id="phone-page">
+
+			<div id="phone" hidden>
+
+				<div class="status">
+					<div id="conn-status">
+						<span class="field">status: </span>
+						<span class="value"></span>
+					</div>
+					<div hidden>
+						<span class="field">enable video: </span>
+						<input type="checkbox" id="enableVideo" checked disabled/>
+					</div>
+					<div hidden>
+						<span class="field">user: </span>
+						<span class="value user"></span>
+					</div>
+				</div>
+
+				<div class="controls">
+
+					<div class="ws-disconnected"></div>
+
+					<div class="dialbox">
+						<input type="hidden" id="dialboxnumber" class="destination" style="color: black !important;" />
+						<div class="to" style="color: black !important; ">To:</div>
+						<div class="dial-buttons">
+							<div class="button call" id="dialboxcallbtn" style="color: black !important; background-color: lightblue !important;">call</div>
+						</div>
+					</div>
+				</div>
+				<!-- .controls -->
+			</div>
+			<!-- #phone -->
+		</div>
+
+	</div>
+	<!-- phone-page -->
+	<!-- ==================Le javascript ================================ -->
+	<!-- jQuery v2.1.4 -->
+	<script type="text/javascript" src="./bower_components/AdminLTE/plugins/jQuery/jquery-2.2.3.min.js"></script>
+	<!-- socket.io-client -->
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+	<!-- Bootstrap 3.3.5 -->
+	<script type="text/javascript" src="./bower_components/bootstrap/dist/js/bootstrap.js"></script>
+	<!-- Decode JWT tokens -->
+	<script type="text/javascript" src="./bower_components/jwt-decode/build/jwt-decode.min.js"></script>
+	<!-- timer.jquery 0.6.3 -->
+	<script type="text/javascript" src='./bower_components/timer.jquery/dist/timer.jquery.min.js'></script>
+	<!-- simply countable -->
+	<script type="text/javascript" src='./bower_components/jquery-simply-countable/jquery.simplyCountable.js'></script>
+	<!-- moment.js 2.15.1 -->
+	<script type="text/javascript" src='./bower_components/moment/moment.js'></script>
+	<!-- AdminLTE App -->
+	<script type="text/javascript" src="./bower_components/AdminLTE/dist/js/app.min.js"></script>
+	<!-- Jquery input mask -->
+	<script type="text/javascript" src="./bower_components/AdminLTE/plugins/input-mask/jquery.inputmask.js"></script>
+	<!-- JsSIP client -->
+	<script type="text/javascript" src="./jssipclient/js/react-with-addons.js"></script>
+	<script type="text/javascript" src="./jssipclient/js/JSXTransformer.js"></script>
+	<script type="text/jsx" src="./jssipclient/js/sessions.jsx"></script>
+	<script type="text/javascript" src="./jssipclient/js/jquery.balloon.min.js"></script>
+	<script type="text/javascript" src="./jssipclient/js/parseuri.js"></script>
+	<script type="text/javascript" src="./jssipclient/js/init.js"></script>
+	<script type="text/javascript" src="./jssipclient/js/gui.js"></script>
+	<script type="text/javascript" src="./jssipclient/js/iscomposing.js"></script>
+	<script type="text/javascript" src="./jssipclient/js/jssip.js"></script>
+	<script type="text/javascript" src="./jssipclient/js/rtcninja-temasys.min.js"></script>
+	<!-- Custom Javascript for ACEDirect complaint_form.html page-->
+	<script type="text/javascript" src="./js/complaint_form.js"></script>
+	<script>
+		if (window.rtcninjaTemasys) {
+			rtcninjaTemasys({}, {},
+				// alreadyInstalledCb
+				function () {
+					JsSIP.rtcninja({ plugin: rtcninjaTemasys });
+				},
+				// needInstallCb
+				function (data) {
+					alert('WebRTC plugin required');
+				},
+				// notRequiredCb
+				null
+			);
+		}
+	</script>
+</body>
+
+</html>

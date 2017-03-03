@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>ACE Direct</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+    <!-- Bootstrap 3.3.5 -->
+    <link rel="stylesheet" href="./bower_components/AdminLTE/bootstrap/css/bootstrap.css">
+    <!-- Bootstrap Toggle v2.2.0 -->
+    <link rel="stylesheet" href="./bower_components/bootstrap-toggle/css/bootstrap-toggle.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="./bower_components/font-awesome/css/font-awesome.min.css">
+    <!-- Ionicons -->
+    <link rel="stylesheet" href="./bower_components/Ionicons/css/ionicons.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="./bower_components/AdminLTE/dist/css/AdminLTE.css">
+    <!-- AdminLTE Skins  -->
+    <link rel="stylesheet" href="./bower_components/AdminLTE/dist/css/skins/_all-skins.min.css">
+    <!-- Custom Portal stylesheet -->
+    <link rel="stylesheet" href="./css/ca-portal.css">
+
+    <style>
+
+    </style>
+    <script>
+        if (sessionStorage.getItem('accesstoken') === null)
+            window.location.replace("/login.html");
+    </script>
+
+</head>
+
+<body class="hold-transition skin-purple sidebar-mini">
+    <div class="wrapper">
+
+        <header class="main-header">
+
+            <!-- Logo -->
+            <a href="" class="logo">
+                <!-- mini logo for sidebar mini 50x50 pixels -->
+                <span class="logo-mini"><b>ACE</b></span>
+                <!-- logo for regular state and mobile devices -->
+                <span class="logo-lg"><b>ACE</b>&nbsp;<span id="logo-text">Direct</span></span>
+            </a>
+
+            <!-- Header Navbar: style can be found in header.less -->
+            <nav class="navbar navbar-static-top" role="navigation">
+                <!-- Sidebar toggle button-->
+                <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+                    <span class="sr-only">Toggle navigation</span>
+                </a>
+                <div id="agentStatusInfo" class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-2 col-md-offset-2" style="white-space:nowrap;">
+                    <label class="control-label">Call Duration: </label>&nbsp;&nbsp;<span id="duration" class="text-gray">0 sec</span>
+                </div>
+                <div class="col-lg-1 col-md-1 col-sm-1 col-lg-offset-1 col-md-offset-1">
+                    <button id="assistanceBtn" type="button" class="btn btn-danger" style="overflow: hidden;text-overflow:ellipsis;" onclick="requestAssistance()">Assistance</button>
+                </div>
+                <!-- Navbar Right Menu -->
+                <div class="navbar-custom-menu">
+                    <ul class="nav navbar-nav">
+                        <!-- User Account: style can be found in dropdown.less -->
+                        <li class="dropdown user user-menu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <img src="bower_components/AdminLTE/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
+                                <span class="hidden-xs" id="agentname-header"></span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <!-- User image -->
+                                <li class="user-header">
+                                    <img src="bower_components/AdminLTE/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                                    <p>
+                                        <span id="agentname-headerdropdown"></span>
+                                        <br>
+                                        <span id="agentrole-headerdropdown"></span>
+                                    </p>
+                                </li>
+                                <!-- Menu Footer-->
+                                <li class="user-footer">
+                                    <div class="pull-left">
+                                        <a href="#" class="btn btn-default btn-flat">Profile</a>
+                                    </div>
+                                    <div class="pull-right">
+                                        <a href="#" class="btn btn-default btn-flat" onclick="logout()">Sign out</a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                        <!-- Control Sidebar Toggle Button -->
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#licModal"><i class="fa fa-info-circle"></i></a>
+                        </li>
+                        <li>
+                            <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+
+        <!-- Left side column. contains the logo and sidebar -->
+        <aside class="main-sidebar">
+            <!-- sidebar: style can be found in sidebar.less -->
+            <section class="sidebar">
+                <!-- Sidebar user panel -->
+                <div class="user-panel">
+                    <div class="pull-left image">
+                        <img src="bower_components/AdminLTE/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                    </div>
+                    <div class="pull-left info">
+                        <p><span id="agentname-sidebar"></span></p>
+                        <span><i id="status-icon" class="fa fa-circle text-warning"></i></span>&nbsp;&nbsp;&nbsp;<span id="user-status">Away</span>
+                    </div>
+                </div>
+                <!-- sidebar menu: : style can be found in sidebar.less -->
+                <ul class="sidebar-menu">
+                    <li class="header">USER STATUS</li>
+                    <li onclick="pauseQueues();"><a href="#"><i class="fa fa-circle text-yellow"></i> <span>Away</span></a></li>
+                    <li onclick="unpauseQueues();"><a href="#"><i class="fa fa-circle text-green"></i> <span>Ready</span></a></li>
+                    <li class="header">MAIN NAVIGATION</li>
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-desktop"></i> <span id="nav-desktop">AD Desktop</span>
+                        </a>
+                    </li>
+                    <li id="sidebar-queues" class="header"><span id="nav-desktop">QUEUES</span></li>
+                    <li id="sidebar-complaints" onclick="$('#complaintsanchor').click()" hidden>
+                        <a href="#">
+                            <i class="fa fa-thumbs-down"></i>
+                            <span>Complaints</span>
+                            <span id="complaintsInCall" class="pull-right-container" hidden>
+									<small class="label pull-right bg-red">in call</small>
+								</span>
+                        </a>
+                    </li>
+                    <li id="sidebar-geninfo" onclick="$('#geninfoanchor').click()" hidden>
+                        <a href="#">
+                            <i class="fa fa-question-circle"></i>
+                            <span>General Info</span>
+                            <span id="geninfoInCall" class="pull-right-container" hidden>
+									<small class="label pull-right bg-red">in call</small>
+								</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </section>
+            <!-- /.sidebar -->
+        </aside>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+                <h1 id="section-header">AD Desktop</h1>
+                <ol class="breadcrumb">
+                    <li><a href="#"><i class="fa fa-desktop"></i> Home</a></li>
+                    <li class="active" id="breadcrumb-header">AD Desktop</li>
+                </ol>
+            </section>
+
+            <!-- Main content -->
+            <section class="content">
+                <!-- Main Row -->
+                <div class="row">
+
+                    <!-- Left Col -->
+                    <section class="col-lg-5">
+                        <div class="col-md-12">
+                            <div class="box direct-chat direct-chat-primary" id="userchat">
+                                <div class="box-header with-border">
+                                    <i class="fa fa-comments"></i>
+                                    <h3 class="box-title">User Chat</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+											</button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <!-- Conversations are loaded here -->
+                                    <div class="direct-chat-messages" id="chat-messages"></div>
+                                    <div class="direct-chat-timestamp text-bold" id="rtt-typing" style="margin-left: 10px; min-height: 20px"></div>
+                                </div>
+                                <div class="box-footer">
+                                    <form name="chatsend" id="chatsend">
+                                        <div class="input-group">
+                                            <input type="hidden" id="displayname">
+                                            <input type="text" id="newchatmessage" placeholder="Type Message ..." class="form-control" autocomplete="off" required>
+                                            <span class="input-group-btn">
+													<button  class="btn btn-primary btn-flat" type="submit">Send</button>
+												</span>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="nav-tabs-custom" id="scriptscontainer">
+                                <!-- Tabs within a box -->
+                                <ul class="nav nav-tabs pull-right">
+                                    <li><a href="#complaint-scripts-tab" data-toggle="tab" aria-expanded="true">Complaint</a></li>
+                                    <li class="active"><a href="#general-scripts-tab" data-toggle="tab" aria-expanded="false">General</a></li>
+                                    <li class="pull-left header"><i class="fa fa-pencil"></i>Scripts</li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="tab-pane" id="complaint-scripts-tab">
+                                        <h3 class="text-center">Complaints Scripts</h3>
+                                        <div class="form-group">
+                                            <label>Script Content</label>
+                                            <textarea id="complaints_script_content" class="form-control" rows="10" placeholder="Enter ..."></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane active" id="general-scripts-tab">
+                                        <h3 class="text-center">General Info. Scripts</h3>
+                                        <div class="form-group">
+                                            <label>Script Content</label>
+                                            <textarea id="info_script_content" class="form-control" rows="10" placeholder="Enter ..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </section>
+
+                    <section class="col-lg-7">
+                        <div class="col-md-12">
+
+                            <div class="nav-tabs-custom">
+                                <!-- Tabs within a box -->
+                                <ul class="nav nav-tabs pull-right">
+                                    <li id="ticketTab"><a id="ticketTabTitle" href="#ticketinfo" data-toggle="tab" aria-expanded="true">Ticket Info.</a></li>
+                                    <li class="active"><a href="#vrsinfo" data-toggle="tab" aria-expanded="false">VRS Info.</a></li>
+                                    <li class="pull-left header"><i class="fa fa-info-circle"></i>Call Details
+                                        <small id="notickettxt" class="text-danger" hidden>(no ticket)</small>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <div class="tab-pane active" id="vrsinfo">
+                                        <form name="userform" id="userform" autocomplete="off">
+                                            <div class="row">
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label">First Name</label>
+                                                        <div>
+                                                            <input type="text" class="form-control" id="callerFirstName" name="fname" autocomplete="off" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Last Name</label>
+                                                        <input type="text" class="form-control" id="callerLastName" autocomplete="off" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <label class="control-label">Phone</label>
+                                                    <div>
+                                                        <input type="text" class="form-control" id="callerPhone" name="phone" autocomplete="off" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Address</label>
+                                                        <input type="text" class="form-control" id="callerAddress1" autocomplete="off" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label">City/Town</label>
+                                                        <input type="text" class="form-control" id="callerCity" autocomplete="off" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label">State</label>
+                                                        <input type="text" class="form-control" id="callerState" autocomplete="off" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Zip Code</label>
+                                                        <input type="text" class="form-control" id="callerZipcode" autocomplete="off" />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <label class="control-label">Email</label>
+                                                        <div>
+                                                            <input type="email" class="form-control" id="callerEmail" name="email" autocomplete="off" required/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-group text-center">
+                                                    <input type="button" class="btn btn-warning" id="btnClear" value="Finished" onclick="finished();" />
+                                                    <!--input type="button" class="btn btn-success"  id="btnTest" value="TEST BUTTON" /-->
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+
+                                    <div class="tab-pane" id="ticketinfo">
+                                        <form name="ticketForm" id="ticketForm" autocomplete="off">
+                                            <div class="row">
+                                                <div class="col-lg-4 form-group">
+                                                    <label class="control-label">Assignee</label>
+                                                    <input type="text" class="form-control" id="assignee" autocomplete="off" />
+                                                </div>
+                                                <div class="col-lg-4 form-group">
+                                                    <label class="control-label">Requester</label>
+                                                    <input type="text" class="form-control" id="requester" autocomplete="off" />
+                                                </div>
+                                                <div class="col-lg-4 form-group">
+                                                    <label class="control-label">Last Updated</label>
+                                                    <input type="text" id="lastupdated" class="form-control" autocomplete="off" disabled/>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-8 form-group">
+                                                    <label class="control-label">Subject</label>
+                                                    <input type="text" id="subject" class="form-control" name="subject" autocomplete="off" required/>
+                                                </div>
+                                                <div class="col-lg-4 form-group">
+                                                    <label class="control-label">Ticket ID</label>
+                                                    <input type="text" id="ticketId" class="form-control" autocomplete="off" disabled/>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12 form-group">
+                                                    <label class="control-label text-left">Problem Description</label>
+                                                    <textarea rows="3" id="problemdesc" class="form-control" name="desc" required></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group">
+                                                        <label class="control-label text-left">Resolution</label>
+                                                        <textarea rows="3" id="resolution" class="form-control"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="form-group pull-right">
+                                                        <input type="button" class="btn btn-primary" id="btnModifyTicket" value="Save" onclick="modifyTicket()" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div id="alertPlaceholder" class="col-lg-12">
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                </div>
+                <!-- /.row -->
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+
+        <footer class="main-footer">
+            <div class="pull-right hidden-xs">
+                <b>Version</b> 1.0
+            </div>
+            <strong>Copyright &copy; 2016.</strong> All rights reserved.
+        </footer>
+
+        <!-- Control Sidebar -->
+        <aside class="control-sidebar control-sidebar-dark" style="width: 400px; right:-400px">
+            <!-- Create the tabs -->
+            <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
+                <li class="active"><a href="#control-sidebar-agents-tab" data-toggle="tab"><i class="fa fa-users"></i>&nbsp;&nbsp;Agents</a></li>
+                <li><a href="#control-sidebar-videomail-tab" data-toggle="tab"><i class="fa fa-envelope-o"></i>&nbsp;&nbsp;Video Mail</a></li>
+                <li id="debugtab"><a href="#control-sidebar-debug-tab" data-toggle="tab"><i class="fa fa-bug"></i></a></li>
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <!-- Agent Status tab content -->
+                <div class="tab-pane active" id="control-sidebar-agents-tab">
+                    <div class="form-group">
+                        <table id='agenttable' class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Status&nbsp;&nbsp;&nbsp;</th>
+                                    <th>Agent</th>
+                                    <th>Ext</th>
+                                    <th>Queues</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+                <!-- /.Agent Status tab content -->
+
+                <!-- Debug tab content -->
+                <div class="tab-pane" id="control-sidebar-debug-tab">
+                    <input type="button" class="btn btn-danger" id="btndbgclear" value="Clear Debug Text" onclick='cleardbgtxt();' />
+                    <br>
+                    <div id="dbgtxt" style='height:400px;max-height: 400px;overflow-y:scroll;'></div>
+                </div>
+                <!-- /.Debug tab content -->
+
+                <!-- Mail tab content -->
+                <div class="tab-pane" id="control-sidebar-videomail-tab">
+                    <div class="form-group">
+                        <label>Mailbox Messages</label>
+                        <table class="table table-hover">
+                            <tr>
+                                <th>Caller ID</th>
+                                <th>Call Received</th>
+                                <th>Duration (min.)</th>
+                            </tr>
+                            <tr>
+                                <td>000-000-0000</td>
+                                <td>2016-04-01 08:00:00</td>
+                                <td>1</td>
+                            </tr>
+                            <tr>
+                                <td>111-000-0000</td>
+                                <td>2016-04-02 09:00:00</td>
+                                <td>0.5</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <!-- /.Mail tab content -->
+            </div>
+            <!-- /.Tab panes -->
+        </aside>
+        <!-- /.control-sidebar -->
+        <!-- Add the sidebar's background. This div must be placed immediately after the control sidebar -->
+        <div class="control-sidebar-bg" style="width:400px; right:-400px"></div>
+
+    </div>
+    <!-- ./wrapper -->
+
+    <!-- Glass Panel -->
+    <div id='divGlassPanel' class='glass-panel' style='visibility:hidden'></div>
+
+    <!-- License Modal -->
+    <div class="modal fade" id="licModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+                    <h4 class="modal-title" id="licModalLabel">Copyright Notices</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="licModalBody"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VRS Input Modal -->
+    <div class="modal fade" id="myVrsModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">What is your VRS Number?</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger" id="ivrsmessage" hidden></div>
+                    <div class="form-group">
+                        <label for="usr">VRS number:</label>
+                        <input type="text" class="form-control input-lg" id="ivrsnum" placeholder="VRS Number" data-inputmask="'mask': '(999) 999-9999'"
+                            data-mask>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="submitvrs">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Incoming Call Modal -->
+    <div id="myRingingModal" class="modal fade">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h2 class="modal-title">Incoming call...</h2>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="images/phoneRinging.gif" alt="Phone Ringing" height="100">
+                </div>
+                <div class="modal-footer">
+                    <h2 id='myRingingModalPhoneNumber' class="modal-title text-center"></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================Le javascript ================================ -->
+    <!-- jQuery v2.1.4 -->
+    <script src="./bower_components/AdminLTE/plugins/jQuery/jquery-2.2.3.min.js"></script>
+    <!-- socket.io-client -->
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <!-- Bootstrap 3.3.5 -->
+    <script type="text/javascript" src="./bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <!-- Decode JWT tokens -->
+    <script type="text/javascript" src="./bower_components/jwt-decode/build/jwt-decode.min.js"></script>
+    <!-- timer.jquery 0.6.3 -->
+    <script type="text/javascript" src='./bower_components/timer.jquery/dist/timer.jquery.min.js'></script>
+    <!-- moment.js 2.15.1 -->
+    <script type="text/javascript" src='./bower_components/moment/moment.js'></script>
+    <script type="text/javascript" src="./bower_components/AdminLTE/plugins/input-mask/jquery.inputmask.js"></script>
+    <!-- AdminLTE App -->
+    <script src="./bower_components/AdminLTE/dist/js/app.min.js"></script>
+    <!-- DataTables 1.10.12 -->
+    <script type="text/javascript" src="./bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+    <!-- Custom Javascript for ACEDirect index.html page-->
+    <script type="text/javascript" src="./js/acedirect.js"></script>
+</body>
+
+</html>

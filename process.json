@@ -1,0 +1,8 @@
+{
+	"apps": [{
+			"name": "ACE Direct: 8005",
+			"script": "./adserver.js",
+			"error_file": "./logs/adserver.log",
+			"out_file": "./logs/adserver.log"
+		}]
+}
