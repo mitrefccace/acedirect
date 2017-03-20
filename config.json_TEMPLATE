@@ -82,6 +82,10 @@
 	"cdrportal": {
 		"url": "http://host:111/cdr.html"
 	},
+	"redis": {
+        "host": "host",
+        "port": 1000
+	},    
 	"jsonwebtoken": {
 		"encoding": "base64",
 		"secretkey": "somekey",
