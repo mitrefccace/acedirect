@@ -333,7 +333,7 @@ $('#submitvrs').on('click', function (event) {
 
 $("#newchatmessage").on('change keydown paste input', function () {
 	var value = $("#newchatmessage").val();
-	var displayname = $('#txtAgentDisplayName').val();
+	var displayname = $('#displayname').val();
 	var vrs = $('#callerPhone').val();
 
 	if (value.length > 0) {
@@ -347,7 +347,7 @@ $('#chatsend').submit(function (evt) {
 	evt.preventDefault();
 
 	var msg = $('#newchatmessage').val();
-	var displayname = $('#txtAgentDisplayName').val();
+	var displayname = $('#displayname').val();
 	var vrs = $('#callerPhone').val();
 	var date = moment();
 	var timestamp = date.format("D MMM h:mm a");
