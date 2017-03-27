@@ -183,7 +183,7 @@ function connect_socket() {
 		var msgtime = document.createElement('span');
 		var msgtext = document.createElement('div');
 
-		if ($("#txtAgentDisplayName").val() === displayname) {
+		if ($("#displayname").val() === displayname) {
 			$(msgsender).addClass("direct-chat-name pull-right").html(displayname).appendTo(msginfo);
 			$(msgtime).addClass("direct-chat-timestamp pull-left").html(timestamp).appendTo(msginfo);
 			$(msginfo).addClass("direct-chat-info clearfix").appendTo(msgblock);
