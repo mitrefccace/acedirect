@@ -103,12 +103,12 @@ function connect_socket() {
 		}
 	}).on('typing', function (data) {
 		debugtxt('typing', data);
-		if ($("#txtAgentDisplayName").val() !== data.displayname) {
+		if ($("#displayname").val() !== data.displayname) {
 			$('#rtt-typing').html(data.displayname + ": " + data.rttmsg);
 		}
 	}).on('typing-clear', function (data) {
 		debugtxt('typing-clear', data);
-		if ($("#txtAgentDisplayName").val() !== data.displayname) {
+		if ($("#displayname").val() !== data.displayname) {
 			$('#rtt-typing').html('');
 		}
 	}).on('new-caller', function (data) { // a new caller has connected
