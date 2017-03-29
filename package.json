@@ -7,7 +7,6 @@
     "asterisk-manager": "^0.1.15",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
-    "hashmap": "^2.0.6",
     "jsonwebtoken": "^7.1.9",
     "log4js": "^0.6.38",
     "nconf": "^0.8.4",
