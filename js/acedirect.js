@@ -40,7 +40,7 @@ function connect_socket() {
 	if (sessionStorage.getItem('accesstoken') === null)
 		logout();
 	console.log('connect_socket');
-	socket = io.connect('https://' + window.location.host, {
+	socket = io.connect('https://' + window.location.host+'/agent', {
 		query: 'token=' + sessionStorage.accesstoken,
 		forceNew: true
 	});
