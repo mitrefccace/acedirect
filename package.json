@@ -1,8 +1,8 @@
 {
-  "name": "aceconnectlite",
+  "name": "acedirect",
   "version": "1.0.0",
-  "description": "The ACE Connect Lite Project",
-  "main": "server.js",
+  "description": "The ACE Direct Project",
+  "main": "adserver.js",
   "dependencies": {
     "asterisk-manager": "^0.1.15",
     "body-parser": "^1.15.2",
