@@ -22,15 +22,6 @@
     <link rel="stylesheet" href="./bower_components/AdminLTE/dist/css/skins/_all-skins.min.css">
     <!-- Custom Portal stylesheet -->
     <link rel="stylesheet" href="./css/ca-portal.css">
-
-    <style>
-
-    </style>
-    <script>
-        if (sessionStorage.getItem('accesstoken') === null)
-            window.location.replace("/agent/login.html");
-    </script>
-
 </head>
 
 <body class="hold-transition skin-purple sidebar-mini">
@@ -525,7 +516,7 @@
     <!-- jQuery v2.1.4 -->
     <script src="./bower_components/AdminLTE/plugins/jQuery/jquery-2.2.3.min.js"></script>
     <!-- socket.io-client -->
-    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="./socket.io/socket.io.js"></script>
     <!-- Bootstrap 3.3.5 -->
     <script type="text/javascript" src="./bower_components/bootstrap/dist/js/bootstrap.js"></script>
     <!-- Decode JWT tokens -->

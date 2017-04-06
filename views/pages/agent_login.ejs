@@ -54,9 +54,9 @@
 							if (data.redirect) {
 								window.location.replace(data.redirect);
 							} else {
-								sessionStorage.accesstoken = data.token;
+								//sessionStorage.accesstoken = data.token;
 								//$('#message').text(data.token);
-								window.location.replace("/agent/index.html");
+								window.location.reload();
 							}
 						} else {
 							$('#message').text(data.message);

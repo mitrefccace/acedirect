@@ -62,13 +62,13 @@
 
 	<script type="text/javascript" src="./bower_components/AdminLTE/plugins/input-mask/jquery.inputmask.js"></script>
 
-	<script type="text/javascript">
-		$(window).load(function () {
+        <script type="text/javascript">
+	    $(window).load(function () {
 			$("[data-mask]").inputmask();
-			$('#form-login').submit(function (evt) {
-				evt.preventDefault();
+		    $('#form-login').submit(function (evt) {
+			    evt.preventDefault();
 
-				var vrsnumber = $('#vrs_number').val().replace(/^1|[^\d]/g, '');
+			    var vrsnumber = $('#vrs_number').val().replace(/^1|[^\d]/g, '');
 				$('#message').hide();
 				$('#message').text('');
 				$('#input-group').removeClass('has-error');
@@ -83,8 +83,8 @@
 						success: function (data) {
 							//alert(JSON.stringify(data));
 							if (data.message === "success") {
-								sessionStorage.accesstoken = data.token;
-								window.location.replace("complaint_form.html");
+								//sessionStorage.accesstoken = data.token;
+								window.location.reload();	
 							} else {
 								$('#message').text(data.message);
 								$('#message').show();
@@ -97,13 +97,14 @@
 						}
 					});
 				} else {
-					$('#input-group').addClass('has-error');
-					$('#message').text('Invalid phone number format');
-					$('#message').show();
-				}
-			});
-		});
-	</script>
+						$('#input-group').addClass('has-error');
+						$('#message').text('Invalid phone number format');
+						$('#message').show();
+					}
+		    });
+	    });
+
+    </script>
 </body>
 
 </html>

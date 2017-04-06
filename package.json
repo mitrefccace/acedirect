@@ -6,7 +6,11 @@
   "dependencies": {
     "asterisk-manager": "^0.1.15",
     "body-parser": "^1.15.2",
+    "cookie-parser": "^1.4.3",
+    "ejs": "^2.5.6",
     "express": "^4.14.0",
+    "express-session": "^1.15.2",
+    "express-sessions": "^1.0.6",
     "jsonwebtoken": "^7.1.9",
     "log4js": "^0.6.38",
     "nconf": "^0.8.4",
