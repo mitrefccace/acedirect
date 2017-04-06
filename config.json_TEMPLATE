@@ -95,5 +95,14 @@
 		"secretkey": "somekey",
 		"timeout": 15000,
 		"handshake": true
-	}
+	},
+	"session": {
+        "secretKey": "somekey",
+        "resave": true,
+        "saveUninitialized": true,
+        "secure": true,
+        "httpOnly": true,
+        "rolling" : true,
+        "maxAge": 2400000
+    }
 }
