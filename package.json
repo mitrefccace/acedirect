@@ -15,6 +15,7 @@
     "log4js": "^0.6.38",
     "nconf": "^0.8.4",
     "node-zendesk": "^1.1.11",
+    "openam-agent": "^3.1.0",
     "redis": "^2.7.1",
     "request": "^2.74.0",
     "shelljs": "^0.7.5",
