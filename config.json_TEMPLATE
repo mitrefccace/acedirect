@@ -104,5 +104,10 @@
         "httpOnly": true,
         "rolling" : true,
         "maxAge": 2400000
+    },
+    "openam": {
+        "serverUrl": "https://server.name.com:8080/openam",
+        "privateIP": "127.0.0.1",
+        "domain": ".name.com"
     }
 }
