@@ -110,5 +110,9 @@
         "privateIP": "127.0.0.1",
         "domain": ".name.com",
         "port": "8081"
+    },
+	"nginx": {
+        "fqdn": "nginx.server.com",
+        "path": "ACEDirect" 
     }
 }
