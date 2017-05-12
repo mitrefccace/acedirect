@@ -106,8 +106,9 @@
         "maxAge": 2400000
     },
     "openam": {
-        "serverUrl": "https://server.name.com:8080/openam",
+        "serverUrl": "https://server.name.com",
         "privateIP": "127.0.0.1",
-        "domain": ".name.com"
+        "domain": ".name.com",
+        "port": "8081"
     }
 }
