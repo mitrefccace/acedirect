@@ -214,12 +214,14 @@ function connect_socket() {
 							$('#info_script_content').val(data.data[i].text);
 						if (data.data[i].id === 2)
 							$('#complaints_script_content').val(data.data[i].text);
+							/*
 						if(data.data[i].queue_name === "ComplaintsQueue"){
 							$('#complaints_scripts_type').append($("<option/>", {
         						value: data.data[i].id,
         						text: data.data[i].type
     						}));
 						}
+						*/
 					}
 
 
