@@ -66,9 +66,16 @@
                                     <p>
                                         <span id="agentname-headerdropdown"></span>
                                         <br>
-                                        <span id="agentrole-headerdropdown"></span>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-addon">Light Code</span>
+                                            <input id="agentlightcode" type="text" class="form-control">
+                                            <span class="input-group-btn">
+                                                <button type="button" class="btn btn-success btn-flat" id='copyLightcodeButton'><i class="fa fa-files-o"></i></button>
+                                            </span>
+                                        </div>
+                                        <span id="agentrole-headerdropdown" hidden></span>
                                         <br>
-                                        <span id="agentlightcode-headerdropdown"></span>
+                                        <span id="agentlightcode-headerdropdown" hidden></span>
                                     </p>
                                 </li>
                                 <!-- Menu Footer-->
@@ -170,7 +177,7 @@
                                     <h3 class="box-title">User Chat</h3>
                                     <div class="box-tools pull-right">
                                         <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-											</button>
+											</button> 
                                     </div>
                                 </div>
                                 <div class="box-body">
@@ -517,6 +524,8 @@
             </div>
         </div>
     </div>
+                                               
+    <div id="snackbar">Default Text</div>
 
     <!-- ==================Le javascript ================================ -->
     <!-- jQuery v2.1.4 -->
