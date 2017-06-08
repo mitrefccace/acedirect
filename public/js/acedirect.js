@@ -103,7 +103,7 @@ function connect_socket() {
 				}).on('disconnect', function () {
 					debugtxt('disconnect');
 					console.log('disconnected');
-					changeStatusLight('OFF_LINE');
+					changeStatusLight('OFF_DUTY');
 					//logout("disconnected");
 				}).on("unauthorized", function (error) {
 					debugtxt('unauthorized', error);
@@ -409,8 +409,8 @@ function requestAssistance() {
 }
 
 function logout(msg) {
-	
-	changeStatusLight('OFF');
+	busylight.light('OFF_DUTY');
+	changeStatusLight('OFF_DUTY');
 	//clear the token from session storage
 	sessionStorage.clear();
 	//disconnect socket.io connection
