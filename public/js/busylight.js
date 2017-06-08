@@ -74,5 +74,5 @@ function PostLightCode(color) {
             "stop": color.stop
         };
     }
-    $.post('http://localhost:6298/setbusylight', JSON.stringify(lightcode));
+    $.post('https://localhost:6298/setbusylight', JSON.stringify(lightcode));
 }
