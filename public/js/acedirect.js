@@ -103,6 +103,7 @@ function connect_socket() {
 				}).on('disconnect', function () {
 					debugtxt('disconnect');
 					console.log('disconnected');
+					changeStatusLight('OFF_LINE');
 					//logout("disconnected");
 				}).on("unauthorized", function (error) {
 					debugtxt('unauthorized', error);
