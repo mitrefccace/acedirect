@@ -5,7 +5,7 @@ var channelMe;
 var ticketTabFade;
 var busylight = new Busylight();
 var agentStatus = 'OFF';
-setInterval(function(){busylight.light(this.agentStatus);}, 15000);
+setInterval(function(){busylight.light(this.agentStatus);}, 2000);
 
 $(document).ready(function () {
 	connect_socket();
