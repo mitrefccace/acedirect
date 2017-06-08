@@ -543,7 +543,7 @@ function clearScreen() {
 }
 
 function changeStatusLight(state){
-	this.status = state;
+	this.agentStatus = state;
 	busylight.light(state);
 }
 
