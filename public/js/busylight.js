@@ -1,6 +1,5 @@
 function Busylight(configs) {
     this.statusCd = {};
-    this.current = 'OFF';
     this.updateConfigs(configs);
 }
 
@@ -12,8 +11,7 @@ Busylight.prototype.updateConfigs = function (configs) {
 }
 
 Busylight.prototype.light = function (status) {
-    this.current = status;
-    switch (statusCd) {
+    switch (status) {
         case 'OFF_DUTY':
             PostLightCode(this.statusCd.off_duty);
             break;
