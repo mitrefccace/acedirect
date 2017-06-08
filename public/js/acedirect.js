@@ -3,6 +3,9 @@ var extensionMe;
 var queueNameMe;
 var channelMe;
 var ticketTabFade;
+var busylight = new Busylight();
+var agentStatus = 'OFF';
+setInterval(function(){busylight.light(this.agentStatus);}, 15000);
 
 $(document).ready(function () {
 	connect_socket();
@@ -176,10 +179,12 @@ function connect_socket() {
 					$('#user-status').text('Wrap Up');
 					$('#status-icon').removeClass("text-green");
 					$('#status-icon').removeClass("text-yellow");
-					$('#status-icon').addClass("text-red");
+					$('#status-icon').removeClass("text-red");
+					$('#status-icon').addClass("text-blue");
 					$('#complaintsInCall').hide();
 					$('#geninfoInCall').hide();
 					socket.emit('wrapup', null);
+					changeStatusLight('WRAP_UP');
 					socket.emit('chat-leave-ack', data);
 				}).on('chat-message-new', function (data) {
 					debugtxt('chat-message-new', data);
@@ -288,7 +293,7 @@ function connect_socket() {
 							} else if (status === "INCALL") {
 								status = "<div style='display:inline-block'><i class='fa fa-circle text-red'></i>&nbsp;&nbsp;In Call</div>";
 							} else if (status === "WRAPUP") {
-								status = "<div style='display:inline-block'><i class='fa fa-circle text-red'></i>&nbsp;&nbsp;Wrap Up</div>";
+								status = "<div style='display:inline-block'><i class='fa fa-circle text-blue'></i>&nbsp;&nbsp;Wrap Up</div>";
 							} else {
 								status = "<div style='display:inline-block'><i class='fa fa-circle text-white'></i>&nbsp;&nbsp;Unknown</div>";
 							}
@@ -306,11 +311,15 @@ function connect_socket() {
 					}
 				}).on('new-caller-ringing', function (data) {
 					debugtxt('new-caller-ringing', data);
+					changeStatusLight('INCOMING_CALL');
 					$('#myRingingModalPhoneNumber').html(data.phoneNumber)
 					$('#myRingingModal').modal({ show: true, backdrop: 'static', keyboard: false });
 				}).on('request-assistance-response', function (data) {
 					debugtxt('request-assistance-response', data);
 					//alert(data.message);
+				}).on('lightcode-configs', function (data) {
+					debugtxt('lightcode-configs', data);
+					busylight.updateConfigs(data);
 				});
 
 
@@ -399,6 +408,8 @@ function requestAssistance() {
 }
 
 function logout(msg) {
+	
+	changeStatusLight('OFF');
 	//clear the token from session storage
 	sessionStorage.clear();
 	//disconnect socket.io connection
@@ -439,6 +450,7 @@ function inCall() {
 	$('#user-status').text('In Call');
 	$('#status-icon').removeClass("text-green");
 	$('#status-icon').addClass("text-red");
+	changeStatusLight('IN_CALL');
 	var param1 = [{ "Interface": "SIP/" + extensionMe, "Queue": "" }, { "Interface": "", "Queue": "" }];
 	socket.emit('pause-queues', param1);
 }
@@ -452,6 +464,7 @@ function inCallADComplaints() {
 	$('#status-icon').removeClass("text-yellow");
 	$('#status-icon').addClass("text-red");
 	$('#complaintsInCall').show();
+	changeStatusLight('IN_CALL');
 	socket.emit('incall', null);
 }
 
@@ -462,16 +475,20 @@ function inCallADGeneral() {
 	$('#user-status').text('In Call');
 	$('#status-icon').removeClass("text-green");
 	$('#status-icon').removeClass("text-yellow");
+	$('#status-icon').removeClass("text-blue");
 	$('#status-icon').addClass("text-red");
 	$('#geninfoInCall').show();
+	changeStatusLight('IN_CALL');
 	socket.emit('incall', null);
 }
 
 function pauseQueues() {
 	$('#user-status').text('Away');
 	$('#status-icon').removeClass("text-green");
+	$('#status-icon').removeClass("text-blue");
+	$('#status-icon').removeClass("text-red");
 	$('#status-icon').addClass("text-yellow");
-
+	changeStatusLight('AWAY');
 	socket.emit('pause-queues', null);
 	socket.emit('away', null);
 }
@@ -480,6 +497,7 @@ function unpauseQueues() {
 	$('#user-status').text('Ready');
 	$('#status-icon').removeClass("text-yellow");
 	$('#status-icon').addClass("text-green");
+	changeStatusLight('READY');
 
 	socket.emit('unpause-queues', null);
 	socket.emit('ready', null);
@@ -523,6 +541,13 @@ function clearScreen() {
 	$('#ticketTab').removeClass("bg-pink");
 	clearInterval(ticketTabFade);
 }
+
+function changeStatusLight(state){
+	this.status = state;
+	busylight.light(state);
+}
+
+
 
 document.getElementById("copyLightcodeButton").addEventListener("click", function() {
     copyToClipboard(document.getElementById("agentlightcode"));
