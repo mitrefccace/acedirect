@@ -5,6 +5,9 @@ var channelMe;
 var ticketTabFade;
 var busylight = new Busylight();
 var agentStatus = 'OFF';
+var away_color;
+var ready_color;
+var status_color;
 setInterval(function(){busylight.light(this.agentStatus);}, 2000);
 
 $(document).ready(function () {
@@ -60,6 +63,8 @@ function connect_socket() {
 				socket.on('connect', function () {
 					debugtxt('connect', { "no": "data" });
 					console.log('authenticated');
+
+					socket.emit("get_color_config");
 
 					//get the payload form the token
 					var payload = jwt_decode(data.token);
@@ -320,6 +325,7 @@ function connect_socket() {
 					//alert(data.message);
 				}).on('lightcode-configs', function (data) {
 					debugtxt('lightcode-configs', data);
+					updateColors(data);
 					busylight.updateConfigs(data);
 				});
 
@@ -485,10 +491,12 @@ function inCallADGeneral() {
 
 function pauseQueues() {
 	$('#user-status').text('Away');
-	$('#status-icon').removeClass("text-green");
-	$('#status-icon').removeClass("text-blue");
-	$('#status-icon').removeClass("text-red");
-	$('#status-icon').addClass("text-yellow");
+	$("#status-icon").removeClass (function (index, className) {
+    	return (className.match (/\btext-\S+/g) || []).join(' ');
+    });
+	$('#status-icon').addClass(away_color);
+	$('#status-icon').addClass("currently-away");
+	$('#status-icon').removeClass("currently-ready");
 	changeStatusLight('AWAY');
 	socket.emit('pause-queues', null);
 	socket.emit('away', null);
@@ -496,8 +504,12 @@ function pauseQueues() {
 
 function unpauseQueues() {
 	$('#user-status').text('Ready');
-	$('#status-icon').removeClass("text-yellow");
-	$('#status-icon').addClass("text-green");
+	$("#status-icon").removeClass (function (index, className) {
+    	return (className.match (/\btext-\S+/g) || []).join(' ');
+    });
+	$('#status-icon').addClass(ready_color);
+	$('#status-icon').addClass("currently-ready");
+	$('#status-icon').removeClass("currently-away");
 	changeStatusLight('READY');
 
 	socket.emit('unpause-queues', null);
@@ -617,4 +629,31 @@ function debugtxt(title, data) {
 	var dt = new Date();
 	var time = dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
 	$('#dbgtxt').html('<span style="color:green">' + time + ": " + title + '</span><br>' + JSON.stringify(data) + '<br>----------------<br>' + $('#dbgtxt').html());
+}
+
+function updateColors(statuses)
+{
+	//remove current colors from ready away and status
+	$("#status-icon").removeClass (function (index, className) {
+    	return (className.match (/\btext-\S+/g) || []).join(' ');
+    });
+    $("#away-icon").removeClass (function (index, className) {
+    	return (className.match (/\btext-\S+/g) || []).join(' ');
+    });
+    $("#ready-icon").removeClass (function (index, className) {
+    	return (className.match (/\btext-\S+/g) || []).join(' ');
+    });
+
+    //find new away and ready colors
+    for(var status in statuses)
+    {
+    	if(statueses[status].id.toLowerCase() == "away") away_color = statuses[status].color;
+    	if(statueses[status].id.toLowerCase() == "ready") ready_color = statuses[status].color;
+    }
+
+    //add new colors
+     $("#away-icon").addClass("text-"+away_color);
+     $("#ready-icon").addClass("text-"+ready_color);
+     if(("#status-icon").hasClass("currently-away")) $("#status-icon").addClass("text-"+away_color);
+     else $("#status-icon").addClass("text-"+ready_color);
 }

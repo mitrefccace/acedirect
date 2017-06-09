@@ -113,14 +113,14 @@
                     </div>
                     <div class="pull-left info">
                         <p><span id="agentname-sidebar"></span></p>
-                        <span><i id="status-icon" class="fa fa-circle text-warning"></i></span>&nbsp;&nbsp;&nbsp;<span id="user-status">Away</span>
+                        <span><i id="status-icon" class="fa fa-circle text-warning currently-away"></i></span>&nbsp;&nbsp;&nbsp;<span id="user-status">Away</span>
                     </div>
                 </div>
                 <!-- sidebar menu: : style can be found in sidebar.less -->
                 <ul class="sidebar-menu">
                     <li class="header">USER STATUS</li>
-                    <li onclick="pauseQueues();"><a href="#"><i class="fa fa-circle text-yellow"></i> <span>Away</span></a></li>
-                    <li onclick="unpauseQueues();"><a href="#"><i class="fa fa-circle text-green"></i> <span>Ready</span></a></li>
+                    <li onclick="pauseQueues();"><a href="#"><i id ="away_icon" class="fa fa-circle text-yellow"></i> <span>Away</span></a></li>
+                    <li onclick="unpauseQueues();"><a href="#"><i id = "ready_icon" class="fa fa-circle text-green"></i> <span>Ready</span></a></li>
                     <li class="header">MAIN NAVIGATION</li>
                     <li>
                         <a href="#">
