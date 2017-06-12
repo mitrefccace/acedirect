@@ -177,3 +177,13 @@ However, delay the fade out process for 2.5 seconds */
     from {bottom: 30px; opacity: 1;}
     to {bottom: 0; opacity: 0;}
 }
+
+.text-pink
+{
+    color: #ff00ff !important;
+}
+
+.text-gray
+{
+    color: #777777 !important;
+}
