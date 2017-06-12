@@ -180,10 +180,20 @@ However, delay the fade out process for 2.5 seconds */
 
 .text-pink
 {
-    color: #ff00ff !important;
+    color: #d626d0 !important;
 }
 
 .text-gray
 {
     color: #777777 !important;
+}
+
+.text-red
+{
+    color: #d33621 !important;
+}
+
+.text-yellow
+{
+    color: #ffcb11 !important;
 }

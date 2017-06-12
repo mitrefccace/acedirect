@@ -661,6 +661,8 @@ function updateColors(data)
      else if($("#status-icon").hasClass("currently-transferred-call")) $("#status-icon").addClass("text-"+transferred_call_color);
      else if($("#status-icon").hasClass("currently-wrap-up")) $("#status-icon").addClass("text-"+wrap_up_color);
      else $("#status-icon").addClass("text-"+need_assist_color);
+
+     socket.emit('update-agent-list');
 }
 
 function changeStatusIcon(newColor, statusName)
