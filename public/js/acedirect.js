@@ -24,7 +24,9 @@ var wrap_up_blinking;
 var need_assistance_blinking;
 var missed_call_blinking;
 
-setInterval(function(){busylight.light(this.agentStatus);}, 2000);
+setInterval(function () {
+	busylight.light(this.agentStatus);
+}, 2000);
 
 $(document).ready(function () {
 	connect_socket();
@@ -43,7 +45,8 @@ $(document).ready(function () {
 	});
 
 	if (window.addEventListener) {
-		var state = 0, theCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+		var state = 0,
+			theCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
 		window.addEventListener("keydown", function (e) {
 			if (e.keyCode === theCode[state]) {
 				state++;
@@ -77,7 +80,9 @@ function connect_socket() {
 				});
 
 				socket.on('connect', function () {
-					debugtxt('connect', { "no": "data" });
+					debugtxt('connect', {
+						"no": "data"
+					});
 					console.log('authenticated');
 
 					socket.emit("get_color_config");
@@ -100,8 +105,8 @@ function connect_socket() {
 					$('#agentname-headerdropdown').html(payload.first_name + " " + payload.last_name);
 					$('#agentrole-headerdropdown').html("<small>" + payload.role + "</small>");
 					$('#agentlightcode-headerdropdown').html("<small>Light Code: " + payload.lightcode + "</small>");
-					var lighturl = "https://" + window.location.hostname + window.location.pathname	+"/"+payload.lightcode;				
-					lighturl = lighturl.replace('/agent/','/getagentstatus/');
+					var lighturl = "https://" + window.location.hostname + window.location.pathname + "/" + payload.lightcode;
+					lighturl = lighturl.replace('/agent/', '/getagentstatus/');
 					$('#agentlightcode').val(lighturl);
 
 					if (payload.queue_name === "ComplaintsQueue" || payload.queue2_name === "ComplaintsQueue") {
@@ -113,8 +118,12 @@ function connect_socket() {
 
 
 
-					socket.emit('register-client', { "hello": "hello" });
-					socket.emit('register-agent', { "hello": "hello" });
+					socket.emit('register-client', {
+						"hello": "hello"
+					});
+					socket.emit('register-agent', {
+						"hello": "hello"
+					});
 
 					extensionMe = payload.extension; //e.g. 6001
 					queueNameMe = payload.queue_name; //e.g. InboundQueue
@@ -202,7 +211,7 @@ function connect_socket() {
 					$('#complaintsInCall').hide();
 					$('#geninfoInCall').hide();
 					socket.emit('wrapup', null);
-					changeStatusIcon(wrap_up_color, "wrap-up",wrap_up_blinking);
+					changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
 					changeStatusLight('WRAP_UP');
 					socket.emit('chat-leave-ack', data);
 				}).on('chat-message-new', function (data) {
@@ -242,7 +251,7 @@ function connect_socket() {
 							$('#info_script_content').val(data.data[i].text);
 						if (data.data[i].id === 2)
 							$('#complaints_script_content').val(data.data[i].text);
-							/*
+						/*
 						if(data.data[i].queue_name === "ComplaintsQueue"){
 							$('#complaints_scripts_type').append($("<option/>", {
         						value: data.data[i].id,
@@ -275,7 +284,9 @@ function connect_socket() {
 					$('#callerEmail').val(data.data[0].email);
 
 					$('#duration').timer('reset');
-					socket.emit('register-vrs', { "vrs": data.data[0].vrs });
+					socket.emit('register-vrs', {
+						"vrs": data.data[0].vrs
+					});
 				}).on('missing-vrs', function (data) {
 					debugtxt('missing-vrs', data);
 					//show modal to get VRS from user
@@ -284,7 +295,11 @@ function connect_socket() {
 						$('#ivrsmessage').text(data.message);
 						$('#ivrsmessage').show();
 					}
-					$('#myVrsModal').modal({ show: true, backdrop: 'static', keyboard: false });
+					$('#myVrsModal').modal({
+						show: true,
+						backdrop: 'static',
+						keyboard: false
+					});
 				}).on('ad-zendesk-update-success', function (data) {
 					debugtxt('ad-zendesk-update-success', data);
 					$('#alertPlaceholder').html('<div id="saveAlert" class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>Success!</div>');
@@ -300,23 +315,25 @@ function connect_socket() {
 					//debugtxt('agent-status-list', data);
 					var name, status, extension, queues, tabledata;
 					if (data.message === "success") {
-						tabledata = { data: [] }; 
+						tabledata = {
+							data: []
+						};
 						for (var i = 0; i < data.agents.length; i++) {
 							var name, status, extension, queues = "";
 							name = data.agents[i].name;
 							status = data.agents[i].status;
 							if (status === "READY") {
-								if(ready_blinking) status = "<div style='display:inline-block'><i class='text-"+ready_color+"-blinking'></i>&nbsp;&nbsp;Ready</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+ready_color+"'></i>&nbsp;&nbsp;Ready</div>";
+								if (ready_blinking) status = "<div style='display:inline-block'><i class='text-" + ready_color + "-blinking'></i>&nbsp;&nbsp;Ready</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + ready_color + "'></i>&nbsp;&nbsp;Ready</div>";
 							} else if (status === "AWAY") {
-								if(away_blinking) status = "<div style='display:inline-block'><i class='text-"+away_color+"-blinking'></i>&nbsp;&nbsp;Ready</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+away_color+"'></i>&nbsp;&nbsp;Ready</div>";
+								if (away_blinking) status = "<div style='display:inline-block'><i class='text-" + away_color + "-blinking'></i>&nbsp;&nbsp;Ready</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + away_color + "'></i>&nbsp;&nbsp;Ready</div>";
 							} else if (status === "INCALL") {
-								if(in_call_blinking) status = "<div style='display:inline-block'><i class='text-"+in_call_color+"-blinking'></i>&nbsp;&nbsp;Ready</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+in_call_color+"'></i>&nbsp;&nbsp;Ready</div>";
+								if (in_call_blinking) status = "<div style='display:inline-block'><i class='text-" + in_call_color + "-blinking'></i>&nbsp;&nbsp;Ready</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + in_call_color + "'></i>&nbsp;&nbsp;Ready</div>";
 							} else if (status === "WRAPUP") {
-								if(wrap_up_blinking) status = "<div style='display:inline-block'><i class='text-"+wrap_up_color+"-blinking'></i>&nbsp;&nbsp;Ready</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+wrap_up_color+"'></i>&nbsp;&nbsp;Ready</div>";
+								if (wrap_up_blinking) status = "<div style='display:inline-block'><i class='text-" + wrap_up_color + "-blinking'></i>&nbsp;&nbsp;Ready</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + wrap_up_color + "'></i>&nbsp;&nbsp;Ready</div>";
 							} else {
 								status = "<div style='display:inline-block'><i class='fa fa-circle text-white'></i>&nbsp;&nbsp;Ready</div>";
 							}
@@ -326,20 +343,29 @@ function connect_socket() {
 								queues += data.agents[i].queues[j].queuename + "<br>";
 							}
 							queues = queues.replace(/<br>\s*$/, "");
-							tabledata['data'].push({ "status": status, "name": name, "extension": extension, "queues": queues });
+							tabledata['data'].push({
+								"status": status,
+								"name": name,
+								"extension": extension,
+								"queues": queues
+							});
 						}
 
 						$('#agenttable').dataTable().fnClearTable();
 						$('#agenttable').dataTable().fnAddData(tabledata.data);
 					}
 				}).on('new-caller-ringing', function (data) {
-					debugtxt('new-caller-ringing', data); 
+					debugtxt('new-caller-ringing', data);
 					changeStatusLight('INCOMING_CALL');
 					changeStatusIcon(incoming_call_color, "incoming-call", incoming_call_blinking);
 					$('#myRingingModalPhoneNumber').html(data.phoneNumber)
-					$('#myRingingModal').modal({ show: true, backdrop: 'static', keyboard: false });
+					$('#myRingingModal').modal({
+						show: true,
+						backdrop: 'static',
+						keyboard: false
+					});
 				}).on('request-assistance-response', function (data) {
-					debugtxt('request-assistance-response', data); 
+					debugtxt('request-assistance-response', data);
 					//alert(data.message);
 				}).on('lightcode-configs', function (data) {
 					debugtxt('lightcode-configs', data);
@@ -362,11 +388,18 @@ function connect_socket() {
 
 $('#agenttable').DataTable({
 	aaData: null,
-	aoColumns: [
-		{ "mDataProp": "status" },
-		{ "mDataProp": "name" },
-		{ "mDataProp": "extension" },
-		{ "mDataProp": "queues" }
+	aoColumns: [{
+			"mDataProp": "status"
+		},
+		{
+			"mDataProp": "name"
+		},
+		{
+			"mDataProp": "extension"
+		},
+		{
+			"mDataProp": "queues"
+		}
 	],
 	searching: false,
 	paging: false,
@@ -385,7 +418,10 @@ $('#submitvrs').on('click', function (event) {
 	var ivrsnum = $('#ivrsnum').val().replace(/^1|[^\d]/g, '');
 	if (ivrsnum.length === 10) {
 		$(".modal-backdrop").remove();
-		socket.emit('input-vrs', { "vrs": ivrsnum, "extension": extensionMe });
+		socket.emit('input-vrs', {
+			"vrs": ivrsnum,
+			"extension": extensionMe
+		});
 		$('#ivrsnum').removeClass('has-error');
 		$('#ivrsmessage').text('');
 		$('#ivrsmessage').hide();
@@ -404,9 +440,16 @@ $("#newchatmessage").on('change keydown paste input', function () {
 	var vrs = $('#callerPhone').val();
 
 	if (value.length > 0) {
-		socket.emit('chat-typing', { "displayname": displayname, "vrs": vrs, rttmsg: value });
+		socket.emit('chat-typing', {
+			"displayname": displayname,
+			"vrs": vrs,
+			rttmsg: value
+		});
 	} else {
-		socket.emit('chat-typing-clear', { "displayname": displayname, "vrs": vrs });
+		socket.emit('chat-typing-clear', {
+			"displayname": displayname,
+			"vrs": vrs
+		});
 	}
 });
 
@@ -420,7 +463,12 @@ $('#chatsend').submit(function (evt) {
 	var timestamp = date.format("D MMM h:mm a");
 
 	$('#newchatmessage').val('');
-	socket.emit('chat-message', { "message": msg, "timestamp": timestamp, "displayname": displayname, "vrs": vrs });
+	socket.emit('chat-message', {
+		"message": msg,
+		"timestamp": timestamp,
+		"displayname": displayname,
+		"vrs": vrs
+	});
 });
 
 $('#ticketTabTitle').click(function () {
@@ -442,10 +490,10 @@ function logout(msg) {
 		socket.disconnect();
 	//display the login screen to the user.
 	if (msg) {
-		window.location.href='./logout'
+		window.location.href = './logout'
 		//window.location.replace("?message=" + msg);
 	} else {
-		window.location.href='./logout'
+		window.location.href = './logout'
 		//window.location.replace("");
 	}
 
@@ -463,10 +511,42 @@ function modifyTicket() {
 	var lname = $('#callerLastName').val();
 
 	if (id.trim() === "") {
-		var ticket = { "destexten": extensionMe, "vrs": phone, "status": "new", "ticketId": id, "subject": subject, "description": description, "name": fname, "email": email, "phone": phone, "last_name": lname, "resolution": resolution, "comment": { "public": true, "body": description } };
+		var ticket = {
+			"destexten": extensionMe,
+			"vrs": phone,
+			"status": "new",
+			"ticketId": id,
+			"subject": subject,
+			"description": description,
+			"name": fname,
+			"email": email,
+			"phone": phone,
+			"last_name": lname,
+			"resolution": resolution,
+			"comment": {
+				"public": true,
+				"body": description
+			}
+		};
 		socket.emit('ad-ticket', ticket);
 	} else {
-		socket.emit('modify-ticket', { "destexten": extensionMe, "vrs": phone, "status": "new", "ticketId": id, "subject": subject, "description": description, "name": fname, "email": email, "phone": phone, "last_name": lname, "resolution": resolution, "comment": { "public": true, "body": description } });
+		socket.emit('modify-ticket', {
+			"destexten": extensionMe,
+			"vrs": phone,
+			"status": "new",
+			"ticketId": id,
+			"subject": subject,
+			"description": description,
+			"name": fname,
+			"email": email,
+			"phone": phone,
+			"last_name": lname,
+			"resolution": resolution,
+			"comment": {
+				"public": true,
+				"body": description
+			}
+		});
 	}
 
 }
@@ -475,7 +555,13 @@ function inCall() {
 	$('#user-status').text('In Call');
 	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	changeStatusLight('IN_CALL');
-	var param1 = [{ "Interface": "SIP/" + extensionMe, "Queue": "" }, { "Interface": "", "Queue": "" }];
+	var param1 = [{
+		"Interface": "SIP/" + extensionMe,
+		"Queue": ""
+	}, {
+		"Interface": "",
+		"Queue": ""
+	}];
 	socket.emit('pause-queues', param1);
 }
 
@@ -503,7 +589,7 @@ function inCallADGeneral() {
 
 function pauseQueues() {
 	$('#user-status').text('Away');
-	changeStatusIcon(away_color, "away",away_blinking);
+	changeStatusIcon(away_color, "away", away_blinking);
 	changeStatusLight('AWAY');
 	socket.emit('pause-queues', null);
 	socket.emit('away', null);
@@ -511,7 +597,7 @@ function pauseQueues() {
 
 function unpauseQueues() {
 	$('#user-status').text('Ready');
-	changeStatusIcon(ready_color, "ready",ready_blinking);
+	changeStatusIcon(ready_color, "ready", ready_blinking);
 	changeStatusLight('READY');
 	socket.emit('unpause-queues', null);
 	socket.emit('ready', null);
@@ -556,69 +642,71 @@ function clearScreen() {
 	clearInterval(ticketTabFade);
 }
 
-function changeStatusLight(state){
+function changeStatusLight(state) {
 	this.agentStatus = state;
 	busylight.light(state);
 }
 
 
 
-document.getElementById("copyLightcodeButton").addEventListener("click", function() {
-    copyToClipboard(document.getElementById("agentlightcode"));
+document.getElementById("copyLightcodeButton").addEventListener("click", function () {
+	copyToClipboard(document.getElementById("agentlightcode"));
 	var x = document.getElementById("snackbar")
 	x.innerHTML = "Light Code Copied to Clipboard.";
-    x.className = "show";
-    setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+	x.className = "show";
+	setTimeout(function () {
+		x.className = x.className.replace("show", "");
+	}, 3000);
 });
 
 function copyToClipboard(elem) {
-	  // create hidden text element, if it doesn't already exist
-    var targetId = "_hiddenCopyText_";
-    var isInput = elem.tagName === "INPUT" || elem.tagName === "TEXTAREA";
-    var origSelectionStart, origSelectionEnd;
-    if (isInput) {
-        // can just use the original source element for the selection and copy
-        target = elem;
-        origSelectionStart = elem.selectionStart;
-        origSelectionEnd = elem.selectionEnd;
-    } else {
-        // must use a temporary form element for the selection and copy
-        target = document.getElementById(targetId);
-        if (!target) {
-            var target = document.createElement("textarea");
-            target.style.position = "absolute";
-            target.style.left = "-9999px";
-            target.style.top = "0";
-            target.id = targetId;
-            document.body.appendChild(target);
-        }
-        target.textContent = elem.textContent;
-    }
-    // select the content
-    var currentFocus = document.activeElement;
-    target.focus();
-    target.setSelectionRange(0, target.value.length);
-    
-    // copy the selection
-    var succeed;
-    try {
-    	  succeed = document.execCommand("copy");
-    } catch(e) {
-        succeed = false;
-    }
-    // restore original focus
-    if (currentFocus && typeof currentFocus.focus === "function") {
-        currentFocus.focus();
-    }
-    
-    if (isInput) {
-        // restore prior selection
-        elem.setSelectionRange(origSelectionStart, origSelectionEnd);
-    } else {
-        // clear temporary content
-        target.textContent = "";
-    }
-    return succeed;
+	// create hidden text element, if it doesn't already exist
+	var targetId = "_hiddenCopyText_";
+	var isInput = elem.tagName === "INPUT" || elem.tagName === "TEXTAREA";
+	var origSelectionStart, origSelectionEnd;
+	if (isInput) {
+		// can just use the original source element for the selection and copy
+		target = elem;
+		origSelectionStart = elem.selectionStart;
+		origSelectionEnd = elem.selectionEnd;
+	} else {
+		// must use a temporary form element for the selection and copy
+		target = document.getElementById(targetId);
+		if (!target) {
+			var target = document.createElement("textarea");
+			target.style.position = "absolute";
+			target.style.left = "-9999px";
+			target.style.top = "0";
+			target.id = targetId;
+			document.body.appendChild(target);
+		}
+		target.textContent = elem.textContent;
+	}
+	// select the content
+	var currentFocus = document.activeElement;
+	target.focus();
+	target.setSelectionRange(0, target.value.length);
+
+	// copy the selection
+	var succeed;
+	try {
+		succeed = document.execCommand("copy");
+	} catch (e) {
+		succeed = false;
+	}
+	// restore original focus
+	if (currentFocus && typeof currentFocus.focus === "function") {
+		currentFocus.focus();
+	}
+
+	if (isInput) {
+		// restore prior selection
+		elem.setSelectionRange(origSelectionStart, origSelectionEnd);
+	} else {
+		// clear temporary content
+		target.textContent = "";
+	}
+	return succeed;
 }
 
 // Debug Functions for sidebar.
@@ -632,138 +720,150 @@ function debugtxt(title, data) {
 	$('#dbgtxt').html('<span style="color:green">' + time + ": " + title + '</span><br>' + JSON.stringify(data) + '<br>----------------<br>' + $('#dbgtxt').html());
 }
 
-function updateColors(data)
-{
+function updateColors(data) {
 	//remove current colors from ready away and status-icon
-	$("#status-icon").removeClass (function (index, className) {
-    	return (className.match (/\btext-\S+/g) || []).join(' ');
-    });
-    $("#away-icon").removeClass (function (index, className) {
-    	return (className.match (/\btext-\S+/g) || []).join(' ');
-    });
-    $("#ready-icon").removeClass (function (index, className) {
-    	return (className.match (/\btext-\S+/g) || []).join(' ');
-    });
+	$("#status-icon").removeClass(function (index, className) {
+		return (className.match(/\btext-\S+/g) || []).join(' ');
+	});
+	$("#away-icon").removeClass(function (index, className) {
+		return (className.match(/\btext-\S+/g) || []).join(' ');
+	});
+	$("#ready-icon").removeClass(function (index, className) {
+		return (className.match(/\btext-\S+/g) || []).join(' ');
+	});
 
-    //update new statuses colors
-    for(var status in data)
-    {
-    	if(data[status].color.toLowerCase() == "off")
-    	{
-    		data[status].color = "gray";
-    		data[status].blink = false;
-    	}
+	//update new statuses colors
+	for (var status in data) {
+		if (data[status].color.toLowerCase() == "off") {
+			data[status].color = "gray";
+			data[status].blink = false;
+		}
 
-    	if(data[status].id.toLowerCase() == "away")
-    	{
-    		away_color = data[status].color;
-    		away_blinking = data[status].blink;
-    	}
-    	else if(data[status].id.toLowerCase() == "ready")
-    	{
-    		ready_color = data[status].color;
-    		ready_blinking = data[status].blink;
-    	}
-    	else if(data[status].id.toLowerCase() == "in_call")
-    	{
-    		in_call_color = data[status].color;
-    		in_call_blinking = data[status].blink;
-    	}
-    	else if(data[status].id.toLowerCase() == "hold") 
-    	{
-    		hold_color = data[status].color;
-    		hold_blinking = data[status].blink;
-    	}
-    	else if(data[status].id.toLowerCase() == "incoming_call") 
-    	{
-    		incoming_call_color = data[status].color;
-    		incoming_call_blinking = data[status].blink;
-    	}
-    	else if(data[status].id.toLowerCase() == "transferred_call")
-    	{
-    		transferred_call_color = data[status].color;
-    		transferred_call_blinking = data[status].blink;
-    	}
-    	else if(data[status].id.toLowerCase() == "wrap_up")
-    	{
-    		wrap_up_color = data[status].color;
-    		wrap_up_blinking = data[status].blink;
-    	}
-    	else if(data[status].id.toLowerCase() == "need_assistance")
-    	{
-    		need_assistance_color = data[status].color;
-    		need_assistance_blinking = data[status].blink;
-    	}
-    	else
-    	{
-    		missed_call_color= data[status].color;
-    		missed_call_blinking= data[status].blink;
-    	}
- 	}
+		if (data[status].id.toLowerCase() == "away") {
+			away_color = data[status].color;
+			away_blinking = data[status].blink;
+		} else if (data[status].id.toLowerCase() == "ready") {
+			ready_color = data[status].color;
+			ready_blinking = data[status].blink;
+		} else if (data[status].id.toLowerCase() == "in_call") {
+			in_call_color = data[status].color;
+			in_call_blinking = data[status].blink;
+		} else if (data[status].id.toLowerCase() == "hold") {
+			hold_color = data[status].color;
+			hold_blinking = data[status].blink;
+		} else if (data[status].id.toLowerCase() == "incoming_call") {
+			incoming_call_color = data[status].color;
+			incoming_call_blinking = data[status].blink;
+		} else if (data[status].id.toLowerCase() == "transferred_call") {
+			transferred_call_color = data[status].color;
+			transferred_call_blinking = data[status].blink;
+		} else if (data[status].id.toLowerCase() == "wrap_up") {
+			wrap_up_color = data[status].color;
+			wrap_up_blinking = data[status].blink;
+		} else if (data[status].id.toLowerCase() == "need_assistance") {
+			need_assistance_color = data[status].color;
+			need_assistance_blinking = data[status].blink;
+		} else {
+			missed_call_color = data[status].color;
+			missed_call_blinking = data[status].blink;
+		}
+	}
 
-    //add new colors to away and ready
-    if(away_blinking)
-	{
-		$('#away-icon').addClass("text-"+away_color+"-blinking");
-		if(!($("away-icon").hasClass("status-margin"))) $('#away-icon').addClass("status-margin");
+	//add new colors to away and ready
+	if (away_blinking) {
+		$('#away-icon').addClass("text-" + away_color + "-blinking");
+		if (!($("away-icon").hasClass("status-margin"))) $('#away-icon').addClass("status-margin");
 		$("#away-icon").removeClass("fa");
 		$("#away-icon").removeClass("fa-circle");
-	}
-	else
-	{
-		$('#away-icon').addClass("text-"+away_color);
-		if(!($("away-icon").hasClass("fa"))) $("#away-icon").addClass("fa");
-		if(!($("away-icon").hasClass("fa-circle"))) $("#away-icon").addClass("fa-circle");
+	} else {
+		$('#away-icon').addClass("text-" + away_color);
+		if (!($("away-icon").hasClass("fa"))) $("#away-icon").addClass("fa");
+		if (!($("away-icon").hasClass("fa-circle"))) $("#away-icon").addClass("fa-circle");
 		$("#away-icon").removeClass("status-margin");
 	}
-	if(ready_blinking)
-	{
-		if(!($("ready-icon").hasClass("status-margin"))) $('#away-icon').addClass("status-margin");
-		$('#ready-icon').addClass("text-"+ready_color+"-blinking");
+	if (ready_blinking) {
+		if (!($("ready-icon").hasClass("status-margin"))) $('#away-icon').addClass("status-margin");
+		$('#ready-icon').addClass("text-" + ready_color + "-blinking");
 		$("#ready-icon").removeClass("fa");
 		$("#ready-icon").removeClass("fa-circle");
-	}
-	else
-	{
-		$('#ready-icon').addClass("text-"+ready_color);
-		if(!($("ready-icon").hasClass("fa"))) $("#ready-icon").addClass("fa");
-		if(!($("ready-icon").hasClass("fa"))) $("#ready-icon").addClass("fa-circle");
+	} else {
+		$('#ready-icon').addClass("text-" + ready_color);
+		if (!($("ready-icon").hasClass("fa"))) $("#ready-icon").addClass("fa");
+		if (!($("ready-icon").hasClass("fa"))) $("#ready-icon").addClass("fa-circle");
 		$("#ready-icon").removeClass("status-margin");
 	}
 
-     //add new color to status-icon
-     if($("#status-icon").hasClass("currently-away")) changeStatusIcon(away_color,"away",away_blinking);
-     else if($("#status-icon").hasClass("currently-ready")) changeStatusIcon(ready_color,"ready",ready_blinking);
-     else if($("#status-icon").hasClass("currently-in-call")) changeStatusIcon(in_call_color,"in-call",in_call_blinking);
-     else if($("#status-icon").hasClass("currently-hold")) changeStatusIcon(hold_color,"hold",hold_blinking);
-     else if($("#status-icon").hasClass("currently-incoming-call")) changeStatusIcon(incoming_call_color,"incoming-call",incoming_call_blinking);
-     else if($("#status-icon").hasClass("currently-transferred-call")) changeStatusIcon(transferred_call_color,"transferred-call",transferred_blinking);
-     else if($("#status-icon").hasClass("currently-wrap-up")) changeStatusIcon(wrap_up_color,"wrap-up",wrap_up_blinking);
-     else if($("#status-icon").hasClass("currently-need-assistance")) changeStatusIcon(need_assistance_color,"need-assistance",need_assistance_blinking);
-     else changeStatusIcon(missed_call_color,"missed-call",missed_call_blinking);
+	//add new color to status-icon
+	if ($("#status-icon").hasClass("currently-away")) changeStatusIcon(away_color, "away", away_blinking);
+	else if ($("#status-icon").hasClass("currently-ready")) changeStatusIcon(ready_color, "ready", ready_blinking);
+	else if ($("#status-icon").hasClass("currently-in-call")) changeStatusIcon(in_call_color, "in-call", in_call_blinking);
+	else if ($("#status-icon").hasClass("currently-hold")) changeStatusIcon(hold_color, "hold", hold_blinking);
+	else if ($("#status-icon").hasClass("currently-incoming-call")) changeStatusIcon(incoming_call_color, "incoming-call", incoming_call_blinking);
+	else if ($("#status-icon").hasClass("currently-transferred-call")) changeStatusIcon(transferred_call_color, "transferred-call", transferred_blinking);
+	else if ($("#status-icon").hasClass("currently-wrap-up")) changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
+	else if ($("#status-icon").hasClass("currently-need-assistance")) changeStatusIcon(need_assistance_color, "need-assistance", need_assistance_blinking);
+	else changeStatusIcon(missed_call_color, "missed-call", missed_call_blinking);
 
-     socket.emit('update-agent-list');
+	socket.emit('update-agent-list');
 }
 
-function changeStatusIcon(newColor, statusName, blinking)
-{
-	$("#status-icon").removeClass (function (index, className) {
-    	return (className.match (/\btext-\S+/g) || []).join(' ');
-    });
-    $("#status-icon").removeClass (function (index, className) {
-    	return (className.match (/\bcurrently-\S+/g) || []).join(' ');
-    });
-	if(blinking)
-	{
-		$('#status-icon').addClass("text-"+newColor+"-blinking");
+function changeStatusIcon(newColor, statusName, blinking) {
+	$("#status-icon").removeClass(function (index, className) {
+		return (className.match(/\btext-\S+/g) || []).join(' ');
+	});
+	$("#status-icon").removeClass(function (index, className) {
+		return (className.match(/\bcurrently-\S+/g) || []).join(' ');
+	});
+	if (blinking) {
+		$('#status-icon').addClass("text-" + newColor + "-blinking");
 		$("#status-icon").removeClass("fa");
 		$("#status-icon").removeClass("fa-circle");
+	} else {
+		$('#status-icon').addClass("text-" + newColor);
+		if (!($("status-icon").hasClass("fa"))) $("#status-icon").addClass("fa");
+		if (!($("status-icon").hasClass("fa-circle"))) $("#status-icon").addClass("fa-circle");
 	}
-	else
-	{
-		$('#status-icon').addClass("text-"+newColor);
-		if(!($("status-icon").hasClass("fa"))) $("#status-icon").addClass("fa");
-		if(!($("status-icon").hasClass("fa-circle"))) $("#status-icon").addClass("fa-circle");
-	}
-	$('#status-icon').addClass("currently-"+statusName); 
+	$('#status-icon').addClass("currently-" + statusName);
 }
+
+
+function testLightConnection() {
+	$('#busylightModalBody').html(" ");
+	$('#busylightModalTestBtn').prop("disabled", true);
+	$('#busylightModalBody').html("Checking BusyLight server...");
+	$.ajax({
+		type: "get",
+		url: "https://localhost:6298/",
+		timeout: 2000,
+		dataType: "jsonp xml",
+		success: function (data, text) {
+
+		},
+		error: function (request, status, error) {
+			$('#busylightModalTestBtn').prop("disabled", false);
+			if (status === 'timeout') {
+				$('#busylightModalBody').html("BusyLight app is not running.");
+				$('#busylightModal').modal('show');
+			} else if (status === 'error') {
+				var win = window.open('https://localhost:6298/', '_blank');
+				if (win) {
+					//browser allows popups
+					win.focus();
+				} else {
+					//no pop ups display modal
+					$('#busylightModalBody').html(
+						"<a href='https://localhost:6298/' target='_blank'>Please visit the Busylight Test Page</a>");
+					$('#busylightModal').modal('show');
+				}
+			} else {
+				$('#busylightModalBody').html('Connected to busylight!!!!');
+
+				setTimeout(function () {
+					$('#busylightModal').modal('hide');
+				}, 1500);
+			}
+		}
+	});
+}
+
+testLightConnection();
