@@ -14,6 +14,15 @@ var transferred_call_color;
 var wrap_up_color;
 var need_assistance_color;
 var missed_call_color;
+var away_blinking;
+var ready_blinking;
+var in_call_blinking;
+var hold_blinking;
+var incoming_call_blinking;
+var transferred_call_blinking;
+var wrap_up_blinking;
+var need_assistance_blinking;
+var missed_call_blinking;
 
 setInterval(function(){busylight.light(this.agentStatus);}, 2000);
 
@@ -193,7 +202,7 @@ function connect_socket() {
 					$('#complaintsInCall').hide();
 					$('#geninfoInCall').hide();
 					socket.emit('wrapup', null);
-					changeStatusIcon(wrap_up_color, "wrap-up");
+					changeStatusIcon(wrap_up_color, "wrap-up",wrap_up_blinking);
 					changeStatusLight('WRAP_UP');
 					socket.emit('chat-leave-ack', data);
 				}).on('chat-message-new', function (data) {
@@ -297,15 +306,19 @@ function connect_socket() {
 							name = data.agents[i].name;
 							status = data.agents[i].status;
 							if (status === "READY") {
-								status = "<div style='display:inline-block'><i class='fa fa-circle text-"+ready_color+"'></i>&nbsp;&nbsp;Ready</div>";
+								if(ready_blinking) status = "<div style='display:inline-block'><i class='text-"+ready_color+"-blinking'></i>&nbsp;&nbsp;Ready</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+ready_color+"'></i>&nbsp;&nbsp;Ready</div>";
 							} else if (status === "AWAY") {
-								status = "<div style='display:inline-block'><i class='fa fa-circle text-"+away_color+"'></i>&nbsp;&nbsp;Away</div>";
+								if(away_blinking) status = "<div style='display:inline-block'><i class='text-"+away_color+"-blinking'></i>&nbsp;&nbsp;Ready</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+away_color+"'></i>&nbsp;&nbsp;Ready</div>";
 							} else if (status === "INCALL") {
-								status = "<div style='display:inline-block'><i class='fa fa-circle text-"+in_call_color+"'></i>&nbsp;&nbsp;In Call</div>";
+								if(in_call_blinking) status = "<div style='display:inline-block'><i class='text-"+in_call_color+"-blinking'></i>&nbsp;&nbsp;Ready</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+in_call_color+"'></i>&nbsp;&nbsp;Ready</div>";
 							} else if (status === "WRAPUP") {
-								status = "<div style='display:inline-block'><i class='fa fa-circle text-"+wrap_up_color+"'></i>&nbsp;&nbsp;Wrap Up</div>";
+								if(wrap_up_blinking) status = "<div style='display:inline-block'><i class='text-"+wrap_up_color+"-blinking'></i>&nbsp;&nbsp;Ready</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+wrap_up_color+"'></i>&nbsp;&nbsp;Ready</div>";
 							} else {
-								status = "<div style='display:inline-block'><i class='fa fa-circle text-white'></i>&nbsp;&nbsp;Unknown</div>";
+								status = "<div style='display:inline-block'><i class='fa fa-circle text-white'></i>&nbsp;&nbsp;Ready</div>";
 							}
 
 							extension = data.agents[i].extension;
@@ -322,7 +335,7 @@ function connect_socket() {
 				}).on('new-caller-ringing', function (data) {
 					debugtxt('new-caller-ringing', data); 
 					changeStatusLight('INCOMING_CALL');
-					changeStatusIcon(incoming_call_color, "incoming-call");
+					changeStatusIcon(incoming_call_color, "incoming-call", incoming_call_blinking);
 					$('#myRingingModalPhoneNumber').html(data.phoneNumber)
 					$('#myRingingModal').modal({ show: true, backdrop: 'static', keyboard: false });
 				}).on('request-assistance-response', function (data) {
@@ -460,7 +473,7 @@ function modifyTicket() {
 
 function inCall() {
 	$('#user-status').text('In Call');
-	changeStatusIcon(in_call_color, "in-call");
+	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	changeStatusLight('IN_CALL');
 	var param1 = [{ "Interface": "SIP/" + extensionMe, "Queue": "" }, { "Interface": "", "Queue": "" }];
 	socket.emit('pause-queues', param1);
@@ -472,7 +485,7 @@ function inCallADComplaints() {
 	$('#myRingingModal').modal('hide');
 	$('#user-status').text('In Call');
 	$('#complaintsInCall').show();
-	changeStatusIcon(in_call_color, "in-call");
+	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	changeStatusLight('IN_CALL');
 	socket.emit('incall', null);
 }
@@ -484,13 +497,13 @@ function inCallADGeneral() {
 	$('#user-status').text('In Call');
 	$('#geninfoInCall').show();
 	changeStatusLight('IN_CALL');
-	changeStatusIcon(in_call_color, "in-call");
+	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	socket.emit('incall', null);
 }
 
 function pauseQueues() {
 	$('#user-status').text('Away');
-	changeStatusIcon(away_color, "away");
+	changeStatusIcon(away_color, "away",away_blinking);
 	changeStatusLight('AWAY');
 	socket.emit('pause-queues', null);
 	socket.emit('away', null);
@@ -498,7 +511,7 @@ function pauseQueues() {
 
 function unpauseQueues() {
 	$('#user-status').text('Ready');
-	changeStatusIcon(ready_color, "ready");
+	changeStatusIcon(ready_color, "ready",ready_blinking);
 	changeStatusLight('READY');
 	socket.emit('unpause-queues', null);
 	socket.emit('ready', null);
@@ -635,37 +648,104 @@ function updateColors(data)
     //update new statuses colors
     for(var status in data)
     {
-    	if(data[status].color.toLowerCase() == "off") data[status].color = "gray";
+    	if(data[status].color.toLowerCase() == "off")
+    	{
+    		data[status].color = "gray";
+    		data[status].blink = false;
+    	}
 
-    	if(data[status].id.toLowerCase() == "away") away_color = data[status].color;
-    	else if(data[status].id.toLowerCase() == "ready") ready_color = data[status].color;
-    	else if(data[status].id.toLowerCase() == "in_call") in_call_color = data[status].color;
-    	else if(data[status].id.toLowerCase() == "hold") hold_color = data[status].color;
-    	else if(data[status].id.toLowerCase() == "incoming_call") incoming_call_color = data[status].color;
-    	else if(data[status].id.toLowerCase() == "transferred_call") transferred_call_color = data[status].color;
-    	else if(data[status].id.toLowerCase() == "wrap_up") wrap_up_color = data[status].color;
-    	else if(data[status].id.toLowerCase() == "need_assistance") need_assistance_color = data[status].color;
-    	else missed_call_color= data[status].color;
-    }
+    	if(data[status].id.toLowerCase() == "away")
+    	{
+    		away_color = data[status].color;
+    		away_blinking = data[status].blink;
+    	}
+    	else if(data[status].id.toLowerCase() == "ready")
+    	{
+    		ready_color = data[status].color;
+    		ready_blinking = data[status].blink;
+    	}
+    	else if(data[status].id.toLowerCase() == "in_call")
+    	{
+    		in_call_color = data[status].color;
+    		in_call_blinking = data[status].blink;
+    	}
+    	else if(data[status].id.toLowerCase() == "hold") 
+    	{
+    		hold_color = data[status].color;
+    		hold_blinking = data[status].blink;
+    	}
+    	else if(data[status].id.toLowerCase() == "incoming_call") 
+    	{
+    		incoming_call_color = data[status].color;
+    		incoming_call_blinking = data[status].blink;
+    	}
+    	else if(data[status].id.toLowerCase() == "transferred_call")
+    	{
+    		transferred_call_color = data[status].color;
+    		transferred_call_blinking = data[status].blink;
+    	}
+    	else if(data[status].id.toLowerCase() == "wrap_up")
+    	{
+    		wrap_up_color = data[status].color;
+    		wrap_up_blinking = data[status].blink;
+    	}
+    	else if(data[status].id.toLowerCase() == "need_assistance")
+    	{
+    		need_assistance_color = data[status].color;
+    		need_assistance_blinking = data[status].blink;
+    	}
+    	else
+    	{
+    		missed_call_color= data[status].color;
+    		missed_call_blinking= data[status].blink;
+    	}
+ 	}
 
     //add new colors to away and ready
-     $("#away-icon").addClass("text-"+away_color);
-     $("#ready-icon").addClass("text-"+ready_color);
+    if(away_blinking)
+	{
+		$('#away-icon').addClass("text-"+newColor+"-blinking");
+		if(!($("away-icon").hasClass("margin"))) $('#away-icon').addClass("margin");
+		$("#away-icon").removeClass("fa");
+		$("#away-icon").removeClass("fa-circle");
+	}
+	else
+	{
+		$('#away-icon').addClass("text-"+newColor);
+		if(!($("away-icon").hasClass("fa"))) $("#away-icon").addClass("fa");
+		if(!($("away-icon").hasClass("fa-circle"))) $("#away-icon").addClass("fa-circle");
+		$("#away-icon").removeClass("margin");
+	}
+	if(ready_blinking)
+	{
+		if(!($("ready-icon").hasClass("margin"))) $('#away-icon').addClass("margin");
+		$('#ready-icon').addClass("text-"+newColor+"-blinking");
+		$("#ready-icon").removeClass("fa");
+		$("#ready-icon").removeClass("fa-circle");
+	}
+	else
+	{
+		$('#ready-icon').addClass("text-"+newColor);
+		if(!($("ready-icon").hasClass("fa"))) $("#ready-icon").addClass("fa");
+		if(!($("ready-icon").hasClass("fa"))) $("#ready-icon").addClass("fa-circle");
+		$("#ready-icon").removeClass("margin");
+	}
 
      //add new color to status-icon
-     if($("#status-icon").hasClass("currently-away")) $("#status-icon").addClass("text-"+away_color);
-     else if($("#status-icon").hasClass("currently-ready")) $("#status-icon").addClass("text-"+ready_color);
-     else if($("#status-icon").hasClass("currently-in-call")) $("#status-icon").addClass("text-"+in_call_color);
-     else if($("#status-icon").hasClass("currently-hold")) $("#status-icon").addClass("text-"+hold_color);
-     else if($("#status-icon").hasClass("currently-incoming-call")) $("#status-icon").addClass("text-"+incoming_call_color);
-     else if($("#status-icon").hasClass("currently-transferred-call")) $("#status-icon").addClass("text-"+transferred_call_color);
-     else if($("#status-icon").hasClass("currently-wrap-up")) $("#status-icon").addClass("text-"+wrap_up_color);
-     else $("#status-icon").addClass("text-"+need_assist_color);
+     if($("#status-icon").hasClass("currently-away")) changeStatusIcon(away_color,"away",away_blinking);
+     else if($("#status-icon").hasClass("currently-ready")) changeStatusIcon(ready_color,"ready",ready_blinking);
+     else if($("#status-icon").hasClass("currently-in-call")) changeStatusIcon(in_call_color,"in-call",in_call_blinking);
+     else if($("#status-icon").hasClass("currently-hold")) changeStatusIcon(hold_color,"hold",hold_blinking);
+     else if($("#status-icon").hasClass("currently-incoming-call")) changeStatusIcon(incoming_call_color,"incoming-call",incoming_call_blinking);
+     else if($("#status-icon").hasClass("currently-transferred-call")) changeStatusIcon(transferred_call_color,"transferred-call",transferred_blinking);
+     else if($("#status-icon").hasClass("currently-wrap-up")) changeStatusIcon(wrap_up_color,"wrap-up",wrap_up_blinking);
+     else if($("#status-icon").hasClass("currently-need-assistance")) changeStatusIcon(need_assistance_color,"need-assistance",need_assistance_blinking);
+     else changeStatusIcon(missed_call_color,"missed-call",missed_call_blinking);
 
      socket.emit('update-agent-list');
 }
 
-function changeStatusIcon(newColor, statusName)
+function changeStatusIcon(newColor, statusName, blinking)
 {
 	$("#status-icon").removeClass (function (index, className) {
     	return (className.match (/\btext-\S+/g) || []).join(' ');
@@ -673,6 +753,17 @@ function changeStatusIcon(newColor, statusName)
     $("#status-icon").removeClass (function (index, className) {
     	return (className.match (/\bcurrently-\S+/g) || []).join(' ');
     });
-	$('#status-icon').addClass("text-"+newColor);
-	$('#status-icon').addClass("currently-"+statusName);
+	if(blinking)
+	{
+		$('#status-icon').addClass("text-"+newColor+"-blinking");
+		$("#status-icon").removeClass("fa");
+		$("#status-icon").removeClass("fa-circle");
+	}
+	else
+	{
+		$('#status-icon').addClass("text-"+newColor);
+		if(!($("status-icon").hasClass("fa"))) $("#status-icon").addClass("fa");
+		if(!($("status-icon").hasClass("fa-circle"))) $("#status-icon").addClass("fa-circle");
+	}
+	$('#status-icon').addClass("currently-"+statusName); 
 }

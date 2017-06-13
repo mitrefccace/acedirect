@@ -183,9 +183,41 @@ However, delay the fade out process for 2.5 seconds */
     color: #d626d0 !important;
 }
 
+.text-pink-blinking
+{
+    width:10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #d626d0;
+    box-shadow: 8px 0 0 -4px #d626d0, 
+              -8px 0 0 -4px #d626d0, 
+                0 8px 0 -4px #d626d0,
+               0 -8px 0 -4px #d626d0, 
+              6px -6px 0 -4px #d626d0, 
+              -6px -6px 0 -4px #d626d0, 
+              -6px 6px 0 -4px #d626d0, 
+              6px 6px 0 -4px #d626d0;
+}
+
 .text-gray
 {
     color: #777777 !important;
+}
+
+.text-gray-blinking
+{
+    width:10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #777777;
+    box-shadow: 8px 0 0 -4px #777777, 
+              -8px 0 0 -4px #777777, 
+                0 8px 0 -4px #777777,
+               0 -8px 0 -4px #777777, 
+              6px -6px 0 -4px #777777, 
+              -6px -6px 0 -4px #777777, 
+              -6px 6px 0 -4px #777777, 
+              6px 6px 0 -4px #777777;
 }
 
 .text-red
@@ -193,7 +225,108 @@ However, delay the fade out process for 2.5 seconds */
     color: #d33621 !important;
 }
 
+.text-red-blinking
+{
+    width:10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #d33621;
+    box-shadow: 8px 0 0 -4px #d33621, 
+              -8px 0 0 -4px #d33621, 
+                0 8px 0 -4px #d33621,
+               0 -8px 0 -4px #d33621, 
+              6px -6px 0 -4px #d33621, 
+              -6px -6px 0 -4px #d33621, 
+              -6px 6px 0 -4px #d33621, 
+              6px 6px 0 -4px #d33621;
+}
+
 .text-yellow
 {
     color: #ffcb11 !important;
+}
+
+.text-yellow-blinking
+{
+    width:10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #ffcb11;
+    box-shadow: 8px 0 0 -4px #ffcb11, 
+              -8px 0 0 -4px #ffcb11, 
+                0 8px 0 -4px #ffcb11,
+               0 -8px 0 -4px #ffcb11, 
+              6px -6px 0 -4px #ffcb11, 
+              -6px -6px 0 -4px #ffcb11, 
+              -6px 6px 0 -4px #ffcb11, 
+              6px 6px 0 -4px #ffcb11;
+}
+
+.text-aqua-blinking
+{
+    width:10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #00c0ef;
+    box-shadow: 8px 0 0 -4px #00c0ef, 
+              -8px 0 0 -4px #00c0ef, 
+                0 8px 0 -4px #00c0ef,
+               0 -8px 0 -4px #00c0ef, 
+              6px -6px 0 -4px #00c0ef, 
+              -6px -6px 0 -4px #00c0ef, 
+              -6px 6px 0 -4px #00c0ef, 
+              6px 6px 0 -4px #00c0ef;
+}
+
+.text-blue-blinking
+{
+    width:10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #0073b7;
+    box-shadow: 8px 0 0 -4px #0073b7, 
+              -8px 0 0 -4px #0073b7, 
+                0 8px 0 -4px #0073b7,
+               0 -8px 0 -4px #0073b7, 
+              6px -6px 0 -4px #0073b7, 
+              -6px -6px 0 -4px #0073b7, 
+              -6px 6px 0 -4px #0073b7, 
+              6px 6px 0 -4px #0073b7;
+}
+
+.text-orange-blinking
+{
+    width:10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #ff851b;
+    box-shadow: 8px 0 0 -4px #ff851b, 
+              -8px 0 0 -4px #ff851b, 
+                0 8px 0 -4px #ff851b,
+               0 -8px 0 -4px #ff851b, 
+              6px -6px 0 -4px #ff851b, 
+              -6px -6px 0 -4px #ff851b, 
+              -6px 6px 0 -4px #ff851b, 
+              6px 6px 0 -4px #ff851b;
+}
+
+.text-white-blinking
+{
+    width:10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: white;
+    box-shadow: 8px 0 0 -4px white, 
+              -8px 0 0 -4px white, 
+                0 8px 0 -4px white,
+               0 -8px 0 -4px white, 
+              6px -6px 0 -4px white, 
+              -6px -6px 0 -4px white, 
+              -6px 6px 0 -4px white, 
+              6px 6px 0 -4px white;
+}
+
+.margin
+{
+    margin-right: 8px;
 }
