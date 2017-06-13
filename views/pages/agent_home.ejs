@@ -113,7 +113,9 @@
                     </div>
                     <div class="pull-left info">
                         <p><span id="agentname-sidebar"></span></p>
-                        <span><i id="status-icon" class="fa fa-circle text-warning currently-away"></i></span>&nbsp;&nbsp;&nbsp;<span id="user-status">Away</span>
+                        <span><i id="status-icon" class="fa fa-circle text-warning currently-away"></i></span>&nbsp;&nbsp;&nbsp;
+                        <span
+                            id="user-status">Away</span>
                     </div>
                 </div>
                 <!-- sidebar menu: : style can be found in sidebar.less -->
@@ -177,7 +179,7 @@
                                     <h3 class="box-title">User Chat</h3>
                                     <div class="box-tools pull-right">
                                         <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-											</button> 
+											</button>
                                     </div>
                                 </div>
                                 <div class="box-body">
@@ -524,7 +526,27 @@
             </div>
         </div>
     </div>
-                                               
+
+    <!-- BusyLight Modal -->
+    <div class="modal fade" id="busylightModal" tabindex="-1" role="dialog" aria-labelledby="busylightModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Busy Light</h4>
+                </div>
+                <div class="modal-body" id='busylightModalBody'>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id='busylightModalTestBtn' onclick="testLightConnection()">Test BusyLight Connection</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+
     <div id="snackbar">Default Text</div>
 
     <!-- ==================Le javascript ================================ -->
@@ -548,7 +570,7 @@
     <!-- Custom Javascript for ACEDirect index.html page-->
     <script type="text/javascript" src="./js/busylight.js"></script>
     <script type="text/javascript" src="./js/acedirect.js"></script>
-    
+
 </body>
 
 </html>
