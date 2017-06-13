@@ -704,31 +704,31 @@ function updateColors(data)
     //add new colors to away and ready
     if(away_blinking)
 	{
-		$('#away-icon').addClass("text-"+newColor+"-blinking");
-		if(!($("away-icon").hasClass("margin"))) $('#away-icon').addClass("margin");
+		$('#away-icon').addClass("text-"+away_color+"-blinking");
+		if(!($("away-icon").hasClass("status-margin"))) $('#away-icon').addClass("status-margin");
 		$("#away-icon").removeClass("fa");
 		$("#away-icon").removeClass("fa-circle");
 	}
 	else
 	{
-		$('#away-icon').addClass("text-"+newColor);
+		$('#away-icon').addClass("text-"+away_color);
 		if(!($("away-icon").hasClass("fa"))) $("#away-icon").addClass("fa");
 		if(!($("away-icon").hasClass("fa-circle"))) $("#away-icon").addClass("fa-circle");
-		$("#away-icon").removeClass("margin");
+		$("#away-icon").removeClass("status-margin");
 	}
 	if(ready_blinking)
 	{
-		if(!($("ready-icon").hasClass("margin"))) $('#away-icon').addClass("margin");
-		$('#ready-icon').addClass("text-"+newColor+"-blinking");
+		if(!($("ready-icon").hasClass("status-margin"))) $('#away-icon').addClass("status-margin");
+		$('#ready-icon').addClass("text-"+ready_color+"-blinking");
 		$("#ready-icon").removeClass("fa");
 		$("#ready-icon").removeClass("fa-circle");
 	}
 	else
 	{
-		$('#ready-icon').addClass("text-"+newColor);
+		$('#ready-icon').addClass("text-"+ready_color);
 		if(!($("ready-icon").hasClass("fa"))) $("#ready-icon").addClass("fa");
 		if(!($("ready-icon").hasClass("fa"))) $("#ready-icon").addClass("fa-circle");
-		$("#ready-icon").removeClass("margin");
+		$("#ready-icon").removeClass("status-margin");
 	}
 
      //add new color to status-icon

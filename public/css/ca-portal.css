@@ -185,6 +185,7 @@ However, delay the fade out process for 2.5 seconds */
 
 .text-pink-blinking
 {
+    display:inline-block;
     width:10px;
     height: 10px;
     border-radius: 50%;
@@ -206,6 +207,7 @@ However, delay the fade out process for 2.5 seconds */
 
 .text-gray-blinking
 {
+    display:inline-block;
     width:10px;
     height: 10px;
     border-radius: 50%;
@@ -227,6 +229,7 @@ However, delay the fade out process for 2.5 seconds */
 
 .text-red-blinking
 {
+    display:inline-block;
     width:10px;
     height: 10px;
     border-radius: 50%;
@@ -248,6 +251,7 @@ However, delay the fade out process for 2.5 seconds */
 
 .text-yellow-blinking
 {
+    display:inline-block;
     width:10px;
     height: 10px;
     border-radius: 50%;
@@ -264,6 +268,7 @@ However, delay the fade out process for 2.5 seconds */
 
 .text-aqua-blinking
 {
+    display:inline-block;
     width:10px;
     height: 10px;
     border-radius: 50%;
@@ -280,6 +285,7 @@ However, delay the fade out process for 2.5 seconds */
 
 .text-blue-blinking
 {
+    display:inline-block;
     width:10px;
     height: 10px;
     border-radius: 50%;
@@ -296,6 +302,7 @@ However, delay the fade out process for 2.5 seconds */
 
 .text-orange-blinking
 {
+    display:inline-block;
     width:10px;
     height: 10px;
     border-radius: 50%;
@@ -312,6 +319,7 @@ However, delay the fade out process for 2.5 seconds */
 
 .text-white-blinking
 {
+    display:inline-block;
     width:10px;
     height: 10px;
     border-radius: 50%;
@@ -326,7 +334,7 @@ However, delay the fade out process for 2.5 seconds */
               6px 6px 0 -4px white;
 }
 
-.margin
+.status-margin
 {
     margin-right: 8px;
 }
