@@ -306,19 +306,19 @@ function connect_socket() {
 							name = data.agents[i].name;
 							status = data.agents[i].status;
 							if (status === "READY") {
-								if(ready_blinking) status = "<div style='display:inline-block'><i class='text-"+ready_color+"-blinking'></i>&nbsp;&nbsp;Ready</div>";
+								if(ready_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-"+ready_color+"-blinking'></i>&nbsp;&nbsp;Ready</div>";
 								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+ready_color+"'></i>&nbsp;&nbsp;Ready</div>";
 							} else if (status === "AWAY") {
-								if(away_blinking) status = "<div style='display:inline-block'><i class='text-"+away_color+"-blinking'></i>&nbsp;&nbsp;Ready</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+away_color+"'></i>&nbsp;&nbsp;Ready</div>";
+								if(away_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-"+away_color+"-blinking'></i>&nbsp;&nbsp;Away</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+away_color+"'></i>&nbsp;&nbsp;Away</div>";
 							} else if (status === "INCALL") {
-								if(in_call_blinking) status = "<div style='display:inline-block'><i class='text-"+in_call_color+"-blinking'></i>&nbsp;&nbsp;Ready</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+in_call_color+"'></i>&nbsp;&nbsp;Ready</div>";
+								if(in_call_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-"+in_call_color+"-blinking'></i>&nbsp;&nbsp;In Call</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+in_call_color+"'></i>&nbsp;&nbsp;In Call</div>";
 							} else if (status === "WRAPUP") {
-								if(wrap_up_blinking) status = "<div style='display:inline-block'><i class='text-"+wrap_up_color+"-blinking'></i>&nbsp;&nbsp;Ready</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+wrap_up_color+"'></i>&nbsp;&nbsp;Ready</div>";
+								if(wrap_up_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-"+wrap_up_color+"-blinking'></i>&nbsp;&nbsp;Wrap Up</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+wrap_up_color+"'></i>&nbsp;&nbsp;Wrap Up</div>";
 							} else {
-								status = "<div style='display:inline-block'><i class='fa fa-circle text-white'></i>&nbsp;&nbsp;Ready</div>";
+								status = "<div style='display:inline-block'><i class='fa fa-circle text-gray'></i>&nbsp;&nbsp;Unknown</div>";
 							}
 
 							extension = data.agents[i].extension;
@@ -429,7 +429,7 @@ $('#ticketTabTitle').click(function () {
 });
 
 function requestAssistance() {
-	socket.emit('request-assistance', null); //TODO
+	socket.emit('request-assistance', null); 
 }
 
 function logout(msg) {
@@ -718,7 +718,7 @@ function updateColors(data)
 	}
 	if(ready_blinking)
 	{
-		if(!($("ready-icon").hasClass("status-margin"))) $('#away-icon').addClass("status-margin");
+		if(!($("ready-icon").hasClass("status-margin"))) $('#ready-icon').addClass("status-margin");
 		$('#ready-icon').addClass("text-"+ready_color+"-blinking");
 		$("#ready-icon").removeClass("fa");
 		$("#ready-icon").removeClass("fa-circle");
@@ -758,12 +758,15 @@ function changeStatusIcon(newColor, statusName, blinking)
 		$('#status-icon').addClass("text-"+newColor+"-blinking");
 		$("#status-icon").removeClass("fa");
 		$("#status-icon").removeClass("fa-circle");
+		if(!($("status-icon").hasClass("status-margin-small"))) $("#status-icon").addClass("status-margin-small");
+
 	}
 	else
 	{
 		$('#status-icon').addClass("text-"+newColor);
 		if(!($("status-icon").hasClass("fa"))) $("#status-icon").addClass("fa");
 		if(!($("status-icon").hasClass("fa-circle"))) $("#status-icon").addClass("fa-circle");
+		$("#status-icon").removeClass("status-margin-small");
 	}
 	$('#status-icon').addClass("currently-"+statusName); 
 }

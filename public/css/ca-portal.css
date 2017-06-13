@@ -283,6 +283,23 @@ However, delay the fade out process for 2.5 seconds */
               6px 6px 0 -4px #00c0ef;
 }
 
+.text-green-blinking
+{
+    display:inline-block;
+    width:10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #00a65a;
+    box-shadow: 8px 0 0 -4px #00a65a, 
+              -8px 0 0 -4px #00a65a, 
+                0 8px 0 -4px #00a65a,
+               0 -8px 0 -4px #00a65a, 
+              6px -6px 0 -4px #00a65a, 
+              -6px -6px 0 -4px #00a65a, 
+              -6px 6px 0 -4px #00a65a, 
+              6px 6px 0 -4px #00a65a;
+}
+
 .text-blue-blinking
 {
     display:inline-block;
@@ -317,6 +334,11 @@ However, delay the fade out process for 2.5 seconds */
               6px 6px 0 -4px #ff851b;
 }
 
+.text-white
+{
+    color: white !important;
+}
+
 .text-white-blinking
 {
     display:inline-block;
@@ -336,5 +358,10 @@ However, delay the fade out process for 2.5 seconds */
 
 .status-margin
 {
-    margin-right: 8px;
+    margin-right: 10px;
+}
+
+.status-margin-small
+{
+    margin-right: 2px;
 }
