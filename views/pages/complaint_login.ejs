@@ -76,6 +76,7 @@
 					$.ajax({
 						url: './consumer_login',
 						data: {
+							_csrf: "<%= csrfToken %>",
 							vrsnumber: vrsnumber
 						},
 						type: 'POST',
