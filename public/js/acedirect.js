@@ -335,6 +335,9 @@ function connect_socket() {
 							} else if (status === "WRAPUP") {
 								if(wrap_up_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-"+wrap_up_color+"-blinking'></i>&nbsp;&nbsp;Wrap Up</div>";
 								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+wrap_up_color+"'></i>&nbsp;&nbsp;Wrap Up</div>";
+							} else if (status === "INCOMINGCALL") {
+								if(incoming_call_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-"+incoming_call_color+"-blinking'></i>&nbsp;&nbsp;Incoming Call</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+incoming_call_color+"'></i>&nbsp;&nbsp;Incoming Call Up</div>";
 							} else {
 								status = "<div style='display:inline-block'><i class='fa fa-circle text-gray'></i>&nbsp;&nbsp;Unknown</div>";
 							}
@@ -359,12 +362,14 @@ function connect_socket() {
 					debugtxt('new-caller-ringing', data);
 					changeStatusLight('INCOMING_CALL');
 					changeStatusIcon(incoming_call_color, "incoming-call", incoming_call_blinking);
+					$('#user-status').text('Incoming Call');
 					$('#myRingingModalPhoneNumber').html(data.phoneNumber)
 					$('#myRingingModal').modal({
 						show: true,
 						backdrop: 'static',
 						keyboard: false
 					});
+					socket.emit('incomingcall',null);
 				}).on('request-assistance-response', function (data) {
 					debugtxt('request-assistance-response', data);
 					//alert(data.message);
