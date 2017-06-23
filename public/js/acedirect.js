@@ -35,6 +35,10 @@ $(document).ready(function () {
 	$("#geninfotab").hide();
 	$("#complaintstab").hide();
 	$("[data-mask]").inputmask();
+	//make boxes draggable
+	$('.box').draggable({
+		cursor: "crosshair"
+	});
 
 	clearScreen();
 
@@ -322,22 +326,21 @@ function connect_socket() {
 							var name, status, extension, queues = "";
 							name = data.agents[i].name;
 							status = data.agents[i].status;
-							if (status === "READY") 
-							{
-								if(ready_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-"+ready_color+"-blinking'></i>&nbsp;&nbsp;Ready</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+ready_color+"'></i>&nbsp;&nbsp;Ready</div>";
+							if (status === "READY") {
+								if (ready_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-" + ready_color + "-blinking'></i>&nbsp;&nbsp;Ready</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + ready_color + "'></i>&nbsp;&nbsp;Ready</div>";
 							} else if (status === "AWAY") {
-								if(away_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-"+away_color+"-blinking'></i>&nbsp;&nbsp;Away</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+away_color+"'></i>&nbsp;&nbsp;Away</div>";
+								if (away_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-" + away_color + "-blinking'></i>&nbsp;&nbsp;Away</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + away_color + "'></i>&nbsp;&nbsp;Away</div>";
 							} else if (status === "INCALL") {
-								if(in_call_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-"+in_call_color+"-blinking'></i>&nbsp;&nbsp;In Call</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+in_call_color+"'></i>&nbsp;&nbsp;In Call</div>";
+								if (in_call_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-" + in_call_color + "-blinking'></i>&nbsp;&nbsp;In Call</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + in_call_color + "'></i>&nbsp;&nbsp;In Call</div>";
 							} else if (status === "WRAPUP") {
-								if(wrap_up_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-"+wrap_up_color+"-blinking'></i>&nbsp;&nbsp;Wrap Up</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+wrap_up_color+"'></i>&nbsp;&nbsp;Wrap Up</div>";
+								if (wrap_up_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-" + wrap_up_color + "-blinking'></i>&nbsp;&nbsp;Wrap Up</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + wrap_up_color + "'></i>&nbsp;&nbsp;Wrap Up</div>";
 							} else if (status === "INCOMINGCALL") {
-								if(incoming_call_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-"+incoming_call_color+"-blinking'></i>&nbsp;&nbsp;Incoming Call</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-"+incoming_call_color+"'></i>&nbsp;&nbsp;Incoming Call</div>";
+								if (incoming_call_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-" + incoming_call_color + "-blinking'></i>&nbsp;&nbsp;Incoming Call</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + incoming_call_color + "'></i>&nbsp;&nbsp;Incoming Call</div>";
 							} else {
 								status = "<div style='display:inline-block'><i class='fa fa-circle text-gray'></i>&nbsp;&nbsp;Unknown</div>";
 							}
@@ -369,7 +372,7 @@ function connect_socket() {
 						backdrop: 'static',
 						keyboard: false
 					});
-					socket.emit('incomingcall',null);
+					socket.emit('incomingcall', null);
 				}).on('request-assistance-response', function (data) {
 					debugtxt('request-assistance-response', data);
 					//alert(data.message);
@@ -483,7 +486,7 @@ $('#ticketTabTitle').click(function () {
 });
 
 function requestAssistance() {
-	socket.emit('request-assistance', null); 
+	socket.emit('request-assistance', null);
 }
 
 function logout(msg) {
@@ -787,9 +790,9 @@ function updateColors(data) {
 		if (!($("away-icon").hasClass("fa-circle"))) $("#away-icon").addClass("fa-circle");
 		$("#away-icon").removeClass("status-margin");
 	}
-	if(ready_blinking){
-		if(!($("ready-icon").hasClass("status-margin"))) $('#ready-icon').addClass("status-margin");
-		$('#ready-icon').addClass("text-"+ready_color+"-blinking");
+	if (ready_blinking) {
+		if (!($("ready-icon").hasClass("status-margin"))) $('#ready-icon').addClass("status-margin");
+		$('#ready-icon').addClass("text-" + ready_color + "-blinking");
 		$("#ready-icon").removeClass("fa");
 		$("#ready-icon").removeClass("fa-circle");
 	} else {
@@ -813,30 +816,26 @@ function updateColors(data) {
 	socket.emit('update-agent-list');
 }
 
-function changeStatusIcon(newColor, statusName, blinking)
-{
-	$("#status-icon").removeClass (function (index, className) {
-    	return (className.match (/\btext-\S+/g) || []).join(' ');
-    });
-    $("#status-icon").removeClass (function (index, className) {
-    	return (className.match (/\bcurrently-\S+/g) || []).join(' ');
-    });
-	if(blinking)
-	{
-		$('#status-icon').addClass("text-"+newColor+"-blinking");
+function changeStatusIcon(newColor, statusName, blinking) {
+	$("#status-icon").removeClass(function (index, className) {
+		return (className.match(/\btext-\S+/g) || []).join(' ');
+	});
+	$("#status-icon").removeClass(function (index, className) {
+		return (className.match(/\bcurrently-\S+/g) || []).join(' ');
+	});
+	if (blinking) {
+		$('#status-icon').addClass("text-" + newColor + "-blinking");
 		$("#status-icon").removeClass("fa");
 		$("#status-icon").removeClass("fa-circle");
-		if(!($("status-icon").hasClass("status-margin-small"))) $("#status-icon").addClass("status-margin-small");
+		if (!($("status-icon").hasClass("status-margin-small"))) $("#status-icon").addClass("status-margin-small");
 
-	}
-	else
-	{
-		$('#status-icon').addClass("text-"+newColor);
-		if(!($("status-icon").hasClass("fa"))) $("#status-icon").addClass("fa");
-		if(!($("status-icon").hasClass("fa-circle"))) $("#status-icon").addClass("fa-circle");
+	} else {
+		$('#status-icon').addClass("text-" + newColor);
+		if (!($("status-icon").hasClass("fa"))) $("#status-icon").addClass("fa");
+		if (!($("status-icon").hasClass("fa-circle"))) $("#status-icon").addClass("fa-circle");
 		$("#status-icon").removeClass("status-margin-small");
 	}
-	$('#status-icon').addClass("currently-"+statusName); 
+	$('#status-icon').addClass("currently-" + statusName);
 }
 
 
@@ -880,4 +879,3 @@ function testLightConnection() {
 }
 
 testLightConnection();
-
