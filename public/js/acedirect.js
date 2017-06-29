@@ -341,6 +341,9 @@ function connect_socket() {
 							} else if (status === "INCOMINGCALL") {
 								if (incoming_call_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-" + incoming_call_color + "-blinking'></i>&nbsp;&nbsp;Incoming Call</div>";
 								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + incoming_call_color + "'></i>&nbsp;&nbsp;Incoming Call</div>";
+							} else if (status === "MISSEDCALL") {
+								if (missed_call_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-" + missed_call_color + "-blinking'></i>&nbsp;&nbsp;Incoming Call</div>";
+								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + missed_call_color + "'></i>&nbsp;&nbsp;Incoming Call</div>";
 							} else {
 								status = "<div style='display:inline-block'><i class='fa fa-circle text-gray'></i>&nbsp;&nbsp;Unknown</div>";
 							}
