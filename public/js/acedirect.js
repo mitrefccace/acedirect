@@ -36,9 +36,9 @@ $(document).ready(function () {
 	$("#complaintstab").hide();
 	$("[data-mask]").inputmask();
 	//make boxes draggable
-	$('.box').draggable({
-		cursor: "crosshair"
-	});
+	//$('.box').draggable({
+	//	cursor: "crosshair"
+	//});
 
 	clearScreen();
 
