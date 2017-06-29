@@ -366,6 +366,7 @@ function connect_socket() {
 					}
 				}).on('new-caller-ringing', function (data) {
 					debugtxt('new-caller-ringing', data);
+					$('#myRingingModal').addClass('fade');
 					changeStatusLight('INCOMING_CALL');
 					changeStatusIcon(incoming_call_color, "incoming-call", incoming_call_blinking);
 					$('#user-status').text('Incoming Call');
@@ -378,6 +379,7 @@ function connect_socket() {
 					socket.emit('incomingcall', null);
 				}).on('new-missed-call', function (data) {
 					debugtxt('new-missed-call', data);
+					$('#myRingingModal').removeClass('fade');
 					$('#myRingingModal').modal('hide');
 					changeStatusLight('MISSED_CALL');
 					changeStatusIcon(missed_call_color, "missed-call", missed_call_blinking);
