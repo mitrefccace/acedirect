@@ -375,6 +375,7 @@ function connect_socket() {
 					socket.emit('incomingcall', null);
 				}).on('new-missed-call', function (data) {
 					debugtxt('new-missed-call', data);
+					$('#myRingingModal').modal('hide');
 					changeStatusLight('MISSED_CALL');
 					changeStatusIcon(missed_call_color, "missed-call", missed_call_blinking);
 					$('#user-status').text('Incoming Call');
