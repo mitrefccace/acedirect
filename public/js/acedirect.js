@@ -373,6 +373,20 @@ function connect_socket() {
 						keyboard: false
 					});
 					socket.emit('incomingcall', null);
+				}).on('new-missed-call', function (data) {
+					debugtxt('new-missed-call', data);
+					changeStatusLight('MISSED_CALL');
+					changeStatusIcon(missed_call_color, "missed-call", missed_call_blinking);
+					$('#user-status').text('Incoming Call');
+					var missedCallNumber = $('#myRingingModalPhoneNumber').html();
+					$('#myMissedCallModalPhoneNumber').html(missedCallNumber)
+					$('#myMissedCallModal').modal({
+						show: true,
+						backdrop: 'static',
+						keyboard: false
+					});
+					socket.emit('missedcall', null);
+					socket.emit('pause-queues');
 				}).on('request-assistance-response', function (data) {
 					debugtxt('request-assistance-response', data);
 					//alert(data.message);
