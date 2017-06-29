@@ -382,7 +382,7 @@ function connect_socket() {
 					changeStatusLight('MISSED_CALL');
 					changeStatusIcon(missed_call_color, "missed-call", missed_call_blinking);
 					$('#user-status').text('Missed Call');
-					var missedCallNumber = $('#myRingingModalPhoneNumber').html();
+					var missedCallNumber = $('#myRingingModalPhoneNumber').text();
 					$('#myMissedCallModalPhoneNumber').html(missedCallNumber)
 					$('#myMissedCallModal').modal({
 						show: true,
