@@ -205,9 +205,12 @@ function connect_socket() {
 					debugtxt('no-ticket-info', data);
 					$('#notickettxt').show();
 					$('#ticketTab').addClass("bg-pink");
+					/*
+					//Removed to stop flashing delay issue.
 					ticketTabFade = setInterval(function () {
 						$('#ticketTab').fadeTo("slow", 0.1).fadeTo("slow", 1.0);
 					}, 1000);
+					*/
 				}).on('chat-leave', function (data) {
 					debugtxt('chat-leave', data);
 					$('#duration').timer('pause');
@@ -379,8 +382,9 @@ function connect_socket() {
 					socket.emit('incomingcall', null);
 				}).on('new-missed-call', function (data) {
 					debugtxt('new-missed-call', data);
-					$('#myRingingModal').removeClass('fade');
+					//$('#myRingingModal').removeClass('fade');					
 					$('#myRingingModal').modal('hide');
+					/*
 					changeStatusLight('MISSED_CALL');
 					changeStatusIcon(missed_call_color, "missed-call", missed_call_blinking);
 					$('#user-status').text('Missed Call');
@@ -393,6 +397,8 @@ function connect_socket() {
 					});
 					socket.emit('missedcall', null);
 					socket.emit('pause-queues');
+					*/
+					unpauseQueues();
 				}).on('request-assistance-response', function (data) {
 					debugtxt('request-assistance-response', data);
 					//alert(data.message);
