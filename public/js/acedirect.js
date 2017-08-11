@@ -97,18 +97,24 @@ function connect_socket() {
 					$('#statusmsg').text(""); //clear status text
 
 					//populate call agent information
-					$('#txtAgentDisplayName').val(payload.username);
-					$('#txtAgentFirstname').val(payload.first_name);
-					$('#txtAgentLastname').val(payload.last_name);
-					$('#txtAgentRole').val(payload.role);
-					$('#txtAgentEmail').val(payload.email);
-					$('#txtAgentPhone').val(payload.phone);
+					/*seems to be dead code 
+					// $('#txtAgentDisplayName').val(payload.username);
+					// $('#txtAgentFirstname').val(payload.first_name);
+					// $('#txtAgentLastname').val(payload.last_name);
+					// $('#txtAgentRole').val(payload.role);
+					// $('#txtAgentEmail').val(payload.email);
+					// $('#txtAgentPhone').val(payload.phone);
+					*/
 					$('#displayname').val(payload.first_name + ' ' + payload.role);
 					$('#agentname-sidebar').html(payload.first_name + " " + payload.last_name);
 					$('#agentname-header').html(payload.first_name + " " + payload.last_name);
 					$('#agentname-headerdropdown').html(payload.first_name + " " + payload.last_name);
 					$('#agentrole-headerdropdown').html("<small>" + payload.role + "</small>");
 					$('#agentlightcode-headerdropdown').html("<small>Light Code: " + payload.lightcode + "</small>");
+					$('#ws_servers').attr("name","wss://" + payload.asteriskPublicHostname + "/ws");
+					$('#my_sip_uri').attr("name","sip:"+payload.extension+"@"+payload.asteriskPublicHostname);
+					$('#sip_password').attr("name",payload.extensionPassword);
+					$("#pc_config").attr("name","stun:" + payload.stunServer );																																																	 
 					var lighturl = "https://" + window.location.hostname + window.location.pathname + "/" + payload.lightcode;
 					lighturl = lighturl.replace('/agent/', '/getagentstatus/');
 					$('#agentlightcode').val(lighturl);
@@ -132,11 +138,12 @@ function connect_socket() {
 					extensionMe = payload.extension; //e.g. 6001
 					queueNameMe = payload.queue_name; //e.g. InboundQueue
 					channelMe = payload.channel; //e.g. SIP/7001
-
+					register_jssip();
 					pauseQueues();
 				}).on('disconnect', function () {
 					debugtxt('disconnect');
 					console.log('disconnected');
+					unregister_jssip();																							 
 					changeStatusLight('OFF_DUTY');
 					//logout("disconnected");
 				}).on("unauthorized", function (error) {
@@ -162,36 +169,6 @@ function connect_socket() {
 					if ($("#displayname").val() !== data.displayname) {
 						$('#rtt-typing').html('');
 					}
-				}).on('new-caller', function (data) { // a new caller has connected
-					debugtxt('new-caller', data);
-
-					//filter out messages not destined for me
-					if (data.id != extensionMe) {
-						return;
-					}
-
-					clearScreen();
-
-					$('#callerFirstName').val(data.data[0].first_name);
-					$('#callerLastName').val(data.data[0].last_name);
-					$('#callerAddress1').val(data.data[0].address);
-					$('#callerCity').val(data.data[0].city);
-					$('#callerState').val(data.data[0].state);
-					$('#callerZipcode').val(data.data[0].zip_code);
-					$('#callerPhone').val(data.data[0].vrs);
-					$('#callerEmail').val(data.data[0].email);
-
-					$('#inboundnumber').text(data.srcPhoneNum);
-					$('#outboundnumber').text($('#destexten').val());
-
-					if (data.vrscaller) {
-						$('#inbounddhohlabel').show();
-					} else {
-						$('#outbounddhohlabel').show();
-					}
-
-					$('#duration').timer('reset');
-					inCall();
 				}).on('new-caller-general', function (data) { // a new general caller has connected
 					debugtxt('new-caller-general', data);
 					$('#duration').timer('reset');
@@ -586,22 +563,8 @@ function modifyTicket() {
 
 }
 
-function inCall() {
-	$('#user-status').text('In Call');
-	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
-	changeStatusLight('IN_CALL');
-	var param1 = [{
-		"Interface": "SIP/" + extensionMe,
-		"Queue": ""
-	}, {
-		"Interface": "",
-		"Queue": ""
-	}];
-	socket.emit('pause-queues', param1);
-}
-
 function inCallADComplaints() {
-	pauseQueues();
+		socket.emit('pause-queues', null);
 	$('#myRingingModalPhoneNumber').html('');
 	$('#myRingingModal').modal('hide');
 	$('#user-status').text('In Call');
@@ -612,7 +575,7 @@ function inCallADComplaints() {
 }
 
 function inCallADGeneral() {
-	pauseQueues();
+	socket.emit('pause-queues', null);
 	$('#myRingingModalPhoneNumber').html('');
 	$('#myRingingModal').modal('hide');
 	$('#user-status').text('In Call');
@@ -905,3 +868,15 @@ function testLightConnection() {
 }
 
 testLightConnection();
+
+
+$("#accept-btn").click(function(){
+	$('#myRingingModalPhoneNumber').html('');
+	$('#myRingingModal').modal('hide');
+	$("#hide-video-icon").css("display","none");
+});
+
+$("#decline-btn").click(function(){
+	$('#myRingingModalPhoneNumber').html('');
+	$('#myRingingModal').modal('hide');
+});

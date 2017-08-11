@@ -20,17 +20,10 @@
 	<link rel="stylesheet" href="./bower_components/AdminLTE/dist/css/AdminLTE.css">
 	<!-- AdminLTE Skins  -->
 	<link rel="stylesheet" href="./bower_components/AdminLTE/dist/css/skins/_all-skins.min.css">
-	<!-- JSSIP CLIENT -->
-	<link rel="stylesheet" href="./jssipclient/css/style.css" type="text/css" />
 	<!-- Custom Portal stylesheet -->
 	<link rel="stylesheet" href="./css/ca-portal.css">
 
-	<style>
-
-	</style>
-
-
-
+	
 </head>
 
 <body class="hold-transition skin-blue-light layout-top-nav">
@@ -163,12 +156,16 @@
 							</div>
 							<div class="box-body">
 								<div id="webcam" hidden>
-									<video id="remoteView" autoplay poster="jssipclient/images/AD-logo.png"></video>
-									<video id="selfView" autoplay muted="true"></video>
+									<video id="remoteView" autoplay poster="images/AD-logo.png"></video>
+									<video id="selfView" style="right: 10px;" autoplay muted="true" hidden></video>
 								</div>
-								<div id="sessions"></div>
-								<div id="ws_reconnect"></div>
-								<div id="unregister_all"></div>
+								<div id= "call-option-buttons">     
+	                                <div id= "inner">     
+	                                    <button  id="mute-audio" type = "button" class = "btn btn-gray" onclick = "mute_audio()"> <i id= "mute-audio-icon" class="call-btn-icon fa fa-microphone"></i> </button> 
+	                                    <button  id="hide-video" type = "button" class = "btn btn-gray" onclick = "hide_video()"> <i class="call-btn-icon fa fa-video-camera"></i>  <div id= "hide-video-icon" class = "fa fa-close fa-close-style" style="display: none;"></div> <!-- hack for hide video button since there's no fa-icon for it. we overlay an x and hide and show it when needed--></button>  
+	                                    <button id="end-call" type = "button" class = "btn btn-danger" onclick = "terminate_call()"> <i class="call-btn-icon fa fa-phone fa-rotate-135"></i> </button>   
+	                                </div>  
+	                            </div>   
 							</div>
 						</div>
 					</section>
@@ -280,146 +277,16 @@
 			</div>
 		</div>
 	</div>
-
-
-
-
-	<div hidden>
-		<div id="login-full-background" style="background-color:#87CEFA" hidden></div>
-
-		<div id="login-box" hidden>
-
-			<form id="login-form" action="/">
-				<label>Name</label>
-				<input id="display_name" tabindex="1" type="text" />
-
-				<label>SIP URI</label>
-				<input id="sip_uri" tabindex="2" type="text" />
-
-				<label>SIP password</label>
-				<input id="sip_password" tabindex="3" type="password" autocomplete="off" />
-
-				<label>WS URI</label>
-				<input id="ws_servers" tabindex="4" type="text" />
-
-				<input type="submit" value="Register" />
-			</form>
-
-			<form id="login-form-from-invitation" action="/">
-				<label>Write your name and press Enter</label>
-				<input class="display_name" id="login_display_name" type="text" />
-				<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" />
-			</form>
-
-			<div id="advanced-settings-link">
-				<a href="#">advanced settings</a>
-			</div>
-
-			<div id="advanced-settings">
-				<div class="close"></div>
-
-				<form id="advanced-settings-form" action="/">
-					<table>
-						<tr>
-							<td>&nbsp;</td>
-							<td>&nbsp;</td>
-						</tr>
-						<tr>
-							<td class="label"><label>authorization_user</label></td>
-							<td class="value"><input type="text" id='authorization_user' name="authorization_user" /></td>
-						</tr>
-						<tr>
-							<td class="label"><label>register</label></td>
-							<td class="value"><input type="checkbox" name="register" checked></td>
-						</tr>
-						<tr>
-							<td class="label"><label>register_expires</label></td>
-							<td class="value"><input type="text" name="register_expires" value="600"></td>
-						</tr>
-						<tr>
-							<td class="label"><label>registrar_server</label></td>
-							<td class="value"><input type="text" name="registrar_server"></td>
-						</tr>
-						<tr>
-							<td class="label"><label>no_answer_timeout</label></td>
-							<td class="value"><input type="text" name="no_answer_timeout" value="60"></td>
-						</tr>
-						<tr>
-							<td class="label"><label>session_timers</label></td>
-							<td class="value"><input type="checkbox" name="session_timers" checked/></td>
-						</tr>
-						<tr>
-							<td class="label"><label>peerconnection_config (use JSON)</label></td>
-							<td class="value"><input type="text" id="peerconnection_config" name="peerconnection_config" /></td>
-						</tr>
-						<tr>
-							<td class="label"><label>use_preloaded_route</label></td>
-							<td class="value"><input type="checkbox" name="use_preloaded_route" /></td>
-						</tr>
-						<tr>
-							<td class="label"><label>connection_recovery_min_interval</label></td>
-							<td class="value"><input type="text" name="connection_recovery_min_interval" value="2"></td>
-						</tr>
-						<tr>
-							<td class="label"><label>connection_recovery_max_interval</label></td>
-							<td class="value"><input type="text" name="connection_recovery_max_interval" value="30"></td>
-						</tr>
-						<tr>
-							<td class="label"><label>hack_via_tcp</label></td>
-							<td class="value"><input type="checkbox" name="hack_via_tcp"></td>
-						</tr>
-						<tr>
-							<td class="label"><label>hack_via_ws</label></td>
-							<td class="value"><input type="checkbox" name="hack_via_ws"></td>
-						</tr>
-						<tr>
-							<td class="label"><label>hack_ip_in_contact</label></td>
-							<td class="value"><input type="checkbox" name="hack_ip_in_contact"></td>
-						</tr>
-					</table>
-					<input type="submit" style="position: absolute; left: -9999px; width: 1px; height: 1px;" />
-				</form>
-			</div>
-		</div>
-
-		<div id="phone-page">
-
-			<div id="phone" hidden>
-
-				<div class="status">
-					<div id="conn-status">
-						<span class="field">status: </span>
-						<span class="value"></span>
-					</div>
-					<div hidden>
-						<span class="field">enable video: </span>
-						<input type="checkbox" id="enableVideo" checked disabled/>
-					</div>
-					<div hidden>
-						<span class="field">user: </span>
-						<span class="value user"></span>
-					</div>
-				</div>
-
-				<div class="controls">
-
-					<div class="ws-disconnected"></div>
-
-					<div class="dialbox">
-						<input type="hidden" id="dialboxnumber" class="destination" style="color: black !important;" />
-						<div class="to" style="color: black !important; ">To:</div>
-						<div class="dial-buttons">
-							<div class="button call" id="dialboxcallbtn" style="color: black !important; background-color: lightblue !important;">call</div>
-						</div>
-					</div>
-				</div>
-				<!-- .controls -->
-			</div>
-			<!-- #phone -->
-		</div>
-
-	</div>
 	<!-- phone-page -->
+
+  <!-- Jssip hidden data -->						
+	<div hidden>
+        <div id="my_sip_uri" > </div>	
+        <div id="ws_servers" > </div>	
+        <div id="sip_password" > </div>		
+        <div id="pc_config" > </div>
+		</div>
+
 	<!-- ==================Le javascript ================================ -->
 	<!-- jQuery v2.1.4 -->
 	<script type="text/javascript" src="./bower_components/AdminLTE/plugins/jQuery/jquery-2.2.3.min.js"></script>
@@ -439,35 +306,11 @@
 	<script type="text/javascript" src="./bower_components/AdminLTE/dist/js/app.min.js"></script>
 	<!-- Jquery input mask -->
 	<script type="text/javascript" src="./bower_components/AdminLTE/plugins/input-mask/jquery.inputmask.js"></script>
-	<!-- JsSIP client -->
-	<script type="text/javascript" src="./jssipclient/js/react-with-addons.js"></script>
-	<script type="text/javascript" src="./jssipclient/js/JSXTransformer.js"></script>
-	<script type="text/jsx" src="./jssipclient/js/sessions.jsx"></script>
-	<script type="text/javascript" src="./jssipclient/js/jquery.balloon.min.js"></script>
-	<script type="text/javascript" src="./jssipclient/js/parseuri.js"></script>
-	<script type="text/javascript" src="./jssipclient/js/init.js"></script>
-	<script type="text/javascript" src="./jssipclient/js/gui.js"></script>
-	<script type="text/javascript" src="./jssipclient/js/iscomposing.js"></script>
-	<script type="text/javascript" src="./jssipclient/js/jssip.js"></script>
-	<script type="text/javascript" src="./jssipclient/js/rtcninja-temasys.min.js"></script>
+	<!--JSSIP-->
+	<script type="text/javascript" src="./bower_components/jssip/dist/jssip.min.js"></script>	
+	<script type="text/javascript" src="./js/myJssip.js"></script>
 	<!-- Custom Javascript for ACEDirect complaint_form.html page-->
 	<script type="text/javascript" src="./js/complaint_form.js"></script>
-	<script>
-		if (window.rtcninjaTemasys) {
-			rtcninjaTemasys({}, {},
-				// alreadyInstalledCb
-				function () {
-					JsSIP.rtcninja({ plugin: rtcninjaTemasys });
-				},
-				// needInstallCb
-				function (data) {
-					alert('WebRTC plugin required');
-				},
-				// notRequiredCb
-				null
-			);
-		}
-	</script>
 </body>
 
 </html>

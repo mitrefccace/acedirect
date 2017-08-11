@@ -1,5 +1,5 @@
 var socket;
-
+var asterisk_sip_uri;
 
 $(document).ready(function () {
 	//formats the phone number.
@@ -65,6 +65,7 @@ function connect_socket() {
 				}).on('ad-ticket-created', function (data) {
 					console.log("got ad-ticket-created");
 					$('#userformoverlay').removeClass("overlay").hide();
+          $('#callbutton').prop("disabled", false);												   
 					if (data.zendesk_ticket) {
 						console.log(data.extension);
 						$('#firstName').val(data.first_name);
@@ -73,25 +74,18 @@ function connect_socket() {
 						$('#callerEmail').val(data.email);
 						$('#ticketNumber').text(data.zendesk_ticket);
 						var extension = data.extension; //returned extension to use for WebRTC
-						$('#extension').val(extension);
-						$('#authorization_user').val(data.extension);
-						$('#login_display_name').val(data.extension);
 						$('#display_name').val(data.extension);
-						$('#sip_uri').val("sip:" + data.extension + "@" + data.asterisk_public_hostname);
-
-						$('#sip_password').val(data.password);
-						$('#ws_servers').val("wss://" + data.asterisk_public_hostname + "/ws");
-						$('#peerconnection_config').val('{ "iceServers": [ {"urls": ["stun:' + data.stun_server + '"]} ], "gatheringTimeout": 9000 }');
-						$('#dialboxnumber').val(data.queues_complaint_number);
-
-						$('#login-form').submit();
-
+						$('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");																																	 
+						$('#my_sip_uri').attr("name","sip:"+data.extension+"@"+data.asterisk_public_hostname);
+						asterisk_sip_uri = "sip:575791@"+data.asterisk_public_hostname;
+						$('#sip_password').attr("name",data.password);
+ 						$("#pc_config").attr("name","stun:" + data.stun_server );
 						$('#callbutton').prop("disabled", false);
 					} else {
 						$("#ZenDeskOutageModal").modal('show');
 						$('#userformbtn').prop("disabled", false);
 					}
-
+					register_jssip(); 												   
 				}).on('chat-message-new', function (data) {
 					var msg = data.message;
 					var displayname = data.displayname;
@@ -134,6 +128,7 @@ function connect_socket() {
 					}
 				}).on('disconnect', function () {
 					console.log('disconnected');
+					unregister_jssip();													  
 					logout("disconnected");
 				}).on("unauthorized", function (error) {
 					if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
@@ -166,10 +161,40 @@ function connect_socket() {
 }
 
 
+ //old callbutton event
 $("#callbutton").click(function () {
 	$('#callbutton').prop("disabled", true);
-	$('#dialboxcallbtn').click();
+	$('#dialboxcallbtn').click(); //may or may not be dead code
+	start_call(asterisk_sip_uri); //calling asterisk to get into the queue
 });
+
+/*
+$("#callbutton").click(function (data) {
+	$('#callbutton').prop("disabled", true);
+	$('#dialboxcallbtn').click(); //may or may not be dead code
+  if (data.zendesk_ticket) {
+	  console.log(data.extension);
+		$('#firstName').val(data.first_name);
+		$('#lastName').val(data.last_name);
+		$('#callerPhone').val(data.vrs);
+		$('#callerEmail').val(data.email);
+		$('#ticketNumber').text(data.zendesk_ticket);
+		var extension = data.extension; //returned extension to use for WebRTC
+		$('#display_name').val(data.extension);
+		$('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");
+		$('#my_sip_uri').attr("name","sip:"+data.extension+"@"+data.asterisk_public_hostname);
+		asterisk_sip_uri = "sip:575791@"+data.asterisk_public_hostname;
+		$('#sip_password').attr("name",data.password);
+ 		$("#pc_config").attr("name","stun:" + data.stun_server );
+		//$('#callbutton').prop("disabled", false);
+	} else {
+		$("#ZenDeskOutageModal").modal('show');
+		//$('#userformbtn').prop("disabled", false);
+	}
+  register_jssip();
+	start_call(asterisk_sip_uri); //calling asterisk to get into the queue
+});
+*/																							  
 
 $('#userform').submit(function (evt) {
 	evt.preventDefault();

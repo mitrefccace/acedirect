@@ -365,3 +365,151 @@ However, delay the fade out process for 2.5 seconds */
 {
     margin-right: 2px;
 }
+
+#selfView   
+{   
+  width:30%;    
+  border: 4px solid #ccc;   
+  top: 52px;    
+  right: 15px;    
+  position: absolute;   
+}   
+#remoteView   
+{   
+  border: 4px solid #ccc;   
+  max-width: 100%;    
+  width: 100%;    
+}   
+#call-option-buttons{   
+    margin-top: 5px;
+    display:none;   
+    width:100%;
+    text-align: center;
+    position: relative;
+}   
+
+#inner{
+  display: inline;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+}
+
+.call-btn-icon
+{
+  font-size: 20px;
+}
+
+#call-option-buttons .btn
+{
+    width: 45px;
+    height: 37px;
+}
+
+.btn-gray
+{
+  background-color: #ccc;
+}
+
+.btn-gray:hover
+{
+  background-color: #ADADAD;
+}
+
+.btn-danger:hover
+{
+  background-color: #C44535;
+}
+
+.fa-rotate-135
+{
+  -webkit-transform: rotate(135deg);
+  -moz-transform: rotate(135deg);
+  -ms-transform: rotate(135deg);
+  -o-transform: rotate(135deg);
+  transform: rotate(135deg);
+}
+
+.fa-close-style
+{
+ position:absolute;
+ left:61px;
+ top:1px;
+ font-size:18px;
+ -webkit-text-stroke: 2px #3a3434; /*hack for getting it to appear narrower */
+ color: #ccc;
+}
+
+#selfView   
+{   
+  width:30%;    
+  border: 4px solid #ccc;   
+  top: 52px;    
+  right: 15px;    
+  position: absolute;   
+}   
+#remoteView   
+{   
+  border: 4px solid #ccc;   
+  max-width: 100%;    
+  width: 100%;    
+}   
+#call-option-buttons{   
+    margin-top: 5px;
+    display:none;   
+    width:100%;
+    text-align: center;
+    position: relative;
+}   
+
+#inner{
+  display: inline;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+}
+
+.call-btn-icon
+{
+  font-size: 20px;
+}
+
+#call-option-buttons .btn
+{
+    width: 45px;
+    height: 37px;
+}
+
+.btn-gray
+{
+  background-color: #ccc;
+}
+
+.btn-gray:hover
+{
+  background-color: #ADADAD;
+}
+
+.btn-danger:hover
+{
+  background-color: #C44535;
+}
+
+.fa-rotate-135
+{
+  -webkit-transform: rotate(135deg);
+  -moz-transform: rotate(135deg);
+  -ms-transform: rotate(135deg);
+  -o-transform: rotate(135deg);
+  transform: rotate(135deg);
+}
+
+.fa-close-style
+{
+ position:absolute;
+ left:61px;
+ top:1px;
+ font-size:18px;
+ -webkit-text-stroke: 2px #3a3434; /*hack for getting it to appear narrower */
+ color: #ccc;
+}
