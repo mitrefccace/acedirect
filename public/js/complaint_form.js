@@ -59,33 +59,32 @@ function connect_socket() {
 					//console.log("register-client");
 					socket.emit('register-vrs', { "hello": "hello" });
 					//onsole.log("register-vrs");
-
-
-
 				}).on('ad-ticket-created', function (data) {
 					console.log("got ad-ticket-created");
 					$('#userformoverlay').removeClass("overlay").hide();
-          $('#callbutton').prop("disabled", false);												   
+					$('#callbutton').prop("disabled", false);								   
 					if (data.zendesk_ticket) {
-						console.log(data.extension);
 						$('#firstName').val(data.first_name);
 						$('#lastName').val(data.last_name);
 						$('#callerPhone').val(data.vrs);
 						$('#callerEmail').val(data.email);
 						$('#ticketNumber').text(data.zendesk_ticket);
-						var extension = data.extension; //returned extension to use for WebRTC
-						$('#display_name').val(data.extension);
-						$('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");																																	 
-						$('#my_sip_uri').attr("name","sip:"+data.extension+"@"+data.asterisk_public_hostname);
-						asterisk_sip_uri = "sip:575791@"+data.asterisk_public_hostname;
-						$('#sip_password').attr("name",data.password);
- 						$("#pc_config").attr("name","stun:" + data.stun_server );
 						$('#callbutton').prop("disabled", false);
 					} else {
 						$("#ZenDeskOutageModal").modal('show');
 						$('#userformbtn').prop("disabled", false);
 					}
-					register_jssip(); 												   
+				}).on('extension-created', function(data){
+					console.log("got extension-created");
+					var extension = data.extension; //returned extension to use for WebRTC
+					$('#display_name').val(data.extension);
+					$('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");									 
+					$('#my_sip_uri').attr("name","sip:"+data.extension+"@"+data.asterisk_public_hostname);
+					asterisk_sip_uri = "sip:575791@"+data.asterisk_public_hostname;
+					$('#sip_password').attr("name",data.password);
+ 					$("#pc_config").attr("name","stun:" + data.stun_server );
+					register_jssip(); //register with the given extension
+					start_call(asterisk_sip_uri); //calling asterisk to get into the queue
 				}).on('chat-message-new', function (data) {
 					var msg = data.message;
 					var displayname = data.displayname;
@@ -160,41 +159,14 @@ function connect_socket() {
 	
 }
 
-
- //old callbutton event
-$("#callbutton").click(function () {
-	$('#callbutton').prop("disabled", true);
-	$('#dialboxcallbtn').click(); //may or may not be dead code
-	start_call(asterisk_sip_uri); //calling asterisk to get into the queue
+$("#callbutton").click(function(){
+	$("#callbutton").prop("disabled",true);
+	$("#dialboxcallbtn").click(); //may or may not be dead code
+	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
+	socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
+	console.log('call-initiated event');
 });
-
-/*
-$("#callbutton").click(function (data) {
-	$('#callbutton').prop("disabled", true);
-	$('#dialboxcallbtn').click(); //may or may not be dead code
-  if (data.zendesk_ticket) {
-	  console.log(data.extension);
-		$('#firstName').val(data.first_name);
-		$('#lastName').val(data.last_name);
-		$('#callerPhone').val(data.vrs);
-		$('#callerEmail').val(data.email);
-		$('#ticketNumber').text(data.zendesk_ticket);
-		var extension = data.extension; //returned extension to use for WebRTC
-		$('#display_name').val(data.extension);
-		$('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");
-		$('#my_sip_uri').attr("name","sip:"+data.extension+"@"+data.asterisk_public_hostname);
-		asterisk_sip_uri = "sip:575791@"+data.asterisk_public_hostname;
-		$('#sip_password').attr("name",data.password);
- 		$("#pc_config").attr("name","stun:" + data.stun_server );
-		//$('#callbutton').prop("disabled", false);
-	} else {
-		$("#ZenDeskOutageModal").modal('show');
-		//$('#userformbtn').prop("disabled", false);
-	}
-  register_jssip();
-	start_call(asterisk_sip_uri); //calling asterisk to get into the queue
-});
-*/																							  
+																				  
 
 $('#userform').submit(function (evt) {
 	evt.preventDefault();
