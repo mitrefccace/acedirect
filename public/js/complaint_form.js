@@ -178,7 +178,8 @@ $("#callbutton").click(function(){
 $("#videomailbutton").click(function(){
   videomailflag = true;
   //dial into the videomail queue
-	//$("#callbutton").prop("disabled",true);
+	//$("#videomailbutton").prop("disabled",true);
+	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');  
   socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
 	console.log('call-initiated event for videomail');
 });																		  
