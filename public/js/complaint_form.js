@@ -1,5 +1,6 @@
 var socket;
 var asterisk_sip_uri;
+var videomailflag = false;
 
 $(document).ready(function () {
 	//formats the phone number.
@@ -81,12 +82,13 @@ function connect_socket() {
 					$('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");					 
 					$('#my_sip_uri').attr("name","sip:"+data.extension+"@"+data.asterisk_public_hostname);
           
-          
-          console.log('*******' + data.queues_videomail_number);
-          
-          
-					asterisk_sip_uri = "sip:" + data.queues_complaint_number + "@"+data.asterisk_public_hostname;
-					$('#sip_password').attr("name",data.password);
+          //is this a videomail call or complaint call?
+          if (videomailflag)
+            asterisk_sip_uri = "sip:" + data.queues_videomail_number + "@"+data.asterisk_public_hostname;
+          else
+            asterisk_sip_uri = "sip:" + data.queues_complaint_number + "@"+data.asterisk_public_hostname;
+					
+          $('#sip_password').attr("name",data.password);
  					$("#pc_config").attr("name","stun:" + data.stun_server );
 					register_jssip(); //register with the given extension
 					start_call(asterisk_sip_uri); //calling asterisk to get into the queue
@@ -165,17 +167,20 @@ function connect_socket() {
 }
 
 $("#callbutton").click(function(){
+  videomailflag = false;
 	$("#callbutton").prop("disabled",true);
 	$("#dialboxcallbtn").click(); //may or may not be dead code
 	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
 	socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
-	console.log('call-initiated event');
+	console.log('call-initiated event for complaint');
 });
 
 $("#videomailbutton").click(function(){
+  videomailflag = true;
   //dial into the videomail queue
 	//$("#callbutton").prop("disabled",true);
-
+  socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
+	console.log('call-initiated event for videomail');
 });																		  
 
 $('#userform').submit(function (evt) {
