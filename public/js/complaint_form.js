@@ -166,7 +166,11 @@ $("#callbutton").click(function(){
 	socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
 	console.log('call-initiated event');
 });
-																				  
+
+$("#videomailbutton").click(function(){
+	//$("#callbutton").prop("disabled",true);
+	console.log('videomailbutton clicked!!!');
+});																		  
 
 $('#userform').submit(function (evt) {
 	evt.preventDefault();
