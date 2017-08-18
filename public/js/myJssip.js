@@ -95,7 +95,7 @@ function register_jssip()
 		});
 	    currentSession.on('ended', function(e)
 		{
-			if(debug) console.log('\nCURRENTSESSION -  ENDED: \nMESSAGE:\n' + e.message + "CAUSE:\n" + e.cause);
+			if(debug) console.log('\nCURRENTSESSION -  ENDED: \nORIGINATOR: \n' + e.originator + '\nMESSAGE:\n' + e.message + "\nCAUSE:\n" + e.cause);
 			terminate_call();
 		});
 	  	currentSession.on('failed', function(e)
@@ -320,7 +320,7 @@ function remove_video(){
 	selfStream.src = "";
 	remoteView.src = "";
 
-	//stops remote track
+	//stops remote track	 
 	if(remoteView.srcObject){
 		if(remoteView.srcObject.getTracks()){
 			if(remoteView.srcObject.getTracks()[0]) remoteView.srcObject.getTracks()[0].stop();
@@ -334,9 +334,35 @@ function remove_video(){
 			if(window.self_stream.getVideoTracks()[0]) window.self_stream.getVideoTracks()[0].stop();	
 		}
 	} 
-	navigator.mediaDevices.getUserMedia({ audio: false, video: false });
+	removeElement("selfView");
+	removeElement("remoteView");
+	addElement("webcam","video","remoteView");
+	remoteView.setAttribute("autoplay", "autoplay");
+	remoteView.setAttribute("poster","images/AD-logo.png");
+	addElement("webcam","video","selfView");
+	selfView.setAttribute("style","right: 11px");
+	selfView.setAttribute("autoplay", "autoplay");
+	selfView.setAttribute("muted",true);
+	selfView.setAttribute("hidden",true);
+	remoteStream = document.getElementById("remoteView");
+	selfStream = document.getElementById("selfView");							 
 
 	toggle_incall_buttons(false);
+}
+
+// Adds an element to the document
+function addElement(parentId, elementTag, elementId, html) {
+    var p = document.getElementById(parentId);
+    var newElement = document.createElement(elementTag);
+    newElement.setAttribute('id', elementId);
+    newElement.innerHTML = html;
+    p.appendChild(newElement);
+}
+
+// Removes an element from the document
+function removeElement(elementId) {
+    var element = document.getElementById(elementId);
+    element.parentNode.removeChild(element);
 }
 
 //mutes self audio so remote cannot hear you
