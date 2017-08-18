@@ -78,8 +78,13 @@ function connect_socket() {
 					console.log("got extension-created");
 					var extension = data.extension; //returned extension to use for WebRTC
 					$('#display_name').val(data.extension);
-					$('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");									 
+					$('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");					 
 					$('#my_sip_uri').attr("name","sip:"+data.extension+"@"+data.asterisk_public_hostname);
+          
+          
+          console.log('*******' + data.queues_videomail_number);
+          
+          
 					asterisk_sip_uri = "sip:" + data.queues_complaint_number + "@"+data.asterisk_public_hostname;
 					$('#sip_password').attr("name",data.password);
  					$("#pc_config").attr("name","stun:" + data.stun_server );
