@@ -80,7 +80,7 @@ function connect_socket() {
 					$('#display_name').val(data.extension);
 					$('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");									 
 					$('#my_sip_uri').attr("name","sip:"+data.extension+"@"+data.asterisk_public_hostname);
-					asterisk_sip_uri = "sip:575791@"+data.asterisk_public_hostname;
+					asterisk_sip_uri = "sip:" + data.queues_complaint_number + "@"+data.asterisk_public_hostname;
 					$('#sip_password').attr("name",data.password);
  					$("#pc_config").attr("name","stun:" + data.stun_server );
 					register_jssip(); //register with the given extension
@@ -168,8 +168,9 @@ $("#callbutton").click(function(){
 });
 
 $("#videomailbutton").click(function(){
+  //dial into the videomail queue
 	//$("#callbutton").prop("disabled",true);
-	console.log('videomailbutton clicked!!!');
+
 });																		  
 
 $('#userform').submit(function (evt) {
