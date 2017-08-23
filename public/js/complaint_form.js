@@ -168,6 +168,7 @@ function connect_socket() {
 
 $("#callbutton").click(function(){
   videomailflag = false;
+  $('#record-progress-bar').hide();
 	$("#callbutton").prop("disabled",true);
 	$("#dialboxcallbtn").click(); //may or may not be dead code
 	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
@@ -177,6 +178,7 @@ $("#callbutton").click(function(){
 
 $("#videomailbutton").click(function(){
   videomailflag = true;
+  $('#record-progress-bar').show();
   //dial into the videomail queue
 	//$("#videomailbutton").prop("disabled",true);
 	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');  

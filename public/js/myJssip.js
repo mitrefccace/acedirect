@@ -13,8 +13,46 @@ var hide_video_button = document.getElementById("hide-video");
 var mute_audio_icon = document.getElementById("mute-audio-icon");
 var hide_video_icon = document.getElementById("hide-video-icon");
 var hold_button = document.getElementById("hold-call");
+var recording_progress_bar = document.getElementById("recording-progress-bar");
 var debug = true; //console logs event info if true
 var jssip_debug = false; //enables debugging logs from jssip library if true NOTE: may have to refresh a lot to update change
+
+
+//VIDEOMAIL recording progress bar
+var recordId = null;
+var maxRecordingSeconds = 90;
+function startRecordProgress() {
+
+  if ( $('#record-progress-bar').css('display') == 'none')
+    return;
+
+  if (recordId)
+    return;
+  var secremain = maxRecordingSeconds;
+  var seconds = 0;
+  recordId = setInterval(myFunc,1000);
+  seconds = 0;
+  function myFunc() {
+    if (seconds >= maxRecordingSeconds) {
+      stopRecordProgress();
+    } else {
+      seconds++;
+      secremain--;
+      percentage = (seconds/maxRecordingSeconds)*100;
+      $('#record-progress-bar').css('width', percentage.toFixed(0)+'%');
+      $('#secsremain').html(secremain+' seconds remaining');
+    }
+  }
+}
+
+function stopRecordProgress() {
+  if (recordId) {
+    $('#record-progress-bar').hide();
+    $('#secsremain').html('');
+    clearInterval(recordId);
+    recordId = null;
+  }
+}
 
 
 //setup for the call. creates and starts the User Agent (UA) and registers event handlers
@@ -97,6 +135,7 @@ function register_jssip()
 		{
 			if(debug) console.log('\nCURRENTSESSION -  ENDED: \nORIGINATOR: \n' + e.originator + '\nMESSAGE:\n' + e.message + "\nCAUSE:\n" + e.cause);
 			terminate_call();
+      stopRecordProgress();
 		});
 	  	currentSession.on('failed', function(e)
 		{
@@ -110,6 +149,7 @@ function register_jssip()
 	    currentSession.on('newInfo', function(e)
 		{
 			if(debug) console.log('\nCURRENTSESSION -  NEWINFO: \nINFO:\n' + e.info + "\nrequest:\n" + e.request);
+      startRecordProgress(); //newInfo gets called repeatedly during a call
 		});
 		currentSession.on('hold', function(e)
 		{
