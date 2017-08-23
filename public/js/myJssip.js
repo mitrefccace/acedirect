@@ -40,7 +40,8 @@ function startRecordProgress() {
       secremain--;
       percentage = (seconds/maxRecordingSeconds)*100;
       $('#record-progress-bar').css('width', percentage.toFixed(0)+'%');
-      $('#secsremain').html(secremain+' seconds remaining');
+      $('#secsremain').html('&nbsp;&nbsp;' + secremain+' seconds remaining');
+      $('#recordicon').show();
     }
   }
 }
@@ -51,6 +52,7 @@ function stopRecordProgress() {
     $('#secsremain').html('');
     clearInterval(recordId);
     recordId = null;
+    $('#recordicon').hide();
   }
 }
 
