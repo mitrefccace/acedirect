@@ -57,7 +57,8 @@
 			"number": "111111"
 		},
 		"videomail": {
-			"number": "111111"
+			"number": "111111",
+      "maxrecordsecs": 90
 		},    
 		"information": {
 			"number": "111111"

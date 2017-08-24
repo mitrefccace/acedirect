@@ -20,12 +20,14 @@ var jssip_debug = false; //enables debugging logs from jssip library if true NOT
 
 //VIDEOMAIL recording progress bar
 var recordId = null;
-var maxRecordingSeconds = 90;
+
 function startRecordProgress() {
 
   if ( $('#record-progress-bar').css('display') == 'none')
     return;
 
+  var maxRecordingSeconds = vmrecordingsecsmax;
+  
   if (recordId)
     return;
   var secremain = maxRecordingSeconds;
