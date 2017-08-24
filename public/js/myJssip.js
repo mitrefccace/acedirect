@@ -40,8 +40,8 @@ function startRecordProgress() {
       secremain--;
       percentage = (seconds/maxRecordingSeconds)*100;
       $('#record-progress-bar').css('width', percentage.toFixed(0)+'%');
-      $('#secsremain').html('&nbsp;&nbsp;' + secremain+' seconds remaining');
-      $('#recordicon').show();
+      $('#secsremain').html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + secremain+' seconds remaining');
+      $('#recordicon').css('visibility','visible');
     }
   }
 }
@@ -52,7 +52,7 @@ function stopRecordProgress() {
     $('#secsremain').html('');
     clearInterval(recordId);
     recordId = null;
-    $('#recordicon').hide();
+    $('#recordicon').css('visibility','hidden');
   }
 }
 
