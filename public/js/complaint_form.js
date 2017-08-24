@@ -1,5 +1,6 @@
 var socket;
-
+var asterisk_sip_uri;
+var videomailflag = false;
 
 $(document).ready(function () {
 	//formats the phone number.
@@ -59,39 +60,38 @@ function connect_socket() {
 					//console.log("register-client");
 					socket.emit('register-vrs', { "hello": "hello" });
 					//onsole.log("register-vrs");
-
-
-
 				}).on('ad-ticket-created', function (data) {
 					console.log("got ad-ticket-created");
 					$('#userformoverlay').removeClass("overlay").hide();
+					$('#callbutton').prop("disabled", false);								   
 					if (data.zendesk_ticket) {
-						console.log(data.extension);
 						$('#firstName').val(data.first_name);
 						$('#lastName').val(data.last_name);
 						$('#callerPhone').val(data.vrs);
 						$('#callerEmail').val(data.email);
 						$('#ticketNumber').text(data.zendesk_ticket);
-						var extension = data.extension; //returned extension to use for WebRTC
-						$('#extension').val(extension);
-						$('#authorization_user').val(data.extension);
-						$('#login_display_name').val(data.extension);
-						$('#display_name').val(data.extension);
-						$('#sip_uri').val("sip:" + data.extension + "@" + data.asterisk_public_hostname);
-
-						$('#sip_password').val(data.password);
-						$('#ws_servers').val("wss://" + data.asterisk_public_hostname + "/ws");
-						$('#peerconnection_config').val('{ "iceServers": [ {"urls": ["stun:' + data.stun_server + '"]} ], "gatheringTimeout": 9000 }');
-						$('#dialboxnumber').val(data.queues_complaint_number);
-
-						$('#login-form').submit();
-
 						$('#callbutton').prop("disabled", false);
 					} else {
 						$("#ZenDeskOutageModal").modal('show');
 						$('#userformbtn').prop("disabled", false);
 					}
-
+				}).on('extension-created', function(data){
+					console.log("got extension-created");
+					var extension = data.extension; //returned extension to use for WebRTC
+					$('#display_name').val(data.extension);
+					$('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");					 
+					$('#my_sip_uri').attr("name","sip:"+data.extension+"@"+data.asterisk_public_hostname);
+          
+          //is this a videomail call or complaint call?
+          if (videomailflag)
+            asterisk_sip_uri = "sip:" + data.queues_videomail_number + "@"+data.asterisk_public_hostname;
+          else
+            asterisk_sip_uri = "sip:" + data.queues_complaint_number + "@"+data.asterisk_public_hostname;
+					
+          $('#sip_password').attr("name",data.password);
+ 					$("#pc_config").attr("name","stun:" + data.stun_server );
+					register_jssip(); //register with the given extension
+					start_call(asterisk_sip_uri); //calling asterisk to get into the queue
 				}).on('chat-message-new', function (data) {
 					var msg = data.message;
 					var displayname = data.displayname;
@@ -134,6 +134,7 @@ function connect_socket() {
 					}
 				}).on('disconnect', function () {
 					console.log('disconnected');
+					unregister_jssip();													  
 					logout("disconnected");
 				}).on("unauthorized", function (error) {
 					if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
@@ -165,11 +166,25 @@ function connect_socket() {
 	
 }
 
-
-$("#callbutton").click(function () {
-	$('#callbutton').prop("disabled", true);
-	$('#dialboxcallbtn').click();
+$("#callbutton").click(function(){
+  videomailflag = false;
+  $('#record-progress-bar').hide();
+	$("#callbutton").prop("disabled",true);
+	$("#dialboxcallbtn").click(); //may or may not be dead code
+	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
+	socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
+	console.log('call-initiated event for complaint');
 });
+
+$("#videomailbutton").click(function(){
+  videomailflag = true;
+  $('#record-progress-bar').show();
+  //dial into the videomail queue
+	//$("#videomailbutton").prop("disabled",true);
+	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');  
+  socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
+	console.log('call-initiated event for videomail');
+});																		  
 
 $('#userform').submit(function (evt) {
 	evt.preventDefault();
