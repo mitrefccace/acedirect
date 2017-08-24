@@ -16,7 +16,7 @@ var hold_button = document.getElementById("hold-call");
 var recording_progress_bar = document.getElementById("recording-progress-bar");
 var debug = true; //console logs event info if true
 var jssip_debug = false; //enables debugging logs from jssip library if true NOTE: may have to refresh a lot to update change
-
+var maxRecordingSeconds = 90;
 
 //VIDEOMAIL recording progress bar
 var recordId = null;
@@ -25,9 +25,7 @@ function startRecordProgress() {
 
   if ( $('#record-progress-bar').css('display') == 'none')
     return;
-
-  var maxRecordingSeconds = vmrecordingsecsmax;
-  
+ 
   if (recordId)
     return;
   var secremain = maxRecordingSeconds;

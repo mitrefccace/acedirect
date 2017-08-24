@@ -1,7 +1,6 @@
 var socket;
 var asterisk_sip_uri;
 var videomailflag = false;
-var vmrecordingsecsmax = 90;
 
 $(document).ready(function () {
 	//formats the phone number.
@@ -90,7 +89,7 @@ function connect_socket() {
             asterisk_sip_uri = "sip:" + data.queues_complaint_number + "@"+data.asterisk_public_hostname;
 					
           //get the max videomail recording seconds
-          vmrecordingsecsmax = data.queues_videomail_maxrecordsecs;
+          maxRecordingSeconds = data.queues_videomail_maxrecordsecs;
           
           $('#sip_password').attr("name",data.password);
  					$("#pc_config").attr("name","stun:" + data.stun_server );
