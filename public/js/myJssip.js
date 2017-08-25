@@ -29,6 +29,9 @@ function startRecordProgress() {
   if (recordId)
     return;
   $('#vmsent').hide();
+  $('#callbutton').prop("disabled", true);    
+  $('#videomailbutton').prop("disabled", true);  
+  $('#userformbtn').prop("disabled", true);  
   var secremain = maxRecordingSeconds;
   var seconds = 0;
   recordId = setInterval(myFunc,1000);
@@ -59,6 +62,7 @@ function stopRecordProgress() {
     $('#record-progress-bar').hide();
     $('#callbutton').prop("disabled", true);    
     $('#videomailbutton').prop("disabled", false);  
+    $('#userformbtn').prop("disabled", false);
     $('#vmsent').show();
   }
 }

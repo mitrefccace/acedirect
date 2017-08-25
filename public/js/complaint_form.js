@@ -186,6 +186,7 @@ $("#videomailbutton").click(function(){
   videomailflag = true;
   $('#record-progress-bar').show();
   $('#callbutton').prop("disabled", true);
+  $('#userformbtn').prop("disabled", true);
   //dial into the videomail queue
 	$("#videomailbutton").prop("disabled",true);
 	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');  
