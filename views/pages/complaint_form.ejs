@@ -187,7 +187,11 @@
 
               <div id="recordicon" style="display:inline;visibility:hidden;">&nbsp;&nbsp;<span id="recordicon" class="glyphicon glyphicon-facetime-video blink" style="color:#FF0000;" ></span><label class="blink" style="color:#FF0000;" >&nbsp;&nbsp;RECORDING</label></div>
               <div id="secsremain" style="display:inline;"></div>
-              <div class="alert alert-success" id="vmsent" hidden><strong>Success!</strong> Videomail sent.</div>
+              
+              <div class="alert alert-success alert-dismissable" id="vmsent" hidden>
+                <a class="close" onclick="$('#vmsent').hide()">×</a>
+                <strong>Success!</strong> Videomail sent.
+              </div>              
               
 						</div>
 					</section>
