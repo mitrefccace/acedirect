@@ -172,6 +172,7 @@ function connect_socket() {
 $("#callbutton").click(function(){
   videomailflag = false;
   $('#record-progress-bar').hide();
+  $('#vmsent').hide();
 	$("#callbutton").prop("disabled",true);
   $('#videomailbutton').prop("disabled", true);
 	$("#dialboxcallbtn").click(); //may or may not be dead code
@@ -181,6 +182,7 @@ $("#callbutton").click(function(){
 });
 
 $("#videomailbutton").click(function(){
+  $('#vmsent').hide();
   videomailflag = true;
   $('#record-progress-bar').show();
   $('#callbutton').prop("disabled", true);
