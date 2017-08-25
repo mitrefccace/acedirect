@@ -173,6 +173,7 @@ $("#callbutton").click(function(){
   videomailflag = false;
   $('#record-progress-bar').hide();
 	$("#callbutton").prop("disabled",true);
+  $('#videomailbutton').prop("disabled", true);
 	$("#dialboxcallbtn").click(); //may or may not be dead code
 	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
 	socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
@@ -182,6 +183,7 @@ $("#callbutton").click(function(){
 $("#videomailbutton").click(function(){
   videomailflag = true;
   $('#record-progress-bar').show();
+  $('#callbutton').prop("disabled", true);
   //dial into the videomail queue
 	//$("#videomailbutton").prop("disabled",true);
 	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');  

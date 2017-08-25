@@ -34,6 +34,7 @@ function startRecordProgress() {
   seconds = 0;
   function myFunc() {
     if (seconds >= maxRecordingSeconds) {
+      terminate_call();
       stopRecordProgress();
     } else {
       seconds++;
@@ -53,6 +54,9 @@ function stopRecordProgress() {
     clearInterval(recordId);
     recordId = null;
     $('#recordicon').css('visibility','hidden');
+    $('#record-progress-bar').hide();
+    $('#callbutton').prop("disabled", true);    
+    $('#videomailbutton').prop("disabled", false);  
   }
 }
 
