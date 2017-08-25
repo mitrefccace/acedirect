@@ -55,7 +55,7 @@ function stopRecordProgress() {
     clearInterval(recordId);
     recordId = null;
     $('#recordicon').css('visibility','hidden');
-    $('#record-progress-bar').css('width', percentage.toFixed(0)+'%');
+    $('#record-progress-bar').css('width', '0%');
     $('#record-progress-bar').hide();
     $('#callbutton').prop("disabled", true);    
     $('#videomailbutton').prop("disabled", false);  
