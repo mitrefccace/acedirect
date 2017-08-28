@@ -195,6 +195,15 @@
                                             <button id="end-call" type = "button" class = "btn btn-danger" onclick = "terminate_call()"> <i class="call-btn-icon fa fa-phone fa-rotate-135"></i> </button> 
                                         </div>
                                     </div>
+									<div id= "videomail-status-buttons">
+										<div id= "inner">
+											<button  id="unread" type = "button" class = "btn btn-gray" onclick = "videomail_unread(document.getElementById('videomailId').getAttribute('name'))"> Mark as Unread<!--i id= "mute-audio-icon" class="call-btn-icon fa fa-microphone"></i--> </button> 
+											<button  id="closed" type = "button" class = "btn btn-gray" onclick = "videomail_read(document.getElementById('videomailId').getAttribute('name'))"> Mark as Read </button> 
+											<button  id="in-progress" type = "button" class = "btn btn-gray" onclick = "videomail_in_progress(document.getElementById('videomailId').getAttribute('name'))"> Mark as in Progress</i> </button> 
+											<button  id="closed" type = "button" class = "btn btn-gray" onclick = "videomail_closed(document.getElementById('videomailId').getAttribute('name'))"> Mark as Closed </button> 
+											<button  id="stopVideomail" type = "button" class = "btn btn-gray" onclick = "stopVideomail()"> Exit Videomail </button> 
+										</div>
+									</div> 
                                 </div>
                             </div>
 
@@ -456,23 +465,15 @@
 
                 <!-- Mail tab content -->
                 <div class="tab-pane" id="control-sidebar-videomail-tab">
+					<button type="button" class="btn btn-default" onclick="getVideomailRecs();"> Get Videomail Recs </button>
                     <div class="form-group">
                         <label>Mailbox Messages</label>
-                        <table class="table table-hover">
+                        <table class="table table-hover" id="Videomail_Table">
                             <tr>
-                                <th>Caller ID</th>
-                                <th>Call Received</th>
-                                <th>Duration (min.)</th>
-                            </tr>
-                            <tr>
-                                <td>000-000-0000</td>
-                                <td>2016-04-01 08:00:00</td>
-                                <td>1</td>
-                            </tr>
-                            <tr>
-                                <td>111-000-0000</td>
-                                <td>2016-04-02 09:00:00</td>
-                                <td>0.5</td>
+                                <th>Video ID</th>
+								<th>Time Received</th>
+                                <th>Duration (sec)</th>
+								<th>Status</th>
                             </tr>
                         </table>
                     </div>
@@ -600,7 +601,12 @@
         <div id="ws_servers" > </div>       
         <div id="sip_password" > </div>     
         <div id="pc_config" > </div>        
-    </div>      
+    </div>
+
+	<!-- Videomail hidden data -->
+	<div hidden>
+		<div id="videomailId" > </div>
+	</div>
 
 
     <div id="snackbar">Default Text</div>

@@ -119,5 +119,15 @@
 	"nginx": {
         "fqdn": "nginx.server.com",
         "path": "ACEDirect" 
-    }
+    },
+	"virtualagent":{
+		"mysql": {
+			"host": "localhost",
+			"user": "username",
+			"password": "password",
+			"database": "agentdb_new",
+			"port": "dbport",
+			"table": "videomail"
+		}
+	}
 }
