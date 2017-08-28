@@ -408,8 +408,8 @@ function swap_video() {
   $('#remoteView').attr('id','tempView');
   $('#selfView').attr('id','remoteView');
   $('#tempView').attr('id','selfView');
-	remoteView.setAttribute("muted",true);
-	remoteView.setAttribute("hidden",true);
+  $('#remoteView').attr('width',0);
+  $('#remoteView').attr('height',0);
 }
 
 // Adds an element to the document
