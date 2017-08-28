@@ -404,12 +404,17 @@ function remove_video(){
 }
 
 //swaps remote and local videos for videomail recording
+//puts Consumer's own video in the big video
 function swap_video() {
+  //local becomes remote and remote becomes local
   $('#remoteView').attr('id','tempView');
   $('#selfView').attr('id','remoteView');
   $('#tempView').attr('id','selfView');
-  $('#remoteView').attr('width',0);
-  $('#remoteView').attr('height',0);
+  
+  $('#selfView').attr('width',0);
+  $('#selfView').attr('height',0);
+  $('#selfView').attr('muted',true);
+  $('#selfView').attr('hidden',true);
 }
 
 // Adds an element to the document
