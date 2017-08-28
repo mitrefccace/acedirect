@@ -88,6 +88,9 @@ function connect_socket() {
           else
             asterisk_sip_uri = "sip:" + data.queues_complaint_number + "@"+data.asterisk_public_hostname;
 					
+          //get the max videomail recording seconds
+          maxRecordingSeconds = data.queues_videomail_maxrecordsecs;
+          
           $('#sip_password').attr("name",data.password);
  					$("#pc_config").attr("name","stun:" + data.stun_server );
 					register_jssip(); //register with the given extension
@@ -169,7 +172,9 @@ function connect_socket() {
 $("#callbutton").click(function(){
   videomailflag = false;
   $('#record-progress-bar').hide();
+  $('#vmsent').hide();
 	$("#callbutton").prop("disabled",true);
+  $('#videomailbutton').prop("disabled", true);
 	$("#dialboxcallbtn").click(); //may or may not be dead code
 	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
 	socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
@@ -177,10 +182,14 @@ $("#callbutton").click(function(){
 });
 
 $("#videomailbutton").click(function(){
+  swap_video();
+  $('#vmsent').hide();
   videomailflag = true;
   $('#record-progress-bar').show();
+  $('#callbutton').prop("disabled", true);
+  $('#userformbtn').prop("disabled", true);
   //dial into the videomail queue
-	//$("#videomailbutton").prop("disabled",true);
+	$("#videomailbutton").prop("disabled",true);
 	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');  
   socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
 	console.log('call-initiated event for videomail');

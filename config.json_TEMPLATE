@@ -57,7 +57,8 @@
 			"number": "111111"
 		},
 		"videomail": {
-			"number": "111111"
+			"number": "111111",
+      "maxrecordsecs": 90
 		},    
 		"information": {
 			"number": "111111"
@@ -118,5 +119,15 @@
 	"nginx": {
         "fqdn": "nginx.server.com",
         "path": "ACEDirect" 
-    }
+    },
+	"virtualagent":{
+		"mysql": {
+			"host": "localhost",
+			"user": "username",
+			"password": "password",
+			"database": "agentdb_new",
+			"port": "dbport",
+			"table": "videomail"
+		}
+	}
 }

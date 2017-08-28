@@ -16,32 +16,37 @@ var hold_button = document.getElementById("hold-call");
 var recording_progress_bar = document.getElementById("recording-progress-bar");
 var debug = true; //console logs event info if true
 var jssip_debug = false; //enables debugging logs from jssip library if true NOTE: may have to refresh a lot to update change
-
+var maxRecordingSeconds = 90;
 
 //VIDEOMAIL recording progress bar
 var recordId = null;
-var maxRecordingSeconds = 90;
+
 function startRecordProgress() {
 
   if ( $('#record-progress-bar').css('display') == 'none')
     return;
-
+ 
   if (recordId)
     return;
+  $('#vmsent').hide();
+  $('#callbutton').prop("disabled", true);    
+  $('#videomailbutton').prop("disabled", true);  
+  $('#userformbtn').prop("disabled", true);  
   var secremain = maxRecordingSeconds;
   var seconds = 0;
   recordId = setInterval(myFunc,1000);
   seconds = 0;
   function myFunc() {
     if (seconds >= maxRecordingSeconds) {
+      terminate_call();
       stopRecordProgress();
     } else {
       seconds++;
       secremain--;
       percentage = (seconds/maxRecordingSeconds)*100;
       $('#record-progress-bar').css('width', percentage.toFixed(0)+'%');
-      $('#secsremain').html('&nbsp;&nbsp;' + secremain+' seconds remaining');
-      $('#recordicon').show();
+      $('#secsremain').html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + secremain+' seconds remaining');
+      $('#recordicon').css('visibility','visible');
     }
   }
 }
@@ -52,7 +57,13 @@ function stopRecordProgress() {
     $('#secsremain').html('');
     clearInterval(recordId);
     recordId = null;
-    $('#recordicon').hide();
+    $('#recordicon').css('visibility','hidden');
+    $('#record-progress-bar').css('width', '0%');
+    $('#record-progress-bar').hide();
+    $('#callbutton').prop("disabled", true);    
+    $('#videomailbutton').prop("disabled", false);  
+    $('#userformbtn').prop("disabled", false);
+    $('#vmsent').show();
   }
 }
 
@@ -390,6 +401,20 @@ function remove_video(){
 	selfStream = document.getElementById("selfView");							 
 
 	toggle_incall_buttons(false);
+}
+
+//swaps remote and local videos for videomail recording
+//puts Consumer's own video in the big video
+function swap_video() {
+  //local becomes remote and remote becomes local
+  $('#remoteView').attr('id','tempView');
+  $('#selfView').attr('id','remoteView');
+  $('#tempView').attr('id','selfView');
+  
+  $('#selfView').attr('width',0);
+  $('#selfView').attr('height',0);
+  $('#selfView').attr('muted',true);
+  $('#selfView').attr('hidden',true);
 }
 
 // Adds an element to the document

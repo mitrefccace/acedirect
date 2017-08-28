@@ -23,6 +23,8 @@ var transferred_call_blinking;
 var wrap_up_blinking;
 var need_assistance_blinking;
 var missed_call_blinking;
+var videomail_status_buttons = document.getElementById("videomail-status-buttons");
+
 
 setInterval(function () {
 	busylight.light(this.agentStatus);
@@ -140,6 +142,11 @@ function connect_socket() {
 					channelMe = payload.channel; //e.g. SIP/7001
 					register_jssip();
 					pauseQueues();
+					socket.emit('get-videomail',{
+						"extension": extensionMe
+					});
+					toggle_videomail_buttons(false);
+					console.log('Sent a get-videomail event');
 				}).on('disconnect', function () {
 					debugtxt('disconnect');
 					console.log('disconnected');
@@ -383,6 +390,8 @@ function connect_socket() {
 					debugtxt('lightcode-configs', data);
 					updateColors(data);
 					busylight.updateConfigs(data);
+				}).on('got-videomail-recs',function(data){
+					updateVideomailTable(data);
 				});
 
 
@@ -868,6 +877,132 @@ function testLightConnection() {
 }
 
 testLightConnection();
+
+//####################################################################
+//Videomail functionality: mostly sending socket.io events to adserver
+
+function getVideomailRecs(){
+	socket.emit('get-videomail',{
+		"extension": extensionMe
+	});
+	console.log('Sent a get-videomail event');	
+}
+
+
+$('#Videomail_Table tbody').on('click', 'tr', function () {
+    var tableData = $(this).children("td").map(function() {
+        return $(this).text();
+    }).get();
+
+    console.log('Click event for playing video');
+    console.log('vidId: ' + tableData[0] );
+    $("#videomailId").attr("name",tableData[0]);
+    playVideomail(tableData[0], tableData[4]);//vidId, vidFilepath+vidFilename);
+
+    //console.log(tableData);
+});
+
+
+function updateVideomailTable(data){
+	console.log("Updating videomail table");
+	var table;
+	var row;
+	var idCell;
+	var receivedCell;
+	var durationCell;
+	var statusCell;
+	for(var i=0; i<data.length; i++){
+		var vidId = data[i].id;
+		var vidReceived = data[i].received;
+		var vidDuration = data[i].video_duration;
+		var vidStatus = data[i].status;
+		var vidFilepath = data[i].video_filepath;
+		var vidFilename = data[i].video_filename;
+		table = document.getElementById("Videomail_Table");
+		row = table.insertRow(table.length);
+		//var tagId = 'video' + data[i].id;
+		//row.setAttribute("id", tagId);
+		idCell = row.insertCell(0);
+		receivedCell = row.insertCell(1);
+		durationCell = row.insertCell(2);
+		statusCell = row.insertCell(3);
+		filepathCell = row.insertCell(4);
+		filepathCell.setAttribute('hidden', true)
+		filepathCell.innerHTML = vidFilepath + vidFilename;
+		idCell.innerHTML = vidId;
+		receivedCell.innerHTML = vidReceived;
+		durationCell.innerHTML = vidDuration;
+		statusCell.innerHTML = vidStatus;
+	/*	$(row).click(function(){
+			//var recs = JSON.stringify(data[i]);
+			console.log('Click event for playing video');
+			console.log('vidId: ' + vidId + '; vidReceived: ' + vidReceived + '; vidFilepath: ' + vidFilepath + '; vidFilename: ' + vidFilename);
+			//console.log(JSON.stringify(JSON.parse(recs[i])));
+			playVideomail(vidId, vidFilepath, vidFilename);
+		});
+*/
+	}
+}
+
+
+function playVideomail(id, filepath){
+	console.log('Playing video mail with id ' + id);
+	remoteView.removeAttribute("autoplay");
+	remoteView.removeAttribute("poster");
+	remoteView.setAttribute("controls", "controls");
+	remoteView.setAttribute("src",'./getVideomail?location='+filepath);
+	toggle_videomail_buttons(true);
+	videomail_read(id);
+}
+
+function toggle_videomail_buttons(make_visible){
+	if(make_visible) videomail_status_buttons.style.display = "block";
+	else videomail_status_buttons.style.display = "none";
+}
+
+function stopVideomail(){
+	console.log("Videomail view has been stopped, back to call view")
+	remoteView.setAttribute("src","");
+	remoteView.removeAttribute("controls");
+	remoteView.removeAttribute("src");
+	remoteView.setAttribute("autoplay", "autoplay");
+	remoteView.setAttribute("poster", "images/AD-logo.png");
+	toggle_videomail_buttons(false);
+}
+
+function videomail_unread(id){
+	socket.emit('videomail-unread', {
+		"id": id,
+		"extension": extensionMe
+	});
+	console.log('Emitted a socket videomail-unread');
+}
+
+function videomail_read(id){
+	socket.emit('videomail-read', {
+		"id": id,
+		"extension": extensionMe
+	});
+	console.log('Emitted a socket videomail-read');
+}
+
+function videomail_in_progress(id){
+	socket.emit('videomail-in-progress', {
+		"id": id,
+		"extension": extensionMe
+	});
+	console.log('Emitted a socket videomail-in-progress');
+
+}
+
+function videomail_closed(id){
+	socket.emit('videomail-closed', {
+		"id": id,
+		"extension": extensionMe
+	});
+	console.log('Emitted a socket videomail-closed');
+}
+
 
 
 $("#accept-btn").click(function(){
