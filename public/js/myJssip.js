@@ -413,7 +413,7 @@ function swap_video() {
   
   $('#selfView').attr('width',0);
   $('#selfView').attr('height',0);
-  $('#selfView').attr('muted',true);
+  //$('#selfView').attr('muted',true);
   $('#selfView').attr('hidden',true);
 }
 
