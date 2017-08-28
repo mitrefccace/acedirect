@@ -403,6 +403,25 @@ function remove_video(){
 	toggle_incall_buttons(false);
 }
 
+//swaps remote and local videos for videomail recording
+function swap_video() {
+	removeElement("selfView");
+	removeElement("remoteView");
+  
+	addElement("webcam","video","selfView");
+	selfView.setAttribute("autoplay", "autoplay");
+	selfView.setAttribute("poster","images/AD-logo.png");
+  
+	addElement("webcam","video","remoteView");
+	remoteView.setAttribute("style","right: 11px");
+	remoteView.setAttribute("autoplay", "autoplay");
+	remoteView.setAttribute("muted",true);
+	remoteView.setAttribute("hidden",true);
+  
+	remoteStream = document.getElementById("remoteView");
+	selfStream = document.getElementById("selfView");		
+}
+
 // Adds an element to the document
 function addElement(parentId, elementTag, elementId, html) {
     var p = document.getElementById(parentId);

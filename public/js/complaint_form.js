@@ -170,6 +170,7 @@ function connect_socket() {
 }
 
 $("#callbutton").click(function(){
+  swap_video();
   videomailflag = false;
   $('#record-progress-bar').hide();
   $('#vmsent').hide();
