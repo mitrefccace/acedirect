@@ -29,6 +29,7 @@ function startRecordProgress() {
   if (recordId)
     return;
   $('#vmsent').hide();
+  $('#vmwait').hide();
   $('#callbutton').prop("disabled", true);    
   $('#videomailbutton').prop("disabled", true);  
   $('#userformbtn').prop("disabled", true);  
@@ -64,6 +65,11 @@ function stopRecordProgress() {
     $('#videomailbutton').prop("disabled", false);  
     $('#userformbtn').prop("disabled", false);
     $('#vmsent').show();
+    
+    $("#callEndedModal").modal('show');
+    setTimeout(function () {
+      window.location = "http://www.fcc.gov";
+    }, 5000);    
   }
 }
 
