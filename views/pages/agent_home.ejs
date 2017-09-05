@@ -201,7 +201,7 @@
 											<button  id="closed" type = "button" class = "btn btn-gray" onclick = "videomail_read(document.getElementById('videomailId').getAttribute('name'))"> Mark as Read </button> 
 											<button  id="in-progress" type = "button" class = "btn btn-gray" onclick = "videomail_in_progress(document.getElementById('videomailId').getAttribute('name'))"> Mark as in Progress</i> </button> 
 											<button  id="closed" type = "button" class = "btn btn-gray" onclick = "videomail_closed(document.getElementById('videomailId').getAttribute('name'))"> Mark as Closed </button> 
-											<button  id="stopVideomail" type = "button" class = "btn btn-gray" onclick = "stopVideomail()"> Exit Videomail </button> 
+											<button  id="stopVideomail" type = "button" class = "btn btn-gray" data-toggle="control-sidebar" onclick = "stopVideomail()"> Exit Videomail </button> 
 										</div>
 									</div> 
                                 </div>
@@ -574,6 +574,26 @@
                 </div>
                 <div class="modal-footer">
                     <h2 id='myMissedCallModalPhoneNumber' class="modal-title text-center"></h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	
+	<!-- New Videomail Modal -->
+    <div id="myNewVideomailModal" class="modal fade">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h2 class="modal-title">New Videomail</h2>
+                </div>
+                <div class="modal-body text-center">
+					<h4 class="modal-title">You have unread videomail. Open the videomail tab to view the message(s).</h4>
+                    <!--img src="images/missed-call.png" alt="Videomail" height="100"-->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
