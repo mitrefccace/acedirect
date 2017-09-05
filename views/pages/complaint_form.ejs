@@ -188,11 +188,16 @@
               <div id="recordicon" style="display:inline;visibility:hidden;">&nbsp;&nbsp;<span id="recordicon" class="glyphicon glyphicon-facetime-video blink" style="color:#FF0000;" ></span><label class="blink" style="color:#FF0000;" >&nbsp;&nbsp;RECORDING</label></div>
               <div id="secsremain" style="display:inline;"></div>
               
-              <div class="alert alert-success alert-dismissable" id="vmsent" hidden>
-                <a class="close" onclick="$('#vmsent').hide()" style="text-decoration:none">×</a>
-                <strong>Success!</strong> Videomail sent.
-              </div>              
+              <div class="alert alert-info" alert-dismissable id="vmwait" hidden>
+                <a class="close" onclick="$('#vmwait').hide();" style="text-decoration:none">×</a>
+                <strong>Videomail request sent.</strong> Please wait.
+              </div>                 
               
+              <div class="alert alert-success alert-dismissable" id="vmsent" hidden>
+                <a class="close" onclick="$('#vmsent').hide();" style="text-decoration:none">×</a>
+                <strong>Success!</strong> Videomail sent.
+              </div>      
+
 						</div>
 					</section>
 					<!-- Right Col -->
@@ -303,6 +308,29 @@
 			</div>
 		</div>
 	</div>
+  
+  <!-- Videomail Modal -->
+  <div id="videomailModal" class="modal fade">
+      <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h2 class="modal-title">Ready to record?</h2>
+              </div>
+              <div class="modal-body text-center">
+                  <span class="glyphicon glyphicon-facetime-video" style="font-size: 100px;" ></span>
+                  <p style="font-size: 18px;">Recording will begin when you click the Record button.</p>
+              </div>
+              <div class="modal-footer">
+                  <div class = "btn-group" style="width: 100%;">
+                      <button id="start-recording-btn" type ="button" onclick = "startRecordingVideomail();" class ="btn btn-success btn-style" style="width: 50%; height: 50px;"> Record </button>
+                      <button id="cancel-recording-btn" type ="button" onclick = "$('#videomailModal').modal('hide');" class ="btn btn-danger btn-style" style="width: 50%; height: 50px;"> Cancel </button>
+                </div>
+            </div>
+          </div>			   
+      </div>
+  </div>  
+  
 	<!-- phone-page -->
 
   <!-- Jssip hidden data -->						

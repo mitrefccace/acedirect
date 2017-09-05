@@ -182,6 +182,12 @@ $("#callbutton").click(function(){
 });
 
 $("#videomailbutton").click(function(){
+  $('#videomailModal').modal('show');
+});
+
+function startRecordingVideomail() {
+  $('#videomailModal').modal('hide');
+  $('#vmwait').show();
   swap_video();
   $('#vmsent').hide();
   videomailflag = true;
@@ -193,7 +199,7 @@ $("#videomailbutton").click(function(){
 	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');  
   socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
 	console.log('call-initiated event for videomail');
-});																		  
+}																		  
 
 $('#userform').submit(function (evt) {
 	evt.preventDefault();

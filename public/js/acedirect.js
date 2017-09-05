@@ -937,7 +937,11 @@ function updateVideomailTable(data){
 		idCell.innerHTML = vidId;
 		receivedCell.innerHTML = vidReceived;
 		durationCell.innerHTML = vidDuration;
-		statusCell.innerHTML = vidStatus;
+    
+    if (vidStatus === 'UNREAD')
+      statusCell.innerHTML = '<span style="font-weight:bold">' + vidStatus+ '</span>';
+    else
+      statusCell.innerHTML = vidStatus;
 	}
 }
 
