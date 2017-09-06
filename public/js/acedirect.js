@@ -148,7 +148,7 @@ function connect_socket() {
 					setInterval(function(){
 						socket.emit('get-videomail',{
 						"extension": extensionMe
-					}); }, 5000);		
+					}); }, 5000);
 					toggle_videomail_buttons(false);
 					console.log('Sent a get-videomail event');
 				}).on('disconnect', function () {
@@ -396,6 +396,9 @@ function connect_socket() {
 					busylight.updateConfigs(data);
 				}).on('got-videomail-recs',function(data){
 					updateVideomailTable(data);
+				}).on('got-unread-count',function(data){
+					console.log(data);
+					updateVideomailNotification(data);											
 				}).on('marked-unread',function(){
 					getVideomailRecs();
 				}).on('marked-read',function(){
@@ -949,6 +952,11 @@ function updateVideomailTable(data){
 	}
 }
 
+function updateVideomailNotification(data){
+	console.log("Updating videomail notification");
+	console.log(data);
+	$("#unread-mail-count").html(data);
+}
 
 function playVideomail(id, filepath){
 	console.log('Playing video mail with id ' + id);
