@@ -145,6 +145,10 @@ function connect_socket() {
 					socket.emit('get-videomail',{
 						"extension": extensionMe
 					});
+					setInterval(function(){
+						socket.emit('get-videomail',{
+						"extension": extensionMe
+					}); }, 5000);		
 					toggle_videomail_buttons(false);
 					console.log('Sent a get-videomail event');
 				}).on('disconnect', function () {
