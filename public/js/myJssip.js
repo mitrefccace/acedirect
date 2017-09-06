@@ -154,8 +154,10 @@ function register_jssip()
 		{
 			if(debug) console.log('\nCURRENTSESSION -  ENDED: \nORIGINATOR: \n' + e.originator + '\nMESSAGE:\n' + e.message + "\nCAUSE:\n" + e.cause);
 			terminate_call();
-      if (complaintForm)
+      if (complaintForm) {
+        unregister_jssip();
         stopRecordProgress();
+      }
 		});
 	  	currentSession.on('failed', function(e)
 		{
@@ -370,7 +372,13 @@ function terminate_call()
 function unregister_jssip()
 {
 	terminate_call();
-	if(ua) ua.stop(); 
+	if(ua) {
+    ua.unregister();
+    ua.terminateSessions();
+    ua.stop(); 
+  }
+  localStorage.clear();
+  sessionStorage.clear();
 }
 
 //removes both the remote and self video streams and replaces it with default image. stops allowing camera to be active. also hides call_options_buttons.
