@@ -145,6 +145,10 @@ function connect_socket() {
 					socket.emit('get-videomail',{
 						"extension": extensionMe
 					});
+					setInterval(function(){
+						socket.emit('get-videomail',{
+						"extension": extensionMe
+					}); }, 5000);
 					toggle_videomail_buttons(false);
 					console.log('Sent a get-videomail event');
 				}).on('disconnect', function () {
@@ -392,7 +396,19 @@ function connect_socket() {
 					busylight.updateConfigs(data);
 				}).on('got-videomail-recs',function(data){
 					updateVideomailTable(data);
+				}).on('got-unread-count',function(data){
+					console.log(data);
+					updateVideomailNotification(data);											
+				}).on('marked-unread',function(){
+					getVideomailRecs();
+				}).on('marked-read',function(){
+					getVideomailRecs();
+				}).on('marked-in-progress',function(){
+					getVideomailRecs();
+				}).on('marked-closed',function(){
+					getVideomailRecs();
 				});
+				
 
 
 			} else {
@@ -898,13 +914,11 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
     console.log('vidId: ' + tableData[0] );
     $("#videomailId").attr("name",tableData[0]);
     playVideomail(tableData[0], tableData[4]);//vidId, vidFilepath+vidFilename);
-
-    //console.log(tableData);
 });
-
 
 function updateVideomailTable(data){
 	console.log("Updating videomail table");
+	$("#videomailTbody").html("");
 	var table;
 	var row;
 	var idCell;
@@ -918,10 +932,8 @@ function updateVideomailTable(data){
 		var vidStatus = data[i].status;
 		var vidFilepath = data[i].video_filepath;
 		var vidFilename = data[i].video_filename;
-		table = document.getElementById("Videomail_Table");
+		table = document.getElementById("videomailTbody");
 		row = table.insertRow(table.length);
-		//var tagId = 'video' + data[i].id;
-		//row.setAttribute("id", tagId);
 		idCell = row.insertCell(0);
 		receivedCell = row.insertCell(1);
 		durationCell = row.insertCell(2);
@@ -932,18 +944,19 @@ function updateVideomailTable(data){
 		idCell.innerHTML = vidId;
 		receivedCell.innerHTML = vidReceived;
 		durationCell.innerHTML = vidDuration;
-		statusCell.innerHTML = vidStatus;
-	/*	$(row).click(function(){
-			//var recs = JSON.stringify(data[i]);
-			console.log('Click event for playing video');
-			console.log('vidId: ' + vidId + '; vidReceived: ' + vidReceived + '; vidFilepath: ' + vidFilepath + '; vidFilename: ' + vidFilename);
-			//console.log(JSON.stringify(JSON.parse(recs[i])));
-			playVideomail(vidId, vidFilepath, vidFilename);
-		});
-*/
+    
+    if (vidStatus === 'UNREAD')
+      statusCell.innerHTML = '<span style="font-weight:bold">' + vidStatus+ '</span>';
+    else
+      statusCell.innerHTML = vidStatus;
 	}
 }
 
+function updateVideomailNotification(data){
+	console.log("Updating videomail notification");
+	console.log(data);
+	$("#unread-mail-count").html(data);
+}
 
 function playVideomail(id, filepath){
 	console.log('Playing video mail with id ' + id);
@@ -982,7 +995,7 @@ function videomail_read(id){
 	socket.emit('videomail-read', {
 		"id": id,
 		"extension": extensionMe
-	});
+	});	
 	console.log('Emitted a socket videomail-read');
 }
 
