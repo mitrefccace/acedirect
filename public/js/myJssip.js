@@ -154,7 +154,8 @@ function register_jssip()
 		{
 			if(debug) console.log('\nCURRENTSESSION -  ENDED: \nORIGINATOR: \n' + e.originator + '\nMESSAGE:\n' + e.message + "\nCAUSE:\n" + e.cause);
 			terminate_call();
-      stopRecordProgress();
+      if (complaintForm)
+        stopRecordProgress();
 		});
 	  	currentSession.on('failed', function(e)
 		{
@@ -168,7 +169,8 @@ function register_jssip()
 	    currentSession.on('newInfo', function(e)
 		{
 			if(debug) console.log('\nCURRENTSESSION -  NEWINFO: \nINFO:\n' + e.info + "\nrequest:\n" + e.request);
-      startRecordProgress(); //newInfo gets called repeatedly during a call
+      if (complaintForm)
+        startRecordProgress(); //newInfo gets called repeatedly during a call
 		});
 		currentSession.on('hold', function(e)
 		{
