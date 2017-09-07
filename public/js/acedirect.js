@@ -956,6 +956,8 @@ function updateVideomailNotification(data){
 	console.log("Updating videomail notification");
 	console.log(data);
 	$("#unread-mail-count").html(data);
+	if (data === 0)
+		$("#unread-mail-count").html("");
 }
 
 function playVideomail(id, filepath){
