@@ -46,10 +46,10 @@
                     <span class="sr-only">Toggle navigation</span>
                 </a>
                 <div id="agentStatusInfo" class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-2 col-md-offset-2" style="white-space:nowrap;">
-                    <label class="control-label">Call Duration: </label>&nbsp;&nbsp;<span id="duration" class="text-gray">0 sec</span>
+                    <label class="control-label">Call Duration: </label>&nbsp;&nbsp;<span id="duration" class="text-light-gray">0 sec</span>
                 </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-lg-offset-1 col-md-offset-1">
-                    <button id="assistanceBtn" type="button" class="btn btn-danger" style="overflow: hidden;text-overflow:ellipsis;" onclick="requestAssistance()">Assistance</button>
+                <div class="pull-right">
+                    <button id="assistanceBtn" type="button" class="btn btn-danger" onclick="requestAssistance()">Get Help</button>
                 </div>
                 <!-- Navbar Right Menu -->
                 <div class="navbar-custom-menu">
@@ -95,6 +95,7 @@
 							<a href="#" data-toggle="control-sidebar">
 								<i class="fa fa-envelope-o"></i><span class="label label-danger" id="unread-mail-count"></span>
 							</a>
+                        </li> 
                         <li>
                             <a href="#" data-toggle="modal" data-target="#licModal"><i class="fa fa-info-circle"></i></a>
                         </li>
@@ -112,21 +113,27 @@
             <!-- sidebar: style can be found in sidebar.less -->
             <section class="sidebar">
                 <!-- Sidebar user panel -->
-                <div class="user-panel">
-                    <div class="pull-left image">
-                        <img src="bower_components/AdminLTE/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
-                    </div>
-                    <div class="pull-left info">
-                        <p><span id="agentname-sidebar"></span></p>
-                        <span><i id="status-icon" class="fa fa-circle text-warning currently-away"></i></span>&nbsp;&nbsp;&nbsp;
+                <div class="user-panel" style="overflow: visible;">
+                  <div class="pull-left image">
+                      <img src="bower_components/AdminLTE/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                  </div>
+                  <div class="pull-left info">
+                    <p style="margin-bottom: 5px;"><span id="agentname-sidebar">Franklin Pierce</span></p>
+                    <span id = "status-dropdown" class="dropdown dropdown-menu-left">
+                      <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                        <span><i id="status-icon" class="fa fa-circle text-yellow currently-away"></i></span>&nbsp;&nbsp;&nbsp;
                         <span id="user-status">Away</span>
-                    </div>
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu">
+                         <li onclick="pauseQueues();"><a href="#"><i id ="away-icon" class="fa fa-circle text-yellow"></i> <span>Away</span></a></li>
+                         <li onclick="unpauseQueues();"><a href="#"><i id = "ready-icon" class="fa fa-circle text-green"></i> <span>Ready</span></a></li>
+                      </ul>
+                    </span>
+                  </div>
                 </div>
                 <!-- sidebar menu: : style can be found in sidebar.less -->
                 <ul class="sidebar-menu">
-                    <li class="header">USER STATUS</li>
-                    <li onclick="pauseQueues();"><a href="#"><i id ="away-icon" class="fa fa-circle text-yellow"></i> <span>Away</span></a></li>
-                    <li onclick="unpauseQueues();"><a href="#"><i id = "ready-icon" class="fa fa-circle text-green"></i> <span>Ready</span></a></li>
                     <li class="header">MAIN NAVIGATION</li>
                     <li>
                         <a href="#">
@@ -134,15 +141,7 @@
                         </a>
                     </li>
                     <li id="sidebar-queues" class="header"><span id="nav-desktop">QUEUES</span></li>
-                    <li id="sidebar-complaints" onclick="$('#complaintsanchor').click()" hidden>
-                        <a href="#">
-                            <i class="fa fa-thumbs-down"></i>
-                            <span>Complaints</span>
-                            <span id="complaintsInCall" class="pull-right-container" hidden>
-									<small class="label pull-right bg-red">in call</small>
-								</span>
-                        </a>
-                    </li>
+                   
                     <li id="sidebar-geninfo" onclick="$('#geninfoanchor').click()" hidden>
                         <a href="#">
                             <i class="fa fa-question-circle"></i>
@@ -150,6 +149,15 @@
                             <span id="geninfoInCall" class="pull-right-container" hidden>
 									<small class="label pull-right bg-red">in call</small>
 								</span>
+                        </a>
+                    </li>
+                     <li id="sidebar-complaints" onclick="$('#complaintsanchor').click()" hidden>
+                        <a href="#">
+                            <i class="fa fa-thumbs-down"></i>
+                            <span>Complaints</span>
+                            <span id="complaintsInCall" class="pull-right-container" hidden>
+                                    <small class="label pull-right bg-red">in call</small>
+                                </span>
                         </a>
                     </li>
 
@@ -348,9 +356,11 @@
                                                 </div>
                                             </div>
                                             <div class="row">
-                                                <div class="form-group text-center">
-                                                    <input type="button" class="btn btn-warning" id="btnClear" value="Finished" onclick="finished();" />
-                                                    <!--input type="button" class="btn btn-success"  id="btnTest" value="TEST BUTTON" /-->
+                                                <div class = "col-lg-12">
+                                                    <div class="form-group pull-right">
+                                                        <input type="button" class="btn btn-danger" id="btnClear" value="Save" onclick="finished();" />
+                                                        <!--input type="button" class="btn btn-success"  id="btnTest" value="TEST BUTTON" /-->
+                                                    </div>
                                                 </div>
                                             </div>
                                         </form>
@@ -400,7 +410,7 @@
                                             <div class="row">
                                                 <div class="col-lg-12">
                                                     <div class="form-group pull-right">
-                                                        <input type="button" class="btn btn-primary" id="btnModifyTicket" value="Save" onclick="modifyTicket()" />
+                                                        <input type="button" class="btn btn-danger" id="btnModifyTicket" value="Save" onclick="modifyTicket()" />
                                                     </div>
                                                 </div>
                                             </div>
