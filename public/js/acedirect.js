@@ -397,7 +397,6 @@ function connect_socket() {
 				}).on('got-videomail-recs',function(data){
 					updateVideomailTable(data);
 				}).on('got-unread-count',function(data){
-					console.log(data);
 					updateVideomailNotification(data);											
 				}).on('marked-unread',function(){
 					getVideomailRecs();
@@ -917,7 +916,7 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
 });
 
 function updateVideomailTable(data){
-	console.log("Updating videomail table");
+	console.log("Refreshing videomail");
 	$("#videomailTbody").html("");
 	var table;
 	var row;
@@ -953,19 +952,17 @@ function updateVideomailTable(data){
 }
 
 function updateVideomailNotification(data){
-	console.log("Updating videomail notification");
-	console.log(data);
 	$("#unread-mail-count").html(data);
 	if (data === 0)
 		$("#unread-mail-count").html("");
 }
 
-function playVideomail(id, filepath){
+function playVideomail(id){
 	console.log('Playing video mail with id ' + id);
 	remoteView.removeAttribute("autoplay");
 	remoteView.removeAttribute("poster");
 	remoteView.setAttribute("controls", "controls");
-	remoteView.setAttribute("src",'./getVideomail?location='+filepath);
+	remoteView.setAttribute("src",'./getVideomail?id='+id);
 	toggle_videomail_buttons(true);
 	videomail_read(id);
 }
