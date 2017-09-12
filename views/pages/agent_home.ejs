@@ -210,9 +210,10 @@
 									<div id= "videomail-status-buttons">
 										<div id= "inner">
 											<button  id="unread" type = "button" class = "btn btn-gray" onclick = "videomail_unread(document.getElementById('videomailId').getAttribute('name'))"> Mark as Unread<!--i id= "mute-audio-icon" class="call-btn-icon fa fa-microphone"></i--> </button> 
-											<button  id="closed" type = "button" class = "btn btn-gray" onclick = "videomail_read(document.getElementById('videomailId').getAttribute('name'))"> Mark as Read </button> 
+											<button  id="read" type = "button" class = "btn btn-gray" onclick = "videomail_read(document.getElementById('videomailId').getAttribute('name'))"> Mark as Read </button> 
 											<button  id="in-progress" type = "button" class = "btn btn-gray" onclick = "videomail_in_progress(document.getElementById('videomailId').getAttribute('name'))"> Mark as in Progress</i> </button> 
 											<button  id="closed" type = "button" class = "btn btn-gray" onclick = "videomail_closed(document.getElementById('videomailId').getAttribute('name'))"> Mark as Closed </button> 
+											<button  id="deleted" type = "button" class = "btn btn-gray" onclick = "videomail_deleted(document.getElementById('videomailId').getAttribute('name'))"> Delete </button> 
 											<button  id="stopVideomail" type = "button" class = "btn btn-gray" data-toggle="control-sidebar" onclick = "stopVideomail()"> Exit Videomail </button> 
 										</div>
 									</div> 

@@ -406,6 +406,8 @@ function connect_socket() {
 					getVideomailRecs();
 				}).on('marked-closed',function(){
 					getVideomailRecs();
+				}).on('deleted-videomail',function(){
+					getVideomailRecs();
 				});
 				
 
@@ -1013,6 +1015,14 @@ function videomail_closed(id){
 		"extension": extensionMe
 	});
 	console.log('Emitted a socket videomail-closed');
+}
+
+function videomail_deleted(id){
+	socket.emit('videomail-deleted', {
+		"id": id,
+		"extension": extensionMe
+	});
+	console.log('Emitted a socket videomail-deleted');
 }
 
 
