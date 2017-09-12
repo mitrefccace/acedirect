@@ -400,14 +400,18 @@ function connect_socket() {
 					updateVideomailNotification(data);											
 				}).on('marked-unread',function(){
 					getVideomailRecs();
+					stopVideomail();
 				}).on('marked-read',function(){
 					getVideomailRecs();
 				}).on('marked-in-progress',function(){
 					getVideomailRecs();
+					stopVideomail(); 
 				}).on('marked-closed',function(){
 					getVideomailRecs();
+					stopVideomail(); 
 				}).on('deleted-videomail',function(){
 					getVideomailRecs();
+					stopVideomail(); 
 				});
 				
 
