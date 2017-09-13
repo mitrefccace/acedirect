@@ -403,6 +403,7 @@ function connect_socket() {
 					stopVideomail();
 				}).on('marked-read',function(){
 					getVideomailRecs();
+					stopVideomail(); 
 				}).on('marked-in-progress',function(){
 					getVideomailRecs();
 					stopVideomail(); 
@@ -967,10 +968,10 @@ function playVideomail(id){
 	console.log('Playing video mail with id ' + id);
 	remoteView.removeAttribute("autoplay");
 	remoteView.removeAttribute("poster");
-	remoteView.setAttribute("controls", "controls");
+	//remoteView.setAttribute("controls", "controls");
 	remoteView.setAttribute("src",'./getVideomail?id='+id);
 	toggle_videomail_buttons(true);
-	videomail_read(id);
+	//videomail_read(id);
 }
 
 function toggle_videomail_buttons(make_visible){
@@ -981,7 +982,7 @@ function toggle_videomail_buttons(make_visible){
 function stopVideomail(){
 	console.log("Videomail view has been stopped, back to call view")
 	remoteView.setAttribute("src","");
-	remoteView.removeAttribute("controls");
+	//remoteView.removeAttribute("controls");
 	remoteView.removeAttribute("src");
 	remoteView.setAttribute("autoplay", "autoplay");
 	remoteView.setAttribute("poster", "images/AD-logo.png");
@@ -1029,6 +1030,66 @@ function videomail_deleted(id){
 	console.log('Emitted a socket videomail-deleted');
 }
 
+function play_video(){
+	console.log('video paused: ' + remoteView.paused);
+  if (remoteView.paused == true) {
+    // Play the video
+    remoteView.play();
+	// Update the button icon to pause
+	//console.log($("#play-video-icon").classList);
+	document.getElementById("play-video-icon").classList.remove("fa-play");
+    document.getElementById("play-video-icon").classList.add("fa-pause");
+  } else {
+    // Pause the video
+    remoteView.pause();
+    // Update the button icon to play
+	document.getElementById("play-video-icon").classList.add("fa-play");
+    document.getElementById("play-video-icon").classList.remove("fa-pause");
+  }
+}
+
+/*
+var seekBar = $("#seek-bar");
+// Event listener for the seek bar
+seekBar.addEventListener("change", function() {
+  // Calculate the new time
+  var time = remoteView.duration * (seekBar.value / 100);
+
+  // Update the video time
+  remoteView.currentTime = time;
+});
+
+// Update the seek bar as the video plays
+									
+remoteView.addEventListener("timeupdate", function() {
+  // Calculate the slider value
+  var value = (100 / remoteView.duration) * remoteView.currentTime;
+
+  // Update the slider value
+  seekBar.value = value;
+});
+
+// Pause the video when the slider handle is being dragged
+seekBar.addEventListener("mousedown", function() {
+  remoteView.pause();
+});
+
+// Play the video when the slider handle is dropped
+seekBar.addEventListener("mouseup", function() {
+  remoteView.play();
+});
+*/
+
+// Event listener for the full-screen button
+$("#full-screen").click(function() {
+  if (remoteView.requestFullscreen) {
+    remoteView.requestFullscreen();
+  } else if (remoteView.mozRequestFullScreen) {
+    remoteView.mozRequestFullScreen(); // Firefox
+  } else if (remoteView.webkitRequestFullscreen) {
+    remoteView.webkitRequestFullscreen(); // Chrome and Safari
+  }
+});
 
 
 $("#accept-btn").click(function(){

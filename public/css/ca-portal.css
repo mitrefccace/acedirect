@@ -565,3 +565,27 @@ However, delay the fade out process for 2.5 seconds */
 {
   padding: 3px;
 }
+
+/*
+#seek-bar
+{  
+  cursor: pointer;
+  height: 15px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  position: relative;
+  width: 300px;
+}
+*/
+
+#seek-bar {
+   display:block;
+   width:40%;
+   height:81%;
+   margin-top:0.125rem;
+   border:none;
+   color:#0095dd;
+   -moz-border-radius:2px;
+   -webkit-border-radius:2px;
+   border-radius:2px;
+}

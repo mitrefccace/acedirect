@@ -209,11 +209,28 @@
                                     </div>
 									<div id= "videomail-status-buttons">
 										<div id= "inner">
-											<button  id="unread" type = "button" class = "btn btn-gray" onclick = "videomail_unread(document.getElementById('videomailId').getAttribute('name'))"> Mark as Unread<!--i id= "mute-audio-icon" class="call-btn-icon fa fa-microphone"></i--> </button> 
+<button  id="play-video" type = "button" class = "btn btn-gray" onclick = "play_video()"> <i id= "play-video-icon" class="call-btn-icon fa fa-play"></i> </button>
+											<!--input type="range" id="seek-bar" value="0"/-->
+											<button type="button" class = "btn btn-gray" id="full-screen"><i id= "fullscreen-icon" class="call-btn-icon fa fa-expand"></i> </button>
+											<span id = "videomail-status-dropdown" class="dropdown dropdown-menu-left">
+											  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+												<span><i id="status-icon" class="call-btn-icon fa fa-envelope"></i></span>&nbsp;&nbsp;&nbsp;
+												<span id="user-status" >Mark as...</span>
+												<span class="caret"></span>
+											  </button>
+											  <ul class="dropdown-menu">
+												 <li onclick="videomail_unread(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>Unread</span></a></li>
+												 <li onclick="videomail_read(document.getElementById('videomailId').getAttribute('name'),'click')"><a href="#"><span>Read</span></a></li>
+												 <li onclick="videomail_in_progress(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>In Progress</span></a></li>
+												 <li onclick="videomail_closed(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>Closed</span></a></li>
+												 <li onclick="videomail_deleted(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>Deleted</span></a></li>
+											  </ul>
+											</span>
+											<!--button  id="unread" type = "button" class = "btn btn-gray" onclick = "videomail_unread(document.getElementById('videomailId').getAttribute('name'))"> Mark as Unread</button> 
 											<button  id="read" type = "button" class = "btn btn-gray" onclick = "videomail_read(document.getElementById('videomailId').getAttribute('name'))"> Mark as Read </button> 
 											<button  id="in-progress" type = "button" class = "btn btn-gray" onclick = "videomail_in_progress(document.getElementById('videomailId').getAttribute('name'))"> Mark as in Progress</i> </button> 
 											<button  id="closed" type = "button" class = "btn btn-gray" onclick = "videomail_closed(document.getElementById('videomailId').getAttribute('name'))"> Mark as Closed </button> 
-											<button  id="deleted" type = "button" class = "btn btn-gray" onclick = "videomail_deleted(document.getElementById('videomailId').getAttribute('name'))"> Delete </button> 
+											<button  id="deleted" type = "button" class = "btn btn-gray" onclick = "videomail_deleted(document.getElementById('videomailId').getAttribute('name'))"> Delete </button--> 
 										</div>
 									</div> 
                                 </div>
@@ -479,9 +496,9 @@
 
                 <!-- Mail tab content -->
                 <div class="tab-pane" id="control-sidebar-videomail-tab">
-					<button type="button" class="btn btn-default" onclick="getVideomailRecs();"> Refresh Videomail </button>
                     <div class="form-group" style='height: 90vh; max-height:90vh; overflow-y:scroll;'>
                         <label>Mailbox Messages</label>
+						<button type="button" class="btn btn-default" onclick="getVideomailRecs();"><i id= "refresh-icon" class="fa fa-refresh"></i></button>																																																									   
                         <table class="table table-hover" id="Videomail_Table">
                             <thead>
 								<tr>
