@@ -66,10 +66,14 @@ function stopRecordProgress() {
     $('#userformbtn').prop("disabled", false);
     $('#vmsent').show();
     
-    $("#callEndedModal").modal('show');
-    setTimeout(function () {
-      window.location = "http://www.fcc.gov";
-    }, 5000);    
+    if (complaintRedirectActive) {
+      $("#redirecttag").attr("href", complaintRedirectUrl);
+      $("#redirectdesc").text("Redirecting to " + complaintRedirectDesc + " ...");      
+      $("#callEndedModal").modal('show');
+      setTimeout(function () {
+        window.location = complaintRedirectUrl;
+      }, 5000);
+    }
   }
 }
 
