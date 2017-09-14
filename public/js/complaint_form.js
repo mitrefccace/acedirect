@@ -93,8 +93,10 @@ function connect_socket() {
           
           //get complaint redirect options
           complaintRedirectActive = data.complaint_redirect_active;
+          complaintRedirectDesc = data.complaint_redirect_desc;
           complaintRedirectUrl = data.complaint_redirect_url;
           $("#redirecttag").attr("href", complaintRedirectUrl);
+          $("#redirectdesc").text("Redirecting to " + complaintRedirectDesc + " ...");
           
           $('#sip_password').attr("name",data.password);
  					$("#pc_config").attr("name","stun:" + data.stun_server );

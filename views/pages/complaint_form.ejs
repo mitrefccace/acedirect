@@ -285,7 +285,7 @@
 			<div class="modal-content">
 				<div class="modal-body" style="text-align: center">
 					<h1>CALL HAS ENDED</h1>
-					<h4> Redirecting to FCC.gov ...</h4>
+					<h4 id="redirectdesc"> Redirecting to FCC.gov ...</h4>
 				</div>
 				<div class="modal-footer">
 					<p>If not redirected, <a id="redirecttag" href=""><span>CLICK HERE</span></a></p>
@@ -366,7 +366,9 @@
   var complaintForm = true;
   var complaintRedirectActive = true;
   var complaintRedirectUrl = "http://www.fcc.gov";
+  var complaintRedirectDesc = "FCC.gov";
   $("#redirecttag").attr("href", complaintRedirectUrl);
+  $("#redirectdesc").text("Redirecting to " + complaintRedirectDesc + " ...");
   </script>
 	<script type="text/javascript" src="./js/myJssip.js"></script>
 	<!-- Custom Javascript for ACEDirect complaint_form.html page-->
