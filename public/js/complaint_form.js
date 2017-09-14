@@ -79,7 +79,11 @@ function connect_socket() {
 					console.log("got extension-created");
 					var extension = data.extension; //returned extension to use for WebRTC
 					$('#display_name').val(data.extension);
-					$('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");					 
+          if (data.ws_port !== "")
+            $('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + ":" + data.ws_port + "/ws");
+          else
+            $('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");
+
 					$('#my_sip_uri').attr("name","sip:"+data.extension+"@"+data.asterisk_public_hostname);
           
           //is this a videomail call or complaint call?
