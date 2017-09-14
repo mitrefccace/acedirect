@@ -91,6 +91,11 @@ function connect_socket() {
           //get the max videomail recording seconds
           maxRecordingSeconds = data.queues_videomail_maxrecordsecs;
           
+          //get complaint redirect options
+          complaintRedirectActive = data.complaint_redirect_active;
+          complaintRedirectUrl = data.complaint_redirect_url;
+          $("#redirecttag").attr("href", complaintRedirectUrl);
+          
           $('#sip_password').attr("name",data.password);
  					$("#pc_config").attr("name","stun:" + data.stun_server );
 					register_jssip(); //register with the given extension
@@ -144,10 +149,12 @@ function connect_socket() {
 						logout("Session has expired");
 					}
 				}).on("chat-leave", function (error) {
-					$("#callEndedModal").modal('show');
-					setTimeout(function () {
-						window.location = "http://www.fcc.gov";
-					}, 5000);
+					if (complaintRedirectActive) {
+            $("#callEndedModal").modal('show');
+            setTimeout(function () {
+              window.location = complaintRedirectUrl;
+            }, 5000);
+          }
 				}).on('error', function (reason) {
 					if (reason.code === "invalid_token") {
 						logout("Session has expired");

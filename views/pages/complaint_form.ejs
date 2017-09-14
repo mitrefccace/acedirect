@@ -288,7 +288,7 @@
 					<h4> Redirecting to FCC.gov ...</h4>
 				</div>
 				<div class="modal-footer">
-					<p>If not redirected, <a href="http://www.fcc.gov"><span>CLICK HERE</span></a></p>
+					<p>If not redirected, <a id="redirecttag" href=""><span>CLICK HERE</span></a></p>
 				</div>
 			</div>
 		</div>
@@ -364,6 +364,9 @@
 	<script type="text/javascript" src="./bower_components/jssip/dist/jssip.min.js"></script>	
   <script>
   var complaintForm = true;
+  var complaintRedirectActive = true;
+  var complaintRedirectUrl = "http://www.fcc.gov";
+  $("#redirecttag").attr("href", complaintRedirectUrl);
   </script>
 	<script type="text/javascript" src="./js/myJssip.js"></script>
 	<!-- Custom Javascript for ACEDirect complaint_form.html page-->
