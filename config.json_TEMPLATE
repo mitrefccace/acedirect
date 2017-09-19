@@ -1,138 +1,98 @@
 {
-	"debuglevel": "ERROR",
-	"dialaroundnums": "|1234567890|",
-	"https": {
-		"adport": 1000,
-		"port-user": 1000,
-                "certificate": "path_to_cert",
-                "private_key": "path_to_key"
-	},
-	"zendesk": {
-		"ticket": "yes",
-		"apiurl": "http://esbhost:1000/api/v2",
-		"userid": "user@email.com",
-		"token": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-		"proxy": {
-			"host": "host",
-			"port": 1000,
-			"tunnel": "true"
-		}
-	},
-	"asteriskAD": {
-		"sip": {
-            "public": "publichostname",
-            "local": "privatehostname",
-			"stun": "turn:1000",
-			"wsport": 1000,
-			"outboundurl_host": "",
-			"outboundurl_port": "",
-			"disable_3gpp_early_ims": false,
-			"disable_debug_message": false,
-			"cache_media_stream": true,
-			"disable_call_button_options": false,
-			"disable_video": false,
-			"enable_rtcweb_breaker": false,
-			"channel": "SIP"
-		},
-		"ami": {
-			"id": "user",
-			"passwd": "password",
-			"port": 1000
-		},
-		"ari": {
-			"id": "user",
-			"passwd": "password"
-		}
-	},
-	"extensions": {
-		"startnumber": 1,
-		"endnumber": 3,
-		"secret": "password"
-	},
-	"queues": {
-		"inbound": {
-			"name": "inbqueue"
-		},
-		"complaint": {
-			"number": "111111"
-		},
-		"videomail": {
-			"number": "111111",
-      "maxrecordsecs": 90
-		},    
-		"information": {
-			"number": "111111"
-		}
-	},
-	"vrscheck": {
-		"verify": "yes",
-		"url": "http://host",
-		"port": 1000
-	},
-	"agentservice": {
-		"verify": "yes",
-		"url": "http://host",
-		"port": 1111
-	},
-	"scriptservice": {
-		"verify": "yes",
-		"url": "http://host",
-		"port": 1111
-	},
-	"managementportal": {
-		"url": "http://host/dashboard.html",
-		"assistance": "http://host:1111/agentassist"
-	},
-	"cdrportal": {
-		"url": "http://host:111/cdr.html"
-	},
-	"redis": {
-        "host": "host",
-        "port": 1000
-	},
-	"iam": {
-        "host": "host",
-        "port": 1000
-	},    
-	"jsonwebtoken": {
-		"encoding": "base64",
-		"secretkey": "somekey",
-		"timeout": 15000,
-		"handshake": true
-	},
-	"session": {
-        "secretKey": "somekey",
-        "resave": true,
-        "saveUninitialized": true,
-        "secure": true,
-        "httpOnly": true,
-        "rolling" : true,
-        "maxAge": 2400000
+    "clearText": "anyvalue",
+    "debuglevel": "ERROR",
+    "https": {
+        "adport": "0000",
+        "certificate": "/full/path/to/certificatefile",
+        "private_key": "/full/path/to/keyfile"
+    },
+    "zendesk": {
+        "apiurl": "https://domain:0000/api/v2",
+        "userid": "user@email.com",
+        "token": "userToken"
+    },
+    "asteriskAD": {
+        "sip": {
+            "public": "asteriskhost.domain.com",
+            "local": "0.0.0.0",
+            "stun": "stunhost.domain.com:0000",
+            "wsport": "000"
+        },
+        "ami": {
+            "id": "amiid",
+            "passwd": "amipass",
+            "port": "0000"
+        }
+    },
+    "extensions": {
+        "startnumber": "00001",
+        "endnumber": "00005",
+        "secret": "password"
+    },
+    "queues": {
+        "complaint": {
+            "number": "000000"
+        },
+        "videomail": {
+            "number": "000000",
+            "maxrecordsecs": "90"
+        }
+    },
+    "vrscheck": {
+        "url": "https://0.0.0.0",
+        "port": "0000"
+    },
+    "agentservice": {
+        "url": "https://0.0.0.0",
+        "port": "0000"
+    },
+    "scriptservice": {
+        "url": "https://0.0.0.0",
+        "port": "0000"
+    },
+    "managementportal": {
+        "assistance": "https://0.0.0.0:0000/agentassist"
+    },
+    "redis": {
+        "host": "0.0.0.0",
+        "auth": "NotUsedInDevEnvironment",
+        "port": "0000"
+    },
+    "jsonwebtoken": {
+        "encoding": "someEncoding",
+        "secretkey": "someKey",
+        "timeout": "15000",
+        "handshake": "true"
+    },
+    "session": {
+        "secretKey": "someSecretKey",
+        "resave": "true",
+        "saveUninitialized": "true",
+        "secure": "true",
+        "httpOnly": "true",
+        "rolling": "true",
+        "maxAge": "2400000"
     },
     "openam": {
-        "serverUrl": "https://server.name.com",
-		"path": "openam",
-        "privateIP": "127.0.0.1",
-        "domain": ".name.com",
-        "port": "8081"
+        "serverUrl": "https://somehost.domain.com",
+        "privateIP": "0.0.0.0",
+        "port": "0000",
+        "domain": "domain.com",
+        "path": "someopenampath"
     },
-	"nginx": {
-        "fqdn": "nginx.server.com",
-        "path": "ACEDirect" 
+    "virtualagent": {
+        "mysql": {
+            "host": "0.0.0.0",
+            "user": "dbuser",
+            "password": "dbpass",
+            "database": "dbname",
+            "port": "0000",
+            "table": "tblname"
+        }
     },
-	"virtualagent":{
-		"mysql": {
-			"host": "localhost",
-			"user": "username",
-			"password": "password",
-			"database": "agentdb_new",
-			"port": "dbport",
-			"table": "videomail"
-		}
-	},
-	"complaintredirect": {
-        "active": true,
-        "desc": "FCC.gov",
-        "url": "http://www.fcc.gov" 
-  }
+    "complaintredirect": {
+        "active": "true",
+        "desc": "Some Website",
+        "url": "http://www.domain.com"
+    }
 }
