@@ -985,6 +985,7 @@ function stopVideomail(){
 	remoteView.setAttribute("src","");
 	//remoteView.removeAttribute("controls");
 	remoteView.removeAttribute("src");
+	remoteView.removeAttribute("onended");
 	remoteView.setAttribute("autoplay", "autoplay");
 	remoteView.setAttribute("poster", "images/AD-logo.png");
 	toggle_videomail_buttons(false);
