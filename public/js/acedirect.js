@@ -970,6 +970,7 @@ function playVideomail(id){
 	remoteView.removeAttribute("poster");
 	//remoteView.setAttribute("controls", "controls");
 	remoteView.setAttribute("src",'./getVideomail?id='+id);
+		remoteView.setAttribute("onended", "change_play_button()")																					
 	toggle_videomail_buttons(true);
 	//videomail_read(id);
 }
@@ -1046,6 +1047,12 @@ function play_video(){
 	document.getElementById("play-video-icon").classList.add("fa-play");
     document.getElementById("play-video-icon").classList.remove("fa-pause");
   }
+}
+
+function change_play_button(){
+	console.log("Video ended");
+	document.getElementById("play-video-icon").classList.add("fa-play");
+    document.getElementById("play-video-icon").classList.remove("fa-pause");
 }
 
 /*
