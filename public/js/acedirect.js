@@ -404,6 +404,8 @@ function connect_socket() {
 				}).on('marked-read',function(){
 					getVideomailRecs();
 					stopVideomail(); 
+				}).on('marked-read-onclick',function(){
+					getVideomailRecs();										   
 				}).on('marked-in-progress',function(){
 					getVideomailRecs();
 					stopVideomail(); 
@@ -972,7 +974,7 @@ function playVideomail(id){
 	remoteView.setAttribute("src",'./getVideomail?id='+id);
 		remoteView.setAttribute("onended", "change_play_button()")																					
 	toggle_videomail_buttons(true);
-	//videomail_read(id);
+	videomail_read_onclick(id);
 }
 
 function toggle_videomail_buttons(make_visible){
@@ -1005,6 +1007,15 @@ function videomail_read(id){
 		"extension": extensionMe
 	});	
 	console.log('Emitted a socket videomail-read');
+}
+
+//marks the videomail read when the agent clicks it and doesn't close the videomail view
+function videomail_read_onclick(id){
+	socket.emit('videomail-read-onclick', {
+		"id": id,
+		"extension": extensionMe
+	});	
+	console.log('Emitted a socket videomail-read-onclick');
 }
 
 function videomail_in_progress(id){
@@ -1056,8 +1067,8 @@ function change_play_button(){
     document.getElementById("play-video-icon").classList.remove("fa-pause");
 }
 
-/*
-var seekBar = $("#seek-bar");
+
+var seekBar = document.getElementById("seek-bar");
 // Event listener for the seek bar
 seekBar.addEventListener("change", function() {
   // Calculate the new time
@@ -1077,14 +1088,18 @@ remoteView.addEventListener("timeupdate", function() {
   seekBar.value = value;
 });
 
+/* //Getting rid of seek-bar click functionality because Chrome's buffering doesn't support it																							  
 // Pause the video when the slider handle is being dragged
 seekBar.addEventListener("mousedown", function() {
-  remoteView.pause();
+
+	play_video();
+  //remoteView.pause();
 });
 
 // Play the video when the slider handle is dropped
 seekBar.addEventListener("mouseup", function() {
-  remoteView.play();
+	play_video();
+  //remoteView.play();
 });
 */
 

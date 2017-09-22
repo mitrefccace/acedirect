@@ -391,6 +391,15 @@ However, delay the fade out process for 2.5 seconds */
     position: relative;
 }   
 
+#videomail-status-buttons{
+	margin:auto;
+	margin-top: 5px;
+    display:none;   
+    width:100%;
+    text-align: center;
+    position: relative;
+}						  
+
 #inner{
   display: inline;
   margin: 0 auto;
@@ -579,7 +588,7 @@ However, delay the fade out process for 2.5 seconds */
 */
 
 #seek-bar {
-   display:block;
+   display:inline;
    width:40%;
    height:81%;
    margin-top:0.125rem;
