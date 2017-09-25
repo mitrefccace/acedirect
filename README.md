@@ -7,6 +7,7 @@ Accessible Communications for Everyone (ACE) Direct is a Direct Video Calling (D
 Full documentation and screenshots are here: [ACE Direct Platform Release Documentation](docs/ACE-Direct-Platform-Release-Doc-for-PR-Final-11-04-2016.pdf).
 
 ### Getting Started
+To install ACE Direct, follow the README.md file in the autoinstall folder. The instructions for manual install are also provided below for reference.
 1. Clone this repository
 1. Download and install [Node.js](https://nodejs.org/en/)
 1. In an elevated command prompt, run `npm install -g bower`
