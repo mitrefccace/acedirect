@@ -59,24 +59,24 @@ To install ACE Direct, follow the README.md file in the autoinstall folder. The 
     * _jsonwebtoken:secretkey_ - Secret key used for authentication/tokeb signing
     * _jsonwebtoken:timeout_ - Token timeout in ms,connection must be established before timeout
     * _jsonwebtoken:handshake_ - Boolean that indicates if token is accessible in the handshake
-    * _session:secretKey_ -     
-    * _session:resave_ -     
-    * _session:saveUninitialized_ -     
-    * _session:secure_ -     
-    * _session:httpOnly_ -     
-    * _session:rolling_ -     
-    * _session:maxAge_ -         
+    * _session:secretKey_ - The secret key used to sign the session ID cookie. This is a string of characters.     
+    * _session:resave_ - true or false; Forces the session to be saved back to the session store.
+    * _session:saveUninitialized_ - true or false; Forces a session that is "uninitialized" to be saved to the store.      
+    * _session:secure_ -  Specifies the boolean value for the Secure Set-Cookie attribute.  
+    * _session:httpOnly_ - Specifies the boolean value for the HttpOnly Set-Cookie attribute.     
+    * _session:rolling_ - true or false; Force a session identifier cookie to be set on every response. 
+    * _session:maxAge_ - Specifies the number (in milliseconds) to use when calculating the Expires Set-Cookie attribute. 
     * _openam:serverUrl_ - URL of OAM server
     * _openam:privateIP_ - local IP address of OAM server
     * _openam:port_ - port number of OAM server
     * _openam:domain_ - domain of OAM server
     * _openam:path_ - unique path string for OAM server URL    
-    * _virtualagent:mysql:host_ - 
-    * _virtualagent:mysql:user_ - 
-    * _virtualagent:mysql:password_ - 
-    * _virtualagent:mysql:database_ - 
-    * _virtualagent:mysql:port_ - 
-    * _virtualagent:mysql:table_ - 
+    * _virtualagent:mysql:host_ - IP address of mysql database for video mail.
+    * _virtualagent:mysql:user_ - username for accessing mysql database video mail.
+    * _virtualagent:mysql:password_ - password for accessing mysql database video mail.
+    * _virtualagent:mysql:database_ - video mail database name.
+    * _virtualagent:mysql:port_ - port of the mysql database for video mail.
+    * _virtualagent:mysql:table_ - mysql video mail table name.
     * _complaintredirect:active_ - "true" or "false"; whether or not the complaint form redirects consumers after a call
     * _complaintredirect:desc_ - Description of page to redirect to
     * _complaintredirect:url_ - URL of page to redirect to
