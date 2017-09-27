@@ -24,6 +24,8 @@ var wrap_up_blinking;
 var need_assistance_blinking;
 var missed_call_blinking;
 var videomail_status_buttons = document.getElementById("videomail-status-buttons");
+var sortFlag = "date-desc";
+				   
 
 
 setInterval(function () {
@@ -115,7 +117,7 @@ function connect_socket() {
 					$('#ws_servers').attr("name","wss://" + payload.asteriskPublicHostname + "/ws");
 					$('#my_sip_uri').attr("name","sip:"+payload.extension+"@"+payload.asteriskPublicHostname);
 					$('#sip_password').attr("name",payload.extensionPassword);
-					$("#pc_config").attr("name","stun:" + payload.stunServer );				
+					$("#pc_config").attr("name","stun:" + payload.stunServer );																																																	 
 
 					if (payload.queue_name === "ComplaintsQueue" || payload.queue2_name === "ComplaintsQueue") {
 						$('#sidebar-complaints').show();
@@ -139,11 +141,13 @@ function connect_socket() {
 					register_jssip();
 					pauseQueues();
 					socket.emit('get-videomail',{
-						"extension": extensionMe
+						"extension": extensionMe,
+						"sortBy": "date-desc"
 					});
 					setInterval(function(){
 						socket.emit('get-videomail',{
-						"extension": extensionMe
+						"extension": extensionMe,
+						"sortBy": sortFlag
 					}); }, 5000);
 					toggle_videomail_buttons(false);
 					console.log('Sent a get-videomail event');
@@ -841,7 +845,8 @@ testLightConnection();
 
 function getVideomailRecs(){
 	socket.emit('get-videomail',{
-		"extension": extensionMe
+		"extension": extensionMe,
+		"sortBy": sortFlag
 	});
 	console.log('Sent a get-videomail event');	
 }
@@ -857,6 +862,71 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
     $("#videomailId").attr("name",tableData[0]);
     playVideomail(tableData[0], tableData[4]);//vidId, vidFilepath+vidFilename);
 });
+
+$('#vmail-video-id').on('click',function(){
+	var sort = sortButtonToggle($(this).children("i"));
+	if (sort == "asc") {
+		sortFlag = "video-id-asc";
+	} else if (sort == "desc") {
+		sortFlag = "video-id-desc";
+	}
+	socket.emit('get-videomail',{
+		"extension": extensionMe,
+		"sortBy": sortFlag
+	});
+});
+
+$('#vmail-date').on('click',function(){
+	var sort = sortButtonToggle($(this).children("i"));
+	if (sort == "asc") {
+		sortFlag = "date-asc";
+	} else if (sort == "desc") {
+		sortFlag = "date-desc";
+	}
+	socket.emit('get-videomail',{
+		"extension": extensionMe,
+		"sortBy": sortFlag
+	});
+});
+
+$('#vmail-duration').on('click',function(){
+	var sort = sortButtonToggle($(this).children("i"));
+		if (sort == "asc") {
+		sortFlag = "duration-asc";
+	} else if (sort == "desc") {
+		sortFlag = "duration-desc";
+	}
+	socket.emit('get-videomail',{
+		"extension": extensionMe,
+		"sortBy": sortFlag
+	});
+});
+
+$('#vmail-status').on('click',function(){
+	var sort = sortButtonToggle($(this).children("i"));
+	if (sort == "asc") {
+		sortFlag = "status-asc";
+	} else if (sort == "desc") {
+		sortFlag = "status-desc";
+	}
+	socket.emit('get-videomail',{
+		"extension": extensionMe,
+		"sortBy": sortFlag
+	});
+});
+
+function sortButtonToggle(buttonid){
+	if ($(buttonid).attr("class")=='fa fa-sort'){
+		$(buttonid).addClass('fa-sort-asc').removeClass('fa-sort');
+		return("asc");
+	} else if ($(buttonid).attr("class")=='fa fa-sort-desc'){
+		$(buttonid).addClass('fa-sort-asc').removeClass('fa-sort-desc');
+		return("asc");
+	} else if ($(buttonid).attr("class")=='fa fa-sort-asc'){
+		$(buttonid).addClass('fa-sort-desc').removeClass('fa-sort-asc');
+		return("desc");
+	}
+}
 
 function updateVideomailTable(data){
 	console.log("Refreshing videomail");
