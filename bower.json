@@ -12,7 +12,7 @@
     "tests"
   ],
   "dependencies": {
-    "AdminLTE": "adminlte#^2.3.6",
+    "AdminLTE": "adminlte#2.3.6",
     "bootstrap": "^3.3.7",
     "bootstrap-toggle": "^2.2.2",
     "datatables.net": "^1.10.12",
