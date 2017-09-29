@@ -94,5 +94,9 @@
         "active": "true",
         "desc": "Some Website",
         "url": "http://www.domain.com"
+    },
+    "nginx": {
+        "fqdn": "nginx.domain.com",
+        "path": "ACEDirect"
     }
 }
