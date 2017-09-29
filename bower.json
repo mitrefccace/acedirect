@@ -13,15 +13,15 @@
   ],
   "dependencies": {
     "AdminLTE": "adminlte#2.3.6",
-    "bootstrap": "^3.3.7",
-    "bootstrap-toggle": "^2.2.2",
-    "datatables.net": "^1.10.12",
+    "bootstrap": "3.3.7",
+    "bootstrap-toggle": "2.2.2",
+    "datatables.net": "1.10.15",
     "Ionicons": "ionicons#2.0.1",
-    "jwt-decode": "^2.1.0",
-    "timer.jquery": "^0.6.4",
+    "jwt-decode": "2.2.0",
+    "timer.jquery": "0.6.5",
     "font-awesome": "4.6.0",
-    "moment": "^2.15.1",
-    "jquery-simply-countable": "^0.5.1",
-	"jssip": "^3.0.13"				  
+    "moment": "2.18.1",
+    "jquery-simply-countable": "0.5.1",
+    "jssip": "3.0.13"
   }
 }
