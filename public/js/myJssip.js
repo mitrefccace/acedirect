@@ -104,7 +104,7 @@ function register_jssip()
 		if(debug) console.log("\nUA - CONNECTED:  \nTRANSPORT:\n" + e.via_transport + "\nURL:\n" + e.url + "\nSIP_URI:\n" + e.sip_uri);
 	});
 	ua.on('disconnected', function(e){
-		if(debug) console.log("\nUA - DISCONNECTED: \nREASON:\n" + e.reason);
+		if(debug) console.log("\nUA - DISCONNECTED");
 	});
 	ua.on('registered', function(e){
 		if(debug) console.log("\nUA - REGISTERED:\n RESPONSE:\n"+e.response);
