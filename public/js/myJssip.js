@@ -53,19 +53,22 @@ function startRecordProgress() {
 }
 
 function stopRecordProgress() {
+  
+  $('#record-progress-bar').hide();
+  $('#secsremain').html('');  
+  $('#recordicon').css('visibility','hidden');
+  $('#record-progress-bar').css('width', '0%');
+  $('#record-progress-bar').hide();
+  $('#callbutton').prop("disabled", true);    
+  $('#videomailbutton').prop("disabled", false);  
+  $('#userformbtn').prop("disabled", false);
+  $('#vmsent').hide();
+  $('#vmwait').hide();
+  
   if (recordId) {
-    $('#record-progress-bar').hide();
-    $('#secsremain').html('');
     clearInterval(recordId);
     recordId = null;
-    $('#recordicon').css('visibility','hidden');
-    $('#record-progress-bar').css('width', '0%');
-    $('#record-progress-bar').hide();
-    $('#callbutton').prop("disabled", true);    
-    $('#videomailbutton').prop("disabled", false);  
-    $('#userformbtn').prop("disabled", false);
     $('#vmsent').show();
-    
     if (complaintRedirectActive) {
       $("#redirecttag").attr("href", complaintRedirectUrl);
       $("#redirectdesc").text("Redirecting to " + complaintRedirectDesc + " ...");      
