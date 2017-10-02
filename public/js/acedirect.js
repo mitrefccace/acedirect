@@ -24,7 +24,8 @@ var wrap_up_blinking;
 var need_assistance_blinking;
 var missed_call_blinking;
 var videomail_status_buttons = document.getElementById("videomail-status-buttons");
-var sortFlag = "date-desc";
+var sortFlag = "id desc";
+var filter = "ALL";
 				   
 
 
@@ -142,12 +143,14 @@ function connect_socket() {
 					pauseQueues();
 					socket.emit('get-videomail',{
 						"extension": extensionMe,
-						"sortBy": "date-desc"
+						"sortBy": "id desc",
+						"filter": "ALL"
 					});
 					setInterval(function(){
 						socket.emit('get-videomail',{
 						"extension": extensionMe,
-						"sortBy": sortFlag
+						"sortBy": sortFlag,
+						"filter": filter
 					}); }, 5000);
 					toggle_videomail_buttons(false);
 					console.log('Sent a get-videomail event');
@@ -846,7 +849,8 @@ testLightConnection();
 function getVideomailRecs(){
 	socket.emit('get-videomail',{
 		"extension": extensionMe,
-		"sortBy": sortFlag
+		"sortBy": sortFlag,
+		"filter": filter
 	});
 	console.log('Sent a get-videomail event');	
 }
@@ -866,52 +870,56 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
 $('#vmail-video-id').on('click',function(){
 	var sort = sortButtonToggle($(this).children("i"));
 	if (sort == "asc") {
-		sortFlag = "video-id-asc";
+		sortFlag = "id asc";
 	} else if (sort == "desc") {
-		sortFlag = "video-id-desc";
+		sortFlag = "id desc";
 	}
 	socket.emit('get-videomail',{
 		"extension": extensionMe,
-		"sortBy": sortFlag
+		"sortBy": sortFlag,
+		"filter": filter
 	});
 });
 
 $('#vmail-date').on('click',function(){
 	var sort = sortButtonToggle($(this).children("i"));
 	if (sort == "asc") {
-		sortFlag = "date-asc";
+		sortFlag = "unix_timestamp(received) asc";
 	} else if (sort == "desc") {
-		sortFlag = "date-desc";
+		sortFlag = "unix_timestamp(received) desc";
 	}
 	socket.emit('get-videomail',{
 		"extension": extensionMe,
-		"sortBy": sortFlag
+		"sortBy": sortFlag,
+		"filter": filter
 	});
 });
 
 $('#vmail-duration').on('click',function(){
 	var sort = sortButtonToggle($(this).children("i"));
 		if (sort == "asc") {
-		sortFlag = "duration-asc";
+		sortFlag = "video_duration asc";
 	} else if (sort == "desc") {
-		sortFlag = "duration-desc";
+		sortFlag = "video_duration desc";
 	}
 	socket.emit('get-videomail',{
 		"extension": extensionMe,
-		"sortBy": sortFlag
+		"sortBy": sortFlag,
+		"filter": filter
 	});
 });
 
 $('#vmail-status').on('click',function(){
 	var sort = sortButtonToggle($(this).children("i"));
 	if (sort == "asc") {
-		sortFlag = "status-asc";
+		sortFlag = "status asc";
 	} else if (sort == "desc") {
-		sortFlag = "status-desc";
+		sortFlag = "status desc";
 	}
 	socket.emit('get-videomail',{
 		"extension": extensionMe,
-		"sortBy": sortFlag
+		"sortBy": sortFlag,
+		"filter": filter
 	});
 });
 
@@ -968,6 +976,23 @@ function updateVideomailNotification(data){
 	$("#unread-mail-count").html(data);
 	if (data === 0)
 		$("#unread-mail-count").html("");
+}
+
+function filterVideomail(mailFilter){
+	filter = mailFilter
+	socket.emit('get-videomail',{
+		"extension": extensionMe,
+		"sortBy": sortFlag,
+		"filter": filter
+	});
+}
+   
+function processFilter(filter){
+	if (filter == 'ALL'){
+		return('');
+	} else{
+		return('AND status = ' + filter)	
+	}
 }
 
 function playVideomail(id){
