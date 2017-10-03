@@ -490,7 +490,21 @@
                 <div class="tab-pane" id="control-sidebar-videomail-tab">
                     <div class="form-group" style='height: 90vh; max-height:90vh; overflow-y:scroll;'>
                         <label>Mailbox Messages</label>
-						<button type="button" class="btn btn-default" onclick="getVideomailRecs();"><i id= "refresh-icon" class="fa fa-refresh"></i></button>																																																									   
+						<button type="button" class="btn btn-default" onclick="getVideomailRecs();"><i id= "refresh-icon" class="fa fa-refresh"></i></button>
+						<span id = "videomail-filter-dropdown" class="dropdown dropdown-menu-left" style='float:right'>
+						  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+							<!--span><i id="status-icon" class="call-btn-icon fa fa-envelope"></i></span-->&nbsp;&nbsp;&nbsp;
+							<span id="videomail-filter" >Filter Messages<span>
+							<span class="caret"></span>
+						  </button>
+						  <ul class="dropdown-menu">
+							 <li onclick="filterVideomail('ALL');"><a href="#"><span>All</span></a></li>
+							 <li onclick="filterVideomail('UNREAD');"><a href="#"><span>Unread</span></a></li>
+							 <li onclick="filterVideomail('READ');"><a href="#"><span>Read</span></a></li>
+							 <li onclick="filterVideomail('IN PROGRESS');"><a href="#"><span>In Progress</span></a></li>
+							 <li onclick="filterVideomail('CLOSED');"><a href="#"><span>Closed</span></a></li>
+						  </ul>
+						</span>																																																																																																													   
                         <table class="table table-hover" id="Videomail_Table">
                             <thead>
 								<tr>
