@@ -79,7 +79,11 @@ function connect_socket() {
 					console.log("got extension-created");
 					var extension = data.extension; //returned extension to use for WebRTC
 					$('#display_name').val(data.extension);
-					$('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");					 
+          if (data.ws_port !== "")
+            $('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + ":" + data.ws_port + "/ws");
+          else
+            $('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");
+
 					$('#my_sip_uri').attr("name","sip:"+data.extension+"@"+data.asterisk_public_hostname);
           
           //is this a videomail call or complaint call?
@@ -90,6 +94,13 @@ function connect_socket() {
 					
           //get the max videomail recording seconds
           maxRecordingSeconds = data.queues_videomail_maxrecordsecs;
+          
+          //get complaint redirect options
+          complaintRedirectActive = data.complaint_redirect_active;
+          complaintRedirectDesc = data.complaint_redirect_desc;
+          complaintRedirectUrl = data.complaint_redirect_url;
+          $("#redirecttag").attr("href", complaintRedirectUrl);
+          $("#redirectdesc").text("Redirecting to " + complaintRedirectDesc + " ...");
           
           $('#sip_password').attr("name",data.password);
  					$("#pc_config").attr("name","stun:" + data.stun_server );
@@ -144,10 +155,12 @@ function connect_socket() {
 						logout("Session has expired");
 					}
 				}).on("chat-leave", function (error) {
-					$("#callEndedModal").modal('show');
-					setTimeout(function () {
-						window.location = "http://www.fcc.gov";
-					}, 5000);
+					if (complaintRedirectActive) {
+            $("#callEndedModal").modal('show');
+            setTimeout(function () {
+              window.location = complaintRedirectUrl;
+            }, 5000);
+          }
 				}).on('error', function (reason) {
 					if (reason.code === "invalid_token") {
 						logout("Session has expired");

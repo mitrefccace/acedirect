@@ -46,10 +46,10 @@
                     <span class="sr-only">Toggle navigation</span>
                 </a>
                 <div id="agentStatusInfo" class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-2 col-md-offset-2" style="white-space:nowrap;">
-                    <label class="control-label">Call Duration: </label>&nbsp;&nbsp;<span id="duration" class="text-gray">0 sec</span>
+                    <label class="control-label">Call Duration: </label>&nbsp;&nbsp;<span id="duration" class="text-light-gray">0 sec</span>
                 </div>
-                <div class="col-lg-1 col-md-1 col-sm-1 col-lg-offset-1 col-md-offset-1">
-                    <button id="assistanceBtn" type="button" class="btn btn-danger" style="overflow: hidden;text-overflow:ellipsis;" onclick="requestAssistance()">Assistance</button>
+                <div class="pull-right">
+                    <button id="assistanceBtn" type="button" class="btn btn-danger" onclick="requestAssistance()">Get Help</button>
                 </div>
                 <!-- Navbar Right Menu -->
                 <div class="navbar-custom-menu">
@@ -67,16 +67,7 @@
                                     <p>
                                         <span id="agentname-headerdropdown"></span>
                                         <br>
-                                        <div class="input-group input-group-sm">
-                                            <span class="input-group-addon">Light Code</span>
-                                            <input id="agentlightcode" type="text" class="form-control" spellcheck="false" readonly>
-                                            <span class="input-group-btn">
-                                                <button type="button" class="btn btn-success btn-flat" id='copyLightcodeButton'><i class="fa fa-files-o"></i></button>
-                                            </span>
-                                        </div>
-                                        <span id="agentrole-headerdropdown" hidden></span>
-                                        <br>
-                                        <span id="agentlightcode-headerdropdown" hidden></span>
+                                        <span id="agentrole-headerdropdown"></span>
                                     </p>
                                 </li>
                                 <!-- Menu Footer-->
@@ -95,6 +86,7 @@
 							<a href="#" data-toggle="control-sidebar">
 								<i class="fa fa-envelope-o"></i><span class="label label-danger" id="unread-mail-count"></span>
 							</a>
+                        </li> 
                         <li>
                             <a href="#" data-toggle="modal" data-target="#licModal"><i class="fa fa-info-circle"></i></a>
                         </li>
@@ -112,21 +104,27 @@
             <!-- sidebar: style can be found in sidebar.less -->
             <section class="sidebar">
                 <!-- Sidebar user panel -->
-                <div class="user-panel">
-                    <div class="pull-left image">
-                        <img src="bower_components/AdminLTE/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
-                    </div>
-                    <div class="pull-left info">
-                        <p><span id="agentname-sidebar"></span></p>
-                        <span><i id="status-icon" class="fa fa-circle text-warning currently-away"></i></span>&nbsp;&nbsp;&nbsp;
+                <div class="user-panel" style="overflow: visible;">
+                  <div class="pull-left image">
+                      <img src="bower_components/AdminLTE/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                  </div>
+                  <div class="pull-left info">
+                    <p style="margin-bottom: 5px;"><span id="agentname-sidebar">Franklin Pierce</span></p>
+                    <span id = "status-dropdown" class="dropdown dropdown-menu-left">
+                      <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                        <span><i id="status-icon" class="fa fa-circle text-yellow currently-away"></i></span>&nbsp;&nbsp;&nbsp;
                         <span id="user-status">Away</span>
-                    </div>
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu">
+                         <li onclick="pauseQueues();"><a href="#"><i id ="away-icon" class="fa fa-circle text-yellow"></i> <span>Away</span></a></li>
+                         <li onclick="unpauseQueues();"><a href="#"><i id = "ready-icon" class="fa fa-circle text-green"></i> <span>Ready</span></a></li>
+                      </ul>
+                    </span>
+                  </div>
                 </div>
                 <!-- sidebar menu: : style can be found in sidebar.less -->
                 <ul class="sidebar-menu">
-                    <li class="header">USER STATUS</li>
-                    <li onclick="pauseQueues();"><a href="#"><i id ="away-icon" class="fa fa-circle text-yellow"></i> <span>Away</span></a></li>
-                    <li onclick="unpauseQueues();"><a href="#"><i id = "ready-icon" class="fa fa-circle text-green"></i> <span>Ready</span></a></li>
                     <li class="header">MAIN NAVIGATION</li>
                     <li>
                         <a href="#">
@@ -134,15 +132,7 @@
                         </a>
                     </li>
                     <li id="sidebar-queues" class="header"><span id="nav-desktop">QUEUES</span></li>
-                    <li id="sidebar-complaints" onclick="$('#complaintsanchor').click()" hidden>
-                        <a href="#">
-                            <i class="fa fa-thumbs-down"></i>
-                            <span>Complaints</span>
-                            <span id="complaintsInCall" class="pull-right-container" hidden>
-									<small class="label pull-right bg-red">in call</small>
-								</span>
-                        </a>
-                    </li>
+                   
                     <li id="sidebar-geninfo" onclick="$('#geninfoanchor').click()" hidden>
                         <a href="#">
                             <i class="fa fa-question-circle"></i>
@@ -150,6 +140,15 @@
                             <span id="geninfoInCall" class="pull-right-container" hidden>
 									<small class="label pull-right bg-red">in call</small>
 								</span>
+                        </a>
+                    </li>
+                     <li id="sidebar-complaints" onclick="$('#complaintsanchor').click()" hidden>
+                        <a href="#">
+                            <i class="fa fa-thumbs-down"></i>
+                            <span>Complaints</span>
+                            <span id="complaintsInCall" class="pull-right-container" hidden>
+                                    <small class="label pull-right bg-red">in call</small>
+                                </span>
                         </a>
                     </li>
 
@@ -201,11 +200,29 @@
                                     </div>
 									<div id= "videomail-status-buttons">
 										<div id= "inner">
-											<button  id="unread" type = "button" class = "btn btn-gray" onclick = "videomail_unread(document.getElementById('videomailId').getAttribute('name'))"> Mark as Unread<!--i id= "mute-audio-icon" class="call-btn-icon fa fa-microphone"></i--> </button> 
-											<button  id="closed" type = "button" class = "btn btn-gray" onclick = "videomail_read(document.getElementById('videomailId').getAttribute('name'))"> Mark as Read </button> 
+<button  id="play-video" type = "button" class = "btn btn-gray" onclick = "play_video()"> <i id= "play-video-icon" class="call-btn-icon fa fa-play"></i> </button>
+											<input type="range" id="seek-bar" value="0" readonly/>
+											<button type="button" class = "btn btn-gray" id="full-screen"><i id= "fullscreen-icon" class="call-btn-icon fa fa-expand"></i> </button>
+											<span id = "videomail-status-dropdown" class="dropdown dropdown-menu-left">
+											  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+												<span><i id="status-icon" class="call-btn-icon fa fa-envelope"></i></span>&nbsp;&nbsp;&nbsp;
+												<span id="user-status" >Mark as...</span>
+												<span class="caret"></span>
+											  </button>
+											  <ul class="dropdown-menu">
+												 <li onclick="videomail_unread(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>Unread</span></a></li>
+												 <li onclick="videomail_read(document.getElementById('videomailId').getAttribute('name'),'click')"><a href="#"><span>Read</span></a></li>
+												 <li onclick="videomail_in_progress(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>In Progress</span></a></li>
+												 <li onclick="videomail_closed(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>Closed</span></a></li>
+												 <li onclick="videomail_deleted(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>Deleted</span></a></li>
+											  </ul>
+											</span>
+											<button class="btn btn-primary" type="button" onclick="stopVideomail()" data-toggle="control-sidebar" data-target="control-sidebar-videomail-tab aria-expanded="false">Exit Videomail</button>																																																												 
+											<!--button  id="unread" type = "button" class = "btn btn-gray" onclick = "videomail_unread(document.getElementById('videomailId').getAttribute('name'))"> Mark as Unread</button> 
+											<button  id="read" type = "button" class = "btn btn-gray" onclick = "videomail_read(document.getElementById('videomailId').getAttribute('name'))"> Mark as Read </button> 
 											<button  id="in-progress" type = "button" class = "btn btn-gray" onclick = "videomail_in_progress(document.getElementById('videomailId').getAttribute('name'))"> Mark as in Progress</i> </button> 
 											<button  id="closed" type = "button" class = "btn btn-gray" onclick = "videomail_closed(document.getElementById('videomailId').getAttribute('name'))"> Mark as Closed </button> 
-											<button  id="stopVideomail" type = "button" class = "btn btn-gray" data-toggle="control-sidebar" onclick = "stopVideomail()"> Exit Videomail </button> 
+											<button  id="deleted" type = "button" class = "btn btn-gray" onclick = "videomail_deleted(document.getElementById('videomailId').getAttribute('name'))"> Delete </button--> 
 										</div>
 									</div> 
                                 </div>
@@ -348,9 +365,11 @@
                                                 </div>
                                             </div>
                                             <div class="row">
-                                                <div class="form-group text-center">
-                                                    <input type="button" class="btn btn-warning" id="btnClear" value="Finished" onclick="finished();" />
-                                                    <!--input type="button" class="btn btn-success"  id="btnTest" value="TEST BUTTON" /-->
+                                                <div class = "col-lg-12">
+                                                    <div class="form-group pull-right">
+                                                        <input type="button" class="btn btn-danger" id="btnClear" value="Save" onclick="finished();" />
+                                                        <!--input type="button" class="btn btn-success"  id="btnTest" value="TEST BUTTON" /-->
+                                                    </div>
                                                 </div>
                                             </div>
                                         </form>
@@ -400,7 +419,7 @@
                                             <div class="row">
                                                 <div class="col-lg-12">
                                                     <div class="form-group pull-right">
-                                                        <input type="button" class="btn btn-primary" id="btnModifyTicket" value="Save" onclick="modifyTicket()" />
+                                                        <input type="button" class="btn btn-danger" id="btnModifyTicket" value="Save" onclick="modifyTicket()" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -469,16 +488,30 @@
 
                 <!-- Mail tab content -->
                 <div class="tab-pane" id="control-sidebar-videomail-tab">
-					<button type="button" class="btn btn-default" onclick="getVideomailRecs();"> Refresh Videomail </button>
                     <div class="form-group" style='height: 90vh; max-height:90vh; overflow-y:scroll;'>
                         <label>Mailbox Messages</label>
+						<button type="button" class="btn btn-default" onclick="getVideomailRecs();"><i id= "refresh-icon" class="fa fa-refresh"></i></button>
+						<span id = "videomail-filter-dropdown" class="dropdown dropdown-menu-left" style='float:right'>
+						  <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+							<!--span><i id="status-icon" class="call-btn-icon fa fa-envelope"></i></span-->&nbsp;&nbsp;&nbsp;
+							<span id="videomail-filter" >Filter Messages<span>
+							<span class="caret"></span>
+						  </button>
+						  <ul class="dropdown-menu">
+							 <li onclick="filterVideomail('ALL');"><a href="#"><span>All</span></a></li>
+							 <li onclick="filterVideomail('UNREAD');"><a href="#"><span>Unread</span></a></li>
+							 <li onclick="filterVideomail('READ');"><a href="#"><span>Read</span></a></li>
+							 <li onclick="filterVideomail('IN PROGRESS');"><a href="#"><span>In Progress</span></a></li>
+							 <li onclick="filterVideomail('CLOSED');"><a href="#"><span>Closed</span></a></li>
+						  </ul>
+						</span>																																																																																																													   
                         <table class="table table-hover" id="Videomail_Table">
                             <thead>
 								<tr>
-									<th>Video ID</th>
-									<th>Date</th>
-									<th>Duration (sec)</th>
-									<th>Status</th>
+									<th id="vmail-video-id">Video ID <i id = "video-id-sort" class="fa fa-sort"> </i> </th>
+									<th id="vmail-date">Date <i id = "video-id-sort" class="fa fa-sort"> </i></th>
+									<th id="vmail-duration">Duration (sec) <i id = "video-id-sort" class="fa fa-sort"> </i></th>
+									<th id="vmail-status">Status <i id = "video-id-sort" class="fa fa-sort"> </i></th>
 								</tr>
 							</thead>
 							<tbody id = 'videomailTbody'>
@@ -663,7 +696,10 @@
     <script type="text/javascript" src="./js/busylight.js"></script>
     <script type="text/javascript" src="./js/acedirect.js"></script>
     <!-- JSSIP-->       
-    <script type="text/javascript" src="./bower_components/jssip/dist/jssip.min.js"></script>       
+    <script type="text/javascript" src="./bower_components/jssip/dist/jssip.min.js"></script>
+    <script>
+    var complaintForm = false;
+    </script>    
     <script type="text/javascript" src="./js/myJssip.js"></script>
 
 </body>

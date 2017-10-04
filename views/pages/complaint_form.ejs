@@ -285,10 +285,10 @@
 			<div class="modal-content">
 				<div class="modal-body" style="text-align: center">
 					<h1>CALL HAS ENDED</h1>
-					<h4> Redirecting to FCC.gov ...</h4>
+					<h4 id="redirectdesc"> Redirecting to FCC.gov ...</h4>
 				</div>
 				<div class="modal-footer">
-					<p>If not redirected, <a href="http://www.fcc.gov"><span>CLICK HERE</span></a></p>
+					<p>If not redirected, <a id="redirecttag" href=""><span>CLICK HERE</span></a></p>
 				</div>
 			</div>
 		</div>
@@ -362,6 +362,14 @@
 	<script type="text/javascript" src="./bower_components/AdminLTE/plugins/input-mask/jquery.inputmask.js"></script>
 	<!--JSSIP-->
 	<script type="text/javascript" src="./bower_components/jssip/dist/jssip.min.js"></script>	
+  <script>
+  var complaintForm = true;
+  var complaintRedirectActive = true;
+  var complaintRedirectUrl = "http://www.fcc.gov";
+  var complaintRedirectDesc = "FCC.gov";
+  $("#redirecttag").attr("href", complaintRedirectUrl);
+  $("#redirectdesc").text("Redirecting to " + complaintRedirectDesc + " ...");
+  </script>
 	<script type="text/javascript" src="./js/myJssip.js"></script>
 	<!-- Custom Javascript for ACEDirect complaint_form.html page-->
 	<script type="text/javascript" src="./js/complaint_form.js"></script>

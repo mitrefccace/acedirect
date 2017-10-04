@@ -112,8 +112,11 @@ body{
 }
 
 #assistanceBtn{
-  margin-right: 200px;
   margin-top: 8px;
+  overflow: hidden;
+  text-overflow:ellipsis;
+  margin-left: 10px;
+  margin-right: 20px;
 }
 
 .bg-pink{
@@ -388,6 +391,15 @@ However, delay the fade out process for 2.5 seconds */
     position: relative;
 }   
 
+#videomail-status-buttons{
+	margin:auto;
+	margin-top: 5px;
+    display:none;   
+    width:100%;
+    text-align: center;
+    position: relative;
+}						  
+
 #inner{
   display: inline;
   margin: 0 auto;
@@ -512,4 +524,77 @@ However, delay the fade out process for 2.5 seconds */
  font-size:18px;
  -webkit-text-stroke: 2px #3a3434; /*hack for getting it to appear narrower */
  color: #ccc;
+}
+
+.text-light-gray
+{
+  color: #d2d6de;
+}
+
+.btn-primary /*standards from US gov: https://standards.usa.gov/components/buttons/ */
+{
+  background-color: #0071bc !important;
+}
+
+.btn-primary:hover /*standards from US gov: https://standards.usa.gov/components/buttons/ */
+{
+  background-color: #205493 !important;
+}
+
+.btn-danger /*standards from US gov: https://standards.usa.gov/components/buttons/ */
+{
+  background-color: #e31c3d !important;
+}
+
+.btn-danger:hover /*standards from US gov: https://standards.usa.gov/components/buttons/ */
+{
+  background-color: #cd2026 !important;
+}
+
+#status-dropdown .dropdown-menu 
+{
+  background-color: #222d32;
+  border: #222d32;
+}
+
+.caret
+{
+  margin-left: 10px !important;
+}
+
+#status-dropdown .dropdown-toggle
+{
+  background-color: transparent !important; 
+  border: transparent;
+  margin: 0; 
+  padding: 0px 0px 0px 3px;
+}
+
+.#status-dropdown .dropdown-menu a
+{
+  padding: 3px;
+}
+
+/*
+#seek-bar
+{  
+  cursor: pointer;
+  height: 15px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  position: relative;
+  width: 300px;
+}
+*/
+
+#seek-bar {
+   display:inline;
+   width:40%;
+   height:81%;
+   margin-top:0.125rem;
+   border:none;
+   color:#0095dd;
+   -moz-border-radius:2px;
+   -webkit-border-radius:2px;
+   border-radius:2px;
 }

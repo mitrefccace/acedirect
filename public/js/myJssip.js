@@ -53,23 +53,30 @@ function startRecordProgress() {
 }
 
 function stopRecordProgress() {
+  
+  $('#record-progress-bar').hide();
+  $('#secsremain').html('');  
+  $('#recordicon').css('visibility','hidden');
+  $('#record-progress-bar').css('width', '0%');
+  $('#record-progress-bar').hide();
+  $('#callbutton').prop("disabled", true);    
+  $('#videomailbutton').prop("disabled", false);  
+  $('#userformbtn').prop("disabled", false);
+  $('#vmsent').hide();
+  $('#vmwait').hide();
+  
   if (recordId) {
-    $('#record-progress-bar').hide();
-    $('#secsremain').html('');
     clearInterval(recordId);
     recordId = null;
-    $('#recordicon').css('visibility','hidden');
-    $('#record-progress-bar').css('width', '0%');
-    $('#record-progress-bar').hide();
-    $('#callbutton').prop("disabled", true);    
-    $('#videomailbutton').prop("disabled", false);  
-    $('#userformbtn').prop("disabled", false);
     $('#vmsent').show();
-    
-    $("#callEndedModal").modal('show');
-    setTimeout(function () {
-      window.location = "http://www.fcc.gov";
-    }, 5000);    
+    if (complaintRedirectActive) {
+      $("#redirecttag").attr("href", complaintRedirectUrl);
+      $("#redirectdesc").text("Redirecting to " + complaintRedirectDesc + " ...");      
+      $("#callEndedModal").modal('show');
+      setTimeout(function () {
+        window.location = complaintRedirectUrl;
+      }, 5000);
+    }
   }
 }
 
@@ -100,7 +107,7 @@ function register_jssip()
 		if(debug) console.log("\nUA - CONNECTED:  \nTRANSPORT:\n" + e.via_transport + "\nURL:\n" + e.url + "\nSIP_URI:\n" + e.sip_uri);
 	});
 	ua.on('disconnected', function(e){
-		if(debug) console.log("\nUA - DISCONNECTED: \nREASON:\n" + e.reason);
+		if(debug) console.log("\nUA - DISCONNECTED");
 	});
 	ua.on('registered', function(e){
 		if(debug) console.log("\nUA - REGISTERED:\n RESPONSE:\n"+e.response);
@@ -154,7 +161,10 @@ function register_jssip()
 		{
 			if(debug) console.log('\nCURRENTSESSION -  ENDED: \nORIGINATOR: \n' + e.originator + '\nMESSAGE:\n' + e.message + "\nCAUSE:\n" + e.cause);
 			terminate_call();
-      stopRecordProgress();
+      if (complaintForm) {
+        unregister_jssip();
+        stopRecordProgress();
+      }
 		});
 	  	currentSession.on('failed', function(e)
 		{
@@ -168,7 +178,8 @@ function register_jssip()
 	    currentSession.on('newInfo', function(e)
 		{
 			if(debug) console.log('\nCURRENTSESSION -  NEWINFO: \nINFO:\n' + e.info + "\nrequest:\n" + e.request);
-      startRecordProgress(); //newInfo gets called repeatedly during a call
+      if (complaintForm)
+        startRecordProgress(); //newInfo gets called repeatedly during a call
 		});
 		currentSession.on('hold', function(e)
 		{
@@ -368,7 +379,13 @@ function terminate_call()
 function unregister_jssip()
 {
 	terminate_call();
-	if(ua) ua.stop(); 
+	if(ua) {
+    ua.unregister();
+    ua.terminateSessions();
+    ua.stop(); 
+  }
+  localStorage.clear();
+  sessionStorage.clear();
 }
 
 //removes both the remote and self video streams and replaces it with default image. stops allowing camera to be active. also hides call_options_buttons.

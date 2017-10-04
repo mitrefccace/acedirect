@@ -24,6 +24,9 @@ var wrap_up_blinking;
 var need_assistance_blinking;
 var missed_call_blinking;
 var videomail_status_buttons = document.getElementById("videomail-status-buttons");
+var sortFlag = "id desc";
+var filter = "ALL";
+				   
 
 
 setInterval(function () {
@@ -112,14 +115,10 @@ function connect_socket() {
 					$('#agentname-header').html(payload.first_name + " " + payload.last_name);
 					$('#agentname-headerdropdown').html(payload.first_name + " " + payload.last_name);
 					$('#agentrole-headerdropdown').html("<small>" + payload.role + "</small>");
-					$('#agentlightcode-headerdropdown').html("<small>Light Code: " + payload.lightcode + "</small>");
-					$('#ws_servers').attr("name","wss://" + payload.asteriskPublicHostname + "/ws");
+					$('#ws_servers').attr("name","wss://" + payload.asteriskPublicHostname + ":" + payload.wsPort +"/ws");
 					$('#my_sip_uri').attr("name","sip:"+payload.extension+"@"+payload.asteriskPublicHostname);
 					$('#sip_password').attr("name",payload.extensionPassword);
 					$("#pc_config").attr("name","stun:" + payload.stunServer );																																																	 
-					var lighturl = "https://" + window.location.hostname + window.location.pathname + "/" + payload.lightcode;
-					lighturl = lighturl.replace('/agent/', '/getagentstatus/');
-					$('#agentlightcode').val(lighturl);
 
 					if (payload.queue_name === "ComplaintsQueue" || payload.queue2_name === "ComplaintsQueue") {
 						$('#sidebar-complaints').show();
@@ -143,11 +142,15 @@ function connect_socket() {
 					register_jssip();
 					pauseQueues();
 					socket.emit('get-videomail',{
-						"extension": extensionMe
+						"extension": extensionMe,
+						"sortBy": "id desc",
+						"filter": "ALL"
 					});
 					setInterval(function(){
 						socket.emit('get-videomail',{
-						"extension": extensionMe
+						"extension": extensionMe,
+						"sortBy": sortFlag,
+						"filter": filter
 					}); }, 5000);
 					toggle_videomail_buttons(false);
 					console.log('Sent a get-videomail event');
@@ -397,16 +400,24 @@ function connect_socket() {
 				}).on('got-videomail-recs',function(data){
 					updateVideomailTable(data);
 				}).on('got-unread-count',function(data){
-					console.log(data);
 					updateVideomailNotification(data);											
 				}).on('marked-unread',function(){
 					getVideomailRecs();
+					stopVideomail();
 				}).on('marked-read',function(){
 					getVideomailRecs();
+					stopVideomail(); 
+				}).on('marked-read-onclick',function(){
+					getVideomailRecs();										   
 				}).on('marked-in-progress',function(){
 					getVideomailRecs();
+					stopVideomail(); 
 				}).on('marked-closed',function(){
 					getVideomailRecs();
+					stopVideomail(); 
+				}).on('deleted-videomail',function(){
+					getVideomailRecs();
+					stopVideomail(); 
 				});
 				
 
@@ -670,68 +681,6 @@ function changeStatusLight(state) {
 	busylight.light(state);
 }
 
-
-
-document.getElementById("copyLightcodeButton").addEventListener("click", function () {
-	copyToClipboard(document.getElementById("agentlightcode"));
-	var x = document.getElementById("snackbar")
-	x.innerHTML = "Light Code Copied to Clipboard.";
-	x.className = "show";
-	setTimeout(function () {
-		x.className = x.className.replace("show", "");
-	}, 3000);
-});
-
-function copyToClipboard(elem) {
-	// create hidden text element, if it doesn't already exist
-	var targetId = "_hiddenCopyText_";
-	var isInput = elem.tagName === "INPUT" || elem.tagName === "TEXTAREA";
-	var origSelectionStart, origSelectionEnd;
-	if (isInput) {
-		// can just use the original source element for the selection and copy
-		target = elem;
-		origSelectionStart = elem.selectionStart;
-		origSelectionEnd = elem.selectionEnd;
-	} else {
-		// must use a temporary form element for the selection and copy
-		target = document.getElementById(targetId);
-		if (!target) {
-			var target = document.createElement("textarea");
-			target.style.position = "absolute";
-			target.style.left = "-9999px";
-			target.style.top = "0";
-			target.id = targetId;
-			document.body.appendChild(target);
-		}
-		target.textContent = elem.textContent;
-	}
-	// select the content
-	var currentFocus = document.activeElement;
-	target.focus();
-	target.setSelectionRange(0, target.value.length);
-
-	// copy the selection
-	var succeed;
-	try {
-		succeed = document.execCommand("copy");
-	} catch (e) {
-		succeed = false;
-	}
-	// restore original focus
-	if (currentFocus && typeof currentFocus.focus === "function") {
-		currentFocus.focus();
-	}
-
-	if (isInput) {
-		// restore prior selection
-		elem.setSelectionRange(origSelectionStart, origSelectionEnd);
-	} else {
-		// clear temporary content
-		target.textContent = "";
-	}
-	return succeed;
-}
-
 // Debug Functions for sidebar.
 function cleardbgtxt() {
 	$('#dbgtxt').html('');
@@ -899,7 +848,9 @@ testLightConnection();
 
 function getVideomailRecs(){
 	socket.emit('get-videomail',{
-		"extension": extensionMe
+		"extension": extensionMe,
+		"sortBy": sortFlag,
+		"filter": filter
 	});
 	console.log('Sent a get-videomail event');	
 }
@@ -916,8 +867,77 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
     playVideomail(tableData[0], tableData[4]);//vidId, vidFilepath+vidFilename);
 });
 
+$('#vmail-video-id').on('click',function(){
+	var sort = sortButtonToggle($(this).children("i"));
+	if (sort == "asc") {
+		sortFlag = "id asc";
+	} else if (sort == "desc") {
+		sortFlag = "id desc";
+	}
+	socket.emit('get-videomail',{
+		"extension": extensionMe,
+		"sortBy": sortFlag,
+		"filter": filter
+	});
+});
+
+$('#vmail-date').on('click',function(){
+	var sort = sortButtonToggle($(this).children("i"));
+	if (sort == "asc") {
+		sortFlag = "unix_timestamp(received) asc";
+	} else if (sort == "desc") {
+		sortFlag = "unix_timestamp(received) desc";
+	}
+	socket.emit('get-videomail',{
+		"extension": extensionMe,
+		"sortBy": sortFlag,
+		"filter": filter
+	});
+});
+
+$('#vmail-duration').on('click',function(){
+	var sort = sortButtonToggle($(this).children("i"));
+		if (sort == "asc") {
+		sortFlag = "video_duration asc";
+	} else if (sort == "desc") {
+		sortFlag = "video_duration desc";
+	}
+	socket.emit('get-videomail',{
+		"extension": extensionMe,
+		"sortBy": sortFlag,
+		"filter": filter
+	});
+});
+
+$('#vmail-status').on('click',function(){
+	var sort = sortButtonToggle($(this).children("i"));
+	if (sort == "asc") {
+		sortFlag = "status asc";
+	} else if (sort == "desc") {
+		sortFlag = "status desc";
+	}
+	socket.emit('get-videomail',{
+		"extension": extensionMe,
+		"sortBy": sortFlag,
+		"filter": filter
+	});
+});
+
+function sortButtonToggle(buttonid){
+	if ($(buttonid).attr("class")=='fa fa-sort'){
+		$(buttonid).addClass('fa-sort-asc').removeClass('fa-sort');
+		return("asc");
+	} else if ($(buttonid).attr("class")=='fa fa-sort-desc'){
+		$(buttonid).addClass('fa-sort-asc').removeClass('fa-sort-desc');
+		return("asc");
+	} else if ($(buttonid).attr("class")=='fa fa-sort-asc'){
+		$(buttonid).addClass('fa-sort-desc').removeClass('fa-sort-asc');
+		return("desc");
+	}
+}
+
 function updateVideomailTable(data){
-	console.log("Updating videomail table");
+	console.log("Refreshing videomail");
 	$("#videomailTbody").html("");
 	var table;
 	var row;
@@ -953,19 +973,37 @@ function updateVideomailTable(data){
 }
 
 function updateVideomailNotification(data){
-	console.log("Updating videomail notification");
-	console.log(data);
 	$("#unread-mail-count").html(data);
+	if (data === 0)
+		$("#unread-mail-count").html("");
 }
 
-function playVideomail(id, filepath){
+function filterVideomail(mailFilter){
+	filter = mailFilter
+	socket.emit('get-videomail',{
+		"extension": extensionMe,
+		"sortBy": sortFlag,
+		"filter": filter
+	});
+}
+   
+function processFilter(filter){
+	if (filter == 'ALL'){
+		return('');
+	} else{
+		return('AND status = ' + filter)	
+	}
+}
+
+function playVideomail(id){
 	console.log('Playing video mail with id ' + id);
 	remoteView.removeAttribute("autoplay");
 	remoteView.removeAttribute("poster");
-	remoteView.setAttribute("controls", "controls");
-	remoteView.setAttribute("src",'./getVideomail?location='+filepath);
+	//remoteView.setAttribute("controls", "controls");
+	remoteView.setAttribute("src",'./getVideomail?id='+id);
+		remoteView.setAttribute("onended", "change_play_button()")																					
 	toggle_videomail_buttons(true);
-	videomail_read(id);
+	videomail_read_onclick(id);
 }
 
 function toggle_videomail_buttons(make_visible){
@@ -976,8 +1014,9 @@ function toggle_videomail_buttons(make_visible){
 function stopVideomail(){
 	console.log("Videomail view has been stopped, back to call view")
 	remoteView.setAttribute("src","");
-	remoteView.removeAttribute("controls");
+	//remoteView.removeAttribute("controls");
 	remoteView.removeAttribute("src");
+	remoteView.removeAttribute("onended");
 	remoteView.setAttribute("autoplay", "autoplay");
 	remoteView.setAttribute("poster", "images/AD-logo.png");
 	toggle_videomail_buttons(false);
@@ -999,6 +1038,15 @@ function videomail_read(id){
 	console.log('Emitted a socket videomail-read');
 }
 
+//marks the videomail read when the agent clicks it and doesn't close the videomail view
+function videomail_read_onclick(id){
+	socket.emit('videomail-read-onclick', {
+		"id": id,
+		"extension": extensionMe
+	});	
+	console.log('Emitted a socket videomail-read-onclick');
+}
+
 function videomail_in_progress(id){
 	socket.emit('videomail-in-progress', {
 		"id": id,
@@ -1016,6 +1064,84 @@ function videomail_closed(id){
 	console.log('Emitted a socket videomail-closed');
 }
 
+function videomail_deleted(id){
+	socket.emit('videomail-deleted', {
+		"id": id,
+		"extension": extensionMe
+	});
+	console.log('Emitted a socket videomail-deleted');
+}
+
+function play_video(){
+	console.log('video paused: ' + remoteView.paused);
+  if (remoteView.paused == true) {
+    // Play the video
+    remoteView.play();
+	// Update the button icon to pause
+	//console.log($("#play-video-icon").classList);
+	document.getElementById("play-video-icon").classList.remove("fa-play");
+    document.getElementById("play-video-icon").classList.add("fa-pause");
+  } else {
+    // Pause the video
+    remoteView.pause();
+    // Update the button icon to play
+	document.getElementById("play-video-icon").classList.add("fa-play");
+    document.getElementById("play-video-icon").classList.remove("fa-pause");
+  }
+}
+
+function change_play_button(){
+	console.log("Video ended");
+	document.getElementById("play-video-icon").classList.add("fa-play");
+    document.getElementById("play-video-icon").classList.remove("fa-pause");
+}
+
+
+var seekBar = document.getElementById("seek-bar");
+// Event listener for the seek bar
+seekBar.addEventListener("change", function() {
+  // Calculate the new time
+  var time = remoteView.duration * (seekBar.value / 100);
+
+  // Update the video time
+  remoteView.currentTime = time;
+});
+
+// Update the seek bar as the video plays
+									
+remoteView.addEventListener("timeupdate", function() {
+  // Calculate the slider value
+  var value = (100 / remoteView.duration) * remoteView.currentTime;
+
+  // Update the slider value
+  seekBar.value = value;
+});
+
+/* //Getting rid of seek-bar click functionality because Chrome's buffering doesn't support it																							  
+// Pause the video when the slider handle is being dragged
+seekBar.addEventListener("mousedown", function() {
+
+	play_video();
+  //remoteView.pause();
+});
+
+// Play the video when the slider handle is dropped
+seekBar.addEventListener("mouseup", function() {
+	play_video();
+  //remoteView.play();
+});
+*/
+
+// Event listener for the full-screen button
+$("#full-screen").click(function() {
+  if (remoteView.requestFullscreen) {
+    remoteView.requestFullscreen();
+  } else if (remoteView.mozRequestFullScreen) {
+    remoteView.mozRequestFullScreen(); // Firefox
+  } else if (remoteView.webkitRequestFullscreen) {
+    remoteView.webkitRequestFullscreen(); // Chrome and Safari
+  }
+});
 
 
 $("#accept-btn").click(function(){
