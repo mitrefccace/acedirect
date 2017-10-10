@@ -403,21 +403,16 @@ function connect_socket() {
 					updateVideomailNotification(data);											
 				}).on('marked-unread',function(){
 					getVideomailRecs();
-					stopVideomail();
 				}).on('marked-read',function(){
 					getVideomailRecs();
-					stopVideomail(); 
 				}).on('marked-read-onclick',function(){
 					getVideomailRecs();										   
 				}).on('marked-in-progress',function(){
 					getVideomailRecs();
-					stopVideomail(); 
 				}).on('marked-closed',function(){
 					getVideomailRecs();
-					stopVideomail(); 
 				}).on('deleted-videomail',function(){
 					getVideomailRecs();
-					stopVideomail(); 
 				});
 				
 
@@ -864,7 +859,7 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
     console.log('Click event for playing video');
     console.log('vidId: ' + tableData[0] );
     $("#videomailId").attr("name",tableData[0]);
-    playVideomail(tableData[0], tableData[4]);//vidId, vidFilepath+vidFilename);
+    playVideomail(tableData[0], tableData[2], tableData[3]);//vidId, vidDuration vidStatus);
 });
 
 $('#vmail-video-id').on('click',function(){
@@ -995,15 +990,54 @@ function processFilter(filter){
 	}
 }
 
-function playVideomail(id){
+function showVideoMailTab() { 
+	if ($('#agents-tab').hasClass('active')){
+		if (document.getElementById("ctrl-sidebar").hasAttribute('control-sidebar-open')){
+			$('.nav-tabs a[href="#control-sidebar-agents-tab"]').removeClass('active');
+		}
+	}
+    $('.nav-tabs a[href="#control-sidebar-videomail-tab"]').tab('show');
+	$('.nav-tabs a[href="#control-sidebar-videomail-tab"]').addClass('active');
+}
+
+function showAgentsTab() { 
+	if ($('#videomail-tab').hasClass('active')){
+		if (document.getElementById("ctrl-sidebar").hasAttribute('control-sidebar-open')){
+			$('.nav-tabs a[href="#control-sidebar-agents-tab"]').removeClass('active');
+		}
+	}
+    $('.nav-tabs a[href="#control-sidebar-agents-tab"]').tab('show');
+	$('.nav-tabs a[href="#control-sidebar-agents-tab"]').addClass('active');
+}
+
+
+function playVideomail(id, duration, vidStatus){
 	console.log('Playing video mail with id ' + id);
 	remoteView.removeAttribute("autoplay");
 	remoteView.removeAttribute("poster");
 	//remoteView.setAttribute("controls", "controls");
 	remoteView.setAttribute("src",'./getVideomail?id='+id);
-		remoteView.setAttribute("onended", "change_play_button()")																					
+	remoteView.setAttribute("onended", "change_play_button()")																					
 	toggle_videomail_buttons(true);
-	videomail_read_onclick(id);
+	updateVideoTime(duration,"vmail-total-time");
+	if (vidStatus === "UNREAD"){
+		videomail_read_onclick(id);
+	}
+}
+
+function updateVideoTime(time,elementId){
+  var minutes = Math.floor(time / 60);
+  var seconds = Math.round(time - minutes * 60);
+  if (seconds < 10){
+	  var timeStr = minutes.toString() + ":0" + seconds.toString();
+  }
+  else if (seconds === 60){
+	  var timeStr = (minutes+1).toString() + ":00";
+  }
+  else {
+	  var timeStr = minutes.toString() + ":" + seconds.toString();
+  }
+  document.getElementById(elementId).innerHTML = timeStr;
 }
 
 function toggle_videomail_buttons(make_visible){
@@ -1115,6 +1149,20 @@ remoteView.addEventListener("timeupdate", function() {
 
   // Update the slider value
   seekBar.value = value;
+  
+  //update the current time info
+  updateVideoTime(remoteView.currentTime, "vmail-current-time");
+  //console.log(typeof(remoteView.currentTime) + '   ' + remoteView.currentTime);
+  /*var minutes = Math.floor(remoteView.currentTime / 60);
+  var seconds = Math.round(remoteView.currentTime - minutes * 60);
+  if (seconds < 10){
+	  var time = minutes.toString() + ":0" + seconds.toString();
+  }
+  else{
+	  var time = minutes.toString() + ":" + seconds.toString();
+  }
+  document.getElementById("vmail-current-time").innerHTML = time;
+  */
 });
 
 /* //Getting rid of seek-bar click functionality because Chrome's buffering doesn't support it																							  

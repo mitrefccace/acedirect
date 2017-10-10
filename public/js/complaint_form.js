@@ -259,3 +259,15 @@ $('#chatsend').submit(function (evt) {
 	isTyping = false;
 	socket.emit('chat-message', { "message": msg, "timestamp": timestamp, "displayname": displayname });
 });
+
+// Event listener for the full-screen button
+$("#full-screen").click(function() {
+  if (remoteView.requestFullscreen) {
+    remoteView.requestFullscreen();
+  } else if (remoteView.mozRequestFullScreen) {
+    remoteView.mozRequestFullScreen(); // Firefox
+  } else if (remoteView.webkitRequestFullscreen) {
+    remoteView.webkitRequestFullscreen(); // Chrome and Safari
+  }
+});
+
