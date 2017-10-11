@@ -1181,7 +1181,7 @@ seekBar.addEventListener("mouseup", function() {
 */
 
 // Event listener for the full-screen button
-$("#full-screen").click(function() {
+function enterFullscreen() {
   if (remoteView.requestFullscreen) {
     remoteView.requestFullscreen();
   } else if (remoteView.mozRequestFullScreen) {
@@ -1189,7 +1189,7 @@ $("#full-screen").click(function() {
   } else if (remoteView.webkitRequestFullscreen) {
     remoteView.webkitRequestFullscreen(); // Chrome and Safari
   }
-});
+}
 
 
 $("#accept-btn").click(function(){
