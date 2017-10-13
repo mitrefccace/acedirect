@@ -401,17 +401,7 @@ function connect_socket() {
 					updateVideomailTable(data);
 				}).on('got-unread-count',function(data){
 					updateVideomailNotification(data);											
-				}).on('marked-unread',function(){
-					getVideomailRecs();
-				}).on('marked-read',function(){
-					getVideomailRecs();
-				}).on('marked-read-onclick',function(){
-					getVideomailRecs();										   
-				}).on('marked-in-progress',function(){
-					getVideomailRecs();
-				}).on('marked-closed',function(){
-					getVideomailRecs();
-				}).on('deleted-videomail',function(){
+				}).on('changed-status',function(){
 					getVideomailRecs();
 				});
 				
@@ -1056,20 +1046,13 @@ function stopVideomail(){
 	toggle_videomail_buttons(false);
 }
 
-function videomail_unread(id){
-	socket.emit('videomail-unread', {
+function videomail_status_change(id, videoStatus){
+	socket.emit('videomail-status-change', {
 		"id": id,
-		"extension": extensionMe
+		"extension": extensionMe,
+		"status": videoStatus
 	});
-	console.log('Emitted a socket videomail-unread');
-}
-
-function videomail_read(id){
-	socket.emit('videomail-read', {
-		"id": id,
-		"extension": extensionMe
-	});	
-	console.log('Emitted a socket videomail-read');
+	console.log('Emitted a socket videomail-status-change');
 }
 
 //marks the videomail read when the agent clicks it and doesn't close the videomail view
@@ -1079,23 +1062,6 @@ function videomail_read_onclick(id){
 		"extension": extensionMe
 	});	
 	console.log('Emitted a socket videomail-read-onclick');
-}
-
-function videomail_in_progress(id){
-	socket.emit('videomail-in-progress', {
-		"id": id,
-		"extension": extensionMe
-	});
-	console.log('Emitted a socket videomail-in-progress');
-
-}
-
-function videomail_closed(id){
-	socket.emit('videomail-closed', {
-		"id": id,
-		"extension": extensionMe
-	});
-	console.log('Emitted a socket videomail-closed');
 }
 
 function videomail_deleted(id){

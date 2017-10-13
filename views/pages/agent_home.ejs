@@ -213,10 +213,10 @@
 												<span class="caret"></span>
 											  </button>
 											  <ul class="dropdown-menu">
-												 <li onclick="videomail_unread(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>Unread</span></a></li>
-												 <li onclick="videomail_read(document.getElementById('videomailId').getAttribute('name'),'click')"><a href="#"><span>Read</span></a></li>
-												 <li onclick="videomail_in_progress(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>In Progress</span></a></li>
-												 <li onclick="videomail_closed(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>Closed</span></a></li>
+												 <li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'UNREAD')"><a href="#"><span>Unread</span></a></li>
+												 <li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'READ')"><a href="#"><span>Read</span></a></li>
+												 <li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'IN PROGRESS')"><a href="#"><span>In Progress</span></a></li>
+												 <li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'CLOSED')"><a href="#"><span>Closed</span></a></li>
 												 <li onclick="videomail_deleted(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>Deleted</span></a></li>
 											  </ul>
 											</span>
