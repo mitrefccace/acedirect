@@ -645,6 +645,7 @@ function clearScreen() {
 	$('#duration').timer('pause');
 
 	$('#chat-messages').html('');
+  $('#rtt-typing').html('');
 	$('#newchatmessage').val('');
 
 	$('#ticketForm').find('input:text').val('');
