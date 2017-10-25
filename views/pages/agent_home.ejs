@@ -620,17 +620,17 @@
     </div>
 
 	
-	<!-- New Videomail Modal -->
-    <div id="myNewVideomailModal" class="modal fade">
-        <div class="modal-dialog modal-sm">
+	<!-- Videomail Retrieval Error Modal -->
+    <div id="videomailErrorModal" class="modal fade">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h2 class="modal-title">New Videomail</h2>
+                    <h2 class="modal-title">Videomail Retrieval Error</h2>
                 </div>
                 <div class="modal-body text-center">
-					<h4 class="modal-title">You have unread videomail. Open the videomail tab to view the message(s).</h4>
-                    <!--img src="images/missed-call.png" alt="Videomail" height="100"-->
+					<h4 class="modal-title" id="videomailErrorBody"></h4>
+																						
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

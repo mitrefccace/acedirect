@@ -403,6 +403,10 @@ function connect_socket() {
 					updateVideomailNotification(data);											
 				}).on('changed-status',function(){
 					getVideomailRecs();
+				}).on('videomail-retrieval-error',function(data){
+					$('#videomailErrorBody').html('Unable to locate videomail with ID ' + data + '.');
+					$('#videomailErrorModal').modal('show');
+					stopVideomail();
 				});
 				
 
@@ -1007,7 +1011,7 @@ function playVideomail(id, duration, vidStatus){
 	remoteView.removeAttribute("autoplay");
 	remoteView.removeAttribute("poster");
 	//remoteView.setAttribute("controls", "controls");
-	remoteView.setAttribute("src",'./getVideomail?id='+id);
+	remoteView.setAttribute("src",'./getVideomail?id='+id+'&ext='+extensionMe);
 	remoteView.setAttribute("onended", "change_play_button()")																					
 	toggle_videomail_buttons(true);
 	updateVideoTime(duration,"vmail-total-time");
