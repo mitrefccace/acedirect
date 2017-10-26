@@ -1,3 +1,5 @@
+![](images/adsmall.png)
+
 # ACE Direct
 
 ## Release Tag: v2.0 (mm.dd.yyyy)
