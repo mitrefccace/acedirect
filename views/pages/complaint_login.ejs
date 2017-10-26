@@ -128,8 +128,9 @@
 								//sessionStorage.accesstoken = data.token;
 								window.location.reload();
 							} else {
-								$('#message').text(data.message);
+								$('#message').text(data.message + ' ' + $('#vrs_number').val());
 								$('#message').show();
+								$('#vrs_number').val('');
 							}
 						},
 						error: function (xhr, status, error) {
