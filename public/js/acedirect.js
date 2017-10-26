@@ -845,7 +845,7 @@ function getVideomailRecs(){
 	console.log('Sent a get-videomail event');	
 }
 
-
+//Play selected videomail when a row of the table is clicked
 $('#Videomail_Table tbody').on('click', 'tr', function () {
     var tableData = $(this).children("td").map(function() {
         return $(this).text();
@@ -857,6 +857,7 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
     playVideomail(tableData[0], tableData[2], tableData[3]);//vidId, vidDuration vidStatus);
 });
 
+//Sorting the videomail table
 $('#vmail-video-id').on('click',function(){
 	var sort = sortButtonToggle($(this).children("i"));
 	if (sort == "asc") {
@@ -926,6 +927,7 @@ function sortButtonToggle(buttonid){
 	}
 }
 
+//Update the records in the videomail table
 function updateVideomailTable(data){
 	console.log("Refreshing videomail");
 	$("#videomailTbody").html("");
@@ -962,12 +964,14 @@ function updateVideomailTable(data){
 	}
 }
 
+//Notification for unread videomail
 function updateVideomailNotification(data){
 	$("#unread-mail-count").html(data);
 	if (data === 0)
 		$("#unread-mail-count").html("");
 }
 
+//Filter videomail by status
 function filterVideomail(mailFilter){
 	filter = mailFilter
 	socket.emit('get-videomail',{
@@ -985,6 +989,7 @@ function processFilter(filter){
 	}
 }
 
+//Show videomail sidebar tab
 function showVideoMailTab() { 
 	if ($('#agents-tab').hasClass('active')){
 		if (document.getElementById("ctrl-sidebar").hasAttribute('control-sidebar-open')){
@@ -995,6 +1000,7 @@ function showVideoMailTab() {
 	$('.nav-tabs a[href="#control-sidebar-videomail-tab"]').addClass('active');
 }
 
+//Show agent info sidebar tab
 function showAgentsTab() { 
 	if ($('#videomail-tab').hasClass('active')){
 		if (document.getElementById("ctrl-sidebar").hasAttribute('control-sidebar-open')){
@@ -1005,12 +1011,11 @@ function showAgentsTab() {
 	$('.nav-tabs a[href="#control-sidebar-agents-tab"]').addClass('active');
 }
 
-
+//Play the selected videomail
 function playVideomail(id, duration, vidStatus){
 	console.log('Playing video mail with id ' + id);
 	remoteView.removeAttribute("autoplay");
 	remoteView.removeAttribute("poster");
-	//remoteView.setAttribute("controls", "controls");
 	remoteView.setAttribute("src",'./getVideomail?id='+id+'&ext='+extensionMe);
 	remoteView.setAttribute("onended", "change_play_button()")																					
 	toggle_videomail_buttons(true);
@@ -1020,6 +1025,7 @@ function playVideomail(id, duration, vidStatus){
 	}
 }
 
+//Update the time progress in the videomail seekbar
 function updateVideoTime(time,elementId){
   var minutes = Math.floor(time / 60);
   var seconds = Math.round(time - minutes * 60);
@@ -1035,15 +1041,16 @@ function updateVideoTime(time,elementId){
   document.getElementById(elementId).innerHTML = timeStr;
 }
 
+//Display the videomail control buttons
 function toggle_videomail_buttons(make_visible){
 	if(make_visible) videomail_status_buttons.style.display = "block";
 	else videomail_status_buttons.style.display = "none";
 }
 
+//Exit videomail view and return to call view
 function stopVideomail(){
 	console.log("Videomail view has been stopped, back to call view")
 	remoteView.setAttribute("src","");
-	//remoteView.removeAttribute("controls");
 	remoteView.removeAttribute("src");
 	remoteView.removeAttribute("onended");
 	remoteView.setAttribute("autoplay", "autoplay");
@@ -1051,6 +1058,7 @@ function stopVideomail(){
 	toggle_videomail_buttons(false);
 }
 
+//Socket emit for changing status of a videomail
 function videomail_status_change(id, videoStatus){
 	socket.emit('videomail-status-change', {
 		"id": id,
@@ -1060,7 +1068,7 @@ function videomail_status_change(id, videoStatus){
 	console.log('Emitted a socket videomail-status-change');
 }
 
-//marks the videomail read when the agent clicks it and doesn't close the videomail view
+//Marks the videomail read when the agent clicks it and doesn't close the videomail view
 function videomail_read_onclick(id){
 	socket.emit('videomail-read-onclick', {
 		"id": id,
@@ -1069,6 +1077,7 @@ function videomail_read_onclick(id){
 	console.log('Emitted a socket videomail-read-onclick');
 }
 
+//Socket emit for deleting a videomail
 function videomail_deleted(id){
 	socket.emit('videomail-deleted', {
 		"id": id,
@@ -1077,19 +1086,15 @@ function videomail_deleted(id){
 	console.log('Emitted a socket videomail-deleted');
 }
 
+//Videomail play button functionality
 function play_video(){
 	console.log('video paused: ' + remoteView.paused);
-  if (remoteView.paused == true) {
-    // Play the video
+  if (remoteView.paused == true) { // play the video
     remoteView.play();
-	// Update the button icon to pause
-	//console.log($("#play-video-icon").classList);
 	document.getElementById("play-video-icon").classList.remove("fa-play");
     document.getElementById("play-video-icon").classList.add("fa-pause");
-  } else {
-    // Pause the video
+  } else { // pause the video
     remoteView.pause();
-    // Update the button icon to play
 	document.getElementById("play-video-icon").classList.add("fa-play");
     document.getElementById("play-video-icon").classList.remove("fa-pause");
   }
@@ -1101,7 +1106,7 @@ function change_play_button(){
     document.getElementById("play-video-icon").classList.remove("fa-pause");
 }
 
-
+//Seekbar functionality
 var seekBar = document.getElementById("seek-bar");
 // Event listener for the seek bar
 seekBar.addEventListener("change", function() {
@@ -1123,33 +1128,8 @@ remoteView.addEventListener("timeupdate", function() {
   
   //update the current time info
   updateVideoTime(remoteView.currentTime, "vmail-current-time");
-  //console.log(typeof(remoteView.currentTime) + '   ' + remoteView.currentTime);
-  /*var minutes = Math.floor(remoteView.currentTime / 60);
-  var seconds = Math.round(remoteView.currentTime - minutes * 60);
-  if (seconds < 10){
-	  var time = minutes.toString() + ":0" + seconds.toString();
-  }
-  else{
-	  var time = minutes.toString() + ":" + seconds.toString();
-  }
-  document.getElementById("vmail-current-time").innerHTML = time;
-  */
-});
 
-/* //Getting rid of seek-bar click functionality because Chrome's buffering doesn't support it																							  
-// Pause the video when the slider handle is being dragged
-seekBar.addEventListener("mousedown", function() {
-
-	play_video();
-  //remoteView.pause();
 });
-
-// Play the video when the slider handle is dropped
-seekBar.addEventListener("mouseup", function() {
-	play_video();
-  //remoteView.play();
-});
-*/
 
 // Event listener for the full-screen button
 function enterFullscreen() {
