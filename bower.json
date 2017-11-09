@@ -16,6 +16,7 @@
     "bootstrap": "3.3.7",
     "bootstrap-toggle": "2.2.2",
     "datatables.net": "1.10.15",
+    "gridstack": "^0.3.0",
     "Ionicons": "ionicons#2.0.1",
     "jwt-decode": "2.2.0",
     "timer.jquery": "0.6.5",

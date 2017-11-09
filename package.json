@@ -12,6 +12,7 @@
     "ejs": "2.5.7",
     "express": "4.15.4",
     "express-session": "1.15.5",
+    "gridstack": "^0.3.0",
     "jsonwebtoken": "7.4.2",
     "log4js": "0.6.38",
     "mysql": "2.14.1",		   
