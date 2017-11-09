@@ -24,7 +24,7 @@
     <!-- Custom Portal stylesheet -->
     <link rel="stylesheet" href="./css/ca-portal.css">
     <!-- GridStack -->
-    <link rel="stylesheet" href="./bower_components/gridstack/dist/gridstack.css" />
+    <link rel="stylesheet" href="./bower_components/gridstack/dist/gridstack.min.css" />
 </head>
 
 <body class="hold-transition skin-purple sidebar-mini">
@@ -700,8 +700,54 @@
     <script type="text/javascript" src="./js/myJssip.js"></script>
     <!-- GridStack -->
     <script src="./bower_components/lodash/dist/lodash.min.js"></script>
-    <script src="./bower_components/gridstack/dist/gridstack.js"></script>
-    <script src="./bower_components/gridstack/dist/gridstack.jQueryUI.js"></script>
+    <script src="./bower_components/gridstack/dist/gridstack.min.js"></script>
+    <script src="./bower_components/gridstack/dist/gridstack.jQueryUI.min.js"></script>
+
+    <script>
+        var options = {
+            cellHeight: 80,
+            verticalMargin: 10
+        };
+        var grid = $('.grid-stack').gridstack(options);
+
+        var serializedGridData = [];
+        var loadingGridLayout = false;
+        
+        function saveGridLayout() {
+            serializedGridData = _.map($('.grid-stack > .grid-stack-item:visible'), function (el) {
+                el = $(el);
+                var node = el.data('_gridstack_node');
+                return {
+                    id: el[0].id,
+                    visible: el[0].visible,
+                    x: node.x,
+                    y: node.y,
+                    width: node.width,
+                    height: node.height
+                };
+            });
+            console.log(JSON.stringify(serializedGridData));
+        };
+
+        function loadGridLayout(layout) {
+            loadingGridLayout = true;
+            var grid = $('.grid-stack').data('gridstack');
+            grid.batchUpdate();
+
+            layout.forEach(function (el) {
+                grid.update($('#' + el.id), el.x, el.y, el.width, el.height)
+            });
+
+            grid.commit();
+            loadingGridLayout = false;
+        }
+
+        $('.grid-stack').on('change', function(event, items) {
+            if (!loadingGridLayout) {
+                saveGridLayout();
+            }
+        });
+    </script>
 </body>
 
 </html>
