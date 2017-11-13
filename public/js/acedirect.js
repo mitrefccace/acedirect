@@ -127,6 +127,10 @@ function connect_socket() {
 						$('#sidebar-geninfo').show();
 					}
 
+					if(payload.layout){
+						//call loadGridLayout(payload.layout)
+					}
+
 
 
 					socket.emit('register-client', {
