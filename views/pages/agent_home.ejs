@@ -29,9 +29,7 @@
 
 <body class="hold-transition skin-purple sidebar-mini">
     <div class="wrapper">
-
         <header class="main-header">
-
             <!-- Logo -->
             <a href="" class="logo">
                 <!-- mini logo for sidebar mini 50x50 pixels -->
@@ -98,7 +96,6 @@
                 </div>
             </nav>
         </header>
-
 
         <!-- Left side column. contains the logo and sidebar -->
         <aside class="main-sidebar">
@@ -171,19 +168,17 @@
 
             <!-- Main content -->
             <section class="content">
-                <!-- Main Row -->
-                <div class="row">
-
-                    <!-- Left Col -->
-                    <section class="col-lg-6">
-                        <div class="col-md-12">
-                            <div class="box">
+                <div class="grid-stack">
+                    <!-- VideoBox -->
+                    <div class="grid-stack-item" data-gs-x="0" data-gs-width="6" data-gs-height="4" id='Videobox'>
+                        <div class="grid-stack-item-content">
+                            <div class="box" id="VideoBox">
                                 <div class="box-header with-border">
                                     <i class="fa fa-video-camera"></i>
                                     <h3 class="box-title">Video</h3>
                                     <div class="box-tools pull-right">
                                         <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-											</button>
+                                            </button>
                                     </div>
                                 </div>
                                 <div class="box-body">
@@ -195,37 +190,74 @@
                                         <div id= "inner">     
                                             <button  id="mute-audio" type = "button" class = "btn btn-gray" onclick = "mute_audio()"> <i id= "mute-audio-icon" class="call-btn-icon fa fa-microphone"></i> </button> 
                                             <button  id="hide-video" type = "button" class = "btn btn-gray" onclick = "hide_video()"> <i class="call-btn-icon fa fa-video-camera"></i>  <div id= "hide-video-icon" class = "fa fa-close fa-close-style" style="display: none;"></div> <!-- hack for hide video button since there's no fa-icon for it. we overlay an x and hide and show it when needed--></button>  
-											<button type="button" class = "btn btn-gray" onclick = "enterFullscreen()"><i id= "fullscreen-icon" class="call-btn-icon fa fa-expand"></i> </button>														 
+                                            <button type="button" class = "btn btn-gray" onclick = "enterFullscreen()"><i id= "fullscreen-icon" class="call-btn-icon fa fa-expand"></i> </button>														 
                                             <button id="end-call" type = "button" class = "btn btn-danger" onclick = "terminate_call()"> <i class="call-btn-icon fa fa-phone fa-rotate-135"></i> </button> 
                                         </div>
                                     </div>
-									<div id= "videomail-status-buttons">
-										<div id= "inner-videomail">
-											<button  id="play-video" type = "button" class = "btn btn-gray" onclick = "play_video()"> <i id= "play-video-icon" class="call-btn-icon fa fa-play"></i> </button>
-											<span id="vmail-current-time" class="text-gray">0:00</span>
-											<input type="range" id="seek-bar" value="0" disabled />
-											<span id="vmail-total-time" class="text-gray">1:30</span>
-											<button type="button" class = "btn btn-gray" onclick = "enterFullscreen()"><i id= "fullscreen-icon" class="call-btn-icon fa fa-expand"></i> </button>
-											<span id = "videomail-status-dropdown" class="dropdown dropdown-menu-left">
-											  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
-												<span><i id="status-icon" class="call-btn-icon fa fa-envelope"></i></span>&nbsp;&nbsp;&nbsp;
-												<span id="user-status" >Mark as...</span>
-												<span class="caret"></span>
-											  </button>
-											  <ul class="dropdown-menu">
-												 <li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'UNREAD')"><a href="#"><span>Unread</span></a></li>
-												 <li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'READ')"><a href="#"><span>Read</span></a></li>
-												 <li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'IN PROGRESS')"><a href="#"><span>In Progress</span></a></li>
-												 <li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'CLOSED')"><a href="#"><span>Closed</span></a></li>
-												 <li onclick="videomail_deleted(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>Deleted</span></a></li>
-											  </ul>
-											</span>
-											<button id="exit-btn" class="btn btn-primary" type="button" onclick="stopVideomail()">Exit Videomail</button>
-										</div>
-									</div> 
+                                    <div id= "videomail-status-buttons">
+                                        <div id= "inner-videomail">
+                                            <button  id="play-video" type = "button" class = "btn btn-gray" onclick = "play_video()"> <i id= "play-video-icon" class="call-btn-icon fa fa-play"></i> </button>
+                                            <span id="vmail-current-time" class="text-gray">0:00</span>
+                                            <input type="range" id="seek-bar" value="0" disabled />
+                                            <span id="vmail-total-time" class="text-gray">1:30</span>
+                                            <button type="button" class = "btn btn-gray" onclick = "enterFullscreen()"><i id= "fullscreen-icon" class="call-btn-icon fa fa-expand"></i> </button>
+                                            <span id = "videomail-status-dropdown" class="dropdown dropdown-menu-left">
+                                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                <span><i id="status-icon" class="call-btn-icon fa fa-envelope"></i></span>&nbsp;&nbsp;&nbsp;
+                                                <span id="user-status" >Mark as...</span>
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'UNREAD')"><a href="#"><span>Unread</span></a></li>
+                                                <li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'READ')"><a href="#"><span>Read</span></a></li>
+                                                <li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'IN PROGRESS')"><a href="#"><span>In Progress</span></a></li>
+                                                <li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'CLOSED')"><a href="#"><span>Closed</span></a></li>
+                                                <li onclick="videomail_deleted(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>Deleted</span></a></li>
+                                            </ul>
+                                            </span>
+                                            <button id="exit-btn" class="btn btn-primary" type="button" onclick="stopVideomail()">Exit Videomail</button>
+                                        </div>
+                                    </div> 
                                 </div>
                             </div>
+                        </div>
+                    </div>
 
+                    <!-- User Chat -->
+                    <div class="grid-stack-item" data-gs-x="7" data-gs-width="6" data-gs-height="5" id='UserChatBox'>
+                        <div class="grid-stack-item-content">
+                            <div class="box direct-chat direct-chat-primary" id="userchat">
+                                <div class="box-header with-border">
+                                    <i class="fa fa-comments"></i>
+                                    <h3 class="box-title">User Chat</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                            </button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <!-- Conversations are loaded here -->
+                                    <div class="direct-chat-messages" id="chat-messages"></div>
+                                    <div class="direct-chat-timestamp text-bold" id="rtt-typing" style="margin-left: 10px; min-height: 20px"></div>
+                                </div>
+                                <div class="box-footer">
+                                    <form name="chatsend" id="chatsend">
+                                        <div class="input-group">
+                                            <input type="hidden" id="displayname">
+                                            <input type="text" id="newchatmessage" placeholder="Type Message ..." class="form-control" autocomplete="off" required>
+                                            <span class="input-group-btn">
+                                                    <button  class="btn btn-primary btn-flat" type="submit">Send</button>
+                                                </span>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scripts -->
+                    <div class="grid-stack-item" data-gs-x="0" data-gs-width="6" data-gs-height="5" id='Scriptsbox'>
+                        <div class="grid-stack-item-content">
                             <div class="box nav-tabs-custom" id="scriptscontainer">
                                 <!-- Tabs within a box -->
                                 <ul class="nav nav-tabs pull-right">
@@ -253,40 +285,13 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-                    </section>
+                    </div>
 
-                    <section class="col-lg-6">
-                        <div class="col-md-12">
-                             <div class="box direct-chat direct-chat-primary" id="userchat">
-                                <div class="box-header with-border">
-                                    <i class="fa fa-comments"></i>
-                                    <h3 class="box-title">User Chat</h3>
-                                    <div class="box-tools pull-right">
-                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                                            </button>
-                                    </div>
-                                </div>
-                                <div class="box-body">
-                                    <!-- Conversations are loaded here -->
-                                    <div class="direct-chat-messages" id="chat-messages"></div>
-                                    <div class="direct-chat-timestamp text-bold" id="rtt-typing" style="margin-left: 10px; min-height: 20px"></div>
-                                </div>
-                                <div class="box-footer">
-                                    <form name="chatsend" id="chatsend">
-                                        <div class="input-group">
-                                            <input type="hidden" id="displayname">
-                                            <input type="text" id="newchatmessage" placeholder="Type Message ..." class="form-control" autocomplete="off" required>
-                                            <span class="input-group-btn">
-                                                    <button  class="btn btn-primary btn-flat" type="submit">Send</button>
-                                                </span>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>																							
-
-                            <div class="box nav-tabs-custom">
+                    <!-- Call Details -->																					
+                    <div class="grid-stack-item" data-gs-x="7" data-gs-width="6" data-gs-height="6" id="CallDetailsbox">
+                        <div class="grid-stack-item-content">
+                            <div class="box nav-tabs-custom" id="CallinfoBox">
                                 <!-- Tabs within a box -->
                                 <ul class="nav nav-tabs pull-right">
                                     <li id="ticketTab"><a id="ticketTabTitle" href="#ticketinfo" data-toggle="tab" aria-expanded="true">Ticket Info.</a></li>
@@ -428,14 +433,9 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
-
-                    </section>
-
-
+                    </div>
                 </div>
-                <!-- /.row -->
             </section>
             <!-- /.content -->
         </div>
@@ -612,7 +612,6 @@
             </div>
         </div>
     </div>
-
 	
 	<!-- Videomail Retrieval Error Modal -->
     <div id="videomailErrorModal" class="modal fade">
@@ -665,7 +664,6 @@
 	<div hidden>
 		<div id="videomailId" > </div>
 	</div>
-
 
     <div id="snackbar">Default Text</div>
 

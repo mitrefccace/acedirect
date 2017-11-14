@@ -6,9 +6,9 @@ function Busylight(configs) {
 Busylight.prototype.updateConfigs = function (configs) {
     this.statusCd = {};
     for (var i in configs) {
-        this.statusCd[configs[i].id] = configs[i]
+        this.statusCd[configs[i].id] = configs[i];
     }
-}
+};
 
 Busylight.prototype.light = function (status) {
     switch (status) {
@@ -52,7 +52,7 @@ Busylight.prototype.light = function (status) {
                 "stop": true
             });
     }
-}
+};
 
 function PostLightCode(color) {
     var lightcode = {

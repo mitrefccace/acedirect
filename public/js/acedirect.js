@@ -27,8 +27,6 @@ var videomail_status_buttons = document.getElementById("videomail-status-buttons
 var sortFlag = "id desc";
 var filter = "ALL";
 				   
-
-
 setInterval(function () {
 	busylight.light(this.agentStatus);
 }, 2000);
@@ -68,7 +66,6 @@ $(document).ready(function () {
 		}, true);
 	}
 });
-
 
 function connect_socket() {
 	//if (sessionStorage.getItem('accesstoken') === null)
@@ -130,8 +127,6 @@ function connect_socket() {
 					if(payload.layout){
 						//call loadGridLayout(payload.layout)
 					}
-
-
 
 					socket.emit('register-client', {
 						"hello": "hello"
@@ -368,7 +363,7 @@ function connect_socket() {
 					changeStatusLight('INCOMING_CALL');
 					changeStatusIcon(incoming_call_color, "incoming-call", incoming_call_blinking);
 					$('#user-status').text('Incoming Call');
-					$('#myRingingModalPhoneNumber').html(data.phoneNumber)
+					$('#myRingingModalPhoneNumber').html(data.phoneNumber);
 					$('#myRingingModal').modal({
 						show: true,
 						backdrop: 'static',
@@ -531,10 +526,10 @@ function logout(msg) {
 		socket.disconnect();
 	//display the login screen to the user.
 	if (msg) {
-		window.location.href = './logout'
+		window.location.href = './logout';
 		//window.location.replace("?message=" + msg);
 	} else {
-		window.location.href = './logout'
+		window.location.href = './logout';
 		//window.location.replace("");
 	}
 
@@ -955,7 +950,7 @@ function updateVideomailTable(data){
 		durationCell = row.insertCell(2);
 		statusCell = row.insertCell(3);
 		filepathCell = row.insertCell(4);
-		filepathCell.setAttribute('hidden', true)
+		filepathCell.setAttribute('hidden', true);
 		filepathCell.innerHTML = vidFilepath + vidFilename;
 		idCell.innerHTML = vidId;
 		receivedCell.innerHTML = vidReceived;
@@ -977,7 +972,7 @@ function updateVideomailNotification(data){
 
 //Filter videomail by status
 function filterVideomail(mailFilter){
-	filter = mailFilter
+	filter = mailFilter;
 	socket.emit('get-videomail',{
 		"extension": extensionMe,
 		"sortBy": sortFlag,
@@ -989,7 +984,7 @@ function processFilter(filter){
 	if (filter == 'ALL'){
 		return('');
 	} else{
-		return('AND status = ' + filter)	
+		return('AND status = ' + filter);
 	}
 }
 
@@ -1021,7 +1016,7 @@ function playVideomail(id, duration, vidStatus){
 	remoteView.removeAttribute("autoplay");
 	remoteView.removeAttribute("poster");
 	remoteView.setAttribute("src",'./getVideomail?id='+id+'&ext='+extensionMe);
-	remoteView.setAttribute("onended", "change_play_button()")																					
+	remoteView.setAttribute("onended", "change_play_button()");																				
 	toggle_videomail_buttons(true);
 	updateVideoTime(duration,"vmail-total-time");
 	if (vidStatus === "UNREAD"){
@@ -1032,15 +1027,16 @@ function playVideomail(id, duration, vidStatus){
 //Update the time progress in the videomail seekbar
 function updateVideoTime(time,elementId){
   var minutes = Math.floor(time / 60);
-  var seconds = Math.round(time - minutes * 60);
+	var seconds = Math.round(time - minutes * 60);
+	var timeStr = "";
   if (seconds < 10){
-	  var timeStr = minutes.toString() + ":0" + seconds.toString();
+	  timeStr = minutes.toString() + ":0" + seconds.toString();
   }
   else if (seconds === 60){
-	  var timeStr = (minutes+1).toString() + ":00";
+	  timeStr = (minutes+1).toString() + ":00";
   }
   else {
-	  var timeStr = minutes.toString() + ":" + seconds.toString();
+	  timeStr = minutes.toString() + ":" + seconds.toString();
   }
   document.getElementById(elementId).innerHTML = timeStr;
 }
@@ -1053,7 +1049,7 @@ function toggle_videomail_buttons(make_visible){
 
 //Exit videomail view and return to call view
 function stopVideomail(){
-	console.log("Videomail view has been stopped, back to call view")
+	console.log("Videomail view has been stopped, back to call view");
 	remoteView.setAttribute("src","");
 	remoteView.removeAttribute("src");
 	remoteView.removeAttribute("onended");
@@ -1132,7 +1128,6 @@ remoteView.addEventListener("timeupdate", function() {
   
   //update the current time info
   updateVideoTime(remoteView.currentTime, "vmail-current-time");
-
 });
 
 // Event listener for the full-screen button
@@ -1145,7 +1140,6 @@ function enterFullscreen() {
     remoteView.webkitRequestFullscreen(); // Chrome and Safari
   }
 }
-
 
 $("#accept-btn").click(function(){
 	$('#myRingingModalPhoneNumber').html('');
