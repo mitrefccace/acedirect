@@ -32,6 +32,11 @@ setInterval(function () {
 }, 2000);
 
 $(document).ready(function () {
+
+	$('#modalWrapup').modal({
+		backdrop: 'static',
+		keyboard: false
+	  });
 	connect_socket();
 	$("#debugtab").hide();
 	$('#scriptstab').hide();
@@ -211,6 +216,10 @@ function connect_socket() {
 					changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
 					changeStatusLight('WRAP_UP');
 					socket.emit('chat-leave-ack', data);
+					$('#modalWrapup').modal({
+						backdrop: 'static',
+						keyboard: false
+					  });
 				}).on('chat-message-new', function (data) {
 					debugtxt('chat-message-new', data);
 					var msg = data.message;
@@ -663,6 +672,8 @@ function clearScreen() {
 	$('#notickettxt').hide();
 	$('#ticketTab').removeClass("bg-pink");
 	clearInterval(ticketTabFade);
+
+	$('#modalWrapup').modal('hide');
 }
 
 function changeStatusLight(state) {

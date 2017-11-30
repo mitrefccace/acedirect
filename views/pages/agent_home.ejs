@@ -215,25 +215,25 @@
                 <div class="col-md-12 col-lg-3">
                     <% include ./components/agent_box_chat %>
                 </div>
-                    <!--/div>
+                <!--/div>
                     </div>
                     <!-- Scripts - ->
                     <div class="grid-stack-item" data-gs-x="0" data-gs-width="6" data-gs-height="5" id='Scriptsbox'>
                         <div class="grid-stack-item-content"-->
-                    <div hidden>
-                        <% include ./components/agent_box_scripts %>
-                    </div>
-                    <!--/div>
+                <div hidden>
+                    <% include ./components/agent_box_scripts %>
+                </div>
+                <!--/div>
                     </div>
 
 
                     <!-- Call Details - ->
                     <div class="grid-stack-item" data-gs-x="7" data-gs-width="6" data-gs-height="6" id="CallDetailsbox">
                         <div class="grid-stack-item-content"-->
-                    <div hidden>
-                        <% include ./components/agent_box_call_details %>
-                    </div>
-                    <!--/div>
+                <div hidden>
+                    <% include ./components/agent_box_call_details %>
+                </div>
+                <!--/div>
                     </div-->
 
         </div>
@@ -413,183 +413,184 @@
             </div>
         </div>
     </div>
-
     <!-- Incoming Call Modal -->
-    <div id="myRingingModal" class="modal fade">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h2 class="modal-title">Incoming call...</h2>
+    <% include ./components/agent_modal_wrapup %>
+        <!-- Incoming Call Modal -->
+        <div id="myRingingModal" class="modal fade">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h2 class="modal-title">Incoming call...</h2>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img src="images/phoneRinging.gif" alt="Phone Ringing" height="100">
+                        <h2 id='myRingingModalPhoneNumber' class="modal-title text-center"></h2>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="btn-group" style="width: 100%;">
+                            <button id="accept-btn" type="button" onclick="accept_call()" class="btn btn-success btn-style" style="width: 50%; height: 50px;">
+                                Accept </button>
+                            <button id="decline-btn" type="button" onclick="terminate_call()" class="btn btn-danger btn-style" style="width: 50%; height: 50px;">
+                                Decline </button>
+                        </div>
+                    </div>
+
                 </div>
-                <div class="modal-body text-center">
-                    <img src="images/phoneRinging.gif" alt="Phone Ringing" height="100">
-                    <h2 id='myRingingModalPhoneNumber' class="modal-title text-center"></h2>
-                </div>
-                <div class="modal-footer">
-                    <div class="btn-group" style="width: 100%;">
-                        <button id="accept-btn" type="button" onclick="accept_call()" class="btn btn-success btn-style" style="width: 50%; height: 50px;">
-                            Accept </button>
-                        <button id="decline-btn" type="button" onclick="terminate_call()" class="btn btn-danger btn-style" style="width: 50%; height: 50px;">
-                            Decline </button>
+            </div>
+        </div>
+
+        <!-- Missed Call Modal -->
+        <div id="myMissedCallModal" class="modal fade">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h2 class="modal-title">Missed Call</h2>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img src="images/missed-call.png" alt="Missed Call" height="100">
+                    </div>
+                    <div class="modal-footer">
+                        <h2 id='myMissedCallModalPhoneNumber' class="modal-title text-center"></h2>
                     </div>
                 </div>
-
             </div>
         </div>
-    </div>
 
-    <!-- Missed Call Modal -->
-    <div id="myMissedCallModal" class="modal fade">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h2 class="modal-title">Missed Call</h2>
-                </div>
-                <div class="modal-body text-center">
-                    <img src="images/missed-call.png" alt="Missed Call" height="100">
-                </div>
-                <div class="modal-footer">
-                    <h2 id='myMissedCallModalPhoneNumber' class="modal-title text-center"></h2>
-                </div>
-            </div>
-        </div>
-    </div>
+        <!-- Videomail Retrieval Error Modal -->
+        <div id="videomailErrorModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h2 class="modal-title">Videomail Retrieval Error</h2>
+                    </div>
+                    <div class="modal-body text-center">
+                        <h4 class="modal-title" id="videomailErrorBody"></h4>
 
-    <!-- Videomail Retrieval Error Modal -->
-    <div id="videomailErrorModal" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h2 class="modal-title">Videomail Retrieval Error</h2>
-                </div>
-                <div class="modal-body text-center">
-                    <h4 class="modal-title" id="videomailErrorBody"></h4>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- BusyLight Modal -->
-    <div class="modal fade" id="busylightModal" tabindex="-1" role="dialog" aria-labelledby="busylightModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" id="myModalLabel">Busy Light</h4>
+        <!-- BusyLight Modal -->
+        <div class="modal fade" id="busylightModal" tabindex="-1" role="dialog" aria-labelledby="busylightModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel">Busy Light</h4>
+                    </div>
+                    <div class="modal-body" id='busylightModalBody'>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id='busylightModalTestBtn' onclick="testLightConnection()">Test BusyLight Connection</button>
+                    </div>
                 </div>
-                <div class="modal-body" id='busylightModalBody'>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id='busylightModalTestBtn' onclick="testLightConnection()">Test BusyLight Connection</button>
-                </div>
+                <!-- /.modal-content -->
             </div>
-            <!-- /.modal-content -->
+            <!-- /.modal-dialog -->
         </div>
-        <!-- /.modal-dialog -->
-    </div>
 
-    <!-- Jssip hidden data -->
-    <div hidden>
-        <div id="my_sip_uri"> </div>
-        <div id="ws_servers"> </div>
-        <div id="sip_password"> </div>
-        <div id="pc_config"> </div>
-    </div>
+        <!-- Jssip hidden data -->
+        <div hidden>
+            <div id="my_sip_uri"> </div>
+            <div id="ws_servers"> </div>
+            <div id="sip_password"> </div>
+            <div id="pc_config"> </div>
+        </div>
 
-    <!-- Videomail hidden data -->
-    <div hidden>
-        <div id="videomailId"> </div>
-    </div>
+        <!-- Videomail hidden data -->
+        <div hidden>
+            <div id="videomailId"> </div>
+        </div>
 
-    <div id="snackbar">Default Text</div>
+        <div id="snackbar">Default Text</div>
 
-    <!-- ==================Le javascript ================================ -->
-    <!-- jQuery v2.1.4 -->
-    <script src="./bower_components/AdminLTE/plugins/jQuery/jquery-2.2.3.min.js"></script>
-    <!-- jQuery UI - v1.11.4 -->
-    <script src="./bower_components/AdminLTE/plugins/jQueryUI/jquery-ui.min.js"></script>
-    <!-- socket.io-client -->
-    <script type="text/javascript" src="./socket.io/socket.io.js"></script>
-    <!-- Bootstrap 3.3.5 -->
-    <script type="text/javascript" src="./bower_components/bootstrap/dist/js/bootstrap.js"></script>
-    <!-- Decode JWT tokens -->
-    <script type="text/javascript" src="./bower_components/jwt-decode/build/jwt-decode.min.js"></script>
-    <!-- timer.jquery 0.6.3 -->
-    <script type="text/javascript" src='./bower_components/timer.jquery/dist/timer.jquery.min.js'></script>
-    <!-- moment.js 2.15.1 -->
-    <script type="text/javascript" src='./bower_components/moment/moment.js'></script>
-    <script type="text/javascript" src="./bower_components/AdminLTE/plugins/input-mask/jquery.inputmask.js"></script>
-    <!-- AdminLTE App -->
-    <script src="./bower_components/AdminLTE/dist/js/app.min.js"></script>
-    <!-- DataTables 1.10.12 -->
-    <script type="text/javascript" src="./bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-    <!-- Custom Javascript for ACEDirect index.html page-->
-    <script type="text/javascript" src="./js/busylight.js"></script>
-    <script type="text/javascript" src="./js/acedirect.js"></script>
-    <!-- JSSIP-->
-    <script type="text/javascript" src="./bower_components/jssip/dist/jssip.min.js"></script>
-    <script>
-        var complaintForm = false;
-    </script>
-    <script type="text/javascript" src="./js/myJssip.js"></script>
-    <!-- GridStack -->
-    <script src="./bower_components/lodash/dist/lodash.min.js"></script>
-    <script src="./bower_components/gridstack/dist/gridstack.min.js"></script>
-    <script src="./bower_components/gridstack/dist/gridstack.jQueryUI.min.js"></script>
+        <!-- ==================Le javascript ================================ -->
+        <!-- jQuery v2.1.4 -->
+        <script src="./bower_components/AdminLTE/plugins/jQuery/jquery-2.2.3.min.js"></script>
+        <!-- jQuery UI - v1.11.4 -->
+        <script src="./bower_components/AdminLTE/plugins/jQueryUI/jquery-ui.min.js"></script>
+        <!-- socket.io-client -->
+        <script type="text/javascript" src="./socket.io/socket.io.js"></script>
+        <!-- Bootstrap 3.3.5 -->
+        <script type="text/javascript" src="./bower_components/bootstrap/dist/js/bootstrap.js"></script>
+        <!-- Decode JWT tokens -->
+        <script type="text/javascript" src="./bower_components/jwt-decode/build/jwt-decode.min.js"></script>
+        <!-- timer.jquery 0.6.3 -->
+        <script type="text/javascript" src='./bower_components/timer.jquery/dist/timer.jquery.min.js'></script>
+        <!-- moment.js 2.15.1 -->
+        <script type="text/javascript" src='./bower_components/moment/moment.js'></script>
+        <script type="text/javascript" src="./bower_components/AdminLTE/plugins/input-mask/jquery.inputmask.js"></script>
+        <!-- AdminLTE App -->
+        <script src="./bower_components/AdminLTE/dist/js/app.min.js"></script>
+        <!-- DataTables 1.10.12 -->
+        <script type="text/javascript" src="./bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
+        <!-- Custom Javascript for ACEDirect index.html page-->
+        <script type="text/javascript" src="./js/busylight.js"></script>
+        <script type="text/javascript" src="./js/acedirect.js"></script>
+        <!-- JSSIP-->
+        <script type="text/javascript" src="./bower_components/jssip/dist/jssip.min.js"></script>
+        <script>
+            var complaintForm = false;
+        </script>
+        <script type="text/javascript" src="./js/myJssip.js"></script>
+        <!-- GridStack -->
+        <script src="./bower_components/lodash/dist/lodash.min.js"></script>
+        <script src="./bower_components/gridstack/dist/gridstack.min.js"></script>
+        <script src="./bower_components/gridstack/dist/gridstack.jQueryUI.min.js"></script>
 
-    <script>
-        var options = {
-            cellHeight: 80,
-            verticalMargin: 10
-        };
-        var grid = $('.grid-stack').gridstack(options);
+        <script>
+            var options = {
+                cellHeight: 80,
+                verticalMargin: 10
+            };
+            var grid = $('.grid-stack').gridstack(options);
 
-        var serializedGridData = [];
-        var loadingGridLayout = false;
+            var serializedGridData = [];
+            var loadingGridLayout = false;
 
-        function saveGridLayout() {
-            serializedGridData = _.map($('.grid-stack > .grid-stack-item:visible'), function (el) {
-                el = $(el);
-                var node = el.data('_gridstack_node');
-                return {
-                    id: el[0].id,
-                    visible: el[0].visible,
-                    x: node.x,
-                    y: node.y,
-                    width: node.width,
-                    height: node.height
-                };
-            });
-            console.log(JSON.stringify(serializedGridData));
-        };
+            function saveGridLayout() {
+                serializedGridData = _.map($('.grid-stack > .grid-stack-item:visible'), function (el) {
+                    el = $(el);
+                    var node = el.data('_gridstack_node');
+                    return {
+                        id: el[0].id,
+                        visible: el[0].visible,
+                        x: node.x,
+                        y: node.y,
+                        width: node.width,
+                        height: node.height
+                    };
+                });
+                console.log(JSON.stringify(serializedGridData));
+            };
 
-        function loadGridLayout(layout) {
-            loadingGridLayout = true;
-            var grid = $('.grid-stack').data('gridstack');
-            grid.batchUpdate();
+            function loadGridLayout(layout) {
+                loadingGridLayout = true;
+                var grid = $('.grid-stack').data('gridstack');
+                grid.batchUpdate();
 
-            layout.forEach(function (el) {
-                grid.update($('#' + el.id), el.x, el.y, el.width, el.height)
-            });
+                layout.forEach(function (el) {
+                    grid.update($('#' + el.id), el.x, el.y, el.width, el.height)
+                });
 
-            grid.commit();
-            loadingGridLayout = false;
-        }
-
-        $('.grid-stack').on('change', function (event, items) {
-            if (!loadingGridLayout) {
-                saveGridLayout();
+                grid.commit();
+                loadingGridLayout = false;
             }
-        });
-    </script>
+
+            $('.grid-stack').on('change', function (event, items) {
+                if (!loadingGridLayout) {
+                    saveGridLayout();
+                }
+            });
+        </script>
 </body>
 
 </html>
