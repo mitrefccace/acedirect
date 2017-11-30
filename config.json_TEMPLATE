@@ -91,6 +91,9 @@
         "desc": "Some Website",
         "url": "http://www.domain.com"
     },
+    "popticket": {
+      "url": "https://xxxxxx.xxxxxxxxxxx.com/CDC_CustZD_Test/DTK_HttpServices/json/CallDTKEventUsingJSONviaPOSTStream?async=true"
+    },    
     "nginx": {
         "fqdn": "nginx.domain.com",
         "path": "ACEDirect"
