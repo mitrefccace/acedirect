@@ -32,11 +32,6 @@ setInterval(function () {
 }, 2000);
 
 $(document).ready(function () {
-
-	$('#modalWrapup').modal({
-		backdrop: 'static',
-		keyboard: false
-	  });
 	connect_socket();
 	$("#debugtab").hide();
 	$('#scriptstab').hide();
