@@ -181,6 +181,7 @@ function register_jssip()
 	    currentSession.on('newInfo', function(e)
 		{
 			if(debug) console.log('\nCURRENTSESSION -  NEWINFO: \nINFO:\n' + e.info + "\nrequest:\n" + e.request);
+		});
       
 		currentSession.on('hold', function(e)
 		{
