@@ -121,7 +121,7 @@ function register_jssip()
 	ua.on('newMessage', function(e){
 		if(debug) console.log("\nUA - NEWMESSAGE");
 
-		if (complaintForm && e.content == 'STARTRECORDING')
+		if (complaintForm && e.message.content == 'STARTRECORDING')
         	startRecordProgress(); 
 	});
 	ua.on('newRTCSession', function(e){
