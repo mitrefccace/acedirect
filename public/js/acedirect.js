@@ -262,8 +262,6 @@ function connect_socket() {
 						}
 						*/
 					}
-
-
 				}).on('ad-zendesk', function (data) {
 					debugtxt('ad-zendesk', data);
 					//Place holders
@@ -951,6 +949,7 @@ function updateVideomailTable(data){
 			vidNumber = vidNumber.toString();
 			if (vidNumber[0] === '1') vidNumber = vidNumber.slice(1,vidNumber.length);
 			vidNumber = '('+ vidNumber.substring(0,3) + ') ' + vidNumber.substring(3,6) + '-' + vidNumber.substring(6,vidNumber.length);
+		}
 		var vidReceived = data[i].received;
 		var vidDuration = data[i].video_duration;
 		var vidStatus = data[i].status;

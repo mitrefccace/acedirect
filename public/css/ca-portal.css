@@ -693,3 +693,140 @@ input[type=range]:focus::-ms-fill-lower {
 input[type=range]:focus::-ms-fill-upper {
   background: #367ebd;
 }   
+
+/*Dialpad styling*/
+
+p {
+  margin: 0;
+  padding: 0 0 5px 0;
+  line-height: 20px;
+}
+
+.phone {
+  width: 300px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.span4 {
+  width: 85px;
+  float: left;
+  margin: 20px 10px 10px 5px;
+}
+
+.smaller-keyboard{
+	margin: 0px 0px 28.5px 15px;
+	height: 20px;
+}
+
+.smaller-keyboard > .big{
+	width: 20px;
+}
+
+.smaller-keyboard > .small{
+	width: 15px;
+	margin-top: 7px;
+}
+.smaller-keyboard > .txt{
+	margin-left: 15px;
+	display: flex;
+}
+
+/* turn into an id*/
+.num-pad { 
+  margin: auto;
+}
+
+.keypad-button{
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+}
+
+.txt {
+  text-align: center;
+  margin-top: 5px;
+  font-family: 'Source Sans Pro', sans-serif;
+  line-height: px;
+  color: #333;
+}
+
+.big {
+	font-size: 30px;
+}
+
+.small {
+  font-size: 12px;
+}
+
+#button_menu_panel{
+  margin-top: 70px;
+}
+
+.button_menu {
+  background: 0 0;
+  border: none;
+  color: #000;
+  padding: 0px 20px;
+  height: 40px;
+}
+
+.button_menu_selected{
+	background-color : @msg-background; 
+	border: none;
+	color: #000;
+	padding: 0px 20px;
+	height: 40px;
+}
+
+
+div#call-controls input {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-style: oblique;
+  //font-size: 1em;
+  width: 100%;
+  height: 2em;
+  padding: .5em;
+  display: block;
+  font-size: 22px;
+}
+
+div#call-controls button#button-hangup {
+  display: none;
+}
+
+.button-icon {
+  width: 40px;
+}
+
+#button-call {
+  display:block;
+  margin:0 auto;
+  border-radius: 50%;
+  height: 50px;
+  background-color: #32CD32;
+  border: none;
+  margin-top: 10px;
+}
+.bottomspace {
+  margin-bottom: 10px;
+}
+
+
+.input-group{
+	margin-top: 20px;
+}
+
+.hangup-state{
+
+  background-color: #ff1a1a !important;
+  transform: rotate(138deg);
+
+}
+
+#progress-message{
+	text-align: center;
+    font-size: 25px;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-style: oblique;
+}

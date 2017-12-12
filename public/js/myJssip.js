@@ -152,7 +152,7 @@ function register_jssip()
 			if(debug) console.log('\nCURRENTSESSION -  ACCEPTED: \nRESPONSE: \n' + e.response + "\nORIGINATOR:\n"+ e.originator);
 			toggle_incall_buttons(true);
 			start_self_video();
-			$(#'outboundCallAlert').hide();					  
+			$('#outboundCallAlert').hide();					  
 		});
 	    currentSession.on('confirmed', function(e)
 		{
