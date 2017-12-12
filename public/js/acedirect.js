@@ -1079,6 +1079,8 @@ function videomailCallback(callbacknum){
 	var videophoneNumber = callbacknum.match(/\d/g);
 	videophoneNumber = videophoneNumber.join('');
 	start_call(videophoneNumber);
+	$('#duration').timer('reset');
+	$('#outboundCallAlert').show();						   
 	$('#user-status').text('In Call');
 	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	changeStatusLight('IN_CALL');
