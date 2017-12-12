@@ -120,6 +120,8 @@ function register_jssip()
 	});
 	ua.on('newMessage', function(e){
 		if(debug) console.log("\nUA - NEWMESSAGE");
+		if (complaintForm && e.message.content == 'STARTRECORDING')
+        	startRecordProgress(); 
 	});
 	ua.on('newRTCSession', function(e){
 		//e.request.body = edit_request(e.request.body);
