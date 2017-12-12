@@ -26,6 +26,7 @@ var missed_call_blinking;
 var videomail_status_buttons = document.getElementById("videomail-status-buttons");
 var sortFlag = "id desc";
 var filter = "ALL";
+var telNumber;		  
 				   
 setInterval(function () {
 	busylight.light(this.agentStatus);
@@ -857,18 +858,19 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
     }).get();
 
     console.log('Click event for playing video');
-    console.log('vidId: ' + tableData[0] );
-    $("#videomailId").attr("name",tableData[0]);
-    playVideomail(tableData[0], tableData[2], tableData[3]);//vidId, vidDuration vidStatus);
+    console.log('vidId: ' + tableData[5] );
+    $("#videomailId").attr("name",tableData[5]);
+	$("#callbacknum").attr("name",tableData[0]);
+    playVideomail(tableData[5], tableData[2], tableData[3]);//vidId, vidDuration vidStatus);
 });
 
 //Sorting the videomail table
-$('#vmail-video-id').on('click',function(){
+$('#vmail-vrs-number').on('click',function(){
 	var sort = sortButtonToggle($(this).children("i"));
 	if (sort == "asc") {
-		sortFlag = "id asc";
+		sortFlag = "callbacknumber asc";
 	} else if (sort == "desc") {
-		sortFlag = "id desc";
+		sortFlag = "callbacknumber desc";
 	}
 	socket.emit('get-videomail',{
 		"extension": extensionMe,
@@ -938,12 +940,17 @@ function updateVideomailTable(data){
 	$("#videomailTbody").html("");
 	var table;
 	var row;
-	var idCell;
+	var numberCell;				
 	var receivedCell;
 	var durationCell;
 	var statusCell;
 	for(var i=0; i<data.length; i++){
 		var vidId = data[i].id;
+		var vidNumber = data[i].callbacknumber;
+		if (vidNumber) {
+			vidNumber = vidNumber.toString();
+			if (vidNumber[0] === '1') vidNumber = vidNumber.slice(1,vidNumber.length);
+			vidNumber = '('+ vidNumber.substring(0,3) + ') ' + vidNumber.substring(3,6) + '-' + vidNumber.substring(6,vidNumber.length);
 		var vidReceived = data[i].received;
 		var vidDuration = data[i].video_duration;
 		var vidStatus = data[i].status;
@@ -951,14 +958,17 @@ function updateVideomailTable(data){
 		var vidFilename = data[i].video_filename;
 		table = document.getElementById("videomailTbody");
 		row = table.insertRow(table.length);
-		idCell = row.insertCell(0);
+		numberCell = row.insertCell(0);
 		receivedCell = row.insertCell(1);
 		durationCell = row.insertCell(2);
 		statusCell = row.insertCell(3);
 		filepathCell = row.insertCell(4);
 		filepathCell.setAttribute('hidden', true);
+		idCell = row.insertCell(5);
+		idCell.setAttribute('hidden',true);  
 		filepathCell.innerHTML = vidFilepath + vidFilename;
 		idCell.innerHTML = vidId;
+		numberCell.innerHTML = vidNumber;						   
 		receivedCell.innerHTML = vidReceived;
 		durationCell.innerHTML = vidDuration;
     
@@ -1064,6 +1074,18 @@ function stopVideomail(){
 	toggle_videomail_buttons(false);
 }
 
+//Callback for videomail
+function videomailCallback(callbacknum){
+	stopVideomail();
+	var videophoneNumber = callbacknum.match(/\d/g);
+	videophoneNumber = videophoneNumber.join('');
+	start_call(videophoneNumber);
+	$('#user-status').text('In Call');
+	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
+	changeStatusLight('IN_CALL');
+	socket.emit('incall', null);
+}
+
 //Socket emit for changing status of a videomail
 function videomail_status_change(id, videoStatus){
 	socket.emit('videomail-status-change', {
@@ -1147,6 +1169,9 @@ function enterFullscreen() {
   }
 }
 
+$("#sidebar-dialpad .dropdown-menu").click(function(e){
+	e.stopPropagation();
+});
 $("#accept-btn").click(function(){
 	$('#myRingingModalPhoneNumber').html('');
 	$('#myRingingModal').modal('hide');
@@ -1157,3 +1182,35 @@ $("#decline-btn").click(function(){
 	$('#myRingingModalPhoneNumber').html('');
 	$('#myRingingModal').modal('hide');
 });
+
+//Dialpad functionality
+$(".keypad-button").click(function(e){
+	var etemp = $(e.currentTarget);
+	etemp.css("background-color", "Gray");
+	setTimeout(() => {etemp.css("background-color", "White")}, 500);
+	var el = etemp.find('.big');
+    var text = el.text().trim();
+	telNumber = $('#phone-number');
+	$(telNumber).val(telNumber.val() + text);
+});
+
+$('#phone-number-delete-btn').click(function(e){
+	$('#phone-number').val(
+		function (index, value) {
+			return value.substr(0, value.length - 1);
+		})
+});
+
+$("#button-call").click(function(){
+	$('.dropdown.open .dropdown-toggle').dropdown('toggle');
+	telNumber = $('#phone-number');
+	start_call($(telNumber).val());
+	$(telNumber).val('');
+	$('#duration').timer('reset');
+	$('#user-status').text('In Call');
+	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
+	changeStatusLight('IN_CALL');
+	socket.emit('incall', null);
+	toggle_incall_buttons(true);
+	$('#outboundCallAlert').show();
+});						 

@@ -178,7 +178,70 @@
                             </span>
                         </a>
                     </li>
+					<li class="header">TOOLS</li>
+					
+					<li id="sidebar-dialpad">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+							<i class="fa fa-phone"></i>
+							<span>Dial Pad</span>
+						</a>
+						<ul class="dropdown-menu">
+							<div id="callCard" class="card">
+								<div class="container-fluid ">
 
+									<div id="call-controls">
+
+										<div id="button_menu_panel" class="center bottomspace" style="display: none">
+											<button class="button_menu" id="dial">
+												<img class="button-icon" src="images/dial.png">
+											</button>
+										</div>
+										
+										<div class="phone" id="keypad">
+											<div class="input-group">
+													<input id="phone-number" type="text" class="form-control input-lg" placeholder="Enter a phone #" />
+													<span class="input-group-addon">
+														<img id="phone-number-delete-btn" src="images/backspace.png" height=25 />
+													</span>
+											</div>
+											<div>
+												<div class="num-pad">
+													<% var key=[ 1, 2, 3 , 4 ,5 ,6, 7, 8, 9, "*", 0, "#"]; var label=[ "", "ABC", "DEF", "GHI", "JKL", "MNO", "PQRS", "TUV", "WXYZ", "", "", "" ] ; if (key.length === label.length) label.forEach( (x,i)=>{ %>
+														<div class="span4">
+																<div class="txt keypad-button">
+																	<div class="big">
+																		<%=key[i] %>
+																	</div>
+																	<div class="small">
+																		<%= label[i] %>
+																	</div>
+																</div>
+														</div>
+														<% }); else {%>
+															<div>INTERNAL ERROR: mismatched arrays</div>
+															<% } %>
+																<div class="clearfix"></div>
+																<div class="row">
+																	<div class="col-md-12">
+																		<div></div>
+																	</div>
+																</div>
+												</div>
+												<div id="log"></div>
+											</div>
+										</div>
+
+										<div class="center">
+											<button id="button-call">
+												<img class="button-icon" src="images/call.png">
+											</button>
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</ul>
+					</li>
                 </ul>
             </section>
             <!-- /.sidebar -->
@@ -332,7 +395,7 @@
                         <table class="table table-hover" id="Videomail_Table">
                             <thead>
                                 <tr>
-                                    <th id="vmail-video-id">Video ID
+                                    <th id="vmail-vrs-number">Videophone No.
                                         <i id="video-id-sort" class="fa fa-sort"> </i>
                                     </th>
                                     <th id="vmail-date">Date
@@ -501,6 +564,7 @@
         <!-- Videomail hidden data -->
         <div hidden>
             <div id="videomailId"> </div>
+			<div id="callbacknum"> </div>
         </div>
 
         <div id="snackbar">Default Text</div>

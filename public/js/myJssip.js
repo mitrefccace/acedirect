@@ -152,6 +152,7 @@ function register_jssip()
 			if(debug) console.log('\nCURRENTSESSION -  ACCEPTED: \nRESPONSE: \n' + e.response + "\nORIGINATOR:\n"+ e.originator);
 			toggle_incall_buttons(true);
 			start_self_video();
+			$(#'outboundCallAlert').hide();					  
 		});
 	    currentSession.on('confirmed', function(e)
 		{
@@ -161,6 +162,10 @@ function register_jssip()
 		{
 			if(debug) console.log('\nCURRENTSESSION -  ENDED: \nORIGINATOR: \n' + e.originator + '\nMESSAGE:\n' + e.message + "\nCAUSE:\n" + e.cause);
 			terminate_call();
+			$('#duration').timer('pause');
+			$('#user-status').text('Wrap Up');
+			changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
+			changeStatusLight('WRAP_UP');					 
       if (complaintForm) {
         unregister_jssip();
         stopRecordProgress();
@@ -170,6 +175,10 @@ function register_jssip()
 		{
 			if(debug) console.log('\nCURRENTSESSION -  FAILED: \nMESSAGE:\n' + e.message + "\nCAUSE:\n" + e.cause + "\nORIGINATOR:\n" + e.originator);
 	    	terminate_call();
+			$('#user-status').text('Ready');
+			changeStatusIcon(ready_color, "ready", ready_blinking);
+			changeStatusLight('READY');					   
+			$('#outboundCallAlert').hide();											  
 		});
 	     currentSession.on('newDTMF', function(e)
 		{
