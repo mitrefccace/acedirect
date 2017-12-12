@@ -1167,6 +1167,12 @@ function enterFullscreen() {
     remoteView.webkitRequestFullscreen(); // Chrome and Safari
   }
 }
+function showDialpad(){
+	$('#modalDialpad').modal({
+		backdrop: 'static',
+		keyboard: false
+	});
+}					   
 
 $("#sidebar-dialpad .dropdown-menu").click(function(e){
 	e.stopPropagation();
@@ -1201,7 +1207,7 @@ $('#phone-number-delete-btn').click(function(e){
 });
 
 $("#button-call").click(function(){
-	$('.dropdown.open .dropdown-toggle').dropdown('toggle');
+	$('#modalDialpad').modal('hide');							  
 	telNumber = $('#phone-number');
 	start_call($(telNumber).val());
 	$(telNumber).val('');

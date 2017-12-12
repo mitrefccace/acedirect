@@ -181,66 +181,11 @@
 					<li class="header">TOOLS</li>
 					
 					<li id="sidebar-dialpad">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+						<a href="#" onclick="showDialpad()">
 							<i class="fa fa-phone"></i>
 							<span>Dial Pad</span>
 						</a>
-						<ul class="dropdown-menu">
-							<div id="callCard" class="card">
-								<div class="container-fluid ">
 
-									<div id="call-controls">
-
-										<div id="button_menu_panel" class="center bottomspace" style="display: none">
-											<button class="button_menu" id="dial">
-												<img class="button-icon" src="images/dial.png">
-											</button>
-										</div>
-										
-										<div class="phone" id="keypad">
-											<div class="input-group">
-													<input id="phone-number" type="text" class="form-control input-lg" placeholder="Enter a phone #" />
-													<span class="input-group-addon">
-														<img id="phone-number-delete-btn" src="images/backspace.png" height=25 />
-													</span>
-											</div>
-											<div>
-												<div class="num-pad">
-													<% var key=[ 1, 2, 3 , 4 ,5 ,6, 7, 8, 9, "*", 0, "#"]; var label=[ "", "ABC", "DEF", "GHI", "JKL", "MNO", "PQRS", "TUV", "WXYZ", "", "", "" ] ; if (key.length === label.length) label.forEach( (x,i)=>{ %>
-														<div class="span4">
-																<div class="txt keypad-button">
-																	<div class="big">
-																		<%=key[i] %>
-																	</div>
-																	<div class="small">
-																		<%= label[i] %>
-																	</div>
-																</div>
-														</div>
-														<% }); else {%>
-															<div>INTERNAL ERROR: mismatched arrays</div>
-															<% } %>
-																<div class="clearfix"></div>
-																<div class="row">
-																	<div class="col-md-12">
-																		<div></div>
-																	</div>
-																</div>
-												</div>
-												<div id="log"></div>
-											</div>
-										</div>
-
-										<div class="center">
-											<button id="button-call">
-												<img class="button-icon" src="images/call.png">
-											</button>
-										</div>
-									</div>
-
-								</div>
-							</div>
-						</ul>
 					</li>
                 </ul>
             </section>
@@ -514,6 +459,77 @@
             </div>
         </div>
 
+		<!-- Dialpad Modal -->
+		<div class="modal fade" id="modalDialpad">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h4 class="modal-title">Dialpad</h4>
+					</div>
+					<div class="modal-body">
+						<div id="callCard" class="card">
+							<div class="container-fluid ">
+
+								<div id="call-controls">
+
+									<div id="button_menu_panel" class="center bottomspace" style="display: none">
+										<button class="button_menu" id="dial">
+											<img class="button-icon" src="images/dial.png">
+										</button>
+									</div>
+									
+									<div class="phone" id="keypad">
+										<div class="input-group">
+												<input id="phone-number" type="text" class="form-control input-lg" placeholder="Enter a phone #" />
+												<span class="input-group-addon">
+													<img id="phone-number-delete-btn" src="images/backspace.png" height=25 />
+												</span>
+										</div>
+										<div>
+											<div class="num-pad">
+												<% var key=[ 1, 2, 3 , 4 ,5 ,6, 7, 8, 9, "*", 0, "#"]; var label=[ "", "ABC", "DEF", "GHI", "JKL", "MNO", "PQRS", "TUV", "WXYZ", "", "", "" ] ; if (key.length === label.length) label.forEach( (x,i)=>{ %>
+													<div class="span4">
+															<div class="txt keypad-button">
+																<div class="big">
+																	<%=key[i] %>
+																</div>
+																<div class="small">
+																	<%= label[i] %>
+																</div>
+															</div>
+													</div>
+													<% }); else {%>
+														<div>INTERNAL ERROR: mismatched arrays</div>
+														<% } %>
+															<div class="clearfix"></div>
+															<div class="row">
+																<div class="col-md-12">
+																	<div></div>
+																</div>
+															</div>
+											</div>
+											<div id="log"></div>
+										</div>
+									</div>
+
+									<div class="center">
+										<button id="button-call">
+											<img class="button-icon" src="images/call.png">
+										</button>
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</div>
         <!-- Videomail Retrieval Error Modal -->
         <div id="videomailErrorModal" class="modal fade">
             <div class="modal-dialog">

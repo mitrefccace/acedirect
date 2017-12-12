@@ -165,7 +165,11 @@ function register_jssip()
 			$('#duration').timer('pause');
 			$('#user-status').text('Wrap Up');
 			changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
-			changeStatusLight('WRAP_UP');					 
+			changeStatusLight('WRAP_UP');
+			$('#modalWrapup').modal({
+				backdrop: 'static',
+				keyboard: false
+	    	});						 				
       if (complaintForm) {
         unregister_jssip();
         stopRecordProgress();
@@ -179,6 +183,7 @@ function register_jssip()
 			changeStatusIcon(ready_color, "ready", ready_blinking);
 			changeStatusLight('READY');					   
 			$('#outboundCallAlert').hide();											  
+			$('#duration').timer('pause');										  
 		});
 	     currentSession.on('newDTMF', function(e)
 		{
