@@ -1213,4 +1213,4 @@ $("#button-call").click(function(){
 	socket.emit('incall', null);
 	toggle_incall_buttons(true);
 	$('#outboundCallAlert').show();
-});						 
+});
