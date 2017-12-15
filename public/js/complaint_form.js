@@ -160,7 +160,16 @@ function connect_socket() {
           $('#chat-messages').html('');
           $('#rtt-typing').html('');
           $('#newchatmessage').val('');
-          
+
+          //reset buttons and ticket form
+          $('#ticketNumber').text('');
+          $('#complaintcounter').text('2,000');
+          $("#callbutton").prop("disabled",true);
+          $('#videomailbutton').prop("disabled", false);
+          $('#userformbtn').prop("disabled", false);
+          $('#complaint').val('');
+          $('#subject').val('');
+
 					if (complaintRedirectActive) {
             $("#callEndedModal").modal('show');
             setTimeout(function () {
