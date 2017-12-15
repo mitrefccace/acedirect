@@ -63,7 +63,7 @@ function connect_socket() {
 				}).on('ad-ticket-created', function (data) {
 					console.log("got ad-ticket-created");
 					$('#userformoverlay').removeClass("overlay").hide();
-					$('#callbutton').prop("disabled", false);								   
+					$('#callbutton').prop("disabled", false);
 					if (data.zendesk_ticket) {
 						$('#firstName').val(data.first_name);
 						$('#lastName').val(data.last_name);
@@ -85,23 +85,23 @@ function connect_socket() {
             $('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");
 
 					$('#my_sip_uri').attr("name","sip:"+data.extension+"@"+data.asterisk_public_hostname);
-          
+
           //is this a videomail call or complaint call?
           if (videomailflag)
             asterisk_sip_uri = "sip:" + data.queues_videomail_number + "@"+data.asterisk_public_hostname;
           else
             asterisk_sip_uri = "sip:" + data.queues_complaint_number + "@"+data.asterisk_public_hostname;
-					
+
           //get the max videomail recording seconds
           maxRecordingSeconds = data.queues_videomail_maxrecordsecs;
-          
+
           //get complaint redirect options
           complaintRedirectActive = data.complaint_redirect_active;
           complaintRedirectDesc = data.complaint_redirect_desc;
           complaintRedirectUrl = data.complaint_redirect_url;
           $("#redirecttag").attr("href", complaintRedirectUrl);
           $("#redirectdesc").text("Redirecting to " + complaintRedirectDesc + " ...");
-          
+
           $('#sip_password').attr("name",data.password);
  					$("#pc_config").attr("name","stun:" + data.stun_server );
 					register_jssip(); //register with the given extension
@@ -148,13 +148,19 @@ function connect_socket() {
 					}
 				}).on('disconnect', function () {
 					console.log('disconnected');
-					unregister_jssip();													  
+					unregister_jssip();
 					logout("disconnected");
 				}).on("unauthorized", function (error) {
 					if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
 						logout("Session has expired");
 					}
 				}).on("chat-leave", function (error) {
+          //clear chat
+          $('#chatcounter').text('500');
+          $('#chat-messages').html('');
+          $('#rtt-typing').html('');
+          $('#newchatmessage').val('');
+          
 					if (complaintRedirectActive) {
             $("#callEndedModal").modal('show');
             setTimeout(function () {
@@ -179,7 +185,7 @@ function connect_socket() {
 			$('#message').text('An Error Occured.');
 		}
 	});
-	
+
 }
 
 $("#callbutton").click(function(){
@@ -209,10 +215,10 @@ function startRecordingVideomail() {
   $('#userformbtn').prop("disabled", true);
   //dial into the videomail queue
 	$("#videomailbutton").prop("disabled",true);
-	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');  
+	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
   socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
 	console.log('call-initiated event for videomail');
-}																		  
+}
 
 $('#userform').submit(function (evt) {
 	evt.preventDefault();
@@ -231,8 +237,8 @@ function logout(msg) {
 	//disconnect socket.io connection
 	if (socket)
 		socket.disconnect();
-	//display the login screen to the user. 
-	window.location.href='./logout'                            
+	//display the login screen to the user.
+	window.location.href='./logout'
 }
 
 $("#newchatmessage").on('change keydown paste input', function () {
@@ -270,4 +276,3 @@ function enterFullscreen() {
     remoteView.webkitRequestFullscreen(); // Chrome and Safari
   }
 }
-
