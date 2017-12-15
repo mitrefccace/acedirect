@@ -26,8 +26,8 @@ var missed_call_blinking;
 var videomail_status_buttons = document.getElementById("videomail-status-buttons");
 var sortFlag = "id desc";
 var filter = "ALL";
-var telNumber;		  
-				   
+var telNumber;
+
 setInterval(function () {
 	busylight.light(this.agentStatus);
 }, 2000);
@@ -100,7 +100,7 @@ function connect_socket() {
 					$('#statusmsg').text(""); //clear status text
 
 					//populate call agent information
-					/*seems to be dead code 
+					/*seems to be dead code
 					// $('#txtAgentDisplayName').val(payload.username);
 					// $('#txtAgentFirstname').val(payload.first_name);
 					// $('#txtAgentLastname').val(payload.last_name);
@@ -116,7 +116,7 @@ function connect_socket() {
 					$('#ws_servers').attr("name","wss://" + payload.asteriskPublicHostname + ":" + payload.wsPort +"/ws");
 					$('#my_sip_uri').attr("name","sip:"+payload.extension+"@"+payload.asteriskPublicHostname);
 					$('#sip_password').attr("name",payload.extensionPassword);
-					$("#pc_config").attr("name","stun:" + payload.stunServer );																																																	 
+					$("#pc_config").attr("name","stun:" + payload.stunServer );
 
 					if (payload.queue_name === "ComplaintsQueue" || payload.queue2_name === "ComplaintsQueue") {
 						$('#sidebar-complaints').show();
@@ -157,7 +157,7 @@ function connect_socket() {
 				}).on('disconnect', function () {
 					debugtxt('disconnect');
 					console.log('disconnected');
-					unregister_jssip();																							 
+					unregister_jssip();
 					changeStatusLight('OFF_DUTY');
 					//logout("disconnected");
 				}).on("unauthorized", function (error) {
@@ -375,7 +375,7 @@ function connect_socket() {
 					socket.emit('incomingcall', null);
 				}).on('new-missed-call', function (data) {
 					debugtxt('new-missed-call', data);
-					//$('#myRingingModal').removeClass('fade');					
+					//$('#myRingingModal').removeClass('fade');
 					$('#myRingingModal').modal('hide');
 					/*
 					changeStatusLight('MISSED_CALL');
@@ -402,7 +402,7 @@ function connect_socket() {
 				}).on('got-videomail-recs',function(data){
 					updateVideomailTable(data);
 				}).on('got-unread-count',function(data){
-					updateVideomailNotification(data);											
+					updateVideomailNotification(data);
 				}).on('changed-status',function(){
 					getVideomailRecs();
 				}).on('videomail-retrieval-error',function(data){
@@ -410,7 +410,7 @@ function connect_socket() {
 					$('#videomailErrorModal').modal('show');
 					stopVideomail();
 				});
-				
+
 
 
 			} else {
@@ -633,7 +633,7 @@ function finished(i) {
 	$('#destexten').val('');
 	clearScreen();
     if (i == 1)
-	  unpauseQueues();
+	    unpauseQueues();
     else
       pauseQueues();
 	$('#alertPlaceholder').html('');
@@ -850,7 +850,7 @@ function getVideomailRecs(){
 		"sortBy": sortFlag,
 		"filter": filter
 	});
-	console.log('Sent a get-videomail event');	
+	console.log('Sent a get-videomail event');
 }
 
 //Play selected videomail when a row of the table is clicked
@@ -942,7 +942,7 @@ function updateVideomailTable(data){
 	$("#videomailTbody").html("");
 	var table;
 	var row;
-	var numberCell;				
+	var numberCell;
 	var receivedCell;
 	var durationCell;
 	var statusCell;
@@ -968,13 +968,13 @@ function updateVideomailTable(data){
 		filepathCell = row.insertCell(4);
 		filepathCell.setAttribute('hidden', true);
 		idCell = row.insertCell(5);
-		idCell.setAttribute('hidden',true);  
+		idCell.setAttribute('hidden',true);
 		filepathCell.innerHTML = vidFilepath + vidFilename;
 		idCell.innerHTML = vidId;
-		numberCell.innerHTML = vidNumber;						   
+		numberCell.innerHTML = vidNumber;
 		receivedCell.innerHTML = vidReceived;
 		durationCell.innerHTML = vidDuration;
-    
+
     if (vidStatus === 'UNREAD')
       statusCell.innerHTML = '<span style="font-weight:bold">' + vidStatus+ '</span>';
     else
@@ -998,7 +998,7 @@ function filterVideomail(mailFilter){
 		"filter": filter
 	});
 }
-   
+
 function processFilter(filter){
 	if (filter == 'ALL'){
 		return('');
@@ -1008,7 +1008,7 @@ function processFilter(filter){
 }
 
 //Show videomail sidebar tab
-function showVideoMailTab() { 
+function showVideoMailTab() {
 	if ($('#agents-tab').hasClass('active')){
 		if (document.getElementById("ctrl-sidebar").hasAttribute('control-sidebar-open')){
 			$('.nav-tabs a[href="#control-sidebar-agents-tab"]').removeClass('active');
@@ -1019,7 +1019,7 @@ function showVideoMailTab() {
 }
 
 //Show agent info sidebar tab
-function showAgentsTab() { 
+function showAgentsTab() {
 	if ($('#videomail-tab').hasClass('active')){
 		if (document.getElementById("ctrl-sidebar").hasAttribute('control-sidebar-open')){
 			$('.nav-tabs a[href="#control-sidebar-agents-tab"]').removeClass('active');
@@ -1035,7 +1035,7 @@ function playVideomail(id, duration, vidStatus){
 	remoteView.removeAttribute("autoplay");
 	remoteView.removeAttribute("poster");
 	remoteView.setAttribute("src",'./getVideomail?id='+id+'&ext='+extensionMe);
-	remoteView.setAttribute("onended", "change_play_button()");																				
+	remoteView.setAttribute("onended", "change_play_button()");
 	toggle_videomail_buttons(true);
 	updateVideoTime(duration,"vmail-total-time");
 	if (vidStatus === "UNREAD"){
@@ -1084,7 +1084,7 @@ function videomailCallback(callbacknum){
 	videophoneNumber = videophoneNumber.join('');
 	start_call(videophoneNumber);
 	$('#duration').timer('reset');
-	$('#outboundCallAlert').show();						   
+	$('#outboundCallAlert').show();
 	$('#user-status').text('In Call');
 	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	changeStatusLight('IN_CALL');
@@ -1106,7 +1106,7 @@ function videomail_read_onclick(id){
 	socket.emit('videomail-read-onclick', {
 		"id": id,
 		"extension": extensionMe
-	});	
+	});
 	console.log('Emitted a socket videomail-read-onclick');
 }
 
@@ -1151,14 +1151,14 @@ seekBar.addEventListener("change", function() {
 });
 
 // Update the seek bar as the video plays
-									
+
 remoteView.addEventListener("timeupdate", function() {
   // Calculate the slider value
   var value = (100 / remoteView.duration) * remoteView.currentTime;
 
   // Update the slider value
   seekBar.value = value;
-  
+
   //update the current time info
   updateVideoTime(remoteView.currentTime, "vmail-current-time");
 });
@@ -1178,7 +1178,7 @@ function showDialpad(){
 		backdrop: 'static',
 		keyboard: false
 	});
-}					   
+}
 
 $("#sidebar-dialpad .dropdown-menu").click(function(e){
 	e.stopPropagation();
@@ -1213,7 +1213,7 @@ $('#phone-number-delete-btn').click(function(e){
 });
 
 $("#button-call").click(function(){
-	$('#modalDialpad').modal('hide');							  
+	$('#modalDialpad').modal('hide');
 	telNumber = $('#phone-number');
 	start_call($(telNumber).val());
 	$(telNumber).val('');
