@@ -628,10 +628,14 @@ function unpauseQueues() {
 	socket.emit('ready', null);
 }
 
-function finished() {
+//i == 1: go to Ready; i == 0: go to Away
+function finished(i) {
 	$('#destexten').val('');
 	clearScreen();
-	unpauseQueues();
+    if (i == 1)
+	  unpauseQueues();
+    else
+      pauseQueues();
 	$('#alertPlaceholder').html('');
 }
 
