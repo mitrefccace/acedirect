@@ -690,19 +690,38 @@ function debugtxt(title, data) {
 	$('#dbgtxt').html('<span style="color:green">' + time + ": " + title + '</span><br>' + JSON.stringify(data) + '<br>----------------<br>' + $('#dbgtxt').html());
 }
 
+//update colors to custom config colors.
+//NOTE: text has the class "text-colorname" and buttons have the class "btn-colorname"
 function updateColors(data) {
-	//remove current colors from ready away and status-icon
-	$("#status-icon").removeClass(function (index, className) {
-		return (className.match(/\btext-\S+/g) || []).join(' ');
-	});
+	//remove colors from status icons
 	$("#away-icon").removeClass(function (index, className) {
 		return (className.match(/\btext-\S+/g) || []).join(' ');
 	});
 	$("#ready-icon").removeClass(function (index, className) {
 		return (className.match(/\btext-\S+/g) || []).join(' ');
 	});
+	$("#status-icon").removeClass(function (index, className) {
+		return (className.match(/\btext-\S+/g) || []).join(' ');
+	});
 
-	//update new statuses colors
+	//remove colors from wrapup modal
+	$("#away-btn").removeClass(function (index, className) {
+		return (className.match(/\bbtn-\S+/g) || []).join(' ');
+	});
+	$("#away-color").removeClass(function (index, className) {
+		return (className.match(/\btext-\S+/g) || []).join(' ');
+	});
+	$("#ready-color").removeClass(function (index, className) {
+		return (className.match(/\btext-\S+/g) || []).join(' ');
+	});
+	$("#ready-btn").removeClass(function (index, className) {
+		return (className.match(/\bbtn-\S+/g) || []).join(' ');
+	});
+	$("#wrapup-color").removeClass(function (index, className) {
+		return (className.match(/\btext-\S+/g) || []).join(' ');
+	});
+	
+	//get new colors from json config file, save to local variables
 	for (var status in data) {
 		if (data[status].color.toLowerCase() == "off") {
 			data[status].color = "gray";
@@ -739,31 +758,40 @@ function updateColors(data) {
 		}
 	}
 
-	//add new colors to away and ready
+	//add new text-colors to away and ready icons
 	if (away_blinking) {
-		$('#away-icon').addClass("text-" + away_color + "-blinking");
-		if (!($("away-icon").hasClass("status-margin"))) $('#away-icon').addClass("status-margin");
+		$('#away-icon').addClass("text-" + away_color + "-blinking"); 
+		if (!($("#away-icon").hasClass("status-margin"))) $('#away-icon').addClass("status-margin"); 
 		$("#away-icon").removeClass("fa");
 		$("#away-icon").removeClass("fa-circle");
 	} else {
 		$('#away-icon').addClass("text-" + away_color);
-		if (!($("away-icon").hasClass("fa"))) $("#away-icon").addClass("fa");
-		if (!($("away-icon").hasClass("fa-circle"))) $("#away-icon").addClass("fa-circle");
+		if (!($("#away-icon").hasClass("fa"))) $("#away-icon").addClass("fa");
+		if (!($("#away-icon").hasClass("fa-circle"))) $("#away-icon").addClass("fa-circle");
 		$("#away-icon").removeClass("status-margin");
 	}
 	if (ready_blinking) {
-		if (!($("ready-icon").hasClass("status-margin"))) $('#ready-icon').addClass("status-margin");
+		if (!($("#ready-icon").hasClass("status-margin"))) $('#ready-icon').addClass("status-margin");
 		$('#ready-icon').addClass("text-" + ready_color + "-blinking");
 		$("#ready-icon").removeClass("fa");
 		$("#ready-icon").removeClass("fa-circle");
 	} else {
 		$('#ready-icon').addClass("text-" + ready_color);
-		if (!($("ready-icon").hasClass("fa"))) $("#ready-icon").addClass("fa");
-		if (!($("ready-icon").hasClass("fa"))) $("#ready-icon").addClass("fa-circle");
+		if (!($("#ready-icon").hasClass("fa"))) $("#ready-icon").addClass("fa");
+		if (!($("#ready-icon").hasClass("fa-circle"))) $("#ready-icon").addClass("fa-circle");
 		$("#ready-icon").removeClass("status-margin");
 	}
+	//add colors to wrapup model
+	if(wrap_up_color == "white") $('#wrapup-color').addClass("text-gray");
+	else $('#wrapup-color').addClass("text-" + wrap_up_color);
+	if(away_color == "white") $('#away-color').addClass("text-gray");
+	else $('#away-color').addClass("text-" + away_color);
+	if(ready_color == "white") $('#ready-color').addClass("text-gray");
+	else $('#ready-color').addClass("text-" + ready_color);
+	$('#away-btn').addClass("btn-" + away_color);
+	$('#ready-btn').addClass("btn-" + ready_color);
 
-	//add new color to status-icon
+	//add new color to status-icon element
 	if ($("#status-icon").hasClass("currently-away")) changeStatusIcon(away_color, "away", away_blinking);
 	else if ($("#status-icon").hasClass("currently-ready")) changeStatusIcon(ready_color, "ready", ready_blinking);
 	else if ($("#status-icon").hasClass("currently-in-call")) changeStatusIcon(in_call_color, "in-call", in_call_blinking);
@@ -788,12 +816,12 @@ function changeStatusIcon(newColor, statusName, blinking) {
 		$('#status-icon').addClass("text-" + newColor + "-blinking");
 		$("#status-icon").removeClass("fa");
 		$("#status-icon").removeClass("fa-circle");
-		if (!($("status-icon").hasClass("status-margin-small"))) $("#status-icon").addClass("status-margin-small");
+		if (!($("#status-icon").hasClass("status-margin-small"))) $("#status-icon").addClass("status-margin-small");
 
 	} else {
 		$('#status-icon').addClass("text-" + newColor);
-		if (!($("status-icon").hasClass("fa"))) $("#status-icon").addClass("fa");
-		if (!($("status-icon").hasClass("fa-circle"))) $("#status-icon").addClass("fa-circle");
+		if (!($("#status-icon").hasClass("fa"))) $("#status-icon").addClass("fa");
+		if (!($("#status-icon").hasClass("fa-circle"))) $("#status-icon").addClass("fa-circle");
 		$("#status-icon").removeClass("status-margin-small");
 	}
 	$('#status-icon').addClass("currently-" + statusName);

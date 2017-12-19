@@ -203,6 +203,18 @@ However, delay the fade out process for 2.5 seconds */
               6px 6px 0 -4px #d626d0;
 }
 
+.btn-pink
+{
+   background-color: #d626d0;
+   color:white;
+}
+
+.btn-pink:hover
+{
+   background-color: #af1dab;
+   color:white;
+}
+
 .text-gray
 {
     color: #777777 !important;
@@ -223,6 +235,16 @@ However, delay the fade out process for 2.5 seconds */
               -6px -6px 0 -4px #777777, 
               -6px 6px 0 -4px #777777, 
               6px 6px 0 -4px #777777;
+}
+
+.btn-gray
+{
+   background-color: #777777;
+}
+
+.btn-gray:hover
+{
+   background-color: #707070;
 }
 
 .text-red
@@ -247,6 +269,18 @@ However, delay the fade out process for 2.5 seconds */
               6px 6px 0 -4px #d33621;
 }
 
+.btn-red
+{
+   background-color: #d33621;
+   color: white;
+}
+
+.btn-red:hover
+{
+  background-color: #b22b18;
+  color:white;
+}
+
 .text-yellow
 {
     color: #ffcb11 !important;
@@ -269,6 +303,16 @@ However, delay the fade out process for 2.5 seconds */
               6px 6px 0 -4px #ffcb11;
 }
 
+.btn-yellow
+{
+   background-color: #ffcb11;
+}
+
+.btn-yellow:hover
+{
+  background-color: #d1a60e;
+}
+
 .text-aqua-blinking
 {
     display:inline-block;
@@ -284,6 +328,18 @@ However, delay the fade out process for 2.5 seconds */
               -6px -6px 0 -4px #00c0ef, 
               -6px 6px 0 -4px #00c0ef, 
               6px 6px 0 -4px #00c0ef;
+}
+
+.btn-aqua
+{
+   background-color: #00c0ef;
+   color: white;
+}
+
+.btn-aqua:hover
+{
+  background-color: #009dc4;
+  color:white;
 }
 
 .text-green-blinking
@@ -303,6 +359,18 @@ However, delay the fade out process for 2.5 seconds */
               6px 6px 0 -4px #00a65a;
 }
 
+.btn-green
+{
+   background-color: #00a65a;
+   color: white;
+}
+
+.btn-green:hover
+{
+   background-color: #007a42;
+   color:white;
+}
+
 .text-blue-blinking
 {
     display:inline-block;
@@ -320,6 +388,18 @@ However, delay the fade out process for 2.5 seconds */
               6px 6px 0 -4px #0073b7;
 }
 
+.btn-blue
+{
+   background-color: #0073b7;
+   color: white;
+}
+
+.btn-blue:hover
+{
+   background-color: #00598e;
+   color:white;
+}
+
 .text-orange-blinking
 {
     display:inline-block;
@@ -335,6 +415,18 @@ However, delay the fade out process for 2.5 seconds */
               -6px -6px 0 -4px #ff851b, 
               -6px 6px 0 -4px #ff851b, 
               6px 6px 0 -4px #ff851b;
+}
+
+.btn-orange
+{
+   background-color: #ff851b;
+   color: white;
+}
+
+.btn-orange:hover
+{
+   background-color: #d16d17;
+   color:white;
 }
 
 .text-white
@@ -358,6 +450,18 @@ However, delay the fade out process for 2.5 seconds */
               -6px 6px 0 -4px white, 
               6px 6px 0 -4px white;
 }
+
+.btn-white
+{
+   background-color: white;
+    border: 1px solid #777777;   
+}
+
+.btn-white:hover
+{
+   background-color: #f2f0ef;
+}
+
 
 .status-margin
 {
