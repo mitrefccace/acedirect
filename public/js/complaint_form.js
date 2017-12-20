@@ -154,6 +154,36 @@ function connect_socket() {
 					if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
 						logout("Session has expired");
 					}
+				}).on("skinny-config", function(data){
+					if(data == "true")
+					{
+						$("#ticket-section").attr("hidden",true);
+						$("#vrs-info-box").attr("hidden",true);
+						$("#video-section").removeClass(function (index, className) {
+							return (className.match(/\bcol-\S+/g) || []).join(' ');
+						});
+						$("#video-section").addClass("col-lg-7");
+						$("#chat-section").removeClass(function (index, className) {
+							return (className.match(/\bcol-\S+/g) || []).join(' ');
+						});
+						$("#chat-section").addClass("col-lg-5");
+						$("#callbutton").removeAttr("disabled");   
+						
+					}
+					else
+					{
+						$("#ticket-section").removeAttr("hidden");
+						$("#vrs-info-box").removeAttr("hidden");
+						$("#video-section").removeClass(function (index, className) {
+							return (className.match(/\bcol-\S+/g) || []).join(' ');
+						});
+						$("#video-section").addClass("col-lg-5");
+						$("#chat-section").removeClass(function (index, className) {
+							return (className.match(/\bcol-\S+/g) || []).join(' ');
+						});
+						$("#chat-section").addClass("col-lg-3");
+						$("#callbutton").attr("disabled", "disabled");
+					}
 				}).on("chat-leave", function (error) {
           //clear chat
           $('#chatcounter').text('500');

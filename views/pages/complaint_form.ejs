@@ -50,7 +50,7 @@
 				<!-- Main Row -->
 				<div class="row">
 					<section class="col-lg-12">
-						<div class="box">
+						<div id = "vrs-info-box" class="box" hidden>
 							<div class="box-header with-border">
 								<h3 class="box-title">VRS Information</h3>&nbsp;<small>(<a href="javascript:logout();">not my info</a>)</small>
 								<div class="box-tools pull-right">
@@ -104,8 +104,8 @@
 				</div>
 				<div class="row">
 					<!-- Left Col -->
-					<section class="col-lg-4">
-						<div class="box">
+					<section class="col-lg-4" id="ticket-section" hidden>
+						<div class="box" >
 							<div class="box-header with-border">
 								<i class="fa fa-exclamation-triangle"></i>
 								<h3 class="box-title">Complaint Ticket: </h3>
@@ -140,12 +140,6 @@
 											<button id='userformbtn' class="btn btn-success" type="submit">
 													Submit
 												</button>
-											<button class="btn btn-primary" id="callbutton" type="button" disabled>
-													Call
-												</button>
-											<button class="btn btn-primary" id="videomailbutton" type="button">
-													Videomail
-											</button>                        
 										</div>
 									</div>
 								</form>
@@ -156,7 +150,7 @@
 						</div>
 					</section>
 					<!-- Middle Col -->
-					<section class="col-lg-5">
+					<section class="col-lg-7" id="video-section">
 						<div class="box">
 							<div class="box-header with-border">
 								<i class="fa fa-video-camera"></i>
@@ -171,6 +165,7 @@
 									<video id="remoteView" autoplay poster="images/AD-logo.png"></video>
 									<video id="selfView" style="right: 10px;" autoplay muted="true" hidden></video>
 								</div>
+								     
 								<div id= "call-option-buttons">     
 	                                <div id= "inner">     
 	                                    <button  id="mute-audio" type = "button" class = "btn btn-gray" onclick = "mute_audio()"> <i id= "mute-audio-icon" class="call-btn-icon fa fa-microphone"></i> </button> 
@@ -186,6 +181,15 @@
                 </div>
               </div>
 
+              <div class = "col-xs-12 text-center">
+                	<button class="btn btn-primary" id="callbutton" type="button">
+						Call
+					</button>
+					<button class="btn btn-primary" id="videomailbutton" type="button">
+						Videomail
+					</button>    
+                </div> 
+
               <div id="recordicon" style="display:inline;visibility:hidden;">&nbsp;&nbsp;<span id="recordicon" class="glyphicon glyphicon-facetime-video blink" style="color:#FF0000;" ></span><label class="blink" style="color:#FF0000;" >&nbsp;&nbsp;RECORDING</label></div>
               <div id="secsremain" style="display:inline;"></div>
               
@@ -197,12 +201,11 @@
               <div class="alert alert-success alert-dismissable" id="vmsent" hidden>
                 <a class="close" onclick="$('#vmsent').hide();" style="text-decoration:none">×</a>
                 <strong>Success!</strong> Videomail sent.
-              </div>      
-
+              </div>    
 						</div>
 					</section>
 					<!-- Right Col -->
-					<section class="col-lg-3">
+					<section class="col-lg-5" id="chat-section">
 						<div class="box direct-chat direct-chat-primary">
 							<div class="box-header with-border">
 								<i class="fa fa-comments"></i>

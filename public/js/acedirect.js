@@ -401,10 +401,10 @@ function connect_socket() {
 					busylight.updateConfigs(data);
 				}).on('skinny-config', function(data){
 					if(data == "true"){
-						$("#scripts-and-details").hide();
+						$("#scripts-and-details").attr("hidden",true);
 					}
 					else {
-						$("#scripts-and-details").show();
+						$("#scripts-and-details").removeAttr("hidden");
 					}
 				}).on('got-videomail-recs',function(data){
 					updateVideomailTable(data);

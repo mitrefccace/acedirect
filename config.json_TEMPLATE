@@ -98,5 +98,8 @@
         "fqdn": "nginx.domain.com",
         "path": "ACEDirect"
     },
-    "skinny" : "true"
+    "skinny" : {
+        "agent": true,
+        "consumer": true
+    }
 }
