@@ -1260,3 +1260,13 @@ $("#button-call").click(function(){
 	toggle_incall_buttons(true);
 	$('#outboundCallAlert').show();
 });
+
+function enable_chat_buttons(){
+	$("#newchatmessage").removeAttr("disabled");  
+	$("#chat-send").removeAttr("disabled");  
+}
+
+function disable_chat_buttons(){
+	$("#newchatmessage").attr("disabled","disabled");  
+	$("#chat-send").attr("disabled","disabled");  
+}

@@ -167,8 +167,6 @@ function connect_socket() {
 							return (className.match(/\bcol-\S+/g) || []).join(' ');
 						});
 						$("#chat-section").addClass("col-lg-5");
-						$("#callbutton").removeAttr("disabled");   
-						
 					}
 					else
 					{
@@ -183,6 +181,8 @@ function connect_socket() {
 						});
 						$("#chat-section").addClass("col-lg-3");
 						$("#callbutton").attr("disabled", "disabled");
+						$("#newchatmessage").attr("disabled","disabled");  
+						$("#chat-send").attr("disabled","disabled");  
 					}
 				}).on("chat-leave", function (error) {
           //clear chat
@@ -268,6 +268,8 @@ $('#userform').submit(function (evt) {
 	socket.emit('ad-ticket', { "vrs": vrs, "subject": subject, "description": complaint });
 	$('#userformoverlay').addClass("overlay").show();
 	$('#userformbtn').prop("disabled", true);
+	$("#callbutton").removeAttr("disabled");   
+
 });
 
 function logout(msg) {
@@ -314,4 +316,14 @@ function enterFullscreen() {
   } else if (remoteView.webkitRequestFullscreen) {
     remoteView.webkitRequestFullscreen(); // Chrome and Safari
   }
+}
+
+function enable_chat_buttons(){
+	$("#newchatmessage").removeAttr("disabled");  
+	$("#chat-send").removeAttr("disabled");  
+}
+
+function disable_chat_buttons(){
+	$("#newchatmessage").attr("disabled","disabled");  
+	$("#chat-send").attr("disabled","disabled");  
 }

@@ -153,6 +153,7 @@ function register_jssip()
      		 //e.response = edit_response(e.response);
 			if(debug) console.log('\nCURRENTSESSION -  ACCEPTED: \nRESPONSE: \n' + e.response + "\nORIGINATOR:\n"+ e.originator);
 			toggle_incall_buttons(true);
+			enable_chat_buttons();
 			start_self_video();
 			$('#outboundCallAlert').hide();					  
 		});
@@ -388,6 +389,8 @@ function terminate_call()
 		if(!currentSession.isEnded()) currentSession.terminate();
 	}
 	remove_video();
+	disable_chat_buttons();
+
 	// if(ua) ua.stop(); 
 }
 
