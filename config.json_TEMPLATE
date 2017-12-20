@@ -97,5 +97,6 @@
     "nginx": {
         "fqdn": "nginx.domain.com",
         "path": "ACEDirect"
-    }
+    },
+    "skinny" : "true"
 }

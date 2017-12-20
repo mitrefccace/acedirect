@@ -399,6 +399,13 @@ function connect_socket() {
 					debugtxt('lightcode-configs', data);
 					updateColors(data);
 					busylight.updateConfigs(data);
+				}).on('skinny-config', function(data){
+					if(data == "true"){
+						$("#scripts-and-details").hide();
+					}
+					else {
+						$("#scripts-and-details").show();
+					}
 				}).on('got-videomail-recs',function(data){
 					updateVideomailTable(data);
 				}).on('got-unread-count',function(data){
