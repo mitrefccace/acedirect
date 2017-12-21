@@ -51,7 +51,9 @@
                 </a>
                 <div id="agentStatusInfo" class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-2 col-md-offset-2" style="white-space:nowrap;">
                     <span>
-                        <div>Call Duration: &nbsp;&nbsp;<font id="duration" class="text-light-gray">0 sec</font></div>
+                        <div>Call Duration: &nbsp;&nbsp;
+                            <font id="duration" class="text-light-gray">0 sec</font>
+                        </div>
                     </span>
                 </div>
                 <div class="pull-right">
@@ -178,15 +180,15 @@
                             </span>
                         </a>
                     </li>
-					<li class="header">TOOLS</li>
-					
-					<li id="sidebar-dialpad">
-						<a href="#" onclick="showDialpad()">
-							<i class="fa fa-phone"></i>
-							<span>Dial Pad</span>
-						</a>
+                    <li class="header">TOOLS</li>
 
-					</li>
+                    <li id="sidebar-dialpad">
+                        <a href="#" onclick="showDialpad()">
+                            <i class="fa fa-phone"></i>
+                            <span>Dial Pad</span>
+                        </a>
+
+                    </li>
                 </ul>
             </section>
             <!-- /.sidebar -->
@@ -198,164 +200,178 @@
             <section class="content-header">
                 <h1 id="section-header">AD Desktop</h1>
                 <ol class="breadcrumb">
-                    <li><i class="fa fa-desktop"></i> Home</li>
+                    <li>
+                        <i class="fa fa-desktop"></i> Home</li>
                     <li>AD Desktop</li>
                 </ol>
             </section>
 
             <!-- Main content -->
             <section class="content">
-              
-                <div class = "row">
-                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-9">
-                        <div class = "box">
-                            <% include ../partials/agent_box_video %>
+                <div class="grid-stack">
+                    <!-- VideoBox -->
+                    <div class="grid-stack-item" data-gs-x="0" data-gs-width="9" data-gs-height="6" id='gsvideobox'>
+                        <div class="grid-stack-item-content">
+                            <!--div class="col-xs-12 col-sm-12 col-md-12 col-lg-9"-->
+                            <div class="box">
+                                <% include ../partials/agent_box_video %>
+                            </div>
+                            <!--/div-->
                         </div>
                     </div>
-                    <div class = "col-xs-12 col-sm-12 col-md-12 col-lg-3">
-                        <div class="box">
-                            <% include ../partials/agent_box_chat %>
+                    <div class="grid-stack-item" data-gs-x="10" data-gs-width="3" data-gs-height="5" id='gschatbox'>
+                        <div class="grid-stack-item-content">
+
+                            <!--div class="col-xs-12 col-sm-12 col-md-12 col-lg-3"-->
+                            <div class="box">
+                                <% include ../partials/agent_box_chat %>
+                            </div>
+                            <!--/div-->
                         </div>
                     </div>
-                 </div>       
-                 <div class = "row" id = "scripts-and-details" hidden>
-                    <div class = "col-lg-6">
-                         <div class = "box" >
-                            <% include ../partials/agent_box_scripts %>
+                    <div class="grid-stack-item" data-gs-x="0" data-gs-width="6" data-gs-height="0" id='gsscriptbox' hidden>
+                        <div class="grid-stack-item-content">
+                            <!--div class = "row" id = "scripts-and-details"-->
+                            <!--div class="col-xs-12 col-sm-12 col-md-12 col-lg-6"-->
+                            <div class="box">
+                                <% include ../partials/agent_box_scripts %>
+                            </div>
+                            <!--/div-->
                         </div>
                     </div>
-                    <div class = "col-lg-6">
-                        <div class = "box" >
-                            <% include ../partials/agent_box_call_details %>
+                    <div class="grid-stack-item" data-gs-x="7" data-gs-width="6" data-gs-height="0" id='gsdetailsbox' hidden>
+                        <div class="grid-stack-item-content">
+                            <!--div class="col-xs-12 col-sm-12 col-md-12 col-lg-6"-->
+                            <div class="box">
+                                <% include ../partials/agent_box_call_details %>
+                            </div>
+                            <!--/div-->
                         </div>
                     </div>
-                   
                 </div>
-                
-       
-        </section>
-        <!-- /.content -->
-    </div>
-    <!-- /.content-wrapper -->
-
-    <% include ../partials/acedirect_footer %>
-
-    <!-- Control Sidebar -->
-    <aside id="ctrl-sidebar" class="control-sidebar control-sidebar-dark" style="width: 500px; right:-500px">
-        <!-- Create the tabs -->
-        <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
-            <li id="agents-tab" class="active">
-                <a href="#control-sidebar-agents-tab" data-toggle="tab">
-                    <i class="fa fa-users"></i>&nbsp;&nbsp;Agents</a>
-            </li>
-            <li id="videomail-tab">
-                <a href="#control-sidebar-videomail-tab" data-toggle="tab">
-                    <i class="fa fa-envelope-o"></i>&nbsp;&nbsp;Video Mail</a>
-            </li>
-            <li id="debugtab">
-                <a href="#control-sidebar-debug-tab" data-toggle="tab">
-                    <i class="fa fa-bug"></i>
-                </a>
-            </li>
-        </ul>
-        <!-- Tab panes -->
-        <div class="tab-content">
-            <!-- Agent Status tab content -->
-            <div class="tab-pane active" id="control-sidebar-agents-tab">
-                <div class="form-group">
-                    <table id='agenttable' class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Status&nbsp;&nbsp;&nbsp;</th>
-                                <th>Agent</th>
-                                <th>Ext</th>
-                                <th>Queues</th>
-                            </tr>
-                        </thead>
-                    </table>
-                </div>
-            </div>
-            <!-- /.Agent Status tab content -->
-
-            <!-- Debug tab content -->
-            <div class="tab-pane" id="control-sidebar-debug-tab">
-                <input type="button" class="btn btn-danger" id="btndbgclear" value="Clear Debug Text" onclick='cleardbgtxt();' />
-                <br>
-                <div id="dbgtxt" style='height:400px;max-height: 400px;overflow-y:scroll;'></div>
-            </div>
-            <!-- /.Debug tab content -->
-
-            <!-- Mail tab content -->
-            <div class="tab-pane" id="control-sidebar-videomail-tab">
-                <div class="form-group" style='height: 90vh; max-height:90vh; overflow-y:scroll;'>
-                    <label>Mailbox Messages</label>
-                    <button type="button" class="btn btn-default" onclick="getVideomailRecs();">
-                        <i id="refresh-icon" class="fa fa-refresh"></i>
-                    </button>
-                    <span id="videomail-filter-dropdown" class="dropdown dropdown-menu-left" style='float:right'>
-                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
-                            <!--span><i id="status-icon" class="call-btn-icon fa fa-envelope"></i></span-->&nbsp;&nbsp;&nbsp;
-                            <span id="videomail-filter">Filter Messages
-                                <span>
-                                    <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li onclick="filterVideomail('ALL');">
-                                <a href="#">
-                                    <span>All</span>
-                                </a>
-                            </li>
-                            <li onclick="filterVideomail('UNREAD');">
-                                <a href="#">
-                                    <span>Unread</span>
-                                </a>
-                            </li>
-                            <li onclick="filterVideomail('READ');">
-                                <a href="#">
-                                    <span>Read</span>
-                                </a>
-                            </li>
-                            <li onclick="filterVideomail('IN PROGRESS');">
-                                <a href="#">
-                                    <span>In Progress</span>
-                                </a>
-                            </li>
-                            <li onclick="filterVideomail('CLOSED');">
-                                <a href="#">
-                                    <span>Closed</span>
-                                </a>
-                            </li>
-                        </ul>
-                        </span>
-                        <table class="table table-hover" id="Videomail_Table">
-                            <thead>
-                                <tr>
-                                    <th id="vmail-vrs-number">Videophone No.
-                                        <i id="video-id-sort" class="fa fa-sort"> </i>
-                                    </th>
-                                    <th id="vmail-date">Date
-                                        <i id="video-id-sort" class="fa fa-sort"> </i>
-                                    </th>
-                                    <th id="vmail-duration">Duration (sec)
-                                        <i id="video-id-sort" class="fa fa-sort"> </i>
-                                    </th>
-                                    <th id="vmail-status">Status
-                                        <i id="video-id-sort" class="fa fa-sort"> </i>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody id='videomailTbody'>
-                            </tbody>
-                        </table>
-                </div>
-            </div>
-            <!-- /.Mail tab content -->
+            </section>
+            <!-- /.content -->
         </div>
-        <!-- /.Tab panes -->
-    </aside>
-    <!-- /.control-sidebar -->
-    <!-- Add the sidebar's background. This div must be placed immediately after the control sidebar -->
-    <div class="control-sidebar-bg" style="width:400px; right:-400px"></div>
+        <!-- /.content-wrapper -->
+
+        <% include ../partials/acedirect_footer %>
+
+            <!-- Control Sidebar -->
+            <aside id="ctrl-sidebar" class="control-sidebar control-sidebar-dark" style="width: 500px; right:-500px">
+                <!-- Create the tabs -->
+                <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
+                    <li id="agents-tab" class="active">
+                        <a href="#control-sidebar-agents-tab" data-toggle="tab">
+                            <i class="fa fa-users"></i>&nbsp;&nbsp;Agents</a>
+                    </li>
+                    <li id="videomail-tab">
+                        <a href="#control-sidebar-videomail-tab" data-toggle="tab">
+                            <i class="fa fa-envelope-o"></i>&nbsp;&nbsp;Video Mail</a>
+                    </li>
+                    <li id="debugtab">
+                        <a href="#control-sidebar-debug-tab" data-toggle="tab">
+                            <i class="fa fa-bug"></i>
+                        </a>
+                    </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <!-- Agent Status tab content -->
+                    <div class="tab-pane active" id="control-sidebar-agents-tab">
+                        <div class="form-group">
+                            <table id='agenttable' class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Status&nbsp;&nbsp;&nbsp;</th>
+                                        <th>Agent</th>
+                                        <th>Ext</th>
+                                        <th>Queues</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- /.Agent Status tab content -->
+
+                    <!-- Debug tab content -->
+                    <div class="tab-pane" id="control-sidebar-debug-tab">
+                        <input type="button" class="btn btn-danger" id="btndbgclear" value="Clear Debug Text" onclick='cleardbgtxt();' />
+                        <br>
+                        <div id="dbgtxt" style='height:400px;max-height: 400px;overflow-y:scroll;'></div>
+                    </div>
+                    <!-- /.Debug tab content -->
+
+                    <!-- Mail tab content -->
+                    <div class="tab-pane" id="control-sidebar-videomail-tab">
+                        <div class="form-group" style='height: 90vh; max-height:90vh; overflow-y:scroll;'>
+                            <label>Mailbox Messages</label>
+                            <button type="button" class="btn btn-default" onclick="getVideomailRecs();">
+                                <i id="refresh-icon" class="fa fa-refresh"></i>
+                            </button>
+                            <span id="videomail-filter-dropdown" class="dropdown dropdown-menu-left" style='float:right'>
+                                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                    <!--span><i id="status-icon" class="call-btn-icon fa fa-envelope"></i></span-->&nbsp;&nbsp;&nbsp;
+                                    <span id="videomail-filter">Filter Messages
+                                        <span>
+                                            <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li onclick="filterVideomail('ALL');">
+                                        <a href="#">
+                                            <span>All</span>
+                                        </a>
+                                    </li>
+                                    <li onclick="filterVideomail('UNREAD');">
+                                        <a href="#">
+                                            <span>Unread</span>
+                                        </a>
+                                    </li>
+                                    <li onclick="filterVideomail('READ');">
+                                        <a href="#">
+                                            <span>Read</span>
+                                        </a>
+                                    </li>
+                                    <li onclick="filterVideomail('IN PROGRESS');">
+                                        <a href="#">
+                                            <span>In Progress</span>
+                                        </a>
+                                    </li>
+                                    <li onclick="filterVideomail('CLOSED');">
+                                        <a href="#">
+                                            <span>Closed</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                </span>
+                                <table class="table table-hover" id="Videomail_Table">
+                                    <thead>
+                                        <tr>
+                                            <th id="vmail-vrs-number">Videophone No.
+                                                <i id="video-id-sort" class="fa fa-sort"> </i>
+                                            </th>
+                                            <th id="vmail-date">Date
+                                                <i id="video-id-sort" class="fa fa-sort"> </i>
+                                            </th>
+                                            <th id="vmail-duration">Duration (sec)
+                                                <i id="video-id-sort" class="fa fa-sort"> </i>
+                                            </th>
+                                            <th id="vmail-status">Status
+                                                <i id="video-id-sort" class="fa fa-sort"> </i>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id='videomailTbody'>
+                                    </tbody>
+                                </table>
+                        </div>
+                    </div>
+                    <!-- /.Mail tab content -->
+                </div>
+                <!-- /.Tab panes -->
+            </aside>
+            <!-- /.control-sidebar -->
+            <!-- Add the sidebar's background. This div must be placed immediately after the control sidebar -->
+            <div class="control-sidebar-bg" style="width:400px; right:-400px"></div>
 
     </div>
     <!-- ./wrapper -->
@@ -449,77 +465,77 @@
             </div>
         </div>
 
-		<!-- Dialpad Modal -->
-		<div class="modal fade" id="modalDialpad">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h4 class="modal-title">Dialpad</h4>
-					</div>
-					<div class="modal-body">
-						<div id="callCard" class="card">
-							<div class="container-fluid ">
+        <!-- Dialpad Modal -->
+        <div class="modal fade" id="modalDialpad">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Dialpad</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="callCard" class="card">
+                            <div class="container-fluid ">
 
-								<div id="call-controls">
+                                <div id="call-controls">
 
-									<div id="button_menu_panel" class="center bottomspace" style="display: none">
-										<button class="button_menu" id="dial">
-											<img class="button-icon" src="images/dial.png">
-										</button>
-									</div>
-									
-									<div class="phone" id="keypad">
-										<div class="input-group">
-												<input id="phone-number" type="text" class="form-control input-lg" placeholder="Enter a phone #" />
-												<span class="input-group-addon">
-													<img id="phone-number-delete-btn" src="images/backspace.png" height=25 />
-												</span>
-										</div>
-										<div>
-											<div class="num-pad">
-												<% var key=[ 1, 2, 3 , 4 ,5 ,6, 7, 8, 9, "*", 0, "#"]; var label=[ "", "ABC", "DEF", "GHI", "JKL", "MNO", "PQRS", "TUV", "WXYZ", "", "", "" ] ; if (key.length === label.length) label.forEach( (x,i)=>{ %>
-													<div class="span4">
-															<div class="txt keypad-button">
-																<div class="big">
-																	<%=key[i] %>
-																</div>
-																<div class="small">
-																	<%= label[i] %>
-																</div>
-															</div>
-													</div>
-													<% }); else {%>
-														<div>INTERNAL ERROR: mismatched arrays</div>
-														<% } %>
-															<div class="clearfix"></div>
-															<div class="row">
-																<div class="col-md-12">
-																	<div></div>
-																</div>
-															</div>
-											</div>
-											<div id="log"></div>
-										</div>
-									</div>
+                                    <div id="button_menu_panel" class="center bottomspace" style="display: none">
+                                        <button class="button_menu" id="dial">
+                                            <img class="button-icon" src="images/dial.png">
+                                        </button>
+                                    </div>
 
-									<div class="center">
-										<button id="button-call">
-											<img class="button-icon" src="images/call.png">
-										</button>
-									</div>
-								</div>
+                                    <div class="phone" id="keypad">
+                                        <div class="input-group">
+                                            <input id="phone-number" type="text" class="form-control input-lg" placeholder="Enter a phone #" />
+                                            <span class="input-group-addon">
+                                                <img id="phone-number-delete-btn" src="images/backspace.png" height=25 />
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <div class="num-pad">
+                                                <% var key=[ 1, 2, 3 , 4 ,5 ,6, 7, 8, 9, "*", 0, "#"]; var label=[ "", "ABC", "DEF", "GHI", "JKL", "MNO", "PQRS", "TUV", "WXYZ", "", "", "" ] ; if (key.length === label.length) label.forEach( (x,i)=>{ %>
+                                                    <div class="span4">
+                                                        <div class="txt keypad-button">
+                                                            <div class="big">
+                                                                <%=key[i] %>
+                                                            </div>
+                                                            <div class="small">
+                                                                <%= label[i] %>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <% }); else {%>
+                                                        <div>INTERNAL ERROR: mismatched arrays</div>
+                                                        <% } %>
+                                                            <div class="clearfix"></div>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div></div>
+                                                                </div>
+                                                            </div>
+                                            </div>
+                                            <div id="log"></div>
+                                        </div>
+                                    </div>
 
-							</div>
-						</div>
-					</div>
-					<div class="modal-footer">
+                                    <div class="center">
+                                        <button id="button-call">
+                                            <img class="button-icon" src="images/call.png">
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     </div>
-				</div>
-				<!-- /.modal-content -->
-			</div>
-			<!-- /.modal-dialog -->
-		</div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
         <!-- Videomail Retrieval Error Modal -->
         <div id="videomailErrorModal" class="modal fade">
             <div class="modal-dialog">
@@ -570,12 +586,12 @@
         <!-- Videomail hidden data -->
         <div hidden>
             <div id="videomailId"> </div>
-			<div id="callbacknum"> </div>
+            <div id="callbacknum"> </div>
         </div>
 
         <div id="snackbar">Default Text</div>
 
-        <!-- ==================Le javascript ================================ -->
+        <!-- ================== javascript ================================ -->
         <!-- jQuery v2.1.4 -->
         <script src="./bower_components/AdminLTE/plugins/jQuery/jquery-2.2.3.min.js"></script>
         <!-- jQuery UI - v1.11.4 -->
@@ -595,9 +611,6 @@
         <script src="./bower_components/AdminLTE/dist/js/app.min.js"></script>
         <!-- DataTables 1.10.12 -->
         <script type="text/javascript" src="./bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-        <!-- Custom Javascript for ACEDirect index.html page-->
-        <script type="text/javascript" src="./js/busylight.js"></script>
-        <script type="text/javascript" src="./js/acedirect.js"></script>
         <!-- JSSIP-->
         <script type="text/javascript" src="./bower_components/jssip/dist/jssip.min.js"></script>
         <script>
@@ -608,52 +621,9 @@
         <script src="./bower_components/lodash/dist/lodash.min.js"></script>
         <script src="./bower_components/gridstack/dist/gridstack.min.js"></script>
         <script src="./bower_components/gridstack/dist/gridstack.jQueryUI.min.js"></script>
-
-        <script>
-            var options = {
-                cellHeight: 80,
-                verticalMargin: 10
-            };
-            var grid = $('.grid-stack').gridstack(options);
-
-            var serializedGridData = [];
-            var loadingGridLayout = false;
-
-            function saveGridLayout() {
-                serializedGridData = _.map($('.grid-stack > .grid-stack-item:visible'), function (el) {
-                    el = $(el);
-                    var node = el.data('_gridstack_node');
-                    return {
-                        id: el[0].id,
-                        visible: el[0].visible,
-                        x: node.x,
-                        y: node.y,
-                        width: node.width,
-                        height: node.height
-                    };
-                });
-                console.log(JSON.stringify(serializedGridData));
-            };
-
-            function loadGridLayout(layout) {
-                loadingGridLayout = true;
-                var grid = $('.grid-stack').data('gridstack');
-                grid.batchUpdate();
-
-                layout.forEach(function (el) {
-                    grid.update($('#' + el.id), el.x, el.y, el.width, el.height)
-                });
-
-                grid.commit();
-                loadingGridLayout = false;
-            }
-
-            $('.grid-stack').on('change', function (event, items) {
-                if (!loadingGridLayout) {
-                    saveGridLayout();
-                }
-            });
-        </script>
+        <!-- Custom Javascript for ACEDirect index.html page-->
+        <script type="text/javascript" src="./js/busylight.js"></script>
+        <script type="text/javascript" src="./js/acedirect.js"></script>
 </body>
 
 </html>

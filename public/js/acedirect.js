@@ -113,10 +113,10 @@ function connect_socket() {
 					$('#agentname-header').html(payload.first_name + " " + payload.last_name);
 					$('#agentname-headerdropdown').html(payload.first_name + " " + payload.last_name);
 					$('#agentrole-headerdropdown').html("<small>" + payload.role + "</small>");
-					$('#ws_servers').attr("name","wss://" + payload.asteriskPublicHostname + ":" + payload.wsPort +"/ws");
-					$('#my_sip_uri').attr("name","sip:"+payload.extension+"@"+payload.asteriskPublicHostname);
-					$('#sip_password').attr("name",payload.extensionPassword);
-					$("#pc_config").attr("name","stun:" + payload.stunServer );
+					$('#ws_servers').attr("name", "wss://" + payload.asteriskPublicHostname + ":" + payload.wsPort + "/ws");
+					$('#my_sip_uri').attr("name", "sip:" + payload.extension + "@" + payload.asteriskPublicHostname);
+					$('#sip_password').attr("name", payload.extensionPassword);
+					$("#pc_config").attr("name", "stun:" + payload.stunServer);
 
 					if (payload.queue_name === "ComplaintsQueue" || payload.queue2_name === "ComplaintsQueue") {
 						$('#sidebar-complaints').show();
@@ -125,7 +125,7 @@ function connect_socket() {
 						$('#sidebar-geninfo').show();
 					}
 
-					if(payload.layout){
+					if (payload.layout) {
 						//call loadGridLayout(payload.layout)
 					}
 
@@ -141,17 +141,18 @@ function connect_socket() {
 					channelMe = payload.channel; //e.g. SIP/7001
 					register_jssip();
 					pauseQueues();
-					socket.emit('get-videomail',{
+					socket.emit('get-videomail', {
 						"extension": extensionMe,
 						"sortBy": "id desc",
 						"filter": "ALL"
 					});
-					setInterval(function(){
-						socket.emit('get-videomail',{
-						"extension": extensionMe,
-						"sortBy": sortFlag,
-						"filter": filter
-					}); }, 5000);
+					setInterval(function () {
+						socket.emit('get-videomail', {
+							"extension": extensionMe,
+							"sortBy": sortFlag,
+							"filter": filter
+						});
+					}, 5000);
 					toggle_videomail_buttons(false);
 					console.log('Sent a get-videomail event');
 				}).on('disconnect', function () {
@@ -215,7 +216,7 @@ function connect_socket() {
 					$('#modalWrapup').modal({
 						backdrop: 'static',
 						keyboard: false
-					  });
+					});
 				}).on('chat-message-new', function (data) {
 					debugtxt('chat-message-new', data);
 					var msg = data.message;
@@ -399,20 +400,19 @@ function connect_socket() {
 					debugtxt('lightcode-configs', data);
 					updateColors(data);
 					busylight.updateConfigs(data);
-				}).on('skinny-config', function(data){
-					if(data == "true"){
-						$("#scripts-and-details").attr("hidden",true);
-					}
-					else {
+				}).on('skinny-config', function (data) {
+					if (data == "true") {
+						$("#scripts-and-details").attr("hidden", true);
+					} else {
 						$("#scripts-and-details").removeAttr("hidden");
 					}
-				}).on('got-videomail-recs',function(data){
+				}).on('got-videomail-recs', function (data) {
 					updateVideomailTable(data);
-				}).on('got-unread-count',function(data){
+				}).on('got-unread-count', function (data) {
 					updateVideomailNotification(data);
-				}).on('changed-status',function(){
+				}).on('changed-status', function () {
 					getVideomailRecs();
-				}).on('videomail-retrieval-error',function(data){
+				}).on('videomail-retrieval-error', function (data) {
 					$('#videomailErrorBody').html('Unable to locate videomail with ID ' + data + '.');
 					$('#videomailErrorModal').modal('show');
 					stopVideomail();
@@ -598,7 +598,7 @@ function modifyTicket() {
 }
 
 function inCallADComplaints() {
-		socket.emit('pause-queues', null);
+	socket.emit('pause-queues', null);
 	$('#myRingingModalPhoneNumber').html('');
 	$('#myRingingModal').modal('hide');
 	$('#user-status').text('In Call');
@@ -639,10 +639,10 @@ function unpauseQueues() {
 function finished(i) {
 	$('#destexten').val('');
 	clearScreen();
-    if (i == 1)
-	    unpauseQueues();
-    else
-      pauseQueues();
+	if (i == 1)
+		unpauseQueues();
+	else
+		pauseQueues();
 	$('#alertPlaceholder').html('');
 }
 
@@ -662,7 +662,7 @@ function clearScreen() {
 	$('#duration').timer('pause');
 
 	$('#chat-messages').html('');
-  $('#rtt-typing').html('');
+	$('#rtt-typing').html('');
 	$('#newchatmessage').val('');
 
 	$('#ticketForm').find('input:text').val('');
@@ -727,7 +727,7 @@ function updateColors(data) {
 	$("#wrapup-color").removeClass(function (index, className) {
 		return (className.match(/\btext-\S+/g) || []).join(' ');
 	});
-	
+
 	//get new colors from json config file, save to local variables
 	for (var status in data) {
 		if (data[status].color.toLowerCase() == "off") {
@@ -767,8 +767,8 @@ function updateColors(data) {
 
 	//add new text-colors to away and ready icons
 	if (away_blinking) {
-		$('#away-icon').addClass("text-" + away_color + "-blinking"); 
-		if (!($("#away-icon").hasClass("status-margin"))) $('#away-icon').addClass("status-margin"); 
+		$('#away-icon').addClass("text-" + away_color + "-blinking");
+		if (!($("#away-icon").hasClass("status-margin"))) $('#away-icon').addClass("status-margin");
 		$("#away-icon").removeClass("fa");
 		$("#away-icon").removeClass("fa-circle");
 	} else {
@@ -789,11 +789,11 @@ function updateColors(data) {
 		$("#ready-icon").removeClass("status-margin");
 	}
 	//add colors to wrapup model
-	if(wrap_up_color == "white") $('#wrapup-color').addClass("text-gray");
+	if (wrap_up_color == "white") $('#wrapup-color').addClass("text-gray");
 	else $('#wrapup-color').addClass("text-" + wrap_up_color);
-	if(away_color == "white") $('#away-color').addClass("text-gray");
+	if (away_color == "white") $('#away-color').addClass("text-gray");
 	else $('#away-color').addClass("text-" + away_color);
-	if(ready_color == "white") $('#ready-color').addClass("text-gray");
+	if (ready_color == "white") $('#ready-color').addClass("text-gray");
 	else $('#ready-color').addClass("text-" + ready_color);
 	$('#away-btn').addClass("btn-" + away_color);
 	$('#ready-btn').addClass("btn-" + ready_color);
@@ -879,8 +879,8 @@ testLightConnection();
 //####################################################################
 //Videomail functionality: mostly sending socket.io events to adserver
 
-function getVideomailRecs(){
-	socket.emit('get-videomail',{
+function getVideomailRecs() {
+	socket.emit('get-videomail', {
 		"extension": extensionMe,
 		"sortBy": sortFlag,
 		"filter": filter
@@ -890,89 +890,89 @@ function getVideomailRecs(){
 
 //Play selected videomail when a row of the table is clicked
 $('#Videomail_Table tbody').on('click', 'tr', function () {
-    var tableData = $(this).children("td").map(function() {
-        return $(this).text();
-    }).get();
+	var tableData = $(this).children("td").map(function () {
+		return $(this).text();
+	}).get();
 
-    console.log('Click event for playing video');
-    console.log('vidId: ' + tableData[5] );
-    $("#videomailId").attr("name",tableData[5]);
-	$("#callbacknum").attr("name",tableData[0]);
-    playVideomail(tableData[5], tableData[2], tableData[3]);//vidId, vidDuration vidStatus);
+	console.log('Click event for playing video');
+	console.log('vidId: ' + tableData[5]);
+	$("#videomailId").attr("name", tableData[5]);
+	$("#callbacknum").attr("name", tableData[0]);
+	playVideomail(tableData[5], tableData[2], tableData[3]); //vidId, vidDuration vidStatus);
 });
 
 //Sorting the videomail table
-$('#vmail-vrs-number').on('click',function(){
+$('#vmail-vrs-number').on('click', function () {
 	var sort = sortButtonToggle($(this).children("i"));
 	if (sort == "asc") {
 		sortFlag = "callbacknumber asc";
 	} else if (sort == "desc") {
 		sortFlag = "callbacknumber desc";
 	}
-	socket.emit('get-videomail',{
+	socket.emit('get-videomail', {
 		"extension": extensionMe,
 		"sortBy": sortFlag,
 		"filter": filter
 	});
 });
 
-$('#vmail-date').on('click',function(){
+$('#vmail-date').on('click', function () {
 	var sort = sortButtonToggle($(this).children("i"));
 	if (sort == "asc") {
 		sortFlag = "unix_timestamp(received) asc";
 	} else if (sort == "desc") {
 		sortFlag = "unix_timestamp(received) desc";
 	}
-	socket.emit('get-videomail',{
+	socket.emit('get-videomail', {
 		"extension": extensionMe,
 		"sortBy": sortFlag,
 		"filter": filter
 	});
 });
 
-$('#vmail-duration').on('click',function(){
+$('#vmail-duration').on('click', function () {
 	var sort = sortButtonToggle($(this).children("i"));
-		if (sort == "asc") {
+	if (sort == "asc") {
 		sortFlag = "video_duration asc";
 	} else if (sort == "desc") {
 		sortFlag = "video_duration desc";
 	}
-	socket.emit('get-videomail',{
+	socket.emit('get-videomail', {
 		"extension": extensionMe,
 		"sortBy": sortFlag,
 		"filter": filter
 	});
 });
 
-$('#vmail-status').on('click',function(){
+$('#vmail-status').on('click', function () {
 	var sort = sortButtonToggle($(this).children("i"));
 	if (sort == "asc") {
 		sortFlag = "status asc";
 	} else if (sort == "desc") {
 		sortFlag = "status desc";
 	}
-	socket.emit('get-videomail',{
+	socket.emit('get-videomail', {
 		"extension": extensionMe,
 		"sortBy": sortFlag,
 		"filter": filter
 	});
 });
 
-function sortButtonToggle(buttonid){
-	if ($(buttonid).attr("class")=='fa fa-sort'){
+function sortButtonToggle(buttonid) {
+	if ($(buttonid).attr("class") == 'fa fa-sort') {
 		$(buttonid).addClass('fa-sort-asc').removeClass('fa-sort');
-		return("asc");
-	} else if ($(buttonid).attr("class")=='fa fa-sort-desc'){
+		return ("asc");
+	} else if ($(buttonid).attr("class") == 'fa fa-sort-desc') {
 		$(buttonid).addClass('fa-sort-asc').removeClass('fa-sort-desc');
-		return("asc");
-	} else if ($(buttonid).attr("class")=='fa fa-sort-asc'){
+		return ("asc");
+	} else if ($(buttonid).attr("class") == 'fa fa-sort-asc') {
 		$(buttonid).addClass('fa-sort-desc').removeClass('fa-sort-asc');
-		return("desc");
+		return ("desc");
 	}
 }
 
 //Update the records in the videomail table
-function updateVideomailTable(data){
+function updateVideomailTable(data) {
 	console.log("Refreshing videomail");
 	$("#videomailTbody").html("");
 	var table;
@@ -981,13 +981,13 @@ function updateVideomailTable(data){
 	var receivedCell;
 	var durationCell;
 	var statusCell;
-	for(var i=0; i<data.length; i++){
+	for (var i = 0; i < data.length; i++) {
 		var vidId = data[i].id;
 		var vidNumber = data[i].callbacknumber;
 		if (vidNumber) {
 			vidNumber = vidNumber.toString();
-			if (vidNumber[0] === '1') vidNumber = vidNumber.slice(1,vidNumber.length);
-			vidNumber = '('+ vidNumber.substring(0,3) + ') ' + vidNumber.substring(3,6) + '-' + vidNumber.substring(6,vidNumber.length);
+			if (vidNumber[0] === '1') vidNumber = vidNumber.slice(1, vidNumber.length);
+			vidNumber = '(' + vidNumber.substring(0, 3) + ') ' + vidNumber.substring(3, 6) + '-' + vidNumber.substring(6, vidNumber.length);
 		}
 		var vidReceived = data[i].received;
 		var vidDuration = data[i].video_duration;
@@ -1003,108 +1003,106 @@ function updateVideomailTable(data){
 		filepathCell = row.insertCell(4);
 		filepathCell.setAttribute('hidden', true);
 		idCell = row.insertCell(5);
-		idCell.setAttribute('hidden',true);
+		idCell.setAttribute('hidden', true);
 		filepathCell.innerHTML = vidFilepath + vidFilename;
 		idCell.innerHTML = vidId;
 		numberCell.innerHTML = vidNumber;
 		receivedCell.innerHTML = vidReceived;
 		durationCell.innerHTML = vidDuration;
 
-    if (vidStatus === 'UNREAD')
-      statusCell.innerHTML = '<span style="font-weight:bold">' + vidStatus+ '</span>';
-    else
-      statusCell.innerHTML = vidStatus;
+		if (vidStatus === 'UNREAD')
+			statusCell.innerHTML = '<span style="font-weight:bold">' + vidStatus + '</span>';
+		else
+			statusCell.innerHTML = vidStatus;
 	}
 }
 
 //Notification for unread videomail
-function updateVideomailNotification(data){
+function updateVideomailNotification(data) {
 	$("#unread-mail-count").html(data);
 	if (data === 0)
 		$("#unread-mail-count").html("");
 }
 
 //Filter videomail by status
-function filterVideomail(mailFilter){
+function filterVideomail(mailFilter) {
 	filter = mailFilter;
-	socket.emit('get-videomail',{
+	socket.emit('get-videomail', {
 		"extension": extensionMe,
 		"sortBy": sortFlag,
 		"filter": filter
 	});
 }
 
-function processFilter(filter){
-	if (filter == 'ALL'){
-		return('');
-	} else{
-		return('AND status = ' + filter);
+function processFilter(filter) {
+	if (filter == 'ALL') {
+		return ('');
+	} else {
+		return ('AND status = ' + filter);
 	}
 }
 
 //Show videomail sidebar tab
 function showVideoMailTab() {
-	if ($('#agents-tab').hasClass('active')){
-		if (document.getElementById("ctrl-sidebar").hasAttribute('control-sidebar-open')){
+	if ($('#agents-tab').hasClass('active')) {
+		if (document.getElementById("ctrl-sidebar").hasAttribute('control-sidebar-open')) {
 			$('.nav-tabs a[href="#control-sidebar-agents-tab"]').removeClass('active');
 		}
 	}
-    $('.nav-tabs a[href="#control-sidebar-videomail-tab"]').tab('show');
+	$('.nav-tabs a[href="#control-sidebar-videomail-tab"]').tab('show');
 	$('.nav-tabs a[href="#control-sidebar-videomail-tab"]').addClass('active');
 }
 
 //Show agent info sidebar tab
 function showAgentsTab() {
-	if ($('#videomail-tab').hasClass('active')){
-		if (document.getElementById("ctrl-sidebar").hasAttribute('control-sidebar-open')){
+	if ($('#videomail-tab').hasClass('active')) {
+		if (document.getElementById("ctrl-sidebar").hasAttribute('control-sidebar-open')) {
 			$('.nav-tabs a[href="#control-sidebar-agents-tab"]').removeClass('active');
 		}
 	}
-    $('.nav-tabs a[href="#control-sidebar-agents-tab"]').tab('show');
+	$('.nav-tabs a[href="#control-sidebar-agents-tab"]').tab('show');
 	$('.nav-tabs a[href="#control-sidebar-agents-tab"]').addClass('active');
 }
 
 //Play the selected videomail
-function playVideomail(id, duration, vidStatus){
+function playVideomail(id, duration, vidStatus) {
 	console.log('Playing video mail with id ' + id);
 	remoteView.removeAttribute("autoplay");
 	remoteView.removeAttribute("poster");
-	remoteView.setAttribute("src",'./getVideomail?id='+id+'&ext='+extensionMe);
+	remoteView.setAttribute("src", './getVideomail?id=' + id + '&ext=' + extensionMe);
 	remoteView.setAttribute("onended", "change_play_button()");
 	toggle_videomail_buttons(true);
-	updateVideoTime(duration,"vmail-total-time");
-	if (vidStatus === "UNREAD"){
+	updateVideoTime(duration, "vmail-total-time");
+	if (vidStatus === "UNREAD") {
 		videomail_read_onclick(id);
 	}
 }
 
 //Update the time progress in the videomail seekbar
-function updateVideoTime(time,elementId){
-  var minutes = Math.floor(time / 60);
+function updateVideoTime(time, elementId) {
+	var minutes = Math.floor(time / 60);
 	var seconds = Math.round(time - minutes * 60);
 	var timeStr = "";
-  if (seconds < 10){
-	  timeStr = minutes.toString() + ":0" + seconds.toString();
-  }
-  else if (seconds === 60){
-	  timeStr = (minutes+1).toString() + ":00";
-  }
-  else {
-	  timeStr = minutes.toString() + ":" + seconds.toString();
-  }
-  document.getElementById(elementId).innerHTML = timeStr;
+	if (seconds < 10) {
+		timeStr = minutes.toString() + ":0" + seconds.toString();
+	} else if (seconds === 60) {
+		timeStr = (minutes + 1).toString() + ":00";
+	} else {
+		timeStr = minutes.toString() + ":" + seconds.toString();
+	}
+	document.getElementById(elementId).innerHTML = timeStr;
 }
 
 //Display the videomail control buttons
-function toggle_videomail_buttons(make_visible){
-	if(make_visible) videomail_status_buttons.style.display = "block";
+function toggle_videomail_buttons(make_visible) {
+	if (make_visible) videomail_status_buttons.style.display = "block";
 	else videomail_status_buttons.style.display = "none";
 }
 
 //Exit videomail view and return to call view
-function stopVideomail(){
+function stopVideomail() {
 	console.log("Videomail view has been stopped, back to call view");
-	remoteView.setAttribute("src","");
+	remoteView.setAttribute("src", "");
 	remoteView.removeAttribute("src");
 	remoteView.removeAttribute("onended");
 	remoteView.setAttribute("autoplay", "autoplay");
@@ -1113,7 +1111,7 @@ function stopVideomail(){
 }
 
 //Callback for videomail
-function videomailCallback(callbacknum){
+function videomailCallback(callbacknum) {
 	stopVideomail();
 	var videophoneNumber = callbacknum.match(/\d/g);
 	videophoneNumber = videophoneNumber.join('');
@@ -1127,7 +1125,7 @@ function videomailCallback(callbacknum){
 }
 
 //Socket emit for changing status of a videomail
-function videomail_status_change(id, videoStatus){
+function videomail_status_change(id, videoStatus) {
 	socket.emit('videomail-status-change', {
 		"id": id,
 		"extension": extensionMe,
@@ -1137,7 +1135,7 @@ function videomail_status_change(id, videoStatus){
 }
 
 //Marks the videomail read when the agent clicks it and doesn't close the videomail view
-function videomail_read_onclick(id){
+function videomail_read_onclick(id) {
 	socket.emit('videomail-read-onclick', {
 		"id": id,
 		"extension": extensionMe
@@ -1146,7 +1144,7 @@ function videomail_read_onclick(id){
 }
 
 //Socket emit for deleting a videomail
-function videomail_deleted(id){
+function videomail_deleted(id) {
 	socket.emit('videomail-deleted', {
 		"id": id,
 		"extension": extensionMe
@@ -1155,99 +1153,102 @@ function videomail_deleted(id){
 }
 
 //Videomail play button functionality
-function play_video(){
+function play_video() {
 	console.log('video paused: ' + remoteView.paused);
-  if (remoteView.paused == true) { // play the video
-    remoteView.play();
-	document.getElementById("play-video-icon").classList.remove("fa-play");
-    document.getElementById("play-video-icon").classList.add("fa-pause");
-  } else { // pause the video
-    remoteView.pause();
-	document.getElementById("play-video-icon").classList.add("fa-play");
-    document.getElementById("play-video-icon").classList.remove("fa-pause");
-  }
+	if (remoteView.paused == true) { // play the video
+		remoteView.play();
+		document.getElementById("play-video-icon").classList.remove("fa-play");
+		document.getElementById("play-video-icon").classList.add("fa-pause");
+	} else { // pause the video
+		remoteView.pause();
+		document.getElementById("play-video-icon").classList.add("fa-play");
+		document.getElementById("play-video-icon").classList.remove("fa-pause");
+	}
 }
 
-function change_play_button(){
+function change_play_button() {
 	console.log("Video ended");
 	document.getElementById("play-video-icon").classList.add("fa-play");
-    document.getElementById("play-video-icon").classList.remove("fa-pause");
+	document.getElementById("play-video-icon").classList.remove("fa-pause");
 }
 
 //Seekbar functionality
 var seekBar = document.getElementById("seek-bar");
 // Event listener for the seek bar
-seekBar.addEventListener("change", function() {
-  // Calculate the new time
-  var time = remoteView.duration * (seekBar.value / 100);
+seekBar.addEventListener("change", function () {
+	// Calculate the new time
+	var time = remoteView.duration * (seekBar.value / 100);
 
-  // Update the video time
-  remoteView.currentTime = time;
+	// Update the video time
+	remoteView.currentTime = time;
 });
 
 // Update the seek bar as the video plays
 
-remoteView.addEventListener("timeupdate", function() {
-  // Calculate the slider value
-  var value = (100 / remoteView.duration) * remoteView.currentTime;
+remoteView.addEventListener("timeupdate", function () {
+	// Calculate the slider value
+	var value = (100 / remoteView.duration) * remoteView.currentTime;
 
-  // Update the slider value
-  seekBar.value = value;
+	// Update the slider value
+	seekBar.value = value;
 
-  //update the current time info
-  updateVideoTime(remoteView.currentTime, "vmail-current-time");
+	//update the current time info
+	updateVideoTime(remoteView.currentTime, "vmail-current-time");
 });
 
 // Event listener for the full-screen button
 function enterFullscreen() {
-  if (remoteView.requestFullscreen) {
-    remoteView.requestFullscreen();
-  } else if (remoteView.mozRequestFullScreen) {
-    remoteView.mozRequestFullScreen(); // Firefox
-  } else if (remoteView.webkitRequestFullscreen) {
-    remoteView.webkitRequestFullscreen(); // Chrome and Safari
-  }
+	if (remoteView.requestFullscreen) {
+		remoteView.requestFullscreen();
+	} else if (remoteView.mozRequestFullScreen) {
+		remoteView.mozRequestFullScreen(); // Firefox
+	} else if (remoteView.webkitRequestFullscreen) {
+		remoteView.webkitRequestFullscreen(); // Chrome and Safari
+	}
 }
-function showDialpad(){
+
+function showDialpad() {
 	$('#modalDialpad').modal({
 		backdrop: 'static',
 		keyboard: false
 	});
 }
 
-$("#sidebar-dialpad .dropdown-menu").click(function(e){
+$("#sidebar-dialpad .dropdown-menu").click(function (e) {
 	e.stopPropagation();
 });
-$("#accept-btn").click(function(){
+$("#accept-btn").click(function () {
 	$('#myRingingModalPhoneNumber').html('');
 	$('#myRingingModal').modal('hide');
-	$("#hide-video-icon").css("display","none");
+	$("#hide-video-icon").css("display", "none");
 });
 
-$("#decline-btn").click(function(){
+$("#decline-btn").click(function () {
 	$('#myRingingModalPhoneNumber').html('');
 	$('#myRingingModal').modal('hide');
 });
 
 //Dialpad functionality
-$(".keypad-button").click(function(e){
+$(".keypad-button").click(function (e) {
 	var etemp = $(e.currentTarget);
 	etemp.css("background-color", "Gray");
-	setTimeout(() => {etemp.css("background-color", "White")}, 500);
+	setTimeout(() => {
+		etemp.css("background-color", "White")
+	}, 500);
 	var el = etemp.find('.big');
-    var text = el.text().trim();
+	var text = el.text().trim();
 	telNumber = $('#phone-number');
 	$(telNumber).val(telNumber.val() + text);
 });
 
-$('#phone-number-delete-btn').click(function(e){
+$('#phone-number-delete-btn').click(function (e) {
 	$('#phone-number').val(
 		function (index, value) {
 			return value.substr(0, value.length - 1);
 		})
 });
 
-$("#button-call").click(function(){
+$("#button-call").click(function () {
 	$('#modalDialpad').modal('hide');
 	telNumber = $('#phone-number');
 	start_call($(telNumber).val());
@@ -1261,12 +1262,56 @@ $("#button-call").click(function(){
 	$('#outboundCallAlert').show();
 });
 
-function enable_chat_buttons(){
-	$("#newchatmessage").removeAttr("disabled");  
-	$("#chat-send").removeAttr("disabled");  
+function enable_chat_buttons() {
+	$("#newchatmessage").removeAttr("disabled");
+	$("#chat-send").removeAttr("disabled");
 }
 
-function disable_chat_buttons(){
-	$("#newchatmessage").attr("disabled","disabled");  
-	$("#chat-send").attr("disabled","disabled");  
+function disable_chat_buttons() {
+	$("#newchatmessage").attr("disabled", "disabled");
+	$("#chat-send").attr("disabled", "disabled");
 }
+
+var options = {
+	cellHeight: 80,
+	verticalMargin: 10
+};
+var grid = $('.grid-stack').gridstack(options);
+
+var serializedGridData = [];
+var loadingGridLayout = false;
+
+function saveGridLayout() {
+	serializedGridData = _.map($('.grid-stack > .grid-stack-item:visible'), function (el) {
+		el = $(el);
+		var node = el.data('_gridstack_node');
+		return {
+			id: el[0].id,
+			visible: el[0].visible,
+			x: node.x,
+			y: node.y,
+			width: node.width,
+			height: node.height
+		};
+	});
+	console.log(JSON.stringify(serializedGridData));
+};
+
+function loadGridLayout(layout) {
+	loadingGridLayout = true;
+	var grid = $('.grid-stack').data('gridstack');
+	grid.batchUpdate();
+
+	layout.forEach(function (el) {
+		grid.update($('#' + el.id), el.x, el.y, el.width, el.height)
+	});
+
+	grid.commit();
+	loadingGridLayout = false;
+}
+
+$('.grid-stack').on('change', function (event, items) {
+	if (!loadingGridLayout) {
+		//saveGridLayout();
+	}
+});
