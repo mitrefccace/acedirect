@@ -9,7 +9,15 @@
      text-align: center;
      background-color: #2d8ece;
 }
+.btn-gray
+{
+   background-color: #DDDDDD;
+}
 
+.btn-gray:hover
+{
+   background-color: #C4C4C4;
+}
 
 
 
