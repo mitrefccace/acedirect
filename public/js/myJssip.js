@@ -217,6 +217,8 @@ function register_jssip()
 		currentSession.on('reinvite', function(e)
 		{
 			 if(debug) console.log('\nCURRENTSESSION -  REINVITE ');
+			$("#queueModal").modal("hide"); //reinvite is the only flag we get that the call is fully connected. so we have to hide the modal here.
+
 		});
 	  	currentSession.on('refer', function(e)
 		{
@@ -260,6 +262,7 @@ function register_jssip()
 			if(debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
 			remoteStream.srcObject = e.streams[0];
 			remoteStream.play();
+
 		};
 
 	});
