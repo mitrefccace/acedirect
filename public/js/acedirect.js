@@ -1318,7 +1318,7 @@ $('.grid-stack').on('change', function (event, items) {
 });
 
 function resizeVideo(){
-	var contentHeigh = $("#gsvideobox").height() - 100;
+	var contentHeigh = $("#gsvideobox").height() - 50;
 	$('#VideoBox').css("height", contentHeigh + "px");
 	$('#remoteView').css("height", contentHeigh-125 + "px");
 }
