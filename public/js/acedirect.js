@@ -1309,9 +1309,16 @@ function loadGridLayout(layout) {
 	grid.commit();
 	loadingGridLayout = false;
 }
-
+resizeVideo();
 $('.grid-stack').on('change', function (event, items) {
 	if (!loadingGridLayout) {
 		//saveGridLayout();
 	}
+	resizeVideo();
 });
+
+function resizeVideo(){
+	var contentHeigh = $("#gsvideobox").height() - 100;
+	$('#VideoBox').css("height", contentHeigh + "px");
+	$('#remoteView').css("height", contentHeigh-125 + "px");
+}
