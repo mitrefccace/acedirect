@@ -12,6 +12,7 @@
 .btn-gray
 {
    background-color: #DDDDDD;
+   width: 105px;
 }
 
 .btn-gray:hover
@@ -19,6 +20,9 @@
    background-color: #C4C4C4;
 }
 
-
+.margin{
+	margin-top:30px;
+	margin-bottom:5px;
+}
 
 

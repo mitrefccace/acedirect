@@ -233,6 +233,8 @@ $("#callbutton").click(function(){
   $('#vmsent').hide();
 	$("#callbutton").prop("disabled",true);
   $('#videomailbutton').prop("disabled", true);
+  $("#queueModal").modal({backdrop: "static"});
+  $("#queueModal").modal("show");
 	$("#dialboxcallbtn").click(); //may or may not be dead code
 	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
 	socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
@@ -326,4 +328,10 @@ function enable_chat_buttons(){
 function disable_chat_buttons(){
 	$("#newchatmessage").attr("disabled","disabled");  
 	$("#chat-send").attr("disabled","disabled");  
+}
+
+function exit_queue()
+{
+	$('#queueModal').modal('hide');
+	terminate_call();
 }

@@ -55,16 +55,17 @@
 				<div class="account-wall">
 					<form class="form-login" id="form-login">
 						<div class="alert alert-danger" id="message" hidden></div>
-						<label>Please Enter your Videophone Number: </label>
+						<div class = "row margin" style="margin-left: 0;">
+							<label>Please Enter your Videophone Number: </label>
+						</div>
 						<div id="input-group" class="input-group">
 							<div class="input-group-addon">
 								<i class="fa fa-phone"></i>
 							</div>
 							<input type="text" class="form-control input-lg" id="vrs_number" placeholder="Videophone Number" data-inputmask="'mask': '(999) 999-9999'" data-mask required>
 						</div>
-						<br>
 				</div>
-				<div align="center">
+				<div align="center" class = "margin">
 					<div class="row">
 						<button class = "btn btn-lg btn-gray" id = "backtostage" onclick="choosecontactmethod()"> Back </button>
 						<button class="btn btn-lg btn-primary" type="submit"> Continue </button>

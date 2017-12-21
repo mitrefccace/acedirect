@@ -279,7 +279,7 @@
 
 
 	<!--Call Ended Modal -->
-	<div class="modal fade" id="callEndedModal" tabindex="-1" role="dialog">
+	<div class="modal fade" id="callEndedModal" tabindex="-1" role="dialog" style="z-index: 2000;">
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-body" style="text-align: center">
@@ -329,6 +329,23 @@
           </div>			   
       </div>
   </div>  
+
+  <!--In-Queue Modal -->
+	<div class="modal fade" id="queueModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" style= "max-width: 400px;">
+			<div class="modal-content">
+				<div class = "modal-header" style= "padding-top: 0; padding-bottom:0;">
+					<h2>You are in the Queue</h2>
+				</div>
+				<div class="modal-body text-center">
+					<h4> Press the button below to exit. <h4>
+				</div>
+				<div style = "border-top: 1px solid #f4f4f4; padding: 10px;" class = "text-center">
+					<button  id="exit-queue" type = "button" class = "btn btn-danger btn-lg" style="width:100px;" onclick = "exit_queue()"> Cancel </button> 
+				</div>
+			</div>
+		</div>
+	</div>
   
 	<!-- phone-page -->
 
