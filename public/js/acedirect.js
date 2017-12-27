@@ -126,7 +126,7 @@ function connect_socket() {
 					}
 
 					if (payload.layout) {
-						//call loadGridLayout(payload.layout)
+						loadGridLayout(payload.layout)
 					}
 
 					socket.emit('register-client', {
@@ -1294,7 +1294,7 @@ function saveGridLayout() {
 			height: node.height
 		};
 	});
-	console.log(JSON.stringify(serializedGridData));
+	socket.emit('save-grid-layout', {'gridLayout':serializedGridData});
 };
 
 function loadGridLayout(layout) {
@@ -1312,7 +1312,7 @@ function loadGridLayout(layout) {
 resizeVideo();
 $('.grid-stack').on('change', function (event, items) {
 	if (!loadingGridLayout) {
-		//saveGridLayout();
+		saveGridLayout();
 	}
 	resizeVideo();
 });
