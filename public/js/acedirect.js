@@ -1295,7 +1295,7 @@ function saveGridLayout() {
 			height: node.height
 		};
 	});
-	sessionStorage.layout = serializedGridData;
+	sessionStorage.layout = JSON.stringify(serializedGridData);
 	socket.emit('save-grid-layout', {'gridLayout':serializedGridData});
 };
 
