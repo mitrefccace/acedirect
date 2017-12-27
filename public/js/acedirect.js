@@ -125,8 +125,9 @@ function connect_socket() {
 						$('#sidebar-geninfo').show();
 					}
 
-					if (payload.layout) {
-						loadGridLayout(JSON.parse(payload.layout));
+					if (payload.layout||sessionStorage.layout) {
+						var layout = typeof sessionStorage.layout !== "undefined" ? sessionStorage.layout : payload.layout;
+						loadGridLayout(JSON.parse(layout));
 					}
 
 					socket.emit('register-client', {
@@ -1294,10 +1295,12 @@ function saveGridLayout() {
 			height: node.height
 		};
 	});
+	sessionStorage.layout = serializedGridData;
 	socket.emit('save-grid-layout', {'gridLayout':serializedGridData});
 };
 
 function loadGridLayout(layout) {
+	sessionStorage.layout = layout; 
 	loadingGridLayout = true;
 	var grid = $('.grid-stack').data('gridstack');
 	grid.batchUpdate();
