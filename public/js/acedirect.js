@@ -126,7 +126,7 @@ function connect_socket() {
 					}
 
 					if (payload.layout) {
-						loadGridLayout(payload.layout)
+						loadGridLayout(JSON.parse(payload.layout));
 					}
 
 					socket.emit('register-client', {
