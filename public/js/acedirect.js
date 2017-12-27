@@ -1307,6 +1307,7 @@ function loadGridLayout(layout) {
 	});
 
 	grid.commit();
+	resizeVideo();
 	loadingGridLayout = false;
 }
 resizeVideo();
