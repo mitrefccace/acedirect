@@ -126,8 +126,8 @@ function connect_socket() {
 					}
 
 					if (payload.layout||sessionStorage.layout) {
-						var layout = typeof sessionStorage.layout !== "undefined" ? sessionStorage.layout : JSON.parse(payload.layout);
-						loadGridLayout(layout);
+						var layout = typeof sessionStorage.layout !== "undefined" ? sessionStorage.layout : payload.layout;
+						loadGridLayout(JSON.parse(layout));
 					}
 
 					socket.emit('register-client', {
@@ -1296,7 +1296,7 @@ function saveGridLayout() {
 		};
 	});
 
-	sessionStorage.layout = serializedGridData;
+	sessionStorage.layout = JSON.stringify(serializedGridData);
 	socket.emit('save-grid-layout', {'gridLayout':serializedGridData});
 };
 
