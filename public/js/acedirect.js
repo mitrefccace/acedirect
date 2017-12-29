@@ -126,8 +126,8 @@ function connect_socket() {
 					}
 
 					if (payload.layout||sessionStorage.layout) {
-						var layout = typeof sessionStorage.layout !== "undefined" ? sessionStorage.layout : payload.layout;
-						loadGridLayout(JSON.parse(layout));
+						var layout = typeof sessionStorage.layout !== "undefined" ? sessionStorage.layout : JSON.parse(payload.layout);
+						loadGridLayout(layout);
 					}
 
 					socket.emit('register-client', {
@@ -1295,9 +1295,12 @@ function saveGridLayout() {
 			height: node.height
 		};
 	});
-	sessionStorage.layout = JSON.stringify(serializedGridData);
+	sessionStorage.layout = serializedGridData;
 	socket.emit('save-grid-layout', {'gridLayout':serializedGridData});
 };
+
+//if(typeof sessionStorage.layout == 'object')
+//	loadGridLayout(sessionStorage.layout);
 
 function loadGridLayout(layout) {
 	sessionStorage.layout = layout; 
@@ -1314,15 +1317,23 @@ function loadGridLayout(layout) {
 	loadingGridLayout = false;
 }
 resizeVideo();
+resizeChat();
 $('.grid-stack').on('change', function (event, items) {
 	if (!loadingGridLayout) {
 		saveGridLayout();
 	}
 	resizeVideo();
+	resizeChat();
 });
 
 function resizeVideo(){
-	var contentHeigh = $("#gsvideobox").height() - 50;
-	$('#VideoBox').css("height", contentHeigh + "px");
-	$('#remoteView').css("height", contentHeigh-125 + "px");
+	var contentHeight = $("#gsvideobox").height() - 50;
+	$('#VideoBox').css("height", contentHeight + "px");
+	$('#remoteView').css("height", contentHeight-125 + "px");
+}
+
+function resizeChat(){
+	var contentHeight = $("#gschatbox").height();
+	$('#userchat').css("height", contentHeight-75 + "px");
+	$('#chat-messages').css("height", contentHeight-200 + "px");
 }
