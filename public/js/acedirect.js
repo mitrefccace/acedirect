@@ -1295,6 +1295,7 @@ function saveGridLayout() {
 			height: node.height
 		};
 	});
+
 	sessionStorage.layout = serializedGridData;
 	socket.emit('save-grid-layout', {'gridLayout':serializedGridData});
 };
@@ -1336,4 +1337,9 @@ function resizeChat(){
 	var contentHeight = $("#gschatbox").height();
 	$('#userchat').css("height", contentHeight-75 + "px");
 	$('#chat-messages').css("height", contentHeight-200 + "px");
+}
+
+function resetLayout(){
+	var defaultLayout = [{"id":"gsvideobox","x":0,"y":0,"width":8,"height":8},{"id":"gschatbox","x":8,"y":0,"width":4,"height":5}];
+	loadGridLayout(defaultLayout);
 }
