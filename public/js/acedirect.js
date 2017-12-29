@@ -1304,7 +1304,7 @@ function saveGridLayout() {
 //	loadGridLayout(sessionStorage.layout);
 
 function loadGridLayout(layout) {
-	sessionStorage.layout = layout; 
+	sessionStorage.layout = JSON.stringify(layout); 
 	loadingGridLayout = true;
 	var grid = $('.grid-stack').data('gridstack');
 	grid.batchUpdate();
