@@ -417,9 +417,21 @@ function connect_socket() {
 					$('#videomailErrorBody').html('Unable to locate videomail with ID ' + data + '.');
 					$('#videomailErrorModal').modal('show');
 					stopVideomail();
+				}).on('queue-caller-join',function(data){
+					if(data.queue == "ComplaintsQueue") {
+						$("#complaints-queue-num").text(data.count);
+					}
+					else if(data.queue == "GeneralQueue") {
+						$("#general-queue-num").text(data.count);
+					}
+				}).on('queue-caller-leave',function(data){
+					if(data.queue == "ComplaintsQueue") {
+						$("#complaints-queue-num").text(data.count);
+					}
+					else if(data.queue == "GeneralQueue") {
+						$("#general-queue-num").text(data.count);
+					}
 				});
-
-
 
 			} else {
 				//TODO: handle bad connections

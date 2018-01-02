@@ -934,3 +934,10 @@ div#call-controls button#button-hangup {
     font-family: 'Source Sans Pro', sans-serif;
     font-style: oblique;
 }
+
+.bg-md-gray
+{
+   background-color: #80898e; 
+   color: #1b2227;
+   margin-top: 3px;
+}
