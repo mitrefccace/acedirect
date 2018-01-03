@@ -289,6 +289,9 @@ function connect_socket() {
 					socket.emit('register-vrs', {
 						"vrs": data.data[0].vrs
 					});
+					var vrs = $('#callerPhone').val();
+					var agent_name = $("#agentname-sidebar").text();
+					socket.emit('send-name',{"agent_name": agent_name , "vrs": vrs});
 				}).on('missing-vrs', function (data) {
 					debugtxt('missing-vrs', data);
 					//show modal to get VRS from user

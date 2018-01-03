@@ -47,7 +47,7 @@ function startRecordProgress() {
       percentage = (seconds/maxRecordingSeconds)*100;
       $('#record-progress-bar').css('width', percentage.toFixed(0)+'%');
       $('#secsremain').html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + secremain+' seconds remaining');
-      $('#recordicon').css('visibility','visible');
+      $('#recordicon').show();
     }
   }
 }
@@ -56,7 +56,7 @@ function stopRecordProgress() {
   
   $('#record-progress-bar').hide();
   $('#secsremain').html('');  
-  $('#recordicon').css('visibility','hidden');
+  $('#recordicon').hide();
   $('#record-progress-bar').css('width', '0%');
   $('#record-progress-bar').hide();
   $('#callbutton').prop("disabled", true);    
@@ -155,6 +155,7 @@ function register_jssip()
 			toggle_incall_buttons(true);
 			enable_chat_buttons();
 			start_self_video();
+			$("#start-call-buttons").hide();
 			$('#outboundCallAlert').hide();					  
 		});
 	    currentSession.on('confirmed', function(e)
@@ -393,7 +394,10 @@ function terminate_call()
 	}
 	remove_video();
 	disable_chat_buttons();
-
+	enable_initial_buttons();
+	$("#start-call-buttons").show();
+	$("#agent-name-box").hide();
+	$("#agent-name").text("");
 	// if(ua) ua.stop(); 
 }
 
@@ -637,3 +641,12 @@ function edit_request(request)
 
 	return new_request;
 }
+
+//enables submit and videomail buttons on complaint form, and disables call button
+function enable_initial_buttons()
+{
+	$("#userformbtn").removeAttr("disabled");
+	$("#callbutton").attr("disabled","disabled");
+	$("#videomailbutton").removeAttr("disabled");
+}
+

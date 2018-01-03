@@ -205,6 +205,13 @@ function connect_socket() {
 				 		set_queue_text(--current_position);
 					 }
 					 abandoned_caller = true;
+				}).on("agent-name", function(data) {
+					if(data.agent_name != null || data.agent_name != "" || data.agent_name != undefined)
+					{
+						var firstname = data.agent_name.split(" ");
+						$("#agent-name").text(firstname[0]);
+						$("#agent-name-box").show();
+					}
 				}).on("chat-leave", function (error) {
           //clear chat
           $('#chatcounter').text('500');

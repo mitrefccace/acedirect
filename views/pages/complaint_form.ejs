@@ -128,7 +128,7 @@
 									</div>
 									<div class="row">
 										<div class="col-lg-12">
-											<div class="form-group">
+											<div style="margin-bottom: 5px;">
 												<label class="control-label">Description of Complaint</label>
 												<textarea class="form-control" id="complaint" rows="10" maxlength="2000" required></textarea>
 												<p>You have <span id="complaintcounter"></span> characters left.</p>
@@ -166,7 +166,7 @@
 									<video id="selfView" style="right: 10px;" autoplay muted="true" hidden></video>
 								</div>
 								     
-								<div id= "call-option-buttons">     
+								<div id= "call-option-buttons" style="margin-top: 10px;">     
 	                                <div id= "inner">     
 	                                    <button  id="mute-audio" type = "button" class = "btn btn-gray" onclick = "mute_audio()"> <i id= "mute-audio-icon" class="call-btn-icon fa fa-microphone"></i> </button> 
 	                                    <button  id="hide-video" type = "button" class = "btn btn-gray" onclick = "hide_video()"> <i class="call-btn-icon fa fa-video-camera"></i>  <div id= "hide-video-icon" class = "fa fa-close fa-close-style" style="display: none;"></div> <!-- hack for hide video button since there's no fa-icon for it. we overlay an x and hide and show it when needed--></button>
@@ -174,34 +174,36 @@
 	                                    <button id="end-call" type = "button" class = "btn btn-danger" onclick = "terminate_call()"> <i class="call-btn-icon fa fa-phone fa-rotate-135"></i> </button>   
 	                                </div>  
 	                            </div>   
+	                            <div class = "row">
+		                            <div class = "col-xs-12 text-center" id = "start-call-buttons" style="margin-top: 10px; margin-bottom: 10px;">
+					                	<button class="btn btn-primary" id="callbutton" style = "width: 80px;" type="button">
+											Call
+										</button>
+										<button class="btn btn-primary" id="videomailbutton" type="button">
+											Videomail
+										</button>    
+					                </div> 
+					            </div>
+				                <div class = "col-xs-12 text-center" id = "agent-name-box" style="margin-bottom: 5px; margin-top: 5px;" hidden>
+				                	<p> You are talking to <strong id = "agent-name"> </strong>.</p>
+				                </div>
+
+				              	<div id="recordicon" hidden>&nbsp;&nbsp;
+				              		<span id="recordicon" class="glyphicon glyphicon-facetime-video blink" style="color:#FF0000;" ></span>
+				              		<label class="blink" style="color:#FF0000;" >&nbsp;&nbsp;RECORDING</label>
+				                </div>
+				                <div id="secsremain" style="display:inline;"></div>
+				              
+				                <div class="alert alert-info" alert-dismissable id="vmwait" style="margin-top: 10px;" hidden>
+				                	<a class="close" onclick="$('#vmwait').hide();" style="text-decoration:none">×</a>
+				               		<strong>Videomail request sent.</strong> Please wait.
+				             	</div>                 
+				              
+				              	<div class="alert alert-success"  alert-dismissable id="vmsent" style="margin-top: 10px;"" hidden>
+				                	<a class="close" onclick="$('#vmsent').hide();" style="text-decoration:none">×</a>
+				                	<strong>Success!</strong> Videomail sent.
+				             	 </div>    
 							</div>
-
-              <div class="progress">
-                <div class="progress-bar progress-bar-danger progress-bar-striped" id="record-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="90" style="width:0%" hidden>
-                </div>
-              </div>
-
-              <div class = "col-xs-12 text-center">
-                	<button class="btn btn-primary" id="callbutton" type="button">
-						Call
-					</button>
-					<button class="btn btn-primary" id="videomailbutton" type="button">
-						Videomail
-					</button>    
-                </div> 
-
-              <div id="recordicon" style="display:inline;visibility:hidden;">&nbsp;&nbsp;<span id="recordicon" class="glyphicon glyphicon-facetime-video blink" style="color:#FF0000;" ></span><label class="blink" style="color:#FF0000;" >&nbsp;&nbsp;RECORDING</label></div>
-              <div id="secsremain" style="display:inline;"></div>
-              
-              <div class="alert alert-info" alert-dismissable id="vmwait" hidden>
-                <a class="close" onclick="$('#vmwait').hide();" style="text-decoration:none">×</a>
-                <strong>Videomail request sent.</strong> Please wait.
-              </div>                 
-              
-              <div class="alert alert-success alert-dismissable" id="vmsent" hidden>
-                <a class="close" onclick="$('#vmsent').hide();" style="text-decoration:none">×</a>
-                <strong>Success!</strong> Videomail sent.
-              </div>    
 						</div>
 					</section>
 					<!-- Right Col -->
