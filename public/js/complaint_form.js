@@ -1,5 +1,7 @@
 var socket;
 var asterisk_sip_uri;
+var exten;
+var abandoned_caller;
 var videomailflag = false;
 
 $(document).ready(function () {
@@ -78,6 +80,7 @@ function connect_socket() {
 				}).on('extension-created', function(data){
 					console.log("got extension-created");
 					var extension = data.extension; //returned extension to use for WebRTC
+					exten = data.extension;
 					$('#display_name').val(data.extension);
           if (data.ws_port !== "")
             $('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + ":" + data.ws_port + "/ws");
@@ -184,6 +187,24 @@ function connect_socket() {
 						$("#newchatmessage").attr("disabled","disabled");  
 						$("#chat-send").attr("disabled","disabled");  
 					}
+				}).on('queue-caller-join',function(data){
+					if(data.extension == exten) {
+						set_queue_text(--data.position); //subtract because asterisk wording is off by one 
+					}
+				}).on('queue-caller-leave',function(data){
+					var current_position = $("#pos-in-queue").text();
+					if(!abandoned_caller){ //abandoned caller triggers both leave and abandon event. this prevents duplicate removes.
+						set_queue_text(--current_position);
+					}
+					abandoned_caller = false;
+				 }).on('queue-caller-abandon',function(data){
+					var current_position = $("#pos-in-queue").text();
+					current_position++;
+				 	if(current_position > data.position){ //checks if the abandoned caller was ahead of you
+				 		var current_position = $("#pos-in-queue").text();
+				 		set_queue_text(--current_position);
+					 }
+					 abandoned_caller = true;
 				}).on("chat-leave", function (error) {
           //clear chat
           $('#chatcounter').text('500');
@@ -334,4 +355,13 @@ function exit_queue()
 {
 	$('#queueModal').modal('hide');
 	terminate_call();
+}
+
+function set_queue_text(position)
+{
+	if(position == 0) $("#queue-msg").text("There are no callers ahead of you.");
+	else if(position == 1) $("#queue-msg").html('There is <span id="pos-in-queue"> 1 </span> caller ahead of you.');
+	else if(position > 1) $("#pos-in-queue").text(position);
+	else $("#queue-msg").text("One of our agents will be with you shortly."); //default msg
+
 }
