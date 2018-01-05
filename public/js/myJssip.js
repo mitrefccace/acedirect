@@ -440,7 +440,7 @@ function remove_video(){
 	removeElement("remoteView");
 	addElement("webcam","video","remoteView");
 	remoteView.setAttribute("autoplay", "autoplay");
-	remoteView.setAttribute("poster","images/AD-logo.png");
+	remoteView.setAttribute("poster","images/AD-logo-trim.png");
 	addElement("webcam","video","selfView");
 	selfView.setAttribute("style","right: 11px");
 	selfView.setAttribute("autoplay", "autoplay");
