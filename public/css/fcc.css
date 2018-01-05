@@ -25,4 +25,8 @@
 	margin-bottom:5px;
 }
 
+.remoteView{
+  background-color:black;
+  object-fit:fill;
+}
 

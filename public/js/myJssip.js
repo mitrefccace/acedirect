@@ -440,7 +440,7 @@ function remove_video(){
 	removeElement("remoteView");
 	addElement("webcam","video","remoteView");
 	remoteView.setAttribute("autoplay", "autoplay");
-	remoteView.setAttribute("poster","images/AD-logo.png");
+	remoteView.setAttribute("poster","images/AD-logo-trim.png");
 	addElement("webcam","video","selfView");
 	selfView.setAttribute("style","right: 11px");
 	selfView.setAttribute("autoplay", "autoplay");
@@ -470,7 +470,8 @@ function swap_video() {
 function addElement(parentId, elementTag, elementId, html) {
     var p = document.getElementById(parentId);
     var newElement = document.createElement(elementTag);
-    newElement.setAttribute('id', elementId);
+	newElement.setAttribute('id', elementId);
+    newElement.setAttribute('class', elementId);
     newElement.innerHTML = html;
     p.appendChild(newElement);
 }
