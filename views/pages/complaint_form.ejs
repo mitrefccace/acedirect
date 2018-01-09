@@ -28,11 +28,11 @@
   animation: blinker 1s linear infinite;
 }
 
-@keyframes blinker {  
+@keyframes blinker {
   50% { opacity: 0.0; }
-}  
+}
 </style>
-	
+
 </head>
 
 <body class="hold-transition skin-blue-light layout-top-nav">
@@ -165,15 +165,15 @@
 									<video id="remoteView" autoplay poster="images/AD-logo.png"></video>
 									<video id="selfView" style="right: 10px;" autoplay muted="true" hidden></video>
 								</div>
-								     
-								<div id= "call-option-buttons" style="margin-top: 10px;">     
-	                                <div id= "inner">     
-	                                    <button  id="mute-audio" type = "button" class = "btn btn-gray" onclick = "mute_audio()"> <i id= "mute-audio-icon" class="call-btn-icon fa fa-microphone"></i> </button> 
+
+								<div id= "call-option-buttons" style="margin-top: 10px;">
+	                                <div id= "inner">
+	                                    <button  id="mute-audio" type = "button" class = "btn btn-gray" onclick = "mute_audio()"> <i id= "mute-audio-icon" class="call-btn-icon fa fa-microphone"></i> </button>
 	                                    <button  id="hide-video" type = "button" class = "btn btn-gray" onclick = "hide_video()"> <i class="call-btn-icon fa fa-video-camera"></i>  <div id= "hide-video-icon" class = "fa fa-close fa-close-style" style="display: none;"></div> <!-- hack for hide video button since there's no fa-icon for it. we overlay an x and hide and show it when needed--></button>
-										<button type="button" class = "btn btn-gray" onclick = "enterFullscreen()"><i id= "fullscreen-icon" class="call-btn-icon fa fa-expand"></i> </button>										
-	                                    <button id="end-call" type = "button" class = "btn btn-danger" onclick = "terminate_call()"> <i class="call-btn-icon fa fa-phone fa-rotate-135"></i> </button>   
-	                                </div>  
-	                            </div>   
+										<button type="button" class = "btn btn-gray" onclick = "enterFullscreen()"><i id= "fullscreen-icon" class="call-btn-icon fa fa-expand"></i> </button>
+	                                    <button id="end-call" type = "button" class = "btn btn-danger" onclick = "terminate_call()"> <i class="call-btn-icon fa fa-phone fa-rotate-135"></i> </button>
+	                                </div>
+	                            </div>
 	                            <div class = "row">
 		                            <div class = "col-xs-12 text-center" id = "start-call-buttons" style="margin-top: 10px; margin-bottom: 10px;">
 					                	<button class="btn btn-primary" id="callbutton" style = "width: 80px;" type="button">
@@ -181,8 +181,8 @@
 										</button>
 										<button class="btn btn-primary" id="videomailbutton" type="button">
 											Videomail
-										</button>    
-					                </div> 
+										</button>
+					                </div>
 					            </div>
 				                <div class = "col-xs-12 text-center" id = "agent-name-box" style="margin-bottom: 5px; margin-top: 5px;" hidden>
 				                	<p> You are talking to <strong id = "agent-name"> </strong>.</p>
@@ -193,16 +193,16 @@
 				              		<label class="blink" style="color:#FF0000;" >&nbsp;&nbsp;RECORDING</label>
 				                </div>
 				                <div id="secsremain" style="display:inline;"></div>
-				              
+
 				                <div class="alert alert-info" alert-dismissable id="vmwait" style="margin-top: 10px;" hidden>
 				                	<a class="close" onclick="$('#vmwait').hide();" style="text-decoration:none">×</a>
 				               		<strong>Videomail request sent.</strong> Please wait.
-				             	</div>                 
-				              
+				             	</div>
+
 				              	<div class="alert alert-success"  alert-dismissable id="vmsent" style="margin-top: 10px;"" hidden>
 				                	<a class="close" onclick="$('#vmsent').hide();" style="text-decoration:none">×</a>
 				                	<strong>Success!</strong> Videomail sent.
-				             	 </div>    
+				             	 </div>
 							</div>
 						</div>
 					</section>
@@ -309,7 +309,7 @@
 			</div>
 		</div>
 	</div>
-  
+
   <!-- Videomail Modal -->
   <div id="videomailModal" class="modal fade">
       <div class="modal-dialog modal-sm">
@@ -328,9 +328,9 @@
                       <button id="cancel-recording-btn" type ="button" onclick = "$('#videomailModal').modal('hide');" class ="btn btn-danger btn-style" style="width: 50%; height: 50px;"> Cancel </button>
                 </div>
             </div>
-          </div>			   
+          </div>
       </div>
-  </div>  
+  </div>
 
   <!--In-Queue Modal -->
 	<div class="modal fade" id="queueModal" tabindex="-1" role="dialog">
@@ -343,19 +343,24 @@
 					<h4 id="queue-msg"> There are <span id="pos-in-queue"> </span> callers ahead of you. <h4> <!--note, only counting callers in complaints queue-->
 				</div>
 				<div style = "border-top: 1px solid #f4f4f4; padding: 10px;" class = "text-center">
-					<button  id="exit-queue" type = "button" class = "btn btn-danger btn-lg" style="width:100px;" onclick = "exit_queue()"> Cancel </button> 
+					<button  id="exit-queue" type = "button" class = "btn btn-danger btn-lg" style="width:100px;" onclick = "exit_queue()"> Cancel </button>
 				</div>
+
+        <!-- TODO: This URL action should invoke DTMF Tone 1 -->
+        <h5>&nbsp;If you would like to leave a video message <a href="">click here</a>.</h5>
+
+
 			</div>
 		</div>
 	</div>
-  
+
 	<!-- phone-page -->
 
-  <!-- Jssip hidden data -->						
+  <!-- Jssip hidden data -->
 	<div hidden>
-        <div id="my_sip_uri" > </div>	
-        <div id="ws_servers" > </div>	
-        <div id="sip_password" > </div>		
+        <div id="my_sip_uri" > </div>
+        <div id="ws_servers" > </div>
+        <div id="sip_password" > </div>
         <div id="pc_config" > </div>
 		</div>
 
@@ -379,7 +384,7 @@
 	<!-- Jquery input mask -->
 	<script type="text/javascript" src="./bower_components/AdminLTE/plugins/input-mask/jquery.inputmask.js"></script>
 	<!--JSSIP-->
-	<script type="text/javascript" src="./bower_components/jssip/dist/jssip.min.js"></script>	
+	<script type="text/javascript" src="./bower_components/jssip/dist/jssip.min.js"></script>
   <script>
   var complaintForm = true;
   var complaintRedirectActive = true;
