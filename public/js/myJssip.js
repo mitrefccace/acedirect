@@ -378,8 +378,19 @@ function terminate_call() {
 }
 
 function transfer_to_videomail() {
-	if (currentSession)
+	if (currentSession){
 		currentSession.sendDTMF(1);
+		
+		$('#vmwait').show();
+		swap_video();
+		$('#vmsent').hide();
+		videomailflag = true;
+		$('#record-progress-bar').show();
+		$('#callbutton').prop("disabled", true);
+		$('#userformbtn').prop("disabled", true);
+		$("#videomailbutton").prop("disabled",true);
+
+	}
 }
 
 //terminates the call (if present) and unregisters the ua
