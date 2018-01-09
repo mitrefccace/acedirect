@@ -185,15 +185,15 @@ function connect_socket() {
 					if ($("#displayname").val() !== data.displayname) {
 						$('#rtt-typing').html('');
 					}
-				}).on('new-caller-general', function (data) { // a new general caller has connected
+				}).on('new-caller-general', function (endpoint_type) { // a new general caller has connected
 					debugtxt('new-caller-general', data);
 					$('#duration').timer('reset');
-					inCallADGeneral();
-				}).on('new-caller-complaints', function (data) {
+					inCallADGeneral(endpoint_type);
+				}).on('new-caller-complaints', function (endpoint_type) {
 					// a new complaints caller has connected
 					debugtxt('new-caller-complaints', data);
 					$('#duration').timer('reset');
-					inCallADComplaints();
+					inCallADComplaints(endpoint_type);
 				}).on('no-ticket-info', function (data) {
 					debugtxt('no-ticket-info', data);
 					$('#notickettxt').show();
@@ -424,14 +424,14 @@ function connect_socket() {
 					if(data.queue == "ComplaintsQueue") {
 						$("#complaints-queue-num").text(data.count);
 					}
-					else if(data.queue == "GeneralQueue") {
+					else if(data.queue == "GeneralQuestionsQueue") {
 						$("#general-queue-num").text(data.count);
 					}
 				}).on('queue-caller-leave',function(data){
 					if(data.queue == "ComplaintsQueue") {
 						$("#complaints-queue-num").text(data.count);
 					}
-					else if(data.queue == "GeneralQueue") {
+					else if(data.queue == "GeneralQuestionsQueue") {
 						$("#general-queue-num").text(data.count);
 					}
 				});
@@ -613,7 +613,7 @@ function modifyTicket() {
 
 }
 
-function inCallADComplaints() {
+function inCallADComplaints(endpoint_type) {
 	socket.emit('pause-queues', null);
 	$('#myRingingModalPhoneNumber').html('');
 	$('#myRingingModal').modal('hide');
@@ -622,9 +622,18 @@ function inCallADComplaints() {
 	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	changeStatusLight('IN_CALL');
 	socket.emit('incall', null);
+	if(endpoint_type === "Provider_Complaints"){
+		disable_chat_buttons();
+		$("#newchatmessage").attr("placeholder","Chat disabled for provider endpoints");
+	}
+	else{ //should be webrtc 
+		enable_chat_buttons();
+	}
+
+
 }
 
-function inCallADGeneral() {
+function inCallADGeneral(endpoint_type) {
 	socket.emit('pause-queues', null);
 	$('#myRingingModalPhoneNumber').html('');
 	$('#myRingingModal').modal('hide');
@@ -633,6 +642,13 @@ function inCallADGeneral() {
 	changeStatusLight('IN_CALL');
 	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	socket.emit('incall', null);
+	if(endpoint_type === "Provider_General_Questions"){
+		disable_chat_buttons();
+		$("#newchatmessage").attr("placeholder","Chat disabled for provider endpoints");
+	}
+	else{ //should be webrtc 
+		enable_chat_buttons();
+	}
 }
 
 function pauseQueues() {
@@ -1278,16 +1294,6 @@ $("#button-call").click(function () {
 	$('#outboundCallAlert').show();
 });
 
-function enable_chat_buttons() {
-	$("#newchatmessage").removeAttr("disabled");
-	$("#chat-send").removeAttr("disabled");
-}
-
-function disable_chat_buttons() {
-	$("#newchatmessage").attr("disabled", "disabled");
-	$("#chat-send").attr("disabled", "disabled");
-}
-
 var options = {
 	cellHeight: 80,
 	verticalMargin: 10
@@ -1357,4 +1363,22 @@ function resizeChat(){
 function resetLayout(){
 	var defaultLayout = [{"id":"gsvideobox","x":0,"y":0,"width":8,"height":8},{"id":"gschatbox","x":8,"y":0,"width":4,"height":5}];
 	loadGridLayout(defaultLayout);
+}
+
+//enables chat buttons on a webrtc call when it is accepted
+function enable_chat_buttons(){
+	$("#newchatmessage").removeAttr("disabled");  
+	$("#chat-send").removeAttr("disabled");  
+	$("#newchatmessage").attr("placeholder","Type Message ...");
+	$("#characters-left").show();
+
+}
+
+//disables chat buttons 
+function disable_chat_buttons(){
+	$("#newchatmessage").attr("disabled","disabled");  
+	$("#chat-send").attr("disabled","disabled");  
+	$("#newchatmessage").attr("placeholder","Chat disabled");
+	$("#characters-left").hide();
+
 }

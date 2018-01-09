@@ -267,6 +267,7 @@ $("#callbutton").click(function(){
 	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
 	socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
 	console.log('call-initiated event for complaint');
+	enable_chat_buttons();
 });
 
 $("#videomailbutton").click(function(){
@@ -348,15 +349,6 @@ function enterFullscreen() {
   }
 }
 
-function enable_chat_buttons(){
-	$("#newchatmessage").removeAttr("disabled");  
-	$("#chat-send").removeAttr("disabled");  
-}
-
-function disable_chat_buttons(){
-	$("#newchatmessage").attr("disabled","disabled");  
-	$("#chat-send").attr("disabled","disabled");  
-}
 
 function exit_queue()
 {
@@ -372,3 +364,22 @@ function set_queue_text(position)
 	else $("#queue-msg").text("One of our agents will be with you shortly."); //default msg
 
 }
+
+//enables chat buttons on a webrtc call when it is accepted
+function enable_chat_buttons(){
+	$("#newchatmessage").removeAttr("disabled");  
+	$("#chat-send").removeAttr("disabled");  
+	$("#newchatmessage").attr("placeholder","Type Message ...");
+	$("#characters-left").show();
+
+}
+
+//disables chat buttons 
+function disable_chat_buttons(){
+	$("#newchatmessage").attr("disabled","disabled");  
+	$("#chat-send").attr("disabled","disabled");  
+	$("#newchatmessage").attr("placeholder","Chat disabled");
+	$("#characters-left").hide();
+
+}
+
