@@ -277,6 +277,7 @@ $("#videomailbutton").click(function(){
 
 function startRecordingVideomail(switchQueueFlag) {
   if (switchQueueFlag) {
+    $('#videomailModal').modal('hide');
     transfer_to_videomail();
   } else {
     $('#videomailModal').modal('hide');
