@@ -384,6 +384,23 @@ function toggle_incall_buttons(make_visible)
 	else call_option_buttons.style.display = "none";
 }
 
+
+function transfer_to_videomail() {
+	if (currentSession){
+		currentSession.sendDTMF(1);
+		
+		$('#vmwait').show();
+		swap_video();
+		$('#vmsent').hide();
+		videomailflag = true;
+		$('#record-progress-bar').show();
+		$('#callbutton').prop("disabled", true);
+		$('#userformbtn').prop("disabled", true);
+		$("#videomailbutton").prop("disabled",true);
+
+	}
+}
+
 //handles cleanup from jssip call. removes the session if it is active and removes video.
 function terminate_call()
 {
