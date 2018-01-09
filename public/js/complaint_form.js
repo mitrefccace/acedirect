@@ -3,6 +3,7 @@ var asterisk_sip_uri;
 var exten;
 var abandoned_caller;
 var videomailflag = false;
+var switchQueueFlag = false;
 
 $(document).ready(function () {
 	//formats the phone number.
@@ -184,12 +185,12 @@ function connect_socket() {
 						});
 						$("#chat-section").addClass("col-lg-3");
 						$("#callbutton").attr("disabled", "disabled");
-						$("#newchatmessage").attr("disabled","disabled");  
-						$("#chat-send").attr("disabled","disabled");  
+						$("#newchatmessage").attr("disabled","disabled");
+						$("#chat-send").attr("disabled","disabled");
 					}
 				}).on('queue-caller-join',function(data){
 					if(data.extension == exten) {
-						set_queue_text(--data.position); //subtract because asterisk wording is off by one 
+						set_queue_text(--data.position); //subtract because asterisk wording is off by one
 					}
 				}).on('queue-caller-leave',function(data){
 					var current_position = $("#pos-in-queue").text();
@@ -274,20 +275,25 @@ $("#videomailbutton").click(function(){
   $('#videomailModal').modal('show');
 });
 
-function startRecordingVideomail() {
-  $('#videomailModal').modal('hide');
-  $('#vmwait').show();
-  swap_video();
-  $('#vmsent').hide();
-  videomailflag = true;
-  $('#record-progress-bar').show();
-  $('#callbutton').prop("disabled", true);
-  $('#userformbtn').prop("disabled", true);
-  //dial into the videomail queue
-	$("#videomailbutton").prop("disabled",true);
-	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
-  socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
-	console.log('call-initiated event for videomail');
+function startRecordingVideomail(switchQueueFlag) {
+  if (switchQueueFlag) {
+    transfer_to_videomail();
+  } else {
+    $('#videomailModal').modal('hide');
+    $('#vmwait').show();
+    swap_video();
+    $('#vmsent').hide();
+    videomailflag = true;
+    $('#record-progress-bar').show();
+    $('#callbutton').prop("disabled", true);
+    $('#userformbtn').prop("disabled", true);
+    //dial into the videomail queue
+  	$("#videomailbutton").prop("disabled",true);
+  	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
+    socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
+  	console.log('call-initiated event for videomail');
+  }
+  switchQueueFlag = false;
 }
 
 $('#userform').submit(function (evt) {
@@ -299,7 +305,7 @@ $('#userform').submit(function (evt) {
 	socket.emit('ad-ticket', { "vrs": vrs, "subject": subject, "description": complaint });
 	$('#userformoverlay').addClass("overlay").show();
 	$('#userformbtn').prop("disabled", true);
-	$("#callbutton").removeAttr("disabled");   
+	$("#callbutton").removeAttr("disabled");
 
 });
 
@@ -367,19 +373,18 @@ function set_queue_text(position)
 
 //enables chat buttons on a webrtc call when it is accepted
 function enable_chat_buttons(){
-	$("#newchatmessage").removeAttr("disabled");  
-	$("#chat-send").removeAttr("disabled");  
+	$("#newchatmessage").removeAttr("disabled");
+	$("#chat-send").removeAttr("disabled");
 	$("#newchatmessage").attr("placeholder","Type Message ...");
 	$("#characters-left").show();
 
 }
 
-//disables chat buttons 
+//disables chat buttons
 function disable_chat_buttons(){
-	$("#newchatmessage").attr("disabled","disabled");  
-	$("#chat-send").attr("disabled","disabled");  
+	$("#newchatmessage").attr("disabled","disabled");
+	$("#chat-send").attr("disabled","disabled");
 	$("#newchatmessage").attr("placeholder","Chat disabled");
 	$("#characters-left").hide();
 
 }
-
