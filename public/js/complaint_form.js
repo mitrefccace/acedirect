@@ -365,7 +365,7 @@ function exit_queue()
 
 function set_queue_text(position)
 {
-	if(position == 0) $("#queue-msg").text("There are no callers ahead of you.");
+	if(position == 0) $("#queue-msg").text("There are 0 callers ahead of you.");
 	else if(position == 1) $("#queue-msg").html('There is <span id="pos-in-queue"> 1 </span> caller ahead of you.');
 	else if(position > 1) $("#pos-in-queue").text(position);
 	else $("#queue-msg").text("One of our agents will be with you shortly."); //default msg
