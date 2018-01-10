@@ -4,6 +4,7 @@ var exten;
 var abandoned_caller;
 var videomailflag = false;
 var switchQueueFlag = false;
+var afterHoursFlag = false;
 
 $(document).ready(function () {
 	//formats the phone number.
@@ -344,6 +345,12 @@ $('#chatsend').submit(function (evt) {
 	isTyping = false;
 	socket.emit('chat-message', { "message": msg, "timestamp": timestamp, "displayname": displayname });
 });
+
+//after hours processing; if after hours, then show this modal
+if (afterHoursFlag) {
+  $("#afterHoursModal").modal({backdrop: "static"});
+  $("#afterHoursModal").modal("show");
+}
 
 // Event listener for the full-screen button
 function enterFullscreen() {
