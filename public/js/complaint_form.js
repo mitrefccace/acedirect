@@ -193,26 +193,30 @@ function connect_socket() {
 						skinny = false;
 					}
 				}).on('queue-caller-join',function(data){
-					if(data.extension == exten) {
+					if(data.extension == exten && data.queue == "ComplaintsQueue") {
 						set_queue_text(--data.position); //subtract because asterisk wording is off by one
 					}
 					console.log("queue caller join");
 				}).on('queue-caller-leave',function(data){
-					var current_position = $("#pos-in-queue").text();
-					if(!abandoned_caller){ //abandoned caller triggers both leave and abandon event. this prevents duplicate removes.
-						set_queue_text(--current_position);
+					if(data.queue == "ComplaintsQueue"){
+						var current_position = $("#pos-in-queue").text();
+						if(!abandoned_caller){ //abandoned caller triggers both leave and abandon event. this prevents duplicate removes.
+							set_queue_text(--current_position);
+						}
+						console.log("queue caller leave");
+						abandoned_caller = false;
 					}
-					console.log("queue caller leave");
-					abandoned_caller = false;
 				 }).on('queue-caller-abandon',function(data){
-					var current_position = $("#pos-in-queue").text();
-					current_position++;
-				 	if(current_position > data.position){ //checks if the abandoned caller was ahead of you
-				 		var current_position = $("#pos-in-queue").text();
-				 		set_queue_text(--current_position);
-					 }
-					 console.log("queue caller abandon");
-					 abandoned_caller = true;
+				 	if(data.queue == "ComplaintsQueue"){
+						var current_position = $("#pos-in-queue").text();
+						current_position++;
+					 	if(current_position > data.position){ //checks if the abandoned caller was ahead of you
+					 		var current_position = $("#pos-in-queue").text();
+					 		set_queue_text(--current_position);
+						 }
+						 console.log("queue caller abandon");
+						 abandoned_caller = true;
+					}
 				}).on("agent-name", function(data) {
 					if(data.agent_name != null || data.agent_name != "" || data.agent_name != undefined)
 					{
@@ -378,11 +382,10 @@ function exit_queue()
 
 function set_queue_text(position)
 {
-	if(position == 0) $("#queue-msg").text("There are 0 callers ahead of you.");
-	else if(position == 1) $("#queue-msg").html('There is <span id="pos-in-queue"> 1 </span> caller ahead of you.');
+	if(position == 0) $("#queue-msg").text("There are no callers ahead of you.");
+	else if(position == 1) $("#queue-msg").html('There is <span id="pos-in-queue"> 1 </span> caller ahead of you.'); 
 	else if(position > 1) $("#pos-in-queue").text(position);
 	else $("#queue-msg").text("One of our agents will be with you shortly."); //default msg
-
 }
 
 //enables chat buttons on a webrtc call when it is accepted

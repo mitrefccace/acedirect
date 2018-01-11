@@ -117,6 +117,8 @@ function connect_socket() {
 					$('#my_sip_uri').attr("name", "sip:" + payload.extension + "@" + payload.asteriskPublicHostname);
 					$('#sip_password').attr("name", payload.extensionPassword);
 					$("#pc_config").attr("name", "stun:" + payload.stunServer);
+					$("#complaints-queue-num").text(payload.complaint_queue_count);
+					$("#general-queue-num").text(payload.general_queue_count);
 
 					if (payload.queue_name === "ComplaintsQueue" || payload.queue2_name === "ComplaintsQueue") {
 						$('#sidebar-complaints').show();
