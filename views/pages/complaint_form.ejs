@@ -185,7 +185,7 @@
 					                </div>
 					            </div>
 				                <div class = "col-xs-12 text-center" id = "agent-name-box" style="margin-bottom: 5px; margin-top: 5px;" hidden>
-				                	<p> You are talking to <strong id = "agent-name"> </strong>.</p>
+				                	<p> You are talking to CSR <strong id = "agent-name"> </strong>.</p>
 				                </div>
 				              	<div id="recordicon" hidden>&nbsp;&nbsp;
 				              		<span id="recordicon" class="glyphicon glyphicon-facetime-video blink" style="color:#FF0000;" ></span>
@@ -352,20 +352,19 @@
 
   <!--In-Queue Modal -->
 	<div class="modal fade" id="queueModal" tabindex="-1" role="dialog">
-		<div class="modal-dialog" style= "max-width: 400px;">
+		<div class="modal-dialog" style= "max-width: 500px;">
 			<div class="modal-content">
-				<div class = "modal-header" style= "padding-top: 0; padding-bottom:0;">
-					<h2>You are in the Queue</h2>
+				<div class = "modal-header text-center" style= "padding-top: 0; padding-bottom:0;">
+					<h2>Waiting for the next available agent</h2>
 				</div>
 				<div class="modal-body text-center">
 					<h4 id="queue-msg"> There are <span id="pos-in-queue"> 0 </span> callers ahead of you. <h4> <!--note, only counting callers in complaints queue-->
+					<button  id="exit-queue" type = "button" class = "btn btn-danger btn-lg" style="width:100px;" onclick = "exit_queue()"> Hangup </button>
 				</div>
-				<div style = "border-top: 1px solid #f4f4f4; padding: 10px;" class = "text-center">
-					<button  id="exit-queue" type = "button" class = "btn btn-danger btn-lg" style="width:100px;" onclick = "exit_queue()"> Cancel </button>
-				</div>
-
-        <!-- This URL action should invoke DTMF Tone 1 -->
-        <h5>&nbsp;To exit the queue and leave a videomail <a href="#" onclick="switchQueueFlag=true;$('#queueModal').modal('hide');$('#videomailModal').modal('show');">click here</a>.</h5>
+				<div class = "text-center" style = "border-top: 1px solid #f4f4f4; padding: 10px;">
+			        <!-- This URL action should invoke DTMF Tone 1 -->
+			        <h5>&nbsp;To exit the queue and leave a videomail <a href="#" onclick="switchQueueFlag=true;$('#queueModal').modal('hide');$('#videomailModal').modal('show');">click here</a>.</h5>
+		  		</div>
 
 			</div>
 		</div>

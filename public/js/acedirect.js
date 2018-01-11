@@ -108,7 +108,7 @@ function connect_socket() {
 					// $('#txtAgentEmail').val(payload.email);
 					// $('#txtAgentPhone').val(payload.phone);
 					*/
-					$('#displayname').val(payload.first_name + ' ' + payload.role);
+					$('#displayname').val("CSR " + payload.first_name);
 					$('#agentname-sidebar').html(payload.first_name + " " + payload.last_name);
 					$('#agentname-header').html(payload.first_name + " " + payload.last_name);
 					$('#agentname-headerdropdown').html(payload.first_name + " " + payload.last_name);
@@ -232,7 +232,6 @@ function connect_socket() {
 					var msgsender = document.createElement('span');
 					var msgtime = document.createElement('span');
 					var msgtext = document.createElement('div');
-
 					if ($("#displayname").val() === displayname) {
 						$(msgsender).addClass("direct-chat-name pull-right").html(displayname).appendTo(msginfo);
 						$(msgtime).addClass("direct-chat-timestamp pull-left").html(timestamp).appendTo(msginfo);
@@ -626,7 +625,7 @@ function inCallADComplaints(endpoint_type) {
 	socket.emit('incall', null);
 	if(endpoint_type === "Provider_Complaints"){
 		disable_chat_buttons();
-		$("#newchatmessage").attr("placeholder","Chat disabled for provider endpoints");
+		$("#newchatmessage").attr("placeholder","Chat disabled for Provider endpoints");
 	}
 	else{ //should be webrtc 
 		enable_chat_buttons();
