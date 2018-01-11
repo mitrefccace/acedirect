@@ -406,9 +406,11 @@ function connect_socket() {
 					busylight.updateConfigs(data);
 				}).on('skinny-config', function (data) {
 					if (data == "true") {
-						$("#scripts-and-details").attr("hidden", true);
+						$("#gsscriptbox").attr("hidden", true);
+						$("#gsdetailsbox").attr("hidden", true);
 					} else {
-						$("#scripts-and-details").removeAttr("hidden");
+						$("#gsscriptbox").removeAttr("hidden");
+						$("#gsdetailsbox").removeAttr("hidden");
 					}
 				}).on('got-videomail-recs', function (data) {
 					updateVideomailTable(data);
