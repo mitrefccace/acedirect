@@ -21,7 +21,6 @@ var maxRecordingSeconds = 90;
 var recordId = null;
 
 function startRecordProgress() {
-
 	if ($('#record-progress-bar').css('display') == 'none')
 		return;
 
@@ -53,14 +52,13 @@ function startRecordProgress() {
 }
 
 function stopRecordProgress() {
-
 	$('#record-progress-bar').hide();
 	$('#secsremain').html('');
 	$('#recordicon').hide();
 	$('#record-progress-bar').css('width', '0%');
 	$('#record-progress-bar').hide();
-	$('#callbutton').prop("disabled", true);
-	$('#videomailbutton').prop("disabled", false);
+	// $('#callbutton').prop("disabled", true);
+	// $('#videomailbutton').prop("disabled", false);
 	$('#userformbtn').prop("disabled", false);
 	$('#vmsent').hide();
 	$('#vmwait').hide();
@@ -619,11 +617,4 @@ function edit_request(request) {
 	}
 
 	return new_request;
-}
-
-//enables submit and videomail buttons on complaint form, and disables call button
-function enable_initial_buttons() {
-	$("#userformbtn").removeAttr("disabled");
-	$("#callbutton").attr("disabled", "disabled");
-	$("#videomailbutton").removeAttr("disabled");
 }

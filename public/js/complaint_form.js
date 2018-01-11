@@ -5,6 +5,7 @@ var abandoned_caller;
 var videomailflag = false;
 var switchQueueFlag = false;
 var afterHoursFlag = false;
+var skinny = false;
 
 $(document).ready(function () {
 	//formats the phone number.
@@ -67,14 +68,14 @@ function connect_socket() {
 				}).on('ad-ticket-created', function (data) {
 					console.log("got ad-ticket-created");
 					$('#userformoverlay').removeClass("overlay").hide();
-					$('#callbutton').prop("disabled", false);
+					// $('#callbutton').prop("disabled", false);
 					if (data.zendesk_ticket) {
 						$('#firstName').val(data.first_name);
 						$('#lastName').val(data.last_name);
 						$('#callerPhone').val(data.vrs);
 						$('#callerEmail').val(data.email);
 						$('#ticketNumber').text(data.zendesk_ticket);
-						$('#callbutton').prop("disabled", false);
+						// $('#callbutton').prop("disabled", false);
 					} else {
 						$("#ZenDeskOutageModal").modal('show');
 						$('#userformbtn').prop("disabled", false);
@@ -172,6 +173,7 @@ function connect_socket() {
 							return (className.match(/\bcol-\S+/g) || []).join(' ');
 						});
 						$("#chat-section").addClass("col-lg-5");
+						skinny = true;
 					}
 					else
 					{
@@ -188,16 +190,19 @@ function connect_socket() {
 						$("#callbutton").attr("disabled", "disabled");
 						$("#newchatmessage").attr("disabled","disabled");
 						$("#chat-send").attr("disabled","disabled");
+						skinny = false;
 					}
 				}).on('queue-caller-join',function(data){
 					if(data.extension == exten) {
 						set_queue_text(--data.position); //subtract because asterisk wording is off by one
 					}
+					console.log("queue caller join");
 				}).on('queue-caller-leave',function(data){
 					var current_position = $("#pos-in-queue").text();
 					if(!abandoned_caller){ //abandoned caller triggers both leave and abandon event. this prevents duplicate removes.
 						set_queue_text(--current_position);
 					}
+					console.log("queue caller leave");
 					abandoned_caller = false;
 				 }).on('queue-caller-abandon',function(data){
 					var current_position = $("#pos-in-queue").text();
@@ -206,6 +211,7 @@ function connect_socket() {
 				 		var current_position = $("#pos-in-queue").text();
 				 		set_queue_text(--current_position);
 					 }
+					 console.log("queue caller abandon");
 					 abandoned_caller = true;
 				}).on("agent-name", function(data) {
 					if(data.agent_name != null || data.agent_name != "" || data.agent_name != undefined)
@@ -224,9 +230,9 @@ function connect_socket() {
           //reset buttons and ticket form
           $('#ticketNumber').text('');
           $('#complaintcounter').text('2,000');
-          $("#callbutton").prop("disabled",true);
-          $('#videomailbutton').prop("disabled", false);
-          $('#userformbtn').prop("disabled", false);
+          // $("#callbutton").prop("disabled",true);
+          // $('#videomailbutton').prop("disabled", false);
+          // $('#userformbtn').prop("disabled", false);
           $('#complaint').val('');
           $('#subject').val('');
 
@@ -395,4 +401,18 @@ function disable_chat_buttons(){
 	$("#newchatmessage").attr("placeholder","Chat disabled");
 	$("#characters-left").hide();
 
+}
+
+//restores default buttons after a call is completed
+function enable_initial_buttons() {
+	if(skinny){
+		$("#callbutton").removeAttr("disabled");
+		$("#videomailbutton").removeAttr("disabled");
+	}
+	else{
+		$("#userformbtn").removeAttr("disabled");
+		$("#callbutton").attr("disabled", "disabled");
+		$("#videomailbutton").removeAttr("disabled");
+	}
+	
 }

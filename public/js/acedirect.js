@@ -1384,3 +1384,5 @@ function disable_chat_buttons(){
 	$("#characters-left").hide();
 
 }
+
+function enable_initial_buttons(){}
