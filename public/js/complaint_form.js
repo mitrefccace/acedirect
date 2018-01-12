@@ -60,6 +60,10 @@ function connect_socket() {
 					$('#callerEmail').val(payload.email);
 					$('#displayname').val(payload.first_name + ' ' + payload.last_name);
                     isOpen = payload.isOpen;
+                    if (!isOpen) { //after hours processing; if after hours, then show this modal
+                      $("#afterHoursModal").modal({backdrop: "static"});
+                      $("#afterHoursModal").modal("show");
+                    }
 
 					socket.emit('register-client', { "hello": "hello" });
 					//console.log("register-client");
@@ -356,11 +360,6 @@ $('#chatsend').submit(function (evt) {
 	socket.emit('chat-message', { "message": msg, "timestamp": timestamp, "displayname": displayname });
 });
 
-//after hours processing; if after hours, then show this modal
-if (!isOpen) {
-  $("#afterHoursModal").modal({backdrop: "static"});
-  $("#afterHoursModal").modal("show");
-}
 
 // Event listener for the full-screen button
 function enterFullscreen() {
