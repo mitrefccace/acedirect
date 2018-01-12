@@ -4,7 +4,7 @@ var exten;
 var abandoned_caller;
 var videomailflag = false;
 var switchQueueFlag = false;
-var afterHoursFlag = false;
+var isOpen = true;
 var skinny = false;
 
 $(document).ready(function () {
@@ -59,7 +59,7 @@ function connect_socket() {
 					$('#callerPhone').val(payload.vrs);
 					$('#callerEmail').val(payload.email);
 					$('#displayname').val(payload.first_name + ' ' + payload.last_name);
-
+                    isOpen = payload.isOpen;
 
 					socket.emit('register-client', { "hello": "hello" });
 					//console.log("register-client");
@@ -357,7 +357,7 @@ $('#chatsend').submit(function (evt) {
 });
 
 //after hours processing; if after hours, then show this modal
-if (afterHoursFlag) {
+if (!isOpen) {
   $("#afterHoursModal").modal({backdrop: "static"});
   $("#afterHoursModal").modal("show");
 }
