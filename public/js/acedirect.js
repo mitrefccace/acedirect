@@ -1298,7 +1298,7 @@ $("#button-call").click(function () {
 });
 
 var options = {
-	cellHeight: 80,
+	cellHeight: 40,
 	verticalMargin: 10
 };
 var grid = $('.grid-stack').gridstack(options);
@@ -1339,6 +1339,7 @@ function loadGridLayout(layout) {
 
 	grid.commit();
 	resizeVideo();
+	resizeChat();
 	loadingGridLayout = false;
 }
 resizeVideo();
@@ -1359,13 +1360,24 @@ function resizeVideo(){
 
 function resizeChat(){
 	var contentHeight = $("#gschatbox").height();
-	$('#userchat').css("height", contentHeight-75 + "px");
-	$('#chat-messages').css("height", contentHeight-200 + "px");
+
+	var chatheaderHeight = $("#chat-header").outerHeight();
+	var rtttypinHeight = $("#rtt-typing").outerHeight();
+	var chatfooterheight = $("#chat-footer").outerHeight();
+	var parts = chatheaderHeight + rtttypinHeight + chatfooterheight;
+
+	var padding = 30;
+	
+	// userchat is overall chat box content, chatmessages is only the messages area
+	$('#userchat').css("height", contentHeight - padding + "px");
+	$('#chat-messages').css("height", contentHeight - parts - padding + "px");
 }
 
 function resetLayout(){
-	var defaultLayout = [{"id":"gsvideobox","x":0,"y":0,"width":8,"height":8},{"id":"gschatbox","x":8,"y":0,"width":4,"height":5}];
+	var defaultLayout = [{"id":"gsvideobox","x":0,"y":0,"width":8,"height":16},{"id":"gschatbox","x":8,"y":0,"width":4,"height":10}];
 	loadGridLayout(defaultLayout);
+	resizeVideo();
+	resizeChat();
 }
 
 //enables chat buttons on a webrtc call when it is accepted
