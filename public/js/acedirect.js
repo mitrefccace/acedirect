@@ -1106,6 +1106,10 @@ function playVideomail(id, duration, vidStatus) {
 	remoteView.removeAttribute("poster");
 	remoteView.setAttribute("src", './getVideomail?id=' + id + '&ext=' + extensionMe);
 	remoteView.setAttribute("onended", "change_play_button()");
+	if (document.getElementById("play-video-icon").classList.contains("fa-pause")){
+		document.getElementById("play-video-icon").classList.add("fa-play");
+		document.getElementById("play-video-icon").classList.remove("fa-pause");
+	}																			
 	toggle_videomail_buttons(true);
 	updateVideoTime(duration, "vmail-total-time");
 	if (vidStatus === "UNREAD") {
