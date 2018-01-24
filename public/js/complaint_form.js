@@ -6,6 +6,7 @@ var videomailflag = false;
 var switchQueueFlag = false;
 var isOpen = true;
 var skinny = false;
+var version = "0.0";
 
 $(document).ready(function () {
 	//formats the phone number.
@@ -64,6 +65,10 @@ function connect_socket() {
                       $("#afterHoursModal").modal({backdrop: "static"});
                       $("#afterHoursModal").modal("show");
                     }
+
+                    //set the ace direct version
+                    version = payload.version;                    
+                    $('#ad-version').text(version);
 
 					socket.emit('register-client', { "hello": "hello" });
 					//console.log("register-client");
