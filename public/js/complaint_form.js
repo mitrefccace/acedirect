@@ -69,7 +69,7 @@ function connect_socket() {
                     }
 
                     //get the start/end time strings for the after hours dialog
-                    var tz = payload.startTimeUTC.split(' ')[2];
+                    var tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
                     startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0,8); //start time in UTC
                     endTimeUTC = convertUTCtoLocal(payload.endTimeUTC).substring(0,8); //end time in UTC
                     $('#ah-start-time').text(startTimeUTC);
