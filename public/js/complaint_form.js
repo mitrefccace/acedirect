@@ -5,6 +5,8 @@ var abandoned_caller;
 var videomailflag = false;
 var switchQueueFlag = false;
 var isOpen = true;
+var startTimeUTC = "14:00"; //start time in UTC
+var endTimeUTC = "21:30"; //end time in UTC
 var skinny = false;
 var version = "0.0";
 
@@ -65,6 +67,13 @@ function connect_socket() {
                       $("#afterHoursModal").modal({backdrop: "static"});
                       $("#afterHoursModal").modal("show");
                     }
+
+                    //get the start/end time strings for the after hours dialog
+                    startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0,8); //start time in UTC
+                    var tz = startTimeUTC.split(' ')[2];
+                    endTimeUTC = convertUTCtoLocal(payload.endTimeUTC).substring(0,8); //end time in UTC
+                    $('#ah-start-time').text(startTimeUTC);
+                    $('#ah-end-time').text(endTimeUTC + " " + tz);
 
                     //set the ace direct version
                     version = payload.version;                    
@@ -423,3 +432,26 @@ function enable_initial_buttons() {
 	}
 	
 }
+
+//convert UTC hh:mm to current time in browser's timezone, e.g., 01:00 PM EST
+//accepts UTC hh:mm, e.g., 14:00
+//returns hh:mm in browser timezone, e.g., 09:00 AM EST
+function convertUTCtoLocal(hhmmutc) {
+  var hh = parseInt(hhmmutc.split(":")[0]); //e.g., 14
+  var mins = hhmmutc.split(":")[1]; //e.g., 00
+  var todaysDate = new Date();
+  var yyyy = todaysDate.getFullYear().toString();
+  var mm = (todaysDate.getMonth()+1).toString();
+  var dd = todaysDate.getDate().toString();
+  var dte = mm + '/' + dd + '/' + yyyy + ' ' + hh + ':' + mins + ' UTC';
+  var converteddate = new Date(dte);
+  var newdte = converteddate.toString(); //Wed Jan 24 2018 09:00:00 GMT-0500 (EST)
+  var arr = newdte.split(" ");
+  var newhh = arr[4].split(":")[0];
+  var newmin = arr[4].split(":")[1];
+  var ampm = "AM";
+  if (newhh > 11) ampm = "PM";
+  if (newhh > 12) newhh -= 12;
+  return newhh + ":" + newmin + " " + ampm +  " " + arr[6].replace('(','').replace(')','');
+}
+
