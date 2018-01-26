@@ -50,9 +50,10 @@ function connect_socket() {
 					forceNew: true
 				});
 
-                //update the version in the footer
+                //update the version and year in the footer
                 socket.on('adversion', function (data) {
                   $('#ad-version').text(data.version);
+                  $('#ad-year').text(data.year);
                 });
 
 				socket.on('connect', function () {
