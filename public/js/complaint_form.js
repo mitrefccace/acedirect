@@ -8,7 +8,6 @@ var isOpen = true;
 var startTimeUTC = "14:00"; //start time in UTC
 var endTimeUTC = "21:30"; //end time in UTC
 var skinny = false;
-var version = "0.0";
 
 $(document).ready(function () {
 	//formats the phone number.
@@ -51,6 +50,11 @@ function connect_socket() {
 					forceNew: true
 				});
 
+                //update the version in the footer
+                socket.on('adversion', function (data) {
+                  $('#ad-version').text(data.version);
+                });
+
 				socket.on('connect', function () {
 					console.log("got connect");
 					console.log('authenticated');
@@ -75,9 +79,6 @@ function connect_socket() {
                     $('#ah-start-time').text(startTimeUTC);
                     $('#ah-end-time').text(endTimeUTC + " " + tz);
 
-                    //set the ace direct version
-                    version = payload.version;                    
-                    $('#ad-version').text(version);
 
 					socket.emit('register-client', { "hello": "hello" });
 					//console.log("register-client");

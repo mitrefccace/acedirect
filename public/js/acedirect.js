@@ -27,7 +27,6 @@ var videomail_status_buttons = document.getElementById("videomail-status-buttons
 var sortFlag = "id desc";
 var filter = "ALL";
 var telNumber;
-var version = '0.0';
 
 setInterval(function () {
 	busylight.light(this.agentStatus);
@@ -87,6 +86,11 @@ function connect_socket() {
 					forceNew: true
 				});
 
+                //update the version in the footer
+                socket.on('adversion', function (data) {
+                  $('#ad-version').text(data.version);
+                });
+
 				socket.on('connect', function () {
 					debugtxt('connect', {
 						"no": "data"
@@ -132,10 +136,6 @@ function connect_socket() {
 						var layout = typeof sessionStorage.layout !== "undefined" ? sessionStorage.layout : payload.layout;
 						loadGridLayout(JSON.parse(layout));
 					}
-
-                    //set the ace direct version
-                    version = payload.version;
-                    $('#ad-version').text(version);
 
 					socket.emit('register-client', {
 						"hello": "hello"
