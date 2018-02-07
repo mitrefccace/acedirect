@@ -50,11 +50,11 @@ function connect_socket() {
 					forceNew: true
 				});
 
-                //update the version and year in the footer
-                socket.on('adversion', function (data) {
-                  $('#ad-version').text(data.version);
-                  $('#ad-year').text(data.year);
-                });
+				//update the version and year in the footer
+				socket.on('adversion', function (data) {
+					$('#ad-version').text(data.version);
+					$('#ad-year').text(data.year);
+				});
 
 				socket.on('connect', function () {
 					console.log("got connect");
@@ -67,23 +67,29 @@ function connect_socket() {
 					$('#callerPhone').val(payload.vrs);
 					$('#callerEmail').val(payload.email);
 					$('#displayname').val(payload.first_name + ' ' + payload.last_name);
-                    isOpen = payload.isOpen;
-                    if (!isOpen) { //after hours processing; if after hours, then show this modal
-                      $("#afterHoursModal").modal({backdrop: "static"});
-                      $("#afterHoursModal").modal("show");
-                    }
+					isOpen = payload.isOpen;
+					if (!isOpen) { //after hours processing; if after hours, then show this modal
+						$("#afterHoursModal").modal({
+							backdrop: "static"
+						});
+						$("#afterHoursModal").modal("show");
+					}
 
-                    //get the start/end time strings for the after hours dialog
-                    var tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
-                    startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0,8); //start time in UTC
-                    endTimeUTC = convertUTCtoLocal(payload.endTimeUTC).substring(0,8); //end time in UTC
-                    $('#ah-start-time').text(startTimeUTC);
-                    $('#ah-end-time').text(endTimeUTC + " " + tz);
+					//get the start/end time strings for the after hours dialog
+					var tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
+					startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0, 8); //start time in UTC
+					endTimeUTC = convertUTCtoLocal(payload.endTimeUTC).substring(0, 8); //end time in UTC
+					$('#ah-start-time').text(startTimeUTC);
+					$('#ah-end-time').text(endTimeUTC + " " + tz);
 
 
-					socket.emit('register-client', { "hello": "hello" });
+					socket.emit('register-client', {
+						"hello": "hello"
+					});
 					//console.log("register-client");
-					socket.emit('register-vrs', { "hello": "hello" });
+					socket.emit('register-vrs', {
+						"hello": "hello"
+					});
 					//onsole.log("register-vrs");
 				}).on('ad-ticket-created', function (data) {
 					console.log("got ad-ticket-created");
@@ -100,38 +106,51 @@ function connect_socket() {
 						$("#ZenDeskOutageModal").modal('show');
 						$('#userformbtn').prop("disabled", false);
 					}
-				}).on('extension-created', function(data){
+				}).on('extension-created', function (data) {
 					console.log("got extension-created");
-					var extension = data.extension; //returned extension to use for WebRTC
-					exten = data.extension;
-					$('#display_name').val(data.extension);
-          if (data.ws_port !== "")
-            $('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + ":" + data.ws_port + "/ws");
-          else
-            $('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");
+					if (data.message == 'success') {
+						var extension = data.extension; //returned extension to use for WebRTC
+						exten = data.extension;
+						$('#display_name').val(data.extension);
+						if (data.ws_port !== "")
+							$('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + ":" + data.ws_port + "/ws");
+						else
+							$('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");
 
-					$('#my_sip_uri').attr("name","sip:"+data.extension+"@"+data.asterisk_public_hostname);
+						$('#my_sip_uri').attr("name", "sip:" + data.extension + "@" + data.asterisk_public_hostname);
 
-          //is this a videomail call or complaint call?
-          if (videomailflag)
-            asterisk_sip_uri = "sip:" + data.queues_videomail_number + "@"+data.asterisk_public_hostname;
-          else
-            asterisk_sip_uri = "sip:" + data.queues_complaint_number + "@"+data.asterisk_public_hostname;
+						//is this a videomail call or complaint call?
+						if (videomailflag)
+							asterisk_sip_uri = "sip:" + data.queues_videomail_number + "@" + data.asterisk_public_hostname;
+						else
+							asterisk_sip_uri = "sip:" + data.queues_complaint_number + "@" + data.asterisk_public_hostname;
 
-          //get the max videomail recording seconds
-          maxRecordingSeconds = data.queues_videomail_maxrecordsecs;
+						//get the max videomail recording seconds
+						maxRecordingSeconds = data.queues_videomail_maxrecordsecs;
 
-          //get complaint redirect options
-          complaintRedirectActive = data.complaint_redirect_active;
-          complaintRedirectDesc = data.complaint_redirect_desc;
-          complaintRedirectUrl = data.complaint_redirect_url;
-          $("#redirecttag").attr("href", complaintRedirectUrl);
-          $("#redirectdesc").text("Redirecting to " + complaintRedirectDesc + " ...");
+						//get complaint redirect options
+						complaintRedirectActive = data.complaint_redirect_active;
+						complaintRedirectDesc = data.complaint_redirect_desc;
+						complaintRedirectUrl = data.complaint_redirect_url;
+						$("#redirecttag").attr("href", complaintRedirectUrl);
+						$("#redirectdesc").text("Redirecting to " + complaintRedirectDesc + " ...");
 
-          $('#sip_password').attr("name",data.password);
- 					$("#pc_config").attr("name","stun:" + data.stun_server );
-					register_jssip(); //register with the given extension
-					start_call(asterisk_sip_uri); //calling asterisk to get into the queue
+						$('#sip_password').attr("name", data.password);
+						$("#pc_config").attr("name", "stun:" + data.stun_server);
+						register_jssip(); //register with the given extension
+						start_call(asterisk_sip_uri); //calling asterisk to get into the queue
+					} else if (data.message == 'OutOfExtensions'){
+						console.log('out of extensions...')
+						//Try again in 10 seconds.
+						setTimeout(function(){
+							var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
+							socket.emit('call-initiated', {
+								"vrs": vrs
+							});
+						}, 10000);
+					} else {
+						console.log('Something went wrong when getting an extension')
+					}
 				}).on('chat-message-new', function (data) {
 					var msg = data.message;
 					var displayname = data.displayname;
@@ -180,11 +199,10 @@ function connect_socket() {
 					if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
 						logout("Session has expired");
 					}
-				}).on("skinny-config", function(data){
-					if(data == "true")
-					{
-						$("#ticket-section").attr("hidden",true);
-						$("#vrs-info-box").attr("hidden",true);
+				}).on("skinny-config", function (data) {
+					if (data == "true") {
+						$("#ticket-section").attr("hidden", true);
+						$("#vrs-info-box").attr("hidden", true);
 						$("#video-section").removeClass(function (index, className) {
 							return (className.match(/\bcol-\S+/g) || []).join(' ');
 						});
@@ -194,9 +212,7 @@ function connect_socket() {
 						});
 						$("#chat-section").addClass("col-lg-5");
 						skinny = true;
-					}
-					else
-					{
+					} else {
 						$("#ticket-section").removeAttr("hidden");
 						$("#vrs-info-box").removeAttr("hidden");
 						$("#video-section").removeClass(function (index, className) {
@@ -208,64 +224,63 @@ function connect_socket() {
 						});
 						$("#chat-section").addClass("col-lg-3");
 						$("#callbutton").attr("disabled", "disabled");
-						$("#newchatmessage").attr("disabled","disabled");
-						$("#chat-send").attr("disabled","disabled");
+						$("#newchatmessage").attr("disabled", "disabled");
+						$("#chat-send").attr("disabled", "disabled");
 						skinny = false;
 					}
-				}).on('queue-caller-join',function(data){
-					if(data.extension == exten && data.queue == "ComplaintsQueue") {
+				}).on('queue-caller-join', function (data) {
+					if (data.extension == exten && data.queue == "ComplaintsQueue") {
 						set_queue_text(--data.position); //subtract because asterisk wording is off by one
 					}
 					console.log("queue caller join");
-				}).on('queue-caller-leave',function(data){
-					if(data.queue == "ComplaintsQueue"){
+				}).on('queue-caller-leave', function (data) {
+					if (data.queue == "ComplaintsQueue") {
 						var current_position = $("#pos-in-queue").text();
-						if(!abandoned_caller){ //abandoned caller triggers both leave and abandon event. this prevents duplicate removes.
+						if (!abandoned_caller) { //abandoned caller triggers both leave and abandon event. this prevents duplicate removes.
 							set_queue_text(--current_position);
 						}
 						console.log("queue caller leave");
 						abandoned_caller = false;
 					}
-				 }).on('queue-caller-abandon',function(data){
-				 	if(data.queue == "ComplaintsQueue"){
+				}).on('queue-caller-abandon', function (data) {
+					if (data.queue == "ComplaintsQueue") {
 						var current_position = $("#pos-in-queue").text();
 						current_position++;
-					 	if(current_position > data.position){ //checks if the abandoned caller was ahead of you
-					 		var current_position = $("#pos-in-queue").text();
-					 		set_queue_text(--current_position);
-						 }
-						 console.log("queue caller abandon");
-						 abandoned_caller = true;
+						if (current_position > data.position) { //checks if the abandoned caller was ahead of you
+							var current_position = $("#pos-in-queue").text();
+							set_queue_text(--current_position);
+						}
+						console.log("queue caller abandon");
+						abandoned_caller = true;
 					}
-				}).on("agent-name", function(data) {
-					if(data.agent_name != null || data.agent_name != "" || data.agent_name != undefined)
-					{
+				}).on("agent-name", function (data) {
+					if (data.agent_name != null || data.agent_name != "" || data.agent_name != undefined) {
 						var firstname = data.agent_name.split(" ");
 						$("#agent-name").text(firstname[0]);
 						$("#agent-name-box").show();
 					}
 				}).on("chat-leave", function (error) {
-          //clear chat
-          $('#chatcounter').text('500');
-          $('#chat-messages').html('');
-          $('#rtt-typing').html('');
-          $('#newchatmessage').val('');
+					//clear chat
+					$('#chatcounter').text('500');
+					$('#chat-messages').html('');
+					$('#rtt-typing').html('');
+					$('#newchatmessage').val('');
 
-          //reset buttons and ticket form
-          $('#ticketNumber').text('');
-          $('#complaintcounter').text('2,000');
-          // $("#callbutton").prop("disabled",true);
-          // $('#videomailbutton').prop("disabled", false);
-          // $('#userformbtn').prop("disabled", false);
-          $('#complaint').val('');
-          $('#subject').val('');
+					//reset buttons and ticket form
+					$('#ticketNumber').text('');
+					$('#complaintcounter').text('2,000');
+					// $("#callbutton").prop("disabled",true);
+					// $('#videomailbutton').prop("disabled", false);
+					// $('#userformbtn').prop("disabled", false);
+					$('#complaint').val('');
+					$('#subject').val('');
 
 					if (complaintRedirectActive) {
-            $("#callEndedModal").modal('show');
-            setTimeout(function () {
-              window.location = complaintRedirectUrl;
-            }, 5000);
-          }
+						$("#callEndedModal").modal('show');
+						setTimeout(function () {
+							window.location = complaintRedirectUrl;
+						}, 5000);
+					}
 				}).on('error', function (reason) {
 					if (reason.code === "invalid_token") {
 						logout("Session has expired");
@@ -274,8 +289,7 @@ function connect_socket() {
 					}
 				});
 
-			}
-			else {
+			} else {
 				//TODO: handle bad connections
 			}
 		},
@@ -287,45 +301,51 @@ function connect_socket() {
 
 }
 
-$("#callbutton").click(function(){
-  videomailflag = false;
-  $('#record-progress-bar').hide();
-  $('#vmsent').hide();
-	$("#callbutton").prop("disabled",true);
-  $('#videomailbutton').prop("disabled", true);
-  $("#queueModal").modal({backdrop: "static"});
-  $("#queueModal").modal("show");
+$("#callbutton").click(function () {
+	videomailflag = false;
+	$('#record-progress-bar').hide();
+	$('#vmsent').hide();
+	$("#callbutton").prop("disabled", true);
+	$('#videomailbutton').prop("disabled", true);
+	$("#queueModal").modal({
+		backdrop: "static"
+	});
+	$("#queueModal").modal("show");
 	$("#dialboxcallbtn").click(); //may or may not be dead code
 	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
-	socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
+	socket.emit('call-initiated', {
+		"vrs": vrs
+	}); //sends vrs number to adserver
 	console.log('call-initiated event for complaint');
 	enable_chat_buttons();
 });
 
-$("#videomailbutton").click(function(){
-  $('#videomailModal').modal('show');
+$("#videomailbutton").click(function () {
+	$('#videomailModal').modal('show');
 });
 
 function startRecordingVideomail(switchQueueFlag) {
-  if (switchQueueFlag) {
-    $('#videomailModal').modal('hide');
-    transfer_to_videomail();
-  } else {
-    $('#videomailModal').modal('hide');
-    $('#vmwait').show();
-    swap_video();
-    $('#vmsent').hide();
-    videomailflag = true;
-    $('#record-progress-bar').show();
-    $('#callbutton').prop("disabled", true);
-    $('#userformbtn').prop("disabled", true);
-    //dial into the videomail queue
-  	$("#videomailbutton").prop("disabled",true);
-  	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
-    socket.emit('call-initiated', {"vrs": vrs}); //sends vrs number to adserver
-  	console.log('call-initiated event for videomail');
-  }
-  switchQueueFlag = false;
+	if (switchQueueFlag) {
+		$('#videomailModal').modal('hide');
+		transfer_to_videomail();
+	} else {
+		$('#videomailModal').modal('hide');
+		$('#vmwait').show();
+		swap_video();
+		$('#vmsent').hide();
+		videomailflag = true;
+		$('#record-progress-bar').show();
+		$('#callbutton').prop("disabled", true);
+		$('#userformbtn').prop("disabled", true);
+		//dial into the videomail queue
+		$("#videomailbutton").prop("disabled", true);
+		var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
+		socket.emit('call-initiated', {
+			"vrs": vrs
+		}); //sends vrs number to adserver
+		console.log('call-initiated event for videomail');
+	}
+	switchQueueFlag = false;
 }
 
 $('#userform').submit(function (evt) {
@@ -334,7 +354,11 @@ $('#userform').submit(function (evt) {
 	var complaint = $('#complaint').val();
 	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
 
-	socket.emit('ad-ticket', { "vrs": vrs, "subject": subject, "description": complaint });
+	socket.emit('ad-ticket', {
+		"vrs": vrs,
+		"subject": subject,
+		"description": complaint
+	});
 	$('#userformoverlay').addClass("overlay").show();
 	$('#userformbtn').prop("disabled", true);
 	$("#callbutton").removeAttr("disabled");
@@ -348,16 +372,21 @@ function logout(msg) {
 	if (socket)
 		socket.disconnect();
 	//display the login screen to the user.
-	window.location.href='./logout'
+	window.location.href = './logout'
 }
 
 $("#newchatmessage").on('change keydown paste input', function () {
 	var value = $("#newchatmessage").val();
 	var displayname = $('#displayname').val();
 	if (value.length > 0) {
-		socket.emit('chat-typing', { "displayname": displayname, rttmsg: value });
+		socket.emit('chat-typing', {
+			"displayname": displayname,
+			rttmsg: value
+		});
 	} else {
-		socket.emit('chat-typing-clear', { "displayname": displayname });
+		socket.emit('chat-typing-clear', {
+			"displayname": displayname
+		});
 	}
 });
 
@@ -373,87 +402,87 @@ $('#chatsend').submit(function (evt) {
 	$('#chatcounter').text('500');
 	console.log("sent message");
 	isTyping = false;
-	socket.emit('chat-message', { "message": msg, "timestamp": timestamp, "displayname": displayname });
+	socket.emit('chat-message', {
+		"message": msg,
+		"timestamp": timestamp,
+		"displayname": displayname
+	});
 });
 
 
 // Event listener for the full-screen button
 function enterFullscreen() {
-  if (remoteView.requestFullscreen) {
-    remoteView.requestFullscreen();
-  } else if (remoteView.mozRequestFullScreen) {
-    remoteView.mozRequestFullScreen(); // Firefox
-  } else if (remoteView.webkitRequestFullscreen) {
-    remoteView.webkitRequestFullscreen(); // Chrome and Safari
-  }
+	if (remoteView.requestFullscreen) {
+		remoteView.requestFullscreen();
+	} else if (remoteView.mozRequestFullScreen) {
+		remoteView.mozRequestFullScreen(); // Firefox
+	} else if (remoteView.webkitRequestFullscreen) {
+		remoteView.webkitRequestFullscreen(); // Chrome and Safari
+	}
 }
 
 
-function exit_queue()
-{
+function exit_queue() {
 	$('#queueModal').modal('hide');
 	terminate_call();
 }
 
-function set_queue_text(position)
-{
-	if(position == 0) $("#queue-msg").text("There are no callers ahead of you.");
-	else if(position == 1) $("#queue-msg").html('There is <span id="pos-in-queue"> 1 </span> caller ahead of you.'); 
-	else if(position > 1) $("#pos-in-queue").text(position);
+function set_queue_text(position) {
+	if (position == 0) $("#queue-msg").text("There are no callers ahead of you.");
+	else if (position == 1) $("#queue-msg").html('There is <span id="pos-in-queue"> 1 </span> caller ahead of you.');
+	else if (position > 1) $("#pos-in-queue").text(position);
 	else $("#queue-msg").text("One of our agents will be with you shortly."); //default msg
 }
 
 //enables chat buttons on a webrtc call when it is accepted
-function enable_chat_buttons(){
+function enable_chat_buttons() {
 	$("#newchatmessage").removeAttr("disabled");
 	$("#chat-send").removeAttr("disabled");
-	$("#newchatmessage").attr("placeholder","Type Message ...");
+	$("#newchatmessage").attr("placeholder", "Type Message ...");
 	$("#characters-left").show();
 
 }
 
 //disables chat buttons
-function disable_chat_buttons(){
-	$("#newchatmessage").attr("disabled","disabled");
-	$("#chat-send").attr("disabled","disabled");
-	$("#newchatmessage").attr("placeholder","Chat disabled");
+function disable_chat_buttons() {
+	$("#newchatmessage").attr("disabled", "disabled");
+	$("#chat-send").attr("disabled", "disabled");
+	$("#newchatmessage").attr("placeholder", "Chat disabled");
 	$("#characters-left").hide();
 
 }
 
 //restores default buttons after a call is completed
 function enable_initial_buttons() {
-	if(skinny){
+	if (skinny) {
 		$("#callbutton").removeAttr("disabled");
 		$("#videomailbutton").removeAttr("disabled");
-	}
-	else{
+	} else {
 		$("#userformbtn").removeAttr("disabled");
 		$("#callbutton").attr("disabled", "disabled");
 		$("#videomailbutton").removeAttr("disabled");
 	}
-	
+
 }
 
 //convert UTC hh:mm to current time in browser's timezone, e.g., 01:00 PM EST
 //accepts UTC hh:mm, e.g., 14:00
 //returns hh:mm in browser timezone, e.g., 09:00 AM EST
 function convertUTCtoLocal(hhmmutc) {
-  var hh = parseInt(hhmmutc.split(":")[0]); //e.g., 14
-  var mins = hhmmutc.split(":")[1]; //e.g., 00
-  var todaysDate = new Date();
-  var yyyy = todaysDate.getFullYear().toString();
-  var mm = (todaysDate.getMonth()+1).toString();
-  var dd = todaysDate.getDate().toString();
-  var dte = mm + '/' + dd + '/' + yyyy + ' ' + hh + ':' + mins + ' UTC';
-  var converteddate = new Date(dte);
-  var newdte = converteddate.toString(); //Wed Jan 24 2018 09:00:00 GMT-0500 (EST)
-  var arr = newdte.split(" ");
-  var newhh = arr[4].split(":")[0];
-  var newmin = arr[4].split(":")[1];
-  var ampm = "AM";
-  if (newhh > 11) ampm = "PM";
-  if (newhh > 12) newhh -= 12;
-  return newhh + ":" + newmin + " " + ampm +  " " + arr[6].replace('(','').replace(')','');
+	var hh = parseInt(hhmmutc.split(":")[0]); //e.g., 14
+	var mins = hhmmutc.split(":")[1]; //e.g., 00
+	var todaysDate = new Date();
+	var yyyy = todaysDate.getFullYear().toString();
+	var mm = (todaysDate.getMonth() + 1).toString();
+	var dd = todaysDate.getDate().toString();
+	var dte = mm + '/' + dd + '/' + yyyy + ' ' + hh + ':' + mins + ' UTC';
+	var converteddate = new Date(dte);
+	var newdte = converteddate.toString(); //Wed Jan 24 2018 09:00:00 GMT-0500 (EST)
+	var arr = newdte.split(" ");
+	var newhh = arr[4].split(":")[0];
+	var newmin = arr[4].split(":")[1];
+	var ampm = "AM";
+	if (newhh > 11) ampm = "PM";
+	if (newhh > 12) newhh -= 12;
+	return newhh + ":" + newmin + " " + ampm + " " + arr[6].replace('(', '').replace(')', '');
 }
-
