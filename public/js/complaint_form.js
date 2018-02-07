@@ -143,7 +143,6 @@ function connect_socket() {
 					} else if (data.message == 'OutOfExtensions'){
 						console.log('out of extensions...')
 						//Try again in 10 seconds.
-						$('#newExtensionRetryCounter').timer('remove');
 						$('#outOfExtensionsModal').modal({
 							show: true,
 							backdrop: 'static',
@@ -376,6 +375,7 @@ $('#userform').submit(function (evt) {
 });
 
 function extensionRetry(){
+	$('#newExtensionRetryCounter').timer('remove');
 	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
 	socket.emit('call-initiated', {
 		"vrs": vrs
