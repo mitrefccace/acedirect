@@ -370,6 +370,27 @@
 		</div>
 	</div>
 
+
+	 <!--Out of Extensions Modal -->
+	<div class="modal fade" id="outOfExtensionsModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" style= "max-width: 500px;">
+			<div class="modal-content">
+				<div class = "modal-header text-center" style= "padding-top: 0; padding-bottom:0;">
+					<h2>Servers under heavy traffic</h2>
+				</div>
+				<div class="modal-body text-center">
+					<h4 id="queue-msg"> Automatically trying again in <span id="newExtensionRetryCounter">10 seconds</span>. <h4>
+				</div>
+				<div class = "text-center" style = "border-top: 1px solid #f4f4f4; padding: 10px;">
+			        <!-- This URL action should invoke DTMF Tone 1 -->
+			        <h5>&nbsp;10 second wait too long? <a href="#" onclick='extensionRetry()'>Click to try now</a>.</h5>
+		  		</div>
+
+			</div>
+		</div>
+	</div>
+
+
 	<!-- phone-page -->
 
   <!-- Jssip hidden data -->
@@ -408,9 +429,15 @@
   var complaintRedirectDesc = "FCC.gov";
   $("#redirecttag").attr("href", complaintRedirectUrl);
   $("#redirectdesc").text("Redirecting to " + complaintRedirectDesc + " ...");
+
+
+
+
+
+
   </script>
 	<script type="text/javascript" src="./js/myJssip.js"></script>
-	<!-- Custom Javascript for ACEDirect complaint_form.html page-->
+	<!-- Custom Javascript for ACEDirect complaint_form.html page -->
 	<script type="text/javascript" src="./js/complaint_form.js"></script>
 </body>
 

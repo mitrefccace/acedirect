@@ -109,6 +109,7 @@ function connect_socket() {
 				}).on('extension-created', function (data) {
 					console.log("got extension-created");
 					if (data.message == 'success') {
+						$('#outOfExtensionsModal').modal('hide');
 						var extension = data.extension; //returned extension to use for WebRTC
 						exten = data.extension;
 						$('#display_name').val(data.extension);
@@ -142,12 +143,21 @@ function connect_socket() {
 					} else if (data.message == 'OutOfExtensions'){
 						console.log('out of extensions...')
 						//Try again in 10 seconds.
-						setTimeout(function(){
-							var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
-							socket.emit('call-initiated', {
-								"vrs": vrs
-							});
-						}, 10000);
+						$('#newExtensionRetryCounter').timer('remove');
+						$('#outOfExtensionsModal').modal({
+							show: true,
+							backdrop: 'static',
+							keyboard: false
+						});
+						$('#newExtensionRetryCounter').timer({
+							duration: '10s',
+							format: '%s seconds',
+							countdown: true,
+							callback: function() {
+								extensionRetry();
+							},
+							repeat: false
+						});
 					} else {
 						console.log('Something went wrong when getting an extension')
 					}
@@ -364,6 +374,13 @@ $('#userform').submit(function (evt) {
 	$("#callbutton").removeAttr("disabled");
 
 });
+
+function extensionRetry(){
+	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
+	socket.emit('call-initiated', {
+		"vrs": vrs
+	});
+}
 
 function logout(msg) {
 	//clear the token from session storage
