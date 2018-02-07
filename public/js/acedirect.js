@@ -302,6 +302,7 @@ function connect_socket() {
 				}).on('missing-vrs', function (data) {
 					debugtxt('missing-vrs', data);
 					//show modal to get VRS from user
+					/*
 					$(".modal-backdrop").remove();
 					if (data.message) {
 						$('#ivrsmessage').text(data.message);
@@ -312,6 +313,7 @@ function connect_socket() {
 						backdrop: 'static',
 						keyboard: false
 					});
+					*/
 				}).on('ad-zendesk-update-success', function (data) {
 					debugtxt('ad-zendesk-update-success', data);
 					$('#alertPlaceholder').html('<div id="saveAlert" class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>Success!</div>');
