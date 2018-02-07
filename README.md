@@ -7,8 +7,11 @@ Accessible Communications for Everyone (ACE) Direct is a Direct Video Calling (D
 Full documentation and screenshots are here: [ACE Direct Platform Release Documentation](docs/ACE-Direct-Platform-Release-Doc-for-PR-Final-11-04-2016.pdf).
 
 ### Getting Started
-To install ACE Direct, follow the README.md file in the autoinstall folder. The instructions for manual install are also provided below for reference.
+Probably the *best* way to install the entire ACE Direct system is to start with the acedirect-public repo. Follow the documentation there for a clean install. The CHECKLISTS.md file provides an overview of the complete installation and configuration process.
+
+To manually install just the ACE Direct server:
 1. Clone this repository
+1. Clone the dat repo in the same folder and follow the configuration instructions.
 1. Download and install [Node.js](https://nodejs.org/en/)
 1. In an elevated command prompt, run `npm install -g bower`
 1. Install the required Node.js modules: cd into the acedirect directory, run `npm install`
@@ -17,9 +20,10 @@ To install ACE Direct, follow the README.md file in the autoinstall folder. The 
 
 ### SSL Configuration
 1. ACE software uses SSL which requires a valid key and certificate
-1. The location of the SSL key and certificate can be specified in the config.json by using the https:certificate and https:private_key parameters in the form of folder/file (e.g., ssl/mycert.pem and ssl/mykey.pem)
+1. The location of the SSL key and certificate is specified in the dat/config.json file with the common:https:certificate and common:https:private_key parameters in the form of full-path/file (e.g., /home/centos/ssl/mycert.pem and /home/centos/ssl/mykey.pem)
 1. Additional information can be found in the ACE Direct Platform Release document
 
 ### Accessing the Portals
-1. ACE Direct Consumer Portal, go to: https://host/ACEDirect/complaint
-1. ACE Direct Customer Service Rep (CSR) Portal, go to: https://host/ACEDirect/agent
+1. ACE Direct Consumer Portal: https://host/ACEDirect/complaint
+1. ACE Direct Customer Service Rep (CSR) Portal: https://host/ACEDirect/agent
+1. ACE Direct Management Portal: https://host/ManagementPortal
