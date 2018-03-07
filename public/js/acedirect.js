@@ -448,7 +448,7 @@ function connect_socket() {
 				});
 
 			} else {
-				//TODO: handle bad connections
+				//we do  nothing with bad connections
 			}
 		},
 		error: function (xhr, status, error) {
