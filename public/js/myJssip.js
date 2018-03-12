@@ -528,7 +528,7 @@ function unhide_video() {
 }
 
 
-//*** TODO times out and ends call after 30 or so seconds. agent gets event "ended" with cause "RTP Timeout". 
+// times out and ends call after 30 or so seconds. agent gets event "ended" with cause "RTP Timeout". 
 // puts session on hold
 function hold() {
 	if (currentSession) {
@@ -550,7 +550,7 @@ function unhold() {
 	}
 }
 
-//TODO: this function may or may not solve our H264 codec issue. Calls to this function are currently commented out as it seems to not be helping.
+//this function may or may not solve our H264 codec issue. Calls to this function are currently commented out as it seems to not be helping.
 //Edits the request to remove H264 modes other than 97, and adds H264 mode 97
 //@ param request is the request message to edit
 //@ return request_lines.join(' ') the edited request

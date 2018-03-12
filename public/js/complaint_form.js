@@ -299,7 +299,7 @@ function connect_socket() {
 				});
 
 			} else {
-				//TODO: handle bad connections
+				//need to handle bad connections?
 			}
 		},
 		error: function (xhr, status, error) {
