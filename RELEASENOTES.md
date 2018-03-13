@@ -1,4 +1,4 @@
-![](images/adsmall.png)
+![](images/acedirectsmall.png)
 
 # ACE Direct
 

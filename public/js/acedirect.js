@@ -1153,7 +1153,7 @@ function stopVideomail() {
 	remoteView.removeAttribute("src");
 	remoteView.removeAttribute("onended");
 	remoteView.setAttribute("autoplay", "autoplay");
-	remoteView.setAttribute("poster", "images/AD-logo.png");
+	remoteView.setAttribute("poster", "images/acedirect-logo.png");
 	toggle_videomail_buttons(false);
 }
 
