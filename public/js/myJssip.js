@@ -275,13 +275,16 @@ var toggling;
 
 
 function startToggling() {
-	if (toggleCall) {
+	if (toggleCall == 'true') {
 		toggling = setInterval(function () {
 			if (!paused) {
 				hide_video()
 				unhide_video()
 			}
 		}, 1000);
+	} else if (toggleCall == 'once') {
+		hide_video()
+		unhide_video()
 	}
 }
 
@@ -417,7 +420,7 @@ function terminate_call() {
 	$("#agent-name-box").hide();
 	$("#agent-name").text("");
 	// if(ua) ua.stop(); 
-	
+
 	stopToggling();
 }
 
