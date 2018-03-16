@@ -155,7 +155,7 @@ function register_jssip() {
 		currentSession.on('ended', function (e) {
 			if (debug) console.log('\nCURRENTSESSION -  ENDED: \nORIGINATOR: \n' + e.originator + '\nMESSAGE:\n' + e.message + "\nCAUSE:\n" + e.cause);
 			terminate_call();
-			
+
 			if (complaintForm) {
 				unregister_jssip();
 				stopRecordProgress();
@@ -267,6 +267,31 @@ function start_call(other_sip_uri) {
 	ua.call(other_sip_uri, options);
 }
 
+var url_string = window.location.href
+var url = new URL(url_string);
+var toggleCall = url.searchParams.get("toggle");
+var paused = false;
+var toggling;
+
+
+function startToggling() {
+	if (toggleCall) {
+		toggling = setInterval(function () {
+			if (!paused) {
+				hide_video()
+				unhide_video()
+			}
+		}, 1000);
+	}
+}
+
+function pauseToggling() {
+	paused = !paused;
+}
+
+function stopToggling() {
+	clearInterval(toggling);
+}
 //answers an incoming call
 function accept_call() {
 	if (currentSession) {
@@ -294,6 +319,7 @@ function accept_call() {
 			remoteStream.srcObject = e.streams[0];
 			remoteStream.play();
 		};
+		startToggling();
 	}
 }
 
@@ -391,6 +417,8 @@ function terminate_call() {
 	$("#agent-name-box").hide();
 	$("#agent-name").text("");
 	// if(ua) ua.stop(); 
+	
+	stopToggling();
 }
 
 //terminates the call (if present) and unregisters the ua
