@@ -213,6 +213,7 @@ function register_jssip() {
 		currentSession.on('sdp', function (e) {
 			//e.sdp = edit_request(e.sdp);
 			if (debug) console.log('\nCURRENTSESSION -  SDP \nORIGINATOR:\n' + e.originator + "\nTYPE:\n" + e.type + "\nSDP:\n" + e.sdp);
+			
 
 		});
 		currentSession.on('getusermediafailed', function (e) {
@@ -267,34 +268,14 @@ function start_call(other_sip_uri) {
 	ua.call(other_sip_uri, options);
 }
 
-var url_string = window.location.href
-var url = new URL(url_string);
-var toggleCall = url.searchParams.get("toggle");
-var paused = false;
-var toggling;
 
-
-function startToggling() {
-	if (toggleCall == 'true') {
-		toggling = setInterval(function () {
-			if (!paused) {
-				hide_video()
-				unhide_video()
-			}
-		}, 1000);
-	} else if (toggleCall == 'once') {
-		hide_video()
-		unhide_video()
-	}
+function toggleSelfview() {
+	setTimeout(function(){
+			hide_video();
+			setTimeout(function(){ unhide_video(); }, 500);
+	}, 2000);
 }
 
-function pauseToggling() {
-	paused = !paused;
-}
-
-function stopToggling() {
-	clearInterval(toggling);
-}
 //answers an incoming call
 function accept_call() {
 	if (currentSession) {
@@ -321,8 +302,9 @@ function accept_call() {
 			if (debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
 			remoteStream.srcObject = e.streams[0];
 			remoteStream.play();
+
+			toggleSelfview()
 		};
-		startToggling();
 	}
 }
 
