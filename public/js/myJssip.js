@@ -239,6 +239,8 @@ function register_jssip() {
 			remoteStream.srcObject = e.streams[0];
 			remoteStream.play();
 
+			//toggleSelfview();
+
 		};
 
 	});
