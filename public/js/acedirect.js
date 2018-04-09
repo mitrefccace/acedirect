@@ -329,11 +329,8 @@ function connect_socket() {
 					$('#problemdesc').val(data.description);
 					$('#ticketId').val(data.zendesk_ticket);
 				}).on('agent-status-list', function (data) {
-					var name, extension, queues, tabledata;
-
-
 					if (data.message === "success") {
-						tabledata = {
+						var tabledata = {
 							data: []
 						};
 						for (var i = 0; i < data.agents.length; i++) {
@@ -376,9 +373,9 @@ function connect_socket() {
 									statusTxt = "Unknown";
 							}
 
-
 							var statusDiv = document.createElement('div');
 							var statusLightIcon = document.createElement('i');
+							
 							$(statusDiv).css('display:inline-block');
 							$(statusLightIcon).addClass(getStatusIconClasses(color, blinking));
 							$(statusDiv).append(statusLightIcon);
