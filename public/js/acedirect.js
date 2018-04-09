@@ -39,10 +39,6 @@ $(document).ready(function () {
 	$("#geninfotab").hide();
 	$("#complaintstab").hide();
 	$("[data-mask]").inputmask();
-	//make boxes draggable
-	//$('.box').draggable({
-	//	cursor: "crosshair"
-	//});
 
 	clearScreen();
 
@@ -51,26 +47,9 @@ $(document).ready(function () {
 			$("#licModalBody").append("<h3>" + data.license[i].name + "<h3><pre>" + data.license[i].pre + "</pre>");
 		});
 	});
-
-	if (window.addEventListener) {
-		var state = 0,
-			theCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
-		window.addEventListener("keydown", function (e) {
-			if (e.keyCode === theCode[state]) {
-				state++;
-			} else {
-				state = 0;
-			}
-			if (state === 10) {
-				$("#debugtab").show();
-			}
-		}, true);
-	}
 });
 
 function connect_socket() {
-	//if (sessionStorage.getItem('accesstoken') === null)
-	//	logout();
 	console.log('connect_socket to ');
 	console.log(window.location.host);
 	$.ajax({
@@ -375,7 +354,7 @@ function connect_socket() {
 
 							var statusDiv = document.createElement('div');
 							var statusLightIcon = document.createElement('i');
-							
+
 							$(statusDiv).css('display:inline-block');
 							$(statusLightIcon).addClass(getStatusIconClasses(color, blinking));
 							$(statusDiv).append(statusLightIcon);
