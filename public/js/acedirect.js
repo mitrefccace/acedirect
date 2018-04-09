@@ -86,11 +86,11 @@ function connect_socket() {
 					forceNew: true
 				});
 
-                //update the version and year in the footer
-                socket.on('adversion', function (data) {
-                  $('#ad-version').text(data.version);
-                  $('#ad-year').text(data.year);
-                });
+				//update the version and year in the footer
+				socket.on('adversion', function (data) {
+					$('#ad-version').text(data.version);
+					$('#ad-year').text(data.year);
+				});
 
 				socket.on('connect', function () {
 					debugtxt('connect', {
@@ -133,7 +133,7 @@ function connect_socket() {
 						$('#sidebar-geninfo').show();
 					}
 
-					if (payload.layout||sessionStorage.layout) {
+					if (payload.layout || sessionStorage.layout) {
 						var layout = typeof sessionStorage.layout !== "undefined" ? sessionStorage.layout : payload.layout;
 						loadGridLayout(JSON.parse(layout));
 					}
@@ -298,7 +298,10 @@ function connect_socket() {
 					});
 					var vrs = $('#callerPhone').val();
 					var agent_name = $("#agentname-sidebar").text();
-					socket.emit('send-name',{"agent_name": agent_name , "vrs": vrs});
+					socket.emit('send-name', {
+						"agent_name": agent_name,
+						"vrs": vrs
+					});
 				}).on('missing-vrs', function (data) {
 					debugtxt('missing-vrs', data);
 					//show modal to get VRS from user
@@ -326,47 +329,70 @@ function connect_socket() {
 					$('#problemdesc').val(data.description);
 					$('#ticketId').val(data.zendesk_ticket);
 				}).on('agent-status-list', function (data) {
-					//debugtxt('agent-status-list', data);
-					var name, status, extension, queues, tabledata;
+					var name, extension, queues, tabledata;
+
+
 					if (data.message === "success") {
 						tabledata = {
 							data: []
 						};
 						for (var i = 0; i < data.agents.length; i++) {
-							var name, status, extension, queues = "";
-							name = data.agents[i].name;
-							status = data.agents[i].status;
-							if (status === "READY") {
-								if (ready_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-" + ready_color + "-blinking'></i>&nbsp;&nbsp;Ready</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + ready_color + "'></i>&nbsp;&nbsp;Ready</div>";
-							} else if (status === "AWAY") {
-								if (away_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-" + away_color + "-blinking'></i>&nbsp;&nbsp;Away</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + away_color + "'></i>&nbsp;&nbsp;Away</div>";
-							} else if (status === "INCALL") {
-								if (in_call_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-" + in_call_color + "-blinking'></i>&nbsp;&nbsp;In Call</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + in_call_color + "'></i>&nbsp;&nbsp;In Call</div>";
-							} else if (status === "WRAPUP") {
-								if (wrap_up_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-" + wrap_up_color + "-blinking'></i>&nbsp;&nbsp;Wrap Up</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + wrap_up_color + "'></i>&nbsp;&nbsp;Wrap Up</div>";
-							} else if (status === "INCOMINGCALL") {
-								if (incoming_call_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-" + incoming_call_color + "-blinking'></i>&nbsp;&nbsp;Incoming Call</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + incoming_call_color + "'></i>&nbsp;&nbsp;Incoming Call</div>";
-							} else if (status === "MISSEDCALL") {
-								if (missed_call_blinking) status = "<div style='display:inline-block'><i class='status-margin-small text-" + missed_call_color + "-blinking'></i>&nbsp;&nbsp;Missed Call</div>";
-								else status = "<div style='display:inline-block'><i class='fa fa-circle text-" + missed_call_color + "'></i>&nbsp;&nbsp;Missed Call</div>";
-							} else {
-								status = "<div style='display:inline-block'><i class='fa fa-circle text-gray'></i>&nbsp;&nbsp;Unknown</div>";
+							var statusTxt, sColor, queues = "";
+							var sBlinking = false;
+							switch (data.agents[i].status) {
+								case "READY":
+									sColor = ready_color;
+									sBlinking = ready_blinking;
+									statusTxt = "Ready";
+									break;
+								case "AWAY":
+									sColor = away_color;
+									sBlinking = away_blinking;
+									statusTxt = "Away"
+									break;
+								case "INCALL":
+									sColor = in_call_color;
+									sBlinking = in_call_blinking;
+									statusTxt = "In Call";
+									break;
+								case "WRAPUP":
+									sColor = wrap_up_color;
+									sBlinking = wrap_up_blinking;
+									statusTxt = "Wrap Up";
+									break;
+								case "INCOMINGCALL":
+									sColor = incoming_call_color;
+									sBlinking = incoming_call_blinking;
+									statusTxt = "Incoming Call";
+									break;
+								case "MISSEDCALL":
+									sColor = missed_call_color;
+									sBlinking = missed_call_blinking;
+									statusTxt = "Missed Call";
+									break;
+								default:
+									sColor = "gray";
+									sBlinking = false;
+									statusTxt = "Unknown";
 							}
 
-							extension = data.agents[i].extension;
+
+							var statusDiv = document.createElement('div');
+							var statusLightIcon = document.createElement('i');
+							$(statusDiv).css('display:inline-block');
+							$(statusLightIcon).addClass(getStatusIconClasses(color, blinking));
+							$(statusDiv).append(statusLightIcon);
+							$(statusDiv).append("&nbsp;&nbsp;" + statusTxt);
+
 							for (var j = 0; j < data.agents[i].queues.length; j++) {
 								queues += data.agents[i].queues[j].queuename + "<br>";
 							}
+
 							queues = queues.replace(/<br>\s*$/, "");
 							tabledata['data'].push({
-								"status": status,
-								"name": name,
-								"extension": extension,
+								"status": statusDiv,
+								"name": data.agents[i].name,
+								"extension": data.agents[i].extension,
 								"queues": queues
 							});
 						}
@@ -431,18 +457,16 @@ function connect_socket() {
 					$('#videomailErrorBody').html('Unable to locate videomail with ID ' + data + '.');
 					$('#videomailErrorModal').modal('show');
 					stopVideomail();
-				}).on('queue-caller-join',function(data){
-					if(data.queue == "ComplaintsQueue") {
+				}).on('queue-caller-join', function (data) {
+					if (data.queue == "ComplaintsQueue") {
 						$("#complaints-queue-num").text(data.count);
-					}
-					else if(data.queue == "GeneralQuestionsQueue") {
+					} else if (data.queue == "GeneralQuestionsQueue") {
 						$("#general-queue-num").text(data.count);
 					}
-				}).on('queue-caller-leave',function(data){
-					if(data.queue == "ComplaintsQueue") {
+				}).on('queue-caller-leave', function (data) {
+					if (data.queue == "ComplaintsQueue") {
 						$("#complaints-queue-num").text(data.count);
-					}
-					else if(data.queue == "GeneralQuestionsQueue") {
+					} else if (data.queue == "GeneralQuestionsQueue") {
 						$("#general-queue-num").text(data.count);
 					}
 				});
@@ -553,6 +577,10 @@ function requestAssistance() {
 	socket.emit('request-assistance', null);
 }
 
+function getStatusIconClasses(color, blinking) {
+	return (blinking) ? "status-margin-small text-" + color + "-blinking" : "fa fa-circle text-" + color;
+}
+
 function logout(msg) {
 	busylight.light('OFF_DUTY');
 	changeStatusLight('OFF_DUTY');
@@ -633,11 +661,10 @@ function inCallADComplaints(endpoint_type) {
 	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	changeStatusLight('IN_CALL');
 	socket.emit('incall', null);
-	if(endpoint_type === "Provider_Complaints"){
+	if (endpoint_type === "Provider_Complaints") {
 		disable_chat_buttons();
-		$("#newchatmessage").attr("placeholder","Chat disabled for Provider endpoints");
-	}
-	else{ //should be webrtc 
+		$("#newchatmessage").attr("placeholder", "Chat disabled for Provider endpoints");
+	} else { //should be webrtc 
 		enable_chat_buttons();
 	}
 
@@ -653,11 +680,10 @@ function inCallADGeneral(endpoint_type) {
 	changeStatusLight('IN_CALL');
 	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	socket.emit('incall', null);
-	if(endpoint_type === "Provider_General_Questions"){
+	if (endpoint_type === "Provider_General_Questions") {
 		disable_chat_buttons();
-		$("#newchatmessage").attr("placeholder","Chat disabled for provider endpoints");
-	}
-	else{ //should be webrtc 
+		$("#newchatmessage").attr("placeholder", "Chat disabled for provider endpoints");
+	} else { //should be webrtc 
 		enable_chat_buttons();
 	}
 }
@@ -1114,10 +1140,10 @@ function playVideomail(id, duration, vidStatus) {
 	remoteView.removeAttribute("poster");
 	remoteView.setAttribute("src", './getVideomail?id=' + id + '&ext=' + extensionMe);
 	remoteView.setAttribute("onended", "change_play_button()");
-	if (document.getElementById("play-video-icon").classList.contains("fa-pause")){
+	if (document.getElementById("play-video-icon").classList.contains("fa-pause")) {
 		document.getElementById("play-video-icon").classList.add("fa-play");
 		document.getElementById("play-video-icon").classList.remove("fa-pause");
-	}																			
+	}
 	toggle_videomail_buttons(true);
 	updateVideoTime(duration, "vmail-total-time");
 	if (vidStatus === "UNREAD") {
@@ -1333,14 +1359,16 @@ function saveGridLayout() {
 	});
 
 	sessionStorage.layout = JSON.stringify(serializedGridData);
-	socket.emit('save-grid-layout', {'gridLayout':serializedGridData});
+	socket.emit('save-grid-layout', {
+		'gridLayout': serializedGridData
+	});
 };
 
 //if(typeof sessionStorage.layout == 'object')
 //	loadGridLayout(sessionStorage.layout);
 
 function loadGridLayout(layout) {
-	sessionStorage.layout = JSON.stringify(layout); 
+	sessionStorage.layout = JSON.stringify(layout);
 	loadingGridLayout = true;
 	var grid = $('.grid-stack').data('gridstack');
 	grid.batchUpdate();
@@ -1364,13 +1392,13 @@ $('.grid-stack').on('change', function (event, items) {
 	resizeChat();
 });
 
-function resizeVideo(){
+function resizeVideo() {
 	var contentHeight = $("#gsvideobox").height() - 50;
 	$('#VideoBox').css("height", contentHeight + "px");
-	$('#remoteView').css("height", contentHeight-125 + "px");
+	$('#remoteView').css("height", contentHeight - 125 + "px");
 }
 
-function resizeChat(){
+function resizeChat() {
 	var contentHeight = $("#gschatbox").height();
 
 	var chatheaderHeight = $("#chat-header").outerHeight();
@@ -1379,35 +1407,47 @@ function resizeChat(){
 	var parts = chatheaderHeight + rtttypinHeight + chatfooterheight;
 
 	var padding = 30;
-	
+
 	// userchat is overall chat box content, chatmessages is only the messages area
 	$('#userchat').css("height", contentHeight - padding + "px");
 	$('#chat-messages').css("height", contentHeight - parts - padding + "px");
 }
 
-function resetLayout(){
-	var defaultLayout = [{"id":"gsvideobox","x":0,"y":0,"width":8,"height":16},{"id":"gschatbox","x":8,"y":0,"width":4,"height":10}];
+function resetLayout() {
+	var defaultLayout = [{
+		"id": "gsvideobox",
+		"x": 0,
+		"y": 0,
+		"width": 8,
+		"height": 16
+	}, {
+		"id": "gschatbox",
+		"x": 8,
+		"y": 0,
+		"width": 4,
+		"height": 10
+	}];
 	loadGridLayout(defaultLayout);
 	resizeVideo();
 	resizeChat();
 }
 
 //enables chat buttons on a webrtc call when it is accepted
-function enable_chat_buttons(){
-	$("#newchatmessage").removeAttr("disabled");  
-	$("#chat-send").removeAttr("disabled");  
-	$("#newchatmessage").attr("placeholder","Type Message ...");
+function enable_chat_buttons() {
+	$("#newchatmessage").removeAttr("disabled");
+	$("#chat-send").removeAttr("disabled");
+	$("#newchatmessage").attr("placeholder", "Type Message ...");
 	$("#characters-left").show();
 
 }
 
 //disables chat buttons 
-function disable_chat_buttons(){
-	$("#newchatmessage").attr("disabled","disabled");  
-	$("#chat-send").attr("disabled","disabled");  
-	$("#newchatmessage").attr("placeholder","Chat disabled");
+function disable_chat_buttons() {
+	$("#newchatmessage").attr("disabled", "disabled");
+	$("#chat-send").attr("disabled", "disabled");
+	$("#newchatmessage").attr("placeholder", "Chat disabled");
 	$("#characters-left").hide();
 
 }
 
-function enable_initial_buttons(){}
+function enable_initial_buttons() {}
