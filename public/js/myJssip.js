@@ -404,8 +404,6 @@ function terminate_call() {
 	$("#agent-name-box").hide();
 	$("#agent-name").text("");
 	// if(ua) ua.stop(); 
-
-	stopToggling();
 }
 
 //terminates the call (if present) and unregisters the ua
