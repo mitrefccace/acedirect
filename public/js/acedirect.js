@@ -324,7 +324,7 @@ function connect_socket() {
 
 							queues = queues.replace(/<br>\s*$/, "");
 							tabledata['data'].push({
-								"status": statusDiv,
+								"status": $(statusDiv).html(),
 								"name": data.agents[i].name,
 								"extension": data.agents[i].extension,
 								"queues": queues
