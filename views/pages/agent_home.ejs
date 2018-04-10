@@ -2,204 +2,18 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>ACE Direct</title>
-    <!-- Tell the browser to be responsive to screen width -->
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-
-    <!-- Bootstrap 3.3.5 -->
-    <link rel="stylesheet" href="./bower_components/AdminLTE/bootstrap/css/bootstrap.css">
-    <!-- Bootstrap Toggle v2.2.0 -->
-    <link rel="stylesheet" href="./bower_components/bootstrap-toggle/css/bootstrap-toggle.css">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="./bower_components/font-awesome/css/font-awesome.min.css">
-    <!-- Ionicons -->
-    <link rel="stylesheet" href="./bower_components/Ionicons/css/ionicons.min.css">
-    <!-- Theme style -->
-    <link rel="stylesheet" href="./bower_components/AdminLTE/dist/css/AdminLTE.css">
-    <!--link rel="stylesheet" href="./custom/AdminLTE/dist/css/AdminLTE.css"-->
-    <!-- AdminLTE Skins  -->
-    <link rel="stylesheet" href="./bower_components/AdminLTE/dist/css/skins/_all-skins.min.css">
-    <!-- Custom Portal stylesheet -->
-    <link rel="stylesheet" href="./css/ca-portal.css">
-    <!-- GridStack -->
-    <link rel="stylesheet" href="./bower_components/gridstack/dist/gridstack.min.css" />
+    <% include ../partials/agent_page_head %>
 </head>
 
 <body class="hold-transition skin-purple sidebar-mini">
     <div class="wrapper">
         <header class="main-header">
-            <!-- Logo -->
-            <a href="" class="logo">
-                <!-- mini logo for sidebar mini 50x50 pixels -->
-                <span class="logo-mini">
-                    <b>ACE</b>
-                </span>
-                <!-- logo for regular state and mobile devices -->
-                <span class="logo-lg">
-                    <b>ACE</b>&nbsp;
-                    <span id="logo-text">Direct</span>
-                </span>
-            </a>
-
-            <!-- Header Navbar: style can be found in header.less -->
-            <nav class="navbar navbar-static-top" role="navigation">
-                <!-- Sidebar toggle button-->
-                <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
-                    <span class="sr-only">Toggle navigation</span>
-                </a>
-                <div id="agentStatusInfo" class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-2 col-md-offset-2" style="white-space:nowrap;">
-                    <span>
-                        <div>Call Duration: &nbsp;&nbsp;
-                            <font id="duration" class="text-light-gray">0 sec</font>
-                        </div>
-                    </span>
-                </div>
-                <div class="pull-right">
-                    <button id="assistanceBtn" type="button" class="btn btn-danger" onclick="requestAssistance()">Get Help</button>
-                </div>
-                <!-- Navbar Right Menu -->
-                <div class="navbar-custom-menu">
-                    <ul class="nav navbar-nav">
-                        <!-- User Account: style can be found in dropdown.less -->
-                        <li class="dropdown user user-menu">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <img src="images/anon.png" class="user-image" alt="User Image">
-                                <span class="hidden-xs" id="agentname-header"></span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <!-- User image -->
-                                <li class="user-header">
-                                    <img src="images/anon.png" class="img-circle" alt="User Image">
-                                    <p>
-                                        <span id="agentname-headerdropdown"></span>
-                                        <br>
-                                        <span id="agentrole-headerdropdown"></span>
-                                    </p>
-                                </li>
-                                <!-- Menu Footer-->
-                                <li class="user-footer">
-                                    <div class="pull-left">
-                                        <a href="#" class="btn btn-default btn-flat" onclick="resetLayout()">Default Layout</a>
-                                    </div>
-                                    <div class="pull-right">
-                                        <a href="#" class="btn btn-default btn-flat" onclick="logout()">Sign out</a>
-                                    </div>
-                                </li>
-                            </ul>
-                        </li>
-                        <!-- Control Sidebar Toggle Button -->
-                        <li>
-                            <a href="#" id="mail-btn" data-toggle="control-sidebar" onClick="showVideoMailTab()">
-                                <i class="fa fa-envelope-o"></i>
-                                <span class="label label-danger" id="unread-mail-count"></span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" data-toggle="modal" data-target="#licModal">
-                                <i class="fa fa-info-circle"></i>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" id="agents-btn" data-toggle="control-sidebar" onClick="showAgentsTab()">
-                                <i class="fa fa-gears"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+            <% include ../partials/agent_page_header %>
         </header>
-
         <!-- Left side column. contains the logo and sidebar -->
         <aside class="main-sidebar">
-            <!-- sidebar: style can be found in sidebar.less -->
-            <section class="sidebar">
-                <!-- Sidebar user panel -->
-                <div class="user-panel" style="overflow: visible;">
-                    <div class="pull-left image">
-                        <img src="images/anon.png" class="img-circle" alt="User Image">
-                    </div>
-                    <div class="pull-left info">
-                        <p style="margin-bottom: 0; padding-bottom: 0;">
-                            <span id="agentname-sidebar">Franklin Pierce</span>
-                        </p>
-                        <span id="status-dropdown" class="dropdown dropdown-menu-left">
-                            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
-                                <span>
-                                    <i id="status-icon" class="fa fa-circle text-yellow currently-away"></i>
-                                </span>&nbsp;&nbsp;&nbsp;
-                                <span id="user-status">Away</span>
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li onclick="pauseQueues();">
-                                    <a href="#">
-                                        <i id="away-icon" class="fa fa-circle text-yellow away-color"></i>
-                                        <span>Away</span>
-                                    </a>
-                                </li>
-                                <li onclick="unpauseQueues();">
-                                    <a href="#">
-                                        <i id="ready-icon" class="fa fa-circle text-green ready-color"></i>
-                                        <span>Ready</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </span>
-                    </div>
-                </div>
-                <!-- sidebar menu: : style can be found in sidebar.less -->
-                <ul class="sidebar-menu">
-                    <li class="header">MAIN NAVIGATION</li>
-                    <li>
-                        <a href="#">
-                            <i class="fa fa-desktop"></i>
-                            <span id="nav-desktop">AD Desktop</span>
-                        </a>
-                    </li>
-                    <li id="sidebar-queues" class="header">
-                        <span id="nav-desktop">QUEUES</span>
-                    </li>
-
-                    <li id="sidebar-geninfo" onclick="$('#geninfoanchor').click()" hidden>
-                        <a href="#">
-                            <i class="fa fa-question-circle"></i>
-                            <span>General Info</span>
-                             <span >
-                                <small id="general-queue-num"  class="label pull-right bg-md-gray"; >0</small>
-                            </span>
-                            <span id="geninfoInCall" hidden>
-                                <small class="label pull-right bg-red" style="margin-top: 3px;">in call</small>
-                            </span>
-                        </a>
-                    </li>
-                    <li id="sidebar-complaints" onclick="$('#complaintsanchor').click()" hidden>
-                        <a href="#">
-                            <i class="fa fa-thumbs-down"></i>
-                            <span>Complaints</span>
-                             <span>
-                                <small id="complaints-queue-num" class="label pull-right bg-md-gray"; >0</small>
-                            </span>
-                            <span id="complaintsInCall"  hidden>
-                                <small class="label pull-right bg-red" style = 'margin-top: 3px;'>in call</small>
-                            </span>
-                        </a>
-                    </li>
-                    <li class="header">TOOLS</li>
-
-                    <li id="sidebar-dialpad">
-                        <a href="#" onclick="showDialpad()">
-                            <i class="fa fa-video-camera"></i>
-                            <span>Dial Pad</span>
-                        </a>
-
-                    </li>
-                </ul>
-            </section>
-            <!-- /.sidebar -->
+            <% include ../partials/agent_page_sidebar_main %>
         </aside>
-
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->
@@ -595,41 +409,6 @@
         </div>
 
         <div id="snackbar">Default Text</div>
-
-        <!-- ================== javascript ================================ -->
-        <!-- jQuery v2.1.4 -->
-        <script src="./bower_components/AdminLTE/plugins/jQuery/jquery-2.2.3.min.js"></script>
-        <!-- jQuery UI - v1.11.4 -->
-        <script src="./bower_components/AdminLTE/plugins/jQueryUI/jquery-ui.min.js"></script>
-        <!-- socket.io-client -->
-        <script type="text/javascript" src="./socket.io/socket.io.js"></script>
-        <!-- Bootstrap 3.3.5 -->
-        <script type="text/javascript" src="./bower_components/bootstrap/dist/js/bootstrap.js"></script>
-        <!-- Decode JWT tokens -->
-        <script type="text/javascript" src="./bower_components/jwt-decode/build/jwt-decode.min.js"></script>
-        <!-- timer.jquery 0.6.3 -->
-        <script type="text/javascript" src='./bower_components/timer.jquery/dist/timer.jquery.min.js'></script>
-        <!-- moment.js 2.15.1 -->
-        <script type="text/javascript" src='./bower_components/moment/moment.js'></script>
-        <script type="text/javascript" src="./bower_components/AdminLTE/plugins/input-mask/jquery.inputmask.js"></script>
-        <!-- AdminLTE App -->
-        <script src="./bower_components/AdminLTE/dist/js/app.min.js"></script>
-        <!-- DataTables 1.10.12 -->
-        <script type="text/javascript" src="./bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
-        <!-- JSSIP-->
-        <script type="text/javascript" src="./bower_components/jssip/dist/jssip.min.js"></script>
-        <script>
-            var complaintForm = false;
-        </script>
-        <script type="text/javascript" src="./js/myJssip.js"></script>
-        <!-- GridStack -->
-        <script src="./bower_components/lodash/dist/lodash.min.js"></script>
-        <script src="./bower_components/gridstack/dist/gridstack.min.js"></script>
-        <script src="./bower_components/gridstack/dist/gridstack.jQueryUI.min.js"></script>
-        <!-- Custom Javascript for ACEDirect index.html page-->
-        <script type="text/javascript" src="./js/busylight.js"></script>
-        <script type="text/javascript" src="./js/acedirect.js"></script>
-        
 </body>
 
 </html>

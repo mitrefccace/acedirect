@@ -1,0 +1,79 @@
+<!-- Logo -->
+<a href="" class="logo">
+    <!-- mini logo for sidebar mini 50x50 pixels -->
+    <span class="logo-mini">
+        <b>ACE</b>
+    </span>
+    <!-- logo for regular state and mobile devices -->
+    <span class="logo-lg">
+        <b>ACE</b>&nbsp;
+        <span id="logo-text">Direct</span>
+    </span>
+</a>
+
+<!-- Header Navbar: style can be found in header.less -->
+<nav class="navbar navbar-static-top" role="navigation">
+    <!-- Sidebar toggle button-->
+    <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+        <span class="sr-only">Toggle navigation</span>
+    </a>
+    <div id="agentStatusInfo" class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-2 col-md-offset-2" style="white-space:nowrap;">
+        <span>
+            <div>Call Duration: &nbsp;&nbsp;
+                <font id="duration" class="text-light-gray">0 sec</font>
+            </div>
+        </span>
+    </div>
+    <div class="pull-right">
+        <button id="assistanceBtn" type="button" class="btn btn-danger" onclick="requestAssistance()">Get Help</button>
+    </div>
+    <!-- Navbar Right Menu -->
+    <div class="navbar-custom-menu">
+        <ul class="nav navbar-nav">
+            <!-- User Account: style can be found in dropdown.less -->
+            <li class="dropdown user user-menu">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                    <img src="images/anon.png" class="user-image" alt="User Image">
+                    <span class="hidden-xs" id="agentname-header"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <!-- User image -->
+                    <li class="user-header">
+                        <img src="images/anon.png" class="img-circle" alt="User Image">
+                        <p>
+                            <span id="agentname-headerdropdown"></span>
+                            <br>
+                            <span id="agentrole-headerdropdown"></span>
+                        </p>
+                    </li>
+                    <!-- Menu Footer-->
+                    <li class="user-footer">
+                        <div class="pull-left">
+                            <a href="#" class="btn btn-default btn-flat" onclick="resetLayout()">Default Layout</a>
+                        </div>
+                        <div class="pull-right">
+                            <a href="#" class="btn btn-default btn-flat" onclick="logout()">Sign out</a>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            <!-- Control Sidebar Toggle Button -->
+            <li>
+                <a href="#" id="mail-btn" data-toggle="control-sidebar" onClick="showVideoMailTab()">
+                    <i class="fa fa-envelope-o"></i>
+                    <span class="label label-danger" id="unread-mail-count"></span>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-toggle="modal" data-target="#licModal">
+                    <i class="fa fa-info-circle"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#" id="agents-btn" data-toggle="control-sidebar" onClick="showAgentsTab()">
+                    <i class="fa fa-gears"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
