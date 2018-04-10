@@ -85,14 +85,6 @@ function connect_socket() {
 					$('#statusmsg').text(""); //clear status text
 
 					//populate call agent information
-					/*seems to be dead code
-					// $('#txtAgentDisplayName').val(payload.username);
-					// $('#txtAgentFirstname').val(payload.first_name);
-					// $('#txtAgentLastname').val(payload.last_name);
-					// $('#txtAgentRole').val(payload.role);
-					// $('#txtAgentEmail').val(payload.email);
-					// $('#txtAgentPhone').val(payload.phone);
-					*/
 					$('#displayname').val("CSR " + payload.first_name);
 					$('#agentname-sidebar').html(payload.first_name + " " + payload.last_name);
 					$('#agentname-header').html(payload.first_name + " " + payload.last_name);
@@ -148,7 +140,6 @@ function connect_socket() {
 					console.log('disconnected');
 					unregister_jssip();
 					changeStatusLight('OFF_DUTY');
-					//logout("disconnected");
 				}).on("unauthorized", function (error) {
 					debugtxt('unauthorized', error);
 					if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
@@ -185,12 +176,6 @@ function connect_socket() {
 					debugtxt('no-ticket-info', data);
 					$('#notickettxt').show();
 					$('#ticketTab').addClass("bg-pink");
-					/*
-					//Removed to stop flashing delay issue.
-					ticketTabFade = setInterval(function () {
-						$('#ticketTab').fadeTo("slow", 0.1).fadeTo("slow", 1.0);
-					}, 1000);
-					*/
 				}).on('chat-leave', function (data) {
 					debugtxt('chat-leave', data);
 					$('#duration').timer('pause');
@@ -241,21 +226,9 @@ function connect_socket() {
 							$('#info_script_content').val(data.data[i].text);
 						if (data.data[i].id === 2)
 							$('#complaints_script_content').val(data.data[i].text);
-						/*
-						if(data.data[i].queue_name === "ComplaintsQueue"){
-							$('#complaints_scripts_type').append($("<option/>", {
-        						value: data.data[i].id,
-        						text: data.data[i].type
-    						}));
-						}
-						*/
 					}
 				}).on('ad-zendesk', function (data) {
 					debugtxt('ad-zendesk', data);
-					//Place holders
-					//$('#assignee').val('');
-					//$('#requester').val('');
-					//$('#resolution').val('');
 					$('#ticketId').val(data.id);
 					$('#lastupdated').val(data.updated_at);
 					$('#subject').val(data.subject);
@@ -281,21 +254,6 @@ function connect_socket() {
 						"agent_name": agent_name,
 						"vrs": vrs
 					});
-				}).on('missing-vrs', function (data) {
-					debugtxt('missing-vrs', data);
-					//show modal to get VRS from user
-					/*
-					$(".modal-backdrop").remove();
-					if (data.message) {
-						$('#ivrsmessage').text(data.message);
-						$('#ivrsmessage').show();
-					}
-					$('#myVrsModal').modal({
-						show: true,
-						backdrop: 'static',
-						keyboard: false
-					});
-					*/
 				}).on('ad-zendesk-update-success', function (data) {
 					debugtxt('ad-zendesk-update-success', data);
 					$('#alertPlaceholder').html('<div id="saveAlert" class="alert alert-success alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>Success!</div>');
@@ -391,26 +349,10 @@ function connect_socket() {
 					socket.emit('incomingcall', null);
 				}).on('new-missed-call', function (data) {
 					debugtxt('new-missed-call', data);
-					//$('#myRingingModal').removeClass('fade');
 					$('#myRingingModal').modal('hide');
-					/*
-					changeStatusLight('MISSED_CALL');
-					changeStatusIcon(missed_call_color, "missed-call", missed_call_blinking);
-					$('#user-status').text('Missed Call');
-					var missedCallNumber = $('#myRingingModalPhoneNumber').text();
-					$('#myMissedCallModalPhoneNumber').html(missedCallNumber)
-					$('#myMissedCallModal').modal({
-						show: true,
-						backdrop: 'static',
-						keyboard: false
-					});
-					socket.emit('missedcall', null);
-					socket.emit('pause-queues');
-					*/
 					unpauseQueues();
 				}).on('request-assistance-response', function (data) {
 					debugtxt('request-assistance-response', data);
-					//alert(data.message);
 				}).on('lightcode-configs', function (data) {
 					debugtxt('lightcode-configs', data);
 					updateColors(data);
@@ -448,7 +390,7 @@ function connect_socket() {
 				});
 
 			} else {
-				//we do  nothing with bad connections
+				//we do nothing with bad connections
 			}
 		},
 		error: function (xhr, status, error) {
@@ -568,10 +510,8 @@ function logout(msg) {
 	//display the login screen to the user.
 	if (msg) {
 		window.location.href = './logout';
-		//window.location.replace("?message=" + msg);
 	} else {
 		window.location.href = './logout';
-		//window.location.replace("");
 	}
 
 }
@@ -583,7 +523,7 @@ function modifyTicket() {
 	var description = $('#problemdesc').val();
 	var resolution = $('#resolution').val();
 	var fname = $('#callerFirstName').val();
-	var email = $('#callerEmail').val(); //
+	var email = $('#callerEmail').val();
 	var phone = $('#callerPhone').val();
 	var lname = $('#callerLastName').val();
 
@@ -1339,9 +1279,6 @@ function saveGridLayout() {
 		'gridLayout': serializedGridData
 	});
 };
-
-//if(typeof sessionStorage.layout == 'object')
-//	loadGridLayout(sessionStorage.layout);
 
 function loadGridLayout(layout) {
 	sessionStorage.layout = JSON.stringify(layout);
