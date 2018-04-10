@@ -314,7 +314,7 @@ function connect_socket() {
 							var statusLightIcon = document.createElement('i');
 
 							$(statusDiv).css('display:inline-block');
-							$(statusLightIcon).addClass(getStatusIconClasses(color, blinking));
+							$(statusLightIcon).addClass(getStatusIconClasses(sColor, sBlinking));
 							$(statusDiv).append(statusLightIcon);
 							$(statusDiv).append("&nbsp;&nbsp;" + statusTxt);
 
