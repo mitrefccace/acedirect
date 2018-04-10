@@ -239,7 +239,7 @@
 				remoteStream.srcObject = e.streams[0];
 				remoteStream.play();
 
-				//toggleSelfview();
+				toggleSelfview();
 
 			};
 
@@ -276,8 +276,8 @@
 			hide_video();
 			setTimeout(function () {
 				unhide_video();
-			}, 500);
-		}, 2000);
+			}, 1000);
+		}, 3000);
 	}
 
 	//answers an incoming call
