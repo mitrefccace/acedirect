@@ -1,4 +1,3 @@
-$(document).ready(function () {
 	var ua;
 	var my_sip_uri = document.getElementById("my_sip_uri");
 	var ws_servers = document.getElementById("ws_servers");
@@ -634,4 +633,3 @@ $(document).ready(function () {
 
 		return new_request;
 	}
-});
