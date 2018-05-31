@@ -184,8 +184,6 @@
 			});
 			currentSession.on('newInfo', function (e) {
 				if (debug) console.log('\nCURRENTSESSION -  NEWINFO: \nINFO:\n' + e.info + "\nrequest:\n" + e.request);
-				if (complaintForm)
-					startRecordProgress(); //newInfo gets called repeatedly during a call
 			});
 			currentSession.on('hold', function (e) {
 				if (debug) console.log('\nCURRENTSESSION -  HOLD ');

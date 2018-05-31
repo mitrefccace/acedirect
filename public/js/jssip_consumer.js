@@ -125,14 +125,9 @@
 				terminate_call();
 				
 			});
-			currentSession.on('newInfo', function (e) {
-				if (debug) console.log('\nCURRENTSESSION -  NEWINFO: \nINFO:\n' + e.info + "\nrequest:\n" + e.request);
-				startRecordProgress(); //newInfo gets called repeatedly during a call
-			});
 			currentSession.on('reinvite', function (e) {
 				if (debug) console.log('\nCURRENTSESSION -  REINVITE ');
 				$("#queueModal").modal("hide"); //reinvite is the only flag we get that the call is fully connected. so we have to hide the modal here.
-
 			});
 			//event listener for remote video. Adds to html page when ready. 
 			//NOTE: has to be both here and in accept_call() because currentSession.connection is not established until after ua.answer() for incoming calls
