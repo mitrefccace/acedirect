@@ -60,7 +60,7 @@ function connect_socket() {
 			console.log(JSON.stringify(data));
 			if (data.message === "success") {
 				socket = io.connect('https://' + window.location.host, {
-					path: '/ACEDirect/socket.io',
+					path: nginxPath+'/socket.io',
 					query: 'token=' + data.token,
 					forceNew: true
 				});
@@ -958,7 +958,6 @@ function sortButtonToggle(buttonid) {
 
 //Update the records in the videomail table
 function updateVideomailTable(data) {
-	console.log("Refreshing videomail");
 	$("#videomailTbody").html("");
 	var table;
 	var row;
@@ -1187,12 +1186,28 @@ remoteView.addEventListener("timeupdate", function () {
 
 // Event listener for the full-screen button
 function enterFullscreen() {
-	if (remoteView.requestFullscreen) {
-		remoteView.requestFullscreen();
-	} else if (remoteView.mozRequestFullScreen) {
-		remoteView.mozRequestFullScreen(); // Firefox
-	} else if (remoteView.webkitRequestFullscreen) {
-		remoteView.webkitRequestFullscreen(); // Chrome and Safari
+	var webcam_container = document.getElementById("fullscreen-element");
+
+	if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {
+		if (webcam_container.requestFullscreen) {
+			webcam_container.requestFullscreen();
+		} else if (webcam_container.msRequestFullscreen) {
+			webcam_container.msRequestFullscreen();
+		} else if (webcam_container.mozRequestFullScreen) {
+			webcam_container.mozRequestFullScreen();
+		} else if (webcam_container.webkitRequestFullscreen) {
+			webcam_container.webkitRequestFullscreen();
+		}
+	} else {
+		if (document.exitFullscreen) {
+		  	document.exitFullscreen();
+		} else if (document.msExitFullscreen) {
+		  	document.msExitFullscreen();
+		} else if (document.mozCancelFullScreen) {
+		  	document.mozCancelFullScreen();
+		} else if (document.webkitExitFullscreen) {
+		  	document.webkitExitFullscreen();
+		}
 	}
 }
 

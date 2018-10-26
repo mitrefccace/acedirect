@@ -4,3 +4,5 @@ config.json
 nbproject
 bower_components
 /.vscode/
+*.swp
+.env

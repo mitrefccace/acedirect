@@ -472,28 +472,11 @@ However, delay the fade out process for 2.5 seconds */
 {
     margin-right: 2px;
 }
-
-#selfView   
-{   
-  width:30%;    
-  border: 4px solid #ccc;   
-  top: 52px;    
-  right: 15px;    
-  position: absolute;   
-}   
-#remoteView   
-{   
-  border: 4px solid #ccc;   
-  max-width: 100%;    
-  width: 100%;    
-}   
-#call-option-buttons{   
-    margin-top: 5px;
-    display:none;   
-    width:100%;
-    text-align: center;
-    position: relative;
-}   
+   
+#queueModal
+{
+  z-index: 2147483647;
+}
 
 #videomail-status-buttons{
 	margin:auto;
@@ -521,12 +504,6 @@ However, delay the fade out process for 2.5 seconds */
 .call-btn-icon
 {
   font-size: 20px;
-}
-
-#call-option-buttons .btn
-{
-    width: 45px;
-    height: 37px;
 }
 
 .btn-gray
@@ -563,28 +540,6 @@ However, delay the fade out process for 2.5 seconds */
  color: #ccc;
 }
 
-#selfView   
-{   
-  width:30%;    
-  border: 4px solid #ccc;   
-  top: 52px;    
-  right: 15px;    
-  position: absolute;   
-}   
-#remoteView   
-{   
-  border: 4px solid #ccc;   
-  background-color:#000000;
-  object-fit:fill;
-}   
-#call-option-buttons{   
-    margin-top: 5px;
-    display:none;   
-    width:100%;
-    text-align: center;
-    position: relative;
-}   
-
 #inner{
   display: inline;
   margin: 0 auto;
@@ -597,11 +552,7 @@ However, delay the fade out process for 2.5 seconds */
   font-size: 20px;
 }
 
-#call-option-buttons .btn
-{
-    width: 45px;
-    height: 37px;
-}
+
 
 .btn-gray
 {
@@ -940,4 +891,76 @@ div#call-controls button#button-hangup {
    background-color: #80898e; 
    color: #1b2227;
    margin-top: 3px;
+}
+
+/* -------------------------- *
+ * Self-view adjustments - JM *
+ * 11-Oct
+ * -------------------------- */
+
+#fullscreen-element {
+	padding: 0;
+}
+#webcam {
+	height: 100%;
+	position: relative;
+}
+
+#selfView { 
+  width: 25%; 
+  border: 2px solid #ccc;
+  top: 0;
+  right: 0 !important;
+  position: absolute;
+  z-index: 2147483647;
+}
+#remoteView { 
+  max-width: 100%;
+  height: 100% !important;
+  width: 100%;
+  object-fit: cover;
+  background-color:#000000;
+} 
+
+#call-option-buttons {
+  display: none;
+  width: 100%;
+  text-align: center;
+  position: absolute;
+  bottom: 15px;
+  left: 0px;
+  z-index: 2147483647;
+  padding: 10px;
+} 
+
+#call-option-buttons .btn {
+    width: 50px;
+    height: 40px;
+	margin-left: 5px;
+}
+
+/* End of self-view adjustments */
+
+/* Transcript Overlays */
+.transcriptoverlay {
+  display: block;
+  width: 100%;
+  text-align: center;
+  position: absolute;
+  bottom: 75px;    
+  left: 0px;
+  z-index: 2147483647;
+  padding: 10px;
+  background: transparent;
+} 
+        
+.transcripttext{
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  font-size: 24pt;
+  color: white;          
+  background:rgba(192,192,192,0.7); 
+  display: table;
+  padding: 0px 15px 0px 15px;
 }

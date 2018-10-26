@@ -1,0 +1,10 @@
+.gitignore
+images/
+logos/
+license.txt
+README.md
+Dockerfile
+docker-compose.yml
+.env
+*.pem
+*.key

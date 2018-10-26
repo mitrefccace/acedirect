@@ -1,0 +1,47 @@
+# Usage:
+#
+# sudo docker-compose build
+# sudo docker-compose up
+#
+# Remember to setup "./.env" to match your needs prior to build.
+#
+#
+version: "2"
+services:
+    redis:
+        env_file: .env
+        image: "redis:latest"
+        ports:
+        - "6379:6379" # Default REDIS port
+        restart: "no"
+#    mysql:
+#        image: "mysql:latest"
+#        env_file: .env
+#        environment:
+#        - MYSQL_ROOT_PASSWORD
+#        ports:
+#        - "3306":"3306"
+#        volumes:
+#        - ${VOLUMES}/db:/var/lib/mysql
+#        restart: "no"
+    acedirect:
+        env_file: .env
+        image: "acedirect:v1"
+        build:
+            dockerfile: Dockerfile
+            context: .
+            args:
+            - https_proxy=${https_proxy}
+            - http_proxy=${http_proxy}
+        ports:
+        #- 443:8005 
+        - 8005:8005
+        volumes:
+        - ${SSL_public_key}:/home/centos/.ssl/cert.pem
+        - ${SSL_private_key}:/home/centos/.ssl/key.pem
+        - ${DAT_DIR}:/usr/src/dat
+        - ../volumes/logs:/usr/src/app/logs
+        restart: "no"
+        depends_on: 
+        - redis
+#        - mysql

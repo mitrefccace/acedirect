@@ -9,20 +9,22 @@
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
 	<!-- Bootstrap 3.3.5 -->
-	<link rel="stylesheet" href="./bower_components/AdminLTE/bootstrap/css/bootstrap.css">
+	<link rel="stylesheet" href="/bower_components/AdminLTE/bootstrap/css/bootstrap.css">
 	<!-- Bootstrap Toggle v2.2.0 -->
-	<link rel="stylesheet" href="./bower_components/bootstrap-toggle/css/bootstrap-toggle.css">
+	<link rel="stylesheet" href="/bower_components/bootstrap-toggle/css/bootstrap-toggle.css">
 	<!-- Font Awesome -->
-	<link rel="stylesheet" href="./bower_components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css">
 	<!-- Ionicons -->
-	<link rel="stylesheet" href="./bower_components/Ionicons/css/ionicons.min.css">
+	<link rel="stylesheet" href="/bower_components/Ionicons/css/ionicons.min.css">
 	<!-- Theme style -->
-	<link rel="stylesheet" href="./bower_components/AdminLTE/dist/css/AdminLTE.css">
+	<link rel="stylesheet" href="/bower_components/AdminLTE/dist/css/AdminLTE.css">
 	<!-- AdminLTE Skins  -->
-	<link rel="stylesheet" href="./bower_components/AdminLTE/dist/css/skins/_all-skins.min.css">
+	<link rel="stylesheet" href="/bower_components/AdminLTE/dist/css/skins/_all-skins.min.css">
 	<!-- Custom Portal stylesheet -->
-	<link rel="stylesheet" href="./css/ca-portal.css">
-
+	<link rel="stylesheet" href="/css/ca-portal.css">
+<script>
+var nginxPath = '<%= nginxPath %>';
+</script>
 <style>
 .blink {
   animation: blinker 1s linear infinite;
@@ -52,7 +54,7 @@
 					<section class="col-lg-12">
 						<div id = "vrs-info-box" class="box" hidden>
 							<div class="box-header with-border">
-								<h3 class="box-title">VRS Information</h3>&nbsp;<small>(<a href="javascript:logout();">not my info</a>)</small>
+								<h3 class="box-title">VRS Information</h3>&nbsp;<small>(<a href="/logout" id="notMyInfoLink">not my info</a>)</small>
 								<div class="box-tools pull-right">
 									<button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
 								</div>
@@ -160,20 +162,36 @@
 										</button>
 								</div>
 							</div>
-							<div class="box-body">
+
+							<div class="box-body" id="fullscreen-element">
 								<div id="webcam" hidden>
 									<video id="remoteView" autoplay poster="images/acedirect-logo.png"></video>
-									<video id="selfView" style="right: 10px;" autoplay muted="true" hidden></video>
-								</div>
+									<video id="selfView" autoplay muted="true" hidden></video>
+									<!--div id="transcriptoverlay" class="transcriptoverlay"></div-->
+									<div id= "call-option-buttons">
+										<div id= "inner">
+											<!--button id="mute-captions" type="button" class="btn btn-gray" onclick="mute_captions()">
+												<span class="fa-stack">
+                                									<i id="mute-captions-icon" class="fa fa-cc fa-stack-1x"></i>
+                                									<i id="mute-captions-off-icon" class="fa fa-ban fa-stack-2x text-danger" style="display:none;"></i>
+                             									</span>
+											</button-->
+											<button  id="mute-audio" type = "button" class = "btn btn-gray" onclick = "mute_audio()"> <i id= "mute-audio-icon" class="call-btn-icon fa fa-microphone"></i> </button>
+											<button  id="hide-video" type = "button" class = "btn btn-gray" onclick = "enable_video_privacy()">
+											<span class="fa-stack">
+											    <i class="fa fa-video-camera fa-stack-1x"></i>
+											    <i id="mute-camera-off-icon" class="fa fa-ban fa-stack-2x text-danger" style="display:none;"></i>
+                                                                                                </span>
 
-								<div id= "call-option-buttons" style="margin-top: 10px;">
-	                                <div id= "inner">
-	                                    <button  id="mute-audio" type = "button" class = "btn btn-gray" onclick = "mute_audio()"> <i id= "mute-audio-icon" class="call-btn-icon fa fa-microphone"></i> </button>
-	                                    <button  id="hide-video" type = "button" class = "btn btn-gray" onclick = "hide_video()"> <i class="call-btn-icon fa fa-video-camera"></i>  <div id= "hide-video-icon" class = "fa fa-close fa-close-style" style="display: none;"></div> <!-- hack for hide video button since there's no fa-icon for it. we overlay an x and hide and show it when needed--></button>
-										<button type="button" class = "btn btn-gray" onclick = "enterFullscreen()"><i id= "fullscreen-icon" class="call-btn-icon fa fa-expand"></i> </button>
-	                                    <button id="end-call" type = "button" class = "btn btn-danger" onclick = "terminate_call()"> <i class="call-btn-icon fa fa-phone fa-rotate-135"></i> </button>
-	                                </div>
-	                            </div>
+												<!-- hack for hide video button since there's no fa-icon for it. we overlay an x and hide and show it when needed-->
+											</button>
+											<button type="button" class = "btn btn-gray" onclick = "enterFullscreen()"><i id= "fullscreen-icon" class="call-btn-icon fa fa-expand"></i> </button>
+											<button id="end-call" type = "button" class = "btn btn-danger" onclick = "terminate_call()"> <i class="call-btn-icon fa fa-phone fa-rotate-135"></i> </button>
+									</div>
+
+								</div>
+							</div>
+
 	                            <div class = "row">
 		                            <div class = "col-xs-12 text-center" id = "start-call-buttons" style="margin-top: 10px; margin-bottom: 10px;">
 					                	<button class="btn btn-primary" id="callbutton" style = "width: 80px;" type="button">
@@ -340,7 +358,7 @@
 				</div>
 				<div class="modal-body text-center">
           <h4 >Hours of Operation: <span id="ah-start-time"></span> to <span id="ah-end-time"></span> Mondays-Fridays (excluding Federal holidays)<h4>
-          <img src="images/fccColor.png" class="user-image" alt="FCC">
+          <img src="/images/fccColor.png" class="user-image" alt="FCC">
 				</div>
 				<div style = "border-top: 1px solid #f4f4f4; padding: 10px;" class = "text-center">
 				</div>
@@ -403,25 +421,25 @@
 
 	<!-- ==================Le javascript ================================ -->
 	<!-- jQuery v2.1.4 -->
-	<script type="text/javascript" src="./bower_components/AdminLTE/plugins/jQuery/jquery-2.2.3.min.js"></script>
+	<script type="text/javascript" src="/bower_components/AdminLTE/plugins/jQuery/jquery-2.2.3.min.js"></script>
 	<!-- socket.io-client -->
-	<script type="text/javascript" src="./socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<!-- Bootstrap 3.3.5 -->
-	<script type="text/javascript" src="./bower_components/bootstrap/dist/js/bootstrap.js"></script>
+	<script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
 	<!-- Decode JWT tokens -->
-	<script type="text/javascript" src="./bower_components/jwt-decode/build/jwt-decode.min.js"></script>
+	<script type="text/javascript" src="/bower_components/jwt-decode/build/jwt-decode.min.js"></script>
 	<!-- timer.jquery 0.6.3 -->
-	<script type="text/javascript" src='./bower_components/timer.jquery/dist/timer.jquery.min.js'></script>
+	<script type="text/javascript" src='/bower_components/timer.jquery/dist/timer.jquery.min.js'></script>
 	<!-- simply countable -->
-	<script type="text/javascript" src='./bower_components/jquery-simply-countable/jquery.simplyCountable.js'></script>
+	<script type="text/javascript" src='/bower_components/jquery-simply-countable/jquery.simplyCountable.js'></script>
 	<!-- moment.js 2.15.1 -->
-	<script type="text/javascript" src='./bower_components/moment/moment.js'></script>
+	<script type="text/javascript" src='/bower_components/moment/moment.js'></script>
 	<!-- AdminLTE App -->
-	<script type="text/javascript" src="./bower_components/AdminLTE/dist/js/app.min.js"></script>
+	<script type="text/javascript" src="/bower_components/AdminLTE/dist/js/app.min.js"></script>
 	<!-- Jquery input mask -->
-	<script type="text/javascript" src="./bower_components/AdminLTE/plugins/input-mask/jquery.inputmask.js"></script>
+	<script type="text/javascript" src="/bower_components/AdminLTE/plugins/input-mask/jquery.inputmask.js"></script>
 	<!--JSSIP-->
-	<script type="text/javascript" src="./bower_components/jssip/dist/jssip.min.js"></script>
+	<script type="text/javascript" src="/bower_components/jssip/dist/jssip.min.js"></script>
   <script>
   var complaintForm = true;
   var complaintRedirectActive = true;
@@ -436,9 +454,9 @@
 
 
   </script>
-	<script type="text/javascript" src="./js/myJssip.js"></script>
+	<script type="text/javascript" src="/js/jssip_consumer.js"></script>
 	<!-- Custom Javascript for ACEDirect complaint_form.html page -->
-	<script type="text/javascript" src="./js/complaint_form.js"></script>
+	<script type="text/javascript" src="/js/complaint_form.js"></script>
 </body>
 
 </html>

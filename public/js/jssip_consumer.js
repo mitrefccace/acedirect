@@ -10,7 +10,10 @@
 	var mute_audio_button = document.getElementById("mute-audio");
 	var hide_video_button = document.getElementById("hide-video");
 	var mute_audio_icon = document.getElementById("mute-audio-icon");
-	var hide_video_icon = document.getElementById("hide-video-icon");
+	var mute_captions_button = document.getElementById("mute-captions");
+        var mute_captions_icon = document.getElementById("mute-captions-off-icon");
+        var transcript_overlay = document.getElementById("transcriptoverlay");
+	var hide_video_icon = document.getElementById("mute-camera-off-icon");
 	var hold_button = document.getElementById("hold-call");
 	var recording_progress_bar = document.getElementById("recording-progress-bar");
 	var debug = true; //console logs event info if true
@@ -98,8 +101,32 @@
 
 		ua.on('newMessage', function (e) {
 			if (debug) console.log("\nUA - NEWMESSAGE");
-			if (complaintForm && e.message.content == 'STARTRECORDING')
+
+			if (complaintForm && e.message.content == 'STARTRECORDING'){
 				startRecordProgress();
+			} /* else {
+			 	try {
+
+                                	var transcripts = JSON.parse(e.message.content);
+                                	if(transcripts.transcript){
+					var tDiv = document.getElementById(transcripts.msgid);
+                                	if(!tDiv){
+                                        	var temp = document.createElement("div");
+											temp.id = transcripts.msgid;
+											temp.innerHTML = transcripts.transcript;
+                                        	temp.classList.add("transcripttext");
+                                        	document.getElementById("transcriptoverlay").appendChild(temp);
+                                	}else{
+                                        	tDiv.innerHTML = transcripts.transcript;
+                                	        if(transcripts.final){
+                        	                        setTimeout(function(){tDiv.remove()},5000);
+                	                        }
+        	                        }
+					}
+                	        } catch (err) {
+        	                        console.log(err);
+	                        }
+			}*/
 		});
 		ua.on('newRTCSession', function (e) {
 			//e.request.body = edit_request(e.request.body);
@@ -123,13 +150,13 @@
 			currentSession.on('failed', function (e) {
 				if (debug) console.log('\nCURRENTSESSION -  FAILED: \nMESSAGE:\n' + e.message + "\nCAUSE:\n" + e.cause + "\nORIGINATOR:\n" + e.originator);
 				terminate_call();
-				
+
 			});
 			currentSession.on('reinvite', function (e) {
 				if (debug) console.log('\nCURRENTSESSION -  REINVITE ');
 				$("#queueModal").modal("hide"); //reinvite is the only flag we get that the call is fully connected. so we have to hide the modal here.
 			});
-			//event listener for remote video. Adds to html page when ready. 
+			//event listener for remote video. Adds to html page when ready.
 			//NOTE: has to be both here and in accept_call() because currentSession.connection is not established until after ua.answer() for incoming calls
 			if (currentSession.connection) currentSession.connection.ontrack = function (e) {
 				if (debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
@@ -195,7 +222,7 @@
 			currentSession.answer(options);
 
 
-			//event listener for remote video. Adds to html page when ready. 
+			//event listener for remote video. Adds to html page when ready.
 			//NOTE: needs to be both here and in the newRTCSession event listener because currentSession.connection is not established until after ua.answer() for incoming calls
 			if (currentSession.connection) currentSession.connection.ontrack = function (e) {
 				if (debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
@@ -243,7 +270,7 @@
 					audio: true,
 					video: true
 				})
-				//navigator.mediaDevices.getUserMedia({ audio: false, video: true }) 
+				//navigator.mediaDevices.getUserMedia({ audio: false, video: true })
 				.then(function (stream) {
 					selfStream.removeAttribute("hidden");
 					// Older browsers may not have srcObject
@@ -300,7 +327,8 @@
 		$("#start-call-buttons").show();
 		$("#agent-name-box").hide();
 		$("#agent-name").text("");
-		// if(ua) ua.stop(); 
+		// if(ua) ua.stop();
+		exitFullscreen();
 	}
 
 	//terminates the call (if present) and unregisters the ua
@@ -323,7 +351,11 @@
 		selfStream.src = "";
 		remoteView.src = "";
 
-		//stops remote track	 
+		console.log('Disabling video privacy button');
+                hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
+		hide_video_icon.style.display = "none";
+
+		//stops remote track
 		if (remoteView.srcObject) {
 			if (remoteView.srcObject.getTracks()) {
 				if (remoteView.srcObject.getTracks()[0]) remoteView.srcObject.getTracks()[0].stop();
@@ -334,7 +366,10 @@
 		//stops the camera from being active
 		if (window.self_stream) {
 			if (window.self_stream.getVideoTracks()) {
-				if (window.self_stream.getVideoTracks()[0]) window.self_stream.getVideoTracks()[0].stop();
+				if (window.self_stream.getVideoTracks()[0]) {
+					window.self_stream.getVideoTracks()[0].stop();
+					console.log("consumer removed camera");
+				}
 			}
 		}
 		removeElement("selfView");
@@ -346,11 +381,14 @@
 		selfView.setAttribute("style", "right: 11px");
 		selfView.setAttribute("autoplay", "autoplay");
 		selfView.setAttribute("muted", true);
+		selfView.muted = true;
 		selfView.setAttribute("hidden", true);
 		remoteStream = document.getElementById("remoteView");
 		selfStream = document.getElementById("selfView");
 
 		toggle_incall_buttons(false);
+		//transcript_overlay.innerHTML = "";
+
 	}
 
 	//swaps remote and local videos for videomail recording
@@ -409,6 +447,17 @@
 		}
 	}
 
+	//hide/unhide captions
+	function mute_captions() {
+                if(mute_captions_icon.style.display === "none"){
+                        mute_captions_icon.style.display = "block";
+                        transcript_overlay.style.display = "none"
+                }else{
+                        mute_captions_icon.style.display = "none";
+                        transcript_overlay.style.display = "block";
+                }
+        }
+
 
 	//hides self video so remote cannot see you
 	function hide_video() {
@@ -418,9 +467,9 @@
 				audio: false,
 				video: true
 			});
-			hide_video_button.setAttribute("onclick", "javascript: unhide_video();");
+			// hide_video_button.setAttribute("onclick", "javascript: unhide_video();");
 			selfStream.setAttribute("hidden", true);
-			hide_video_icon.style.display = "block";
+			// hide_video_icon.style.display = "block";
 		}
 	}
 
@@ -431,14 +480,155 @@
 				audio: false,
 				video: true
 			});
-			hide_video_button.setAttribute("onclick", "javascript: hide_video();");
+			// hide_video_button.setAttribute("onclick", "javascript: hide_video();");
 			selfStream.removeAttribute("hidden");
-			hide_video_icon.style.display = "none";
+			// hide_video_icon.style.display = "none";
 		}
 	}
 
 
-	// times out and ends call after 30 or so seconds. agent gets event "ended" with cause "RTP Timeout". 
+
+	function enable_video_privacy() {
+
+		if (currentSession) {
+			currentSession.mute({
+				audio: false,
+				video: true
+			});
+
+
+			console.log('Enabling video privacy');
+			hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
+			hide_video_icon.style.display = "block";
+
+			// the following piece of code does not seem to stop the video at remote side
+			if (window.self_stream){
+				if (window.self_stream.getVideoTracks()){
+					if (window.self_stream.getVideoTracks()[0]){
+						window.self_stream.getVideoTracks()[0].stop();
+						console.log("videotrack[0] stopped");
+					}
+				}
+			}
+
+			selfStream.srcObject = null;
+
+			selfStream.src = "images/videoPrivacy.webm";
+			console.log("Using self-constructed 30sec video audio clip with SAR 1:1 DAR 4:3 resolution 640:480");
+
+			// selfStream.src = "images/upload_0c0f3df65e9a6d8565be8955f7f23cd7.webm"; // recorded video from a real videomail - works for webrtc and Z20
+			// console.log("Using the actual recorded videomail clip and stream as webm");
+
+			// the following does not work since aspect ratio changed in the middle, crashes chrome
+			// selfStream.src = "images/recordedPrivacy.webm"; // recorded video from virtualagent: consumer is playing videoPrivacy.webm
+			// console.log("Using the recorded videoPrivacy clip and stream as webm");
+
+
+			selfStream.type = 'type="video/webm"';
+			selfStream.setAttribute("loop","true");
+                        selfStream.play();
+
+			selfStream.onplay = function() {
+  				// Set the source of one <video> element to be a stream from another.
+				console.log("selfStream onPlay()");
+  				var stream = selfStream.captureStream();
+				stream.onactive = function() {		// without onactive the tracks of captured stream may be empty
+					// replace remote screen to be the captured stream
+					var tracks = stream.getTracks();
+				 	Promise.all(currentSession.connection.getSenders().map(sender =>
+						sender.replaceTrack(stream.getTracks().find(t => t.kind == sender.track.kind), stream)));
+					console.log("Replaced tracks with recorded privacy video");
+				}
+  			};
+
+
+			currentSession.unmute({
+				audio: false,
+				video: true
+			});
+
+			// console.log("Toggle selfView after endable privacy");
+			// toggleSelfview();
+		}
+	}
+
+	function disable_video_privacy() {
+		if (currentSession) {
+			currentSession.mute({
+				audio: false,
+				video: true
+			});
+			console.log('Disabling video privacy');
+			hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
+
+			/* DO WE REALLY NEED TO GET USER MEDIA AGAIN? */
+
+			// Older browsers might not implement mediaDevices at all, so we set an empty object first
+			if (navigator.mediaDevices === undefined) {
+				navigator.mediaDevices = {};
+			}
+
+			// Some browsers partially implement mediaDevices. We can't just assign an object
+			// with getUserMedia as it would overwrite existing properties.
+			// Here, we will just add the getUserMedia property if it's missing.
+			if (navigator.mediaDevices.getUserMedia === undefined) {
+				navigator.mediaDevices.getUserMedia = function (constraints) {
+					// First get ahold of the legacy getUserMedia, if present
+					var getUserMedia = navigator.msGetUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+					// Some browsers just don't implement it - return a rejected promise with an error
+					// to keep a consistent interface
+					if (!getUserMedia) {
+						return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+					}
+
+					// Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
+					return new Promise(function (resolve, reject) {
+						getUserMedia.call(navigator, constraints, resolve, reject);
+					});
+				}
+			}
+
+			navigator.mediaDevices.getUserMedia({
+					audio: true,
+					video: true
+				})
+				//navigator.mediaDevices.getUserMedia({ audio: false, video: true })
+				.then(function (stream) {
+					selfStream.removeAttribute("hidden");
+					// Older browsers may not have srcObject
+					if ("srcObject" in selfStream) {
+						selfStream.srcObject = stream;
+					} else {
+						// Avoid using this in new browsers, as it is going away.
+						selfStream.src = window.URL.createObjectURL(stream);
+					}
+					window.self_stream = stream;
+					selfStream.onloadedmetadata = function (e) {
+						// update selfStream to play camera stream
+						selfStream.play();
+						// replace remote track to camera stream
+			 			Promise.all(currentSession.connection.getSenders().map(sender =>
+							sender.replaceTrack(stream.getTracks().find(t => t.kind == sender.track.kind), stream)));
+					};
+					console.log("Replaced tracks with user media");
+				})
+				.catch(function (err) {
+					console.log(err.name + ": " + err.message);
+				});
+
+			hide_video_icon.style.display = "none";
+
+			currentSession.unmute({
+                                audio: false,
+                                video: true
+                        });
+
+			// console.log("Toggle selfView after disable privacy");
+			// toggleSelfview();
+		}
+	}
+	// times out and ends call after 30 or so seconds. agent gets event "ended" with cause "RTP Timeout".
 	// puts session on hold
 	function hold() {
 		if (currentSession) {
@@ -457,5 +647,18 @@
 			currentSession.unhold();
 			hold_button.setAttribute("onclick", "javascript: hold();");
 			hold_button.innerHTML = "Hold";
+		}
+	}
+
+	// Used to exit fullscreen if active when call is teminated
+	function exitFullscreen(){
+		if (document.exitFullscreen) {
+		  	document.exitFullscreen();
+		} else if (document.msExitFullscreen) {
+		  	document.msExitFullscreen();
+		} else if (document.mozCancelFullScreen) {
+		  	document.mozCancelFullScreen();
+		} else if (document.webkitExitFullscreen) {
+		  	document.webkitExitFullscreen();
 		}
 	}

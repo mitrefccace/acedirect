@@ -210,6 +210,7 @@
 			});
 			currentSession.on('sdp', function (e) {
 				//e.sdp = edit_request(e.sdp);
+				e.sdp = edit_request_with_packetizationmode(e.sdp);
 				if (debug) console.log('\nCURRENTSESSION -  SDP \nORIGINATOR:\n' + e.originator + "\nTYPE:\n" + e.type + "\nSDP:\n" + e.sdp);
 
 
@@ -631,3 +632,43 @@
 
 		return new_request;
 	}
+
+
+//
+// This function is added to address the issue that Chrome 66, 67 cannot handle incoming SDP without packetization-mode
+// or with packetization-mode=0. When this issue happens, Chrome fails peerConnection.SetLocalDescription() call, which
+// further causes JSSIP 500 Internal Error towards incoming request.
+//
+// This bug affects ZVRS Z20 (no packetization-mode) and ZVRS i3 (packetization-mode=0), along with Global Android device
+//
+// The fix: adding or replacing the packetization-mode so that the incoming SDP always contains packetization-mode=1.
+//
+//
+//
+function edit_request_with_packetizationmode(request) {
+        console.log("EDITING REQUEST with packetization-mode=1");
+
+        if (request !== undefined) {
+                var request_lines = request.split('\n');
+                for (var i = 0; i < request_lines.length; i++) {
+                        if (request_lines[i].includes("profile-level-id")) {
+                                if (!request_lines[i].includes("packetization-mode")) { // add if does not include - Z20
+                                        request_lines[i] = request_lines[i] + ";packetization-mode=1";
+                                        console.log("ADD incoming SDP with packetization-mode=1");
+                                }
+
+                                if (request_lines[i].includes("packetization-mode=0")) { // change it to packetiation-mode 1
+                                        request_lines[i].replace("packetization-mode=0", "packetization-mode=1");
+                                        console.log("REPALCE with packetization-mode=1");
+                                }
+                        }
+
+                }
+                var new_request = request_lines.join('\n');
+        } else {
+                var new_request = request;
+        }
+
+        return new_request;
+}
+
