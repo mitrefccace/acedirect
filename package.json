@@ -32,6 +32,7 @@
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1",
     "socketio-jwt": "4.5.0",
+    "tunnel-agent": "^0.6.0",
     "util": "0.10.3"
   },
   "devDependencies": {},
