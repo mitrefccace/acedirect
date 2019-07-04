@@ -16,7 +16,6 @@
     "express-session": "1.15.5",
     "fresh": "^0.5.2",
     "gridstack": "^0.3.0",
-    "handlebars": "^4.0.14",
     "hoek": "^4.2.1",
     "jquery": "^3.4.0",
     "jsonwebtoken": "7.4.2",
@@ -29,14 +28,15 @@
     "randomstring": "1.1.5",
     "redis": "2.8.0",
     "request": "2.81.0",
-    "shelljs": "0.7.8",
     "socket.io": "^2.1.1",
     "socket.io-client": "^2.1.1",
     "socketio-jwt": "4.5.0",
     "tunnel-agent": "^0.6.0",
     "util": "0.10.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "handlebars": "^4.1.2"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node adserver.js"
