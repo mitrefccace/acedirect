@@ -1,6 +1,6 @@
 ![](images/acedirectsmall.png)
 
-# ACE Direct Project  
+# ACE Direct Project
 
 Accessible Communications for Everyone (ACE) Direct is a Direct Video Calling (DVC) platform that enables direct calling from deaf and hard-of-hearing individuals to an American Sign Language (ASL)-trained agent in an organization's call center. The agent handles the call using a video-capable phone with a real-time video connection. To demonstrate the capabilities of DVC, the Federal Communications Commission (FCC) and CMS Alliance to Modernize Healthcare (CAMH) have further advanced the original auto-routing proof-of-concept into a call center platform for two to ten customer service representatives.
 
@@ -14,8 +14,7 @@ To manually install just the ACE Direct server:
 1. Clone the dat repo in the same folder and follow the configuration instructions.
 1. Download and install [Node.js](https://nodejs.org/en/)
 1. In an elevated command prompt, run `npm install -g bower`
-1. Install the required Node.js modules: cd into the acedirect directory, run `npm install`
-1. Install the required Bower packages: cd into the acedirect directory, run `bower install`
+1. Run the required build script: cd into the acedirect directory, run `npm run build`
 1. To start the ACE Direct node server manually, run `node adserver.js`
 
 ### SSL Configuration

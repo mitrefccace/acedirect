@@ -55,6 +55,10 @@ Busylight.prototype.light = function (status) {
 };
 
 function PostLightCode(color) {
+
+    if (!busyLightEnabled)
+      return; //no busylight connected
+
     var lightcode = {
         "id": 'off',
         "r": 0,

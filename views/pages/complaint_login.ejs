@@ -3,12 +3,10 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Complaints Form</title>
-	<!-- Bootstrap 3.3.5 -->
-	<link rel="stylesheet" href="/bower_components/AdminLTE/bootstrap/css/bootstrap.css">
-	<!-- Bootstrap Toggle v2.2.0 -->
-	<link rel="stylesheet" href="/bower_components/bootstrap-toggle/css/bootstrap-toggle.css">
-	<!-- Font Awesome -->
-	<link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/assets/css/bootstrap-toggle.css">
+	<link rel="stylesheet" href="/assets/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/assets/css/inputmask.css">
 
 	<link rel="stylesheet" href="/css/fcc.css">
 
@@ -101,14 +99,15 @@
 	</div>
 
 	<!-- jQuery v2.1.4 -->
-	<script type="text/javascript" src="/bower_components/AdminLTE/plugins/jQuery/jquery-2.2.3.min.js"></script>
+	<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
 	<!-- Bootstrap 3.3.5 -->
-	<script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
+	<script type="text/javascript" src="/assets/js/bootstrap.js"></script>
 
-	<script type="text/javascript" src="/bower_components/AdminLTE/plugins/input-mask/jquery.inputmask.js"></script>
+	<script type="text/javascript" src="/assets/js/inputmask.min.js"></script>
+	<script type="text/javascript" src="/assets/js/jquery.inputmask.min.js"></script>
 
 	<script type="text/javascript">
-		$(window).load(function () {
+		$(window).on('load',function () {
 			$("[data-mask]").inputmask();
 			$('#form-login').submit(function (evt) {
 				evt.preventDefault();

@@ -60,8 +60,6 @@
 		$('#recordicon').hide();
 		$('#record-progress-bar').css('width', '0%');
 		$('#record-progress-bar').hide();
-		// $('#callbutton').prop("disabled", true);
-		// $('#videomailbutton').prop("disabled", false);
 		$('#userformbtn').prop("disabled", false);
 		$('#vmsent').hide();
 		$('#vmwait').hide();
@@ -104,36 +102,43 @@
 
 			if (complaintForm && e.message.content == 'STARTRECORDING'){
 				startRecordProgress();
-			} /* else {
-			 	try {
+			}  else { // Caption block start -----------
 
-                                	var transcripts = JSON.parse(e.message.content);
-                                	if(transcripts.transcript){
-					var tDiv = document.getElementById(transcripts.msgid);
-                                	if(!tDiv){
-                                        	var temp = document.createElement("div");
-											temp.id = transcripts.msgid;
-											temp.innerHTML = transcripts.transcript;
-                                        	temp.classList.add("transcripttext");
-                                        	document.getElementById("transcriptoverlay").appendChild(temp);
-                                	}else{
-                                        	tDiv.innerHTML = transcripts.transcript;
-                                	        if(transcripts.final){
-                        	                        setTimeout(function(){tDiv.remove()},5000);
-                	                        }
-        	                        }
-					}
-                	        } catch (err) {
-        	                        console.log(err);
-	                        }
-			}*/
+		 		try {
+		 			var transcripts = JSON.parse(e.message.content);
+
+		 			if(transcripts.transcript){
+		 				var tDiv = document.getElementById(transcripts.msgid);
+
+		 				if(!tDiv) {
+		 					var temp = document.createElement("div");
+
+		 					temp.id = transcripts.msgid;
+		 					temp.innerHTML = transcripts.transcript;
+		 					temp.classList.add("transcripttext");
+		 					document.getElementById("transcriptoverlay").appendChild(temp);
+		 				} else {
+		 					tDiv.innerHTML = transcripts.transcript;
+
+		 					if(transcripts.final){
+								$('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>"+transcripts.transcript+"</div></div>")
+		 						setTimeout(function(){tDiv.remove()},5000);
+		 					}
+		 				}
+		 			}
+		 		} catch (err) {
+		 			console.log(err);
+		 		}
+		    } //Caption block end --------------
+
 		});
+
 		ua.on('newRTCSession', function (e) {
-			//e.request.body = edit_request(e.request.body);
+
 			currentSession = e.session;
 
 			currentSession.on('accepted', function (e) {
-				//e.response = edit_response(e.response);
+
 				if (debug) console.log('\nCURRENTSESSION -  ACCEPTED: \nRESPONSE: \n' + e.response + "\nORIGINATOR:\n" + e.originator);
 				toggle_incall_buttons(true);
 				start_self_video();
@@ -251,7 +256,6 @@
 				navigator.mediaDevices.getUserMedia = function (constraints) {
 					// First get ahold of the legacy getUserMedia, if present
 					var getUserMedia = navigator.msGetUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-					//var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
 					// Some browsers just don't implement it - return a rejected promise with an error
 					// to keep a consistent interface
@@ -270,7 +274,6 @@
 					audio: true,
 					video: true
 				})
-				//navigator.mediaDevices.getUserMedia({ audio: false, video: true })
 				.then(function (stream) {
 					selfStream.removeAttribute("hidden");
 					// Older browsers may not have srcObject
@@ -327,8 +330,8 @@
 		$("#start-call-buttons").show();
 		$("#agent-name-box").hide();
 		$("#agent-name").text("");
-		// if(ua) ua.stop();
 		exitFullscreen();
+		$('#transcriptoverlay').html('');
 	}
 
 	//terminates the call (if present) and unregisters the ua
@@ -387,7 +390,6 @@
 		selfStream = document.getElementById("selfView");
 
 		toggle_incall_buttons(false);
-		//transcript_overlay.innerHTML = "";
 
 	}
 
@@ -467,9 +469,7 @@
 				audio: false,
 				video: true
 			});
-			// hide_video_button.setAttribute("onclick", "javascript: unhide_video();");
 			selfStream.setAttribute("hidden", true);
-			// hide_video_icon.style.display = "block";
 		}
 	}
 
@@ -480,9 +480,7 @@
 				audio: false,
 				video: true
 			});
-			// hide_video_button.setAttribute("onclick", "javascript: hide_video();");
 			selfStream.removeAttribute("hidden");
-			// hide_video_icon.style.display = "none";
 		}
 	}
 
@@ -516,13 +514,6 @@
 			selfStream.src = "images/videoPrivacy.webm";
 			console.log("Using self-constructed 30sec video audio clip with SAR 1:1 DAR 4:3 resolution 640:480");
 
-			// selfStream.src = "images/upload_0c0f3df65e9a6d8565be8955f7f23cd7.webm"; // recorded video from a real videomail - works for webrtc and Z20
-			// console.log("Using the actual recorded videomail clip and stream as webm");
-
-			// the following does not work since aspect ratio changed in the middle, crashes chrome
-			// selfStream.src = "images/recordedPrivacy.webm"; // recorded video from virtualagent: consumer is playing videoPrivacy.webm
-			// console.log("Using the recorded videoPrivacy clip and stream as webm");
-
 
 			selfStream.type = 'type="video/webm"';
 			selfStream.setAttribute("loop","true");
@@ -546,9 +537,6 @@
 				audio: false,
 				video: true
 			});
-
-			// console.log("Toggle selfView after endable privacy");
-			// toggleSelfview();
 		}
 	}
 
@@ -593,7 +581,6 @@
 					audio: true,
 					video: true
 				})
-				//navigator.mediaDevices.getUserMedia({ audio: false, video: true })
 				.then(function (stream) {
 					selfStream.removeAttribute("hidden");
 					// Older browsers may not have srcObject
@@ -623,9 +610,6 @@
                                 audio: false,
                                 video: true
                         });
-
-			// console.log("Toggle selfView after disable privacy");
-			// toggleSelfview();
 		}
 	}
 	// times out and ends call after 30 or so seconds. agent gets event "ended" with cause "RTP Timeout".
@@ -651,14 +635,104 @@
 	}
 
 	// Used to exit fullscreen if active when call is teminated
-	function exitFullscreen(){
-		if (document.exitFullscreen) {
-		  	document.exitFullscreen();
-		} else if (document.msExitFullscreen) {
-		  	document.msExitFullscreen();
-		} else if (document.mozCancelFullScreen) {
-		  	document.mozCancelFullScreen();
-		} else if (document.webkitExitFullscreen) {
-		  	document.webkitExitFullscreen();
+        function exitFullscreen() {
+          if (document.fullscreen) {
+                if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                }
+           }
+        }
+
+	// Change the style of the video captions
+	function changeCaption(id) {
+		var value = id.split('-')[1];
+		var target = id.split('-')[0];
+
+		// change css variable value
+		if(target == 'bg'){
+			var alpha = $('#opacity-slider-consumer').val();
+			if ( alpha == 0 ) {
+				alpha = 1;
+				$('#opacity-slider-consumer').val(1);
+			}
+			var color;
+			switch (value) {
+				case 'black':
+					color = 'rgba(0,0,0,' + alpha + ')';
+					break;
+				case 'grey':
+					color = 'rgba(128,128,128,' + alpha + ')';
+					break;
+				case 'white':
+					color = 'rgba(255,255,255,' + alpha + ')';
+					break;
+			}
+			document.documentElement.style.setProperty('--caption-bg-color', color);
+		} else if(target == 'font'){
+			document.documentElement.style.setProperty('--caption-font-color', value);
+		} else {
+			document.documentElement.style.setProperty('--caption-font-size', id + 'rem');
 		}
 	}
+
+	$('#bg-transparent').click(function() {
+		$('#opacity-slider-consumer').val(0);
+		$('#opacity-slider-consumer').trigger('mousemove');
+	})
+
+	$('#opacity-slider-consumer').on('change mousemove', function() {
+		var alpha = $(this).val();
+		var current = document.documentElement.style.getPropertyValue('--caption-bg-color');
+		if (current == '') {current = 'rgba(128,128,128,0';}
+		var color = current.substring(0,current.lastIndexOf(',')+1) + alpha + ')';
+		document.documentElement.style.setProperty('--caption-bg-color', color);
+	})
+
+	// Run caption demo
+	var demo_running = false;
+	function testCaptions() {
+
+		if(!demo_running) {
+			demo_running = true;
+
+			var temp = document.createElement("div");
+			temp.classList.add("transcripttext");
+
+			document.getElementById("transcriptoverlay").appendChild(temp);
+			temp.innerHTML = 'Hello, how can I help you today?';
+			var count = 0;
+			var intervalId = window.setInterval(function() {
+				switch (count) {
+					case 0:
+						temp.innerHTML = "No problem, I'll just need your account number";
+						break;
+					case 1:
+						temp.innerHTML = 'You are all set. Thank you for your patience';
+						break;
+					case 2:
+						temp.innerHTML = 'Is there anything else I can help you with today?';
+						break;
+					case 3:
+						temp.innerHTML = 'Have a nice day.';
+						break;
+				}
+				count++;
+
+				if(count > 4) {
+					window.clearInterval(intervalId);
+					temp.innerHTML = ''
+					demo_running = false;
+				}
+			}, 6000);
+		} else { console.log('demo running') }
+
+
+	}
+
+	// Clear caption text

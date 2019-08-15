@@ -1,5 +1,10 @@
+:root {
+  --caption-bg-color: grey;
+  --caption-font-color: white;
+  --caption-font-size: 2.5rem;
+}
 body{
-    
+
 }
 
 .navbar-inner-red {
@@ -123,16 +128,16 @@ body{
     background-color: pink;
 }
 
-.control-sidebar.control-sidebar-open, 
+.control-sidebar.control-sidebar-open,
 .control-sidebar.control-sidebar-open + .control-sidebar-bg {
     right: 0 !important;
 }
 .direct-chat-text {
     margin: 5px 0 0 5px;
-} 
+}
 .right .direct-chat-text {
     margin-right: 5px !important;
-}   
+}
 
 /* The snackbar - position it at the bottom and in the middle of the screen */
 #snackbar {
@@ -154,7 +159,7 @@ body{
 #snackbar.show {
     visibility: visible; /* Show the snackbar */
 
-/* Add animation: Take 0.5 seconds to fade in and out the snackbar. 
+/* Add animation: Take 0.5 seconds to fade in and out the snackbar.
 However, delay the fade out process for 2.5 seconds */
     -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
     animation: fadein 0.5s, fadeout 0.5s 2.5s;
@@ -162,7 +167,7 @@ However, delay the fade out process for 2.5 seconds */
 
 /* Animations to fade the snackbar in and out */
 @-webkit-keyframes fadein {
-    from {bottom: 0; opacity: 0;} 
+    from {bottom: 0; opacity: 0;}
     to {bottom: 30px; opacity: 1;}
 }
 
@@ -172,7 +177,7 @@ However, delay the fade out process for 2.5 seconds */
 }
 
 @-webkit-keyframes fadeout {
-    from {bottom: 30px; opacity: 1;} 
+    from {bottom: 30px; opacity: 1;}
     to {bottom: 0; opacity: 0;}
 }
 
@@ -193,13 +198,13 @@ However, delay the fade out process for 2.5 seconds */
     height: 10px;
     border-radius: 50%;
     background-color: #d626d0;
-    box-shadow: 8px 0 0 -4px #d626d0, 
-              -8px 0 0 -4px #d626d0, 
+    box-shadow: 8px 0 0 -4px #d626d0,
+              -8px 0 0 -4px #d626d0,
                 0 8px 0 -4px #d626d0,
-               0 -8px 0 -4px #d626d0, 
-              6px -6px 0 -4px #d626d0, 
-              -6px -6px 0 -4px #d626d0, 
-              -6px 6px 0 -4px #d626d0, 
+               0 -8px 0 -4px #d626d0,
+              6px -6px 0 -4px #d626d0,
+              -6px -6px 0 -4px #d626d0,
+              -6px 6px 0 -4px #d626d0,
               6px 6px 0 -4px #d626d0;
 }
 
@@ -227,13 +232,13 @@ However, delay the fade out process for 2.5 seconds */
     height: 10px;
     border-radius: 50%;
     background-color: #777777;
-    box-shadow: 8px 0 0 -4px #777777, 
-              -8px 0 0 -4px #777777, 
+    box-shadow: 8px 0 0 -4px #777777,
+              -8px 0 0 -4px #777777,
                 0 8px 0 -4px #777777,
-               0 -8px 0 -4px #777777, 
-              6px -6px 0 -4px #777777, 
-              -6px -6px 0 -4px #777777, 
-              -6px 6px 0 -4px #777777, 
+               0 -8px 0 -4px #777777,
+              6px -6px 0 -4px #777777,
+              -6px -6px 0 -4px #777777,
+              -6px 6px 0 -4px #777777,
               6px 6px 0 -4px #777777;
 }
 
@@ -259,13 +264,13 @@ However, delay the fade out process for 2.5 seconds */
     height: 10px;
     border-radius: 50%;
     background-color: #d33621;
-    box-shadow: 8px 0 0 -4px #d33621, 
-              -8px 0 0 -4px #d33621, 
+    box-shadow: 8px 0 0 -4px #d33621,
+              -8px 0 0 -4px #d33621,
                 0 8px 0 -4px #d33621,
-               0 -8px 0 -4px #d33621, 
-              6px -6px 0 -4px #d33621, 
-              -6px -6px 0 -4px #d33621, 
-              -6px 6px 0 -4px #d33621, 
+               0 -8px 0 -4px #d33621,
+              6px -6px 0 -4px #d33621,
+              -6px -6px 0 -4px #d33621,
+              -6px 6px 0 -4px #d33621,
               6px 6px 0 -4px #d33621;
 }
 
@@ -293,13 +298,13 @@ However, delay the fade out process for 2.5 seconds */
     height: 10px;
     border-radius: 50%;
     background-color: #ffcb11;
-    box-shadow: 8px 0 0 -4px #ffcb11, 
-              -8px 0 0 -4px #ffcb11, 
+    box-shadow: 8px 0 0 -4px #ffcb11,
+              -8px 0 0 -4px #ffcb11,
                 0 8px 0 -4px #ffcb11,
-               0 -8px 0 -4px #ffcb11, 
-              6px -6px 0 -4px #ffcb11, 
-              -6px -6px 0 -4px #ffcb11, 
-              -6px 6px 0 -4px #ffcb11, 
+               0 -8px 0 -4px #ffcb11,
+              6px -6px 0 -4px #ffcb11,
+              -6px -6px 0 -4px #ffcb11,
+              -6px 6px 0 -4px #ffcb11,
               6px 6px 0 -4px #ffcb11;
 }
 
@@ -320,13 +325,13 @@ However, delay the fade out process for 2.5 seconds */
     height: 10px;
     border-radius: 50%;
     background-color: #00c0ef;
-    box-shadow: 8px 0 0 -4px #00c0ef, 
-              -8px 0 0 -4px #00c0ef, 
+    box-shadow: 8px 0 0 -4px #00c0ef,
+              -8px 0 0 -4px #00c0ef,
                 0 8px 0 -4px #00c0ef,
-               0 -8px 0 -4px #00c0ef, 
-              6px -6px 0 -4px #00c0ef, 
-              -6px -6px 0 -4px #00c0ef, 
-              -6px 6px 0 -4px #00c0ef, 
+               0 -8px 0 -4px #00c0ef,
+              6px -6px 0 -4px #00c0ef,
+              -6px -6px 0 -4px #00c0ef,
+              -6px 6px 0 -4px #00c0ef,
               6px 6px 0 -4px #00c0ef;
 }
 
@@ -349,13 +354,13 @@ However, delay the fade out process for 2.5 seconds */
     height: 10px;
     border-radius: 50%;
     background-color: #00a65a;
-    box-shadow: 8px 0 0 -4px #00a65a, 
-              -8px 0 0 -4px #00a65a, 
+    box-shadow: 8px 0 0 -4px #00a65a,
+              -8px 0 0 -4px #00a65a,
                 0 8px 0 -4px #00a65a,
-               0 -8px 0 -4px #00a65a, 
-              6px -6px 0 -4px #00a65a, 
-              -6px -6px 0 -4px #00a65a, 
-              -6px 6px 0 -4px #00a65a, 
+               0 -8px 0 -4px #00a65a,
+              6px -6px 0 -4px #00a65a,
+              -6px -6px 0 -4px #00a65a,
+              -6px 6px 0 -4px #00a65a,
               6px 6px 0 -4px #00a65a;
 }
 
@@ -378,13 +383,13 @@ However, delay the fade out process for 2.5 seconds */
     height: 10px;
     border-radius: 50%;
     background-color: #0073b7;
-    box-shadow: 8px 0 0 -4px #0073b7, 
-              -8px 0 0 -4px #0073b7, 
+    box-shadow: 8px 0 0 -4px #0073b7,
+              -8px 0 0 -4px #0073b7,
                 0 8px 0 -4px #0073b7,
-               0 -8px 0 -4px #0073b7, 
-              6px -6px 0 -4px #0073b7, 
-              -6px -6px 0 -4px #0073b7, 
-              -6px 6px 0 -4px #0073b7, 
+               0 -8px 0 -4px #0073b7,
+              6px -6px 0 -4px #0073b7,
+              -6px -6px 0 -4px #0073b7,
+              -6px 6px 0 -4px #0073b7,
               6px 6px 0 -4px #0073b7;
 }
 
@@ -407,13 +412,13 @@ However, delay the fade out process for 2.5 seconds */
     height: 10px;
     border-radius: 50%;
     background-color: #ff851b;
-    box-shadow: 8px 0 0 -4px #ff851b, 
-              -8px 0 0 -4px #ff851b, 
+    box-shadow: 8px 0 0 -4px #ff851b,
+              -8px 0 0 -4px #ff851b,
                 0 8px 0 -4px #ff851b,
-               0 -8px 0 -4px #ff851b, 
-              6px -6px 0 -4px #ff851b, 
-              -6px -6px 0 -4px #ff851b, 
-              -6px 6px 0 -4px #ff851b, 
+               0 -8px 0 -4px #ff851b,
+              6px -6px 0 -4px #ff851b,
+              -6px -6px 0 -4px #ff851b,
+              -6px 6px 0 -4px #ff851b,
               6px 6px 0 -4px #ff851b;
 }
 
@@ -441,20 +446,20 @@ However, delay the fade out process for 2.5 seconds */
     height: 10px;
     border-radius: 50%;
     background-color: white;
-    box-shadow: 8px 0 0 -4px white, 
-              -8px 0 0 -4px white, 
+    box-shadow: 8px 0 0 -4px white,
+              -8px 0 0 -4px white,
                 0 8px 0 -4px white,
-               0 -8px 0 -4px white, 
-              6px -6px 0 -4px white, 
-              -6px -6px 0 -4px white, 
-              -6px 6px 0 -4px white, 
+               0 -8px 0 -4px white,
+              6px -6px 0 -4px white,
+              -6px -6px 0 -4px white,
+              -6px 6px 0 -4px white,
               6px 6px 0 -4px white;
 }
 
 .btn-white
 {
    background-color: white;
-    border: 1px solid #777777;   
+    border: 1px solid #777777;
 }
 
 .btn-white:hover
@@ -472,7 +477,7 @@ However, delay the fade out process for 2.5 seconds */
 {
     margin-right: 2px;
 }
-   
+
 #queueModal
 {
   z-index: 2147483647;
@@ -481,18 +486,19 @@ However, delay the fade out process for 2.5 seconds */
 #videomail-status-buttons{
 	margin:auto;
 	margin-top: 5px;
-    display:none;   
-    width:100%;
-    text-align: center;
-    position: relative;
-}						  
+  display:none;
+  width:100%;
+  text-align: center;
+  position: absolute;
+  bottom: 0;
+}
 
 #inner-videomail{
   display: inline;
   margin: 0 auto;
   text-align: center;
   position: relative;
-}					 
+}
 
 #inner{
   display: inline;
@@ -613,7 +619,7 @@ However, delay the fade out process for 2.5 seconds */
   background-color: #cd2026 !important;
 }
 
-#status-dropdown .dropdown-menu 
+#status-dropdown .dropdown-menu
 {
   background-color: #222d32;
   border: #222d32;
@@ -626,9 +632,9 @@ However, delay the fade out process for 2.5 seconds */
 
 #status-dropdown .dropdown-toggle
 {
-  background-color: transparent !important; 
+  background-color: transparent !important;
   border: transparent;
-  margin: 0; 
+  margin: 0;
   padding: 0px 0px 0px 3px;
 }
 
@@ -639,7 +645,7 @@ However, delay the fade out process for 2.5 seconds */
 
 /*
 #seek-bar
-{  
+{
   cursor: pointer;
   height: 15px;
   margin-bottom: 10px;
@@ -666,23 +672,26 @@ input[type=range] {
   -webkit-appearance: none;
   display: inline;
   margin: 18px 0;
-  width: 40%;
 }
 input[type=range]:focus {
   outline: none;
 }
 input[type=range]::-webkit-slider-runnable-track {
   width: 100%;
-  height: 8.4px;
+  height: 10px;
   animate: 0.2s;
-  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
-  background: #0071bc;
   border-radius: 1.3px;
-  border: 0.2px solid #010101;
+  border: .5px solid grey;
+}
+#opacity-slider-consumer::-webkit-slider-runnable-track{
+  background-image: linear-gradient(to right, white,#0071bc);
+}
+#opacity-slider-agent::-webkit-slider-runnable-track{
+  background-image: linear-gradient(to right, white,darkslateblue);
 }
 input[type=range]::-webkit-slider-thumb {
-  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
-  border: 1px solid #000000;
+  box-shadow: 1px 1px 1px grey, 0px 0px 1px #0d0d0d;
+  border: 1px solid grey;
   height: 16px;
   width: 10px;
   border-radius: 3px;
@@ -690,32 +699,28 @@ input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
   margin-top: -4px;
 }
-input[type=range]:focus::-webkit-slider-runnable-track {
-  background: #367ebd;
-}
 
 /*seekbar styling for firefox and ie -- don't really need */
 input[type=range]::-moz-range-track {
   width: 100%;
-  height: 8.4px;
+  height: 10px;
   animate: 0.2s;
-  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
-  background: #3071a9;
+  background-image: linear-gradient(to right, white,#0071bc);
   border-radius: 1.3px;
-  border: 0.2px solid #010101;
+  border: .5px solid grey;
 }
 input[type=range]::-moz-range-thumb {
-  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
-  border: 1px solid #000000;
-  height: 36px;
-  width: 16px;
+  box-shadow: 1px 1px 1px grey, 0px 0px 1px #0d0d0d;
+  border: 1px solid grey;
+  height: 16px;
+  width: 10px;
   border-radius: 3px;
   background: #ffffff;
 }
 input[type=range]::-ms-track {
   width: 100%;
-  height: 8.4px;
-  cursor: pointer
+  height: 10px;
+  cursor: pointer;
   animate: 0.2s;
   background: transparent;
   border-color: transparent;
@@ -737,8 +742,8 @@ input[type=range]::-ms-fill-upper {
 input[type=range]::-ms-thumb {
   box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
   border: 1px solid #000000;
-  height: 36px;
-  width: 16px;
+  height: 16px;
+  width: 10px;
   border-radius: 3px;
   background: #ffffff;
 }
@@ -747,7 +752,7 @@ input[type=range]:focus::-ms-fill-lower {
 }
 input[type=range]:focus::-ms-fill-upper {
   background: #367ebd;
-}   
+}
 
 /*Dialpad styling*/
 
@@ -788,7 +793,7 @@ p {
 }
 
 /* turn into an id*/
-.num-pad { 
+.num-pad {
   margin: auto;
 }
 
@@ -827,7 +832,7 @@ p {
 }
 
 .button_menu_selected{
-	background-color : @msg-background; 
+	background-color : @msg-background;
 	border: none;
 	color: #000;
 	padding: 0px 20px;
@@ -838,7 +843,7 @@ p {
 div#call-controls input {
   font-family: 'Source Sans Pro', sans-serif;
   font-style: oblique;
-  //font-size: 1em;
+  /*font-size: 1em;*/
   width: 100%;
   height: 2em;
   padding: .5em;
@@ -888,58 +893,10 @@ div#call-controls button#button-hangup {
 
 .bg-md-gray
 {
-   background-color: #80898e; 
+   background-color: #80898e;
    color: #1b2227;
    margin-top: 3px;
 }
-
-/* -------------------------- *
- * Self-view adjustments - JM *
- * 11-Oct
- * -------------------------- */
-
-#fullscreen-element {
-	padding: 0;
-}
-#webcam {
-	height: 100%;
-	position: relative;
-}
-
-#selfView { 
-  width: 25%; 
-  border: 2px solid #ccc;
-  top: 0;
-  right: 0 !important;
-  position: absolute;
-  z-index: 2147483647;
-}
-#remoteView { 
-  max-width: 100%;
-  height: 100% !important;
-  width: 100%;
-  object-fit: cover;
-  background-color:#000000;
-} 
-
-#call-option-buttons {
-  display: none;
-  width: 100%;
-  text-align: center;
-  position: absolute;
-  bottom: 15px;
-  left: 0px;
-  z-index: 2147483647;
-  padding: 10px;
-} 
-
-#call-option-buttons .btn {
-    width: 50px;
-    height: 40px;
-	margin-left: 5px;
-}
-
-/* End of self-view adjustments */
 
 /* Transcript Overlays */
 .transcriptoverlay {
@@ -947,20 +904,106 @@ div#call-controls button#button-hangup {
   width: 100%;
   text-align: center;
   position: absolute;
-  bottom: 75px;    
+  bottom: 10px;
   left: 0px;
   z-index: 2147483647;
   padding: 10px;
   background: transparent;
-} 
-        
+  transition: all 0.5s ease;
+}
 .transcripttext{
   margin: 0 auto;
   text-align: center;
   position: relative;
-  font-size: 24pt;
-  color: white;          
-  background:rgba(192,192,192,0.7); 
+  font-size: var(--caption-font-size);
+  color: var(--caption-font-color);
+  background: var(--caption-bg-color);
   display: table;
   padding: 0px 15px 0px 15px;
+}
+/* Caption setting interface */
+.cap-setting span {
+  color: #ccc;
+}
+.box-body .cap-setting span {
+  color: #444;
+}
+#cap-font-color, #cap-bg-color {
+  display: flex;
+}
+.font-select {
+  padding: 2px 0px;
+}
+.color-select-container {
+  display: flex;
+  position:absolute;
+  right:10px;
+}
+
+#opacity-slider-agent, #opacity-slider-consumer{
+  width: 75px;
+  margin-top:25px;
+  margin-bottom:10px
+}
+
+.cap-setting {
+  padding: 7px 10px !important;
+  display: flex;
+  justify-content: space-between;
+}
+.cap-setting .color-select {
+  height: 15px;
+  width: 15px;
+  border-radius: 50px;
+  margin-left: 5px;
+  border: solid grey 1px;
+  cursor: pointer;
+}
+#font-grey, #bg-grey {
+  background-color: grey;
+}
+#font-white, #bg-white {
+  background-color: whitesmoke;
+  color: grey;
+}
+#font-black, #bg-black {
+  background-color: black;
+}
+#bg-transparent {
+  color: grey;
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+.demo-btn-container {
+  text-align: center;
+  padding-top: 15px;
+}
+.demo-btn {
+  padding: 10px;
+  border-radius: 5px;
+  background-color: darkslateblue;
+  color: #fff;
+}
+.tab-container {
+  display: flex;
+}
+.tab {
+  padding: 10px;
+  border-radius: 5px 5px 0px 0px;
+  border: 1px solid #ccc;
+  border-bottom: none;
+  cursor: pointer;
+}
+.tab:first-child {
+  border-right: none;
+}
+.active-tab {
+  padding: 10px;
+}
+#trans-body {
+  display: none;
+}
+.user-text {
+  background-color: #3c8dbc;
+  margin-right: 5px !important;
 }

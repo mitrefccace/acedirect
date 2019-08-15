@@ -43,41 +43,52 @@
 		ua.on('registered', function (e) {
 			console.log("\nJSSIP UA REGISTERED: " + e +"\n");
 		});
-		/*
+
+		// Caption block start ----------
 		ua.on('newMessage', function (e) {
 			if (debug) console.log("\nUA - NEWMESSAGE");
-                        try {
-				var transcripts = JSON.parse(e.message.content)
-				if(transcripts.transcript){
-				var tDiv = document.getElementById(transcripts.msgid);
-				if(!tDiv){
-					var temp = document.createElement("div");
-					temp.id = transcripts.msgid;
-					temp.innerHTML = transcripts.transcript;
-					temp.classList.add("transcripttext");
-					document.getElementById("transcriptoverlay").appendChild(temp);
-				}else{
-					tDiv.innerHTML = transcripts.transcript;
-					if(transcripts.final){
-						setTimeout(function(){tDiv.remove()},5000);
-					}
-				}
-				}
 
-    			} catch (err) {
-        		 	console.log(err);
-    			}
+			 try {
+			 	var transcripts = JSON.parse(e.message.content)
 
-		});*/
+			// 	var transcripts = {
+			// 		transcript: e.message.content,
+			// 		msgid: 'test-id',
+			// 		final: true
+			// 	}
+
+			 	if(transcripts.transcript) {
+			 		var tDiv = document.getElementById(transcripts.msgid);
+
+			 		if(!tDiv) {
+			 			var temp = document.createElement("div");
+
+						temp.id = transcripts.msgid;
+			 			temp.innerHTML = transcripts.transcript;
+			 			temp.classList.add("transcripttext");
+			 			document.getElementById("transcriptoverlay").appendChild(temp);
+			 		} else {
+			 			tDiv.innerHTML = transcripts.transcript;
+
+			 			if(transcripts.final) {
+			 				setTimeout(function(){ tDiv.remove() },5000);
+			 			}
+			 		}
+			 	}
+
+			 } catch (err) {
+			 	console.log(err);
+			 }	
+			
+		}); // Caption block end -------------
+
 
 		//the event handlers for UA events
 		ua.on('newRTCSession', function (e) {
-			//e.request.body = edit_request(e.request.body);
 			currentSession = e.session;
 			if (debug) console.log("\nUA - NEWRTCSESSION : \nORIGINATOR:\n" + e.originator + "\nSESSION:\n" + e.session + "\nREQUEST:\n" + e.request);
 
 			currentSession.on('accepted', function (e) {
-				//e.response = edit_response(e.response);
 				if (debug) console.log('\nCURRENTSESSION -  ACCEPTED: \nRESPONSE: \n' + e.response + "\nORIGINATOR:\n" + e.originator);
 				toggle_incall_buttons(true);
 				start_self_video();
@@ -270,6 +281,7 @@
 		disable_chat_buttons();
 		enable_initial_buttons();
 		$("#start-call-buttons").show();
+		$("#transcriptoverlay").html('');
 
 		exitFullscreen();
 	}
@@ -330,7 +342,6 @@
 		selfStream = document.getElementById("selfView");
 
 		toggle_incall_buttons(false);
-		//transcript_overlay.innerHTML = "";
 	}
 
 	//swaps remote and local videos for videomail recording
@@ -407,10 +418,8 @@
 				audio: false,
 				video: true
 			});
-			//hide_video_button.setAttribute("onclick", "javascript: unhide_video();");
 			console.log("Hide video reached");
 			selfStream.setAttribute("hidden", true);
-			//hide_video_icon.style.display = "block";
 
 		}
 	}
@@ -422,10 +431,8 @@
 				audio: false,
 				video: true
 			});
-			//hide_video_button.setAttribute("onclick", "javascript: hide_video();");
 			console.log("Unhide video reached");
 			selfStream.removeAttribute("hidden");
-			//hide_video_icon.style.display = "none";
 		}
 	}
 
@@ -457,13 +464,6 @@
 			selfStream.src = "images/videoPrivacy.webm";
 			console.log("Using self-constructed 30sec video audio clip with SAR 1:1 DAR 4:3 resolution 640:480");
 
-			// selfStream.src = "images/upload_0c0f3df65e9a6d8565be8955f7f23cd7.webm"; // recorded video from a real videomail - works for webrtc and Z20
-			// console.log("Using the actual recorded videomail clip and stream as webm");
-
-			// the following does not work since aspect ratio changed in the middle, crashes chrome
-			// selfStream.src = "images/recordedPrivacy.webm"; // recorded video from virtualagent: consumer is playing videoPrivacy.webm
-			// console.log("Using the recorded videoPrivacy clip and stream as webm");
-
 
 			selfStream.type = 'type="video/webm"';
 			selfStream.setAttribute("loop","true");
@@ -487,9 +487,6 @@
 				audio: false,
 				video: true
 			});
-
-			// console.log("Toggle selfView after endable privacy");
-			// toggleSelfview();
 		}
 	}
 
@@ -534,7 +531,6 @@
 					audio: true,
 					video: true
 				})
-				//navigator.mediaDevices.getUserMedia({ audio: false, video: true })
 				.then(function (stream) {
 					selfStream.removeAttribute("hidden");
 					// Older browsers may not have srcObject
@@ -564,9 +560,6 @@
                                 audio: false,
                                 video: true
                         });
-
-			// console.log("Toggle selfView after disable privacy");
-			// toggleSelfview();
 		}
 	}
 
@@ -710,4 +703,85 @@
 		} else if (document.webkitExitFullscreen) {
 		  	document.webkitExitFullscreen();
 		}
+	}
+
+	function changeCaption(id) {
+		var value = id.split('-')[1];
+		var target = id.split('-')[0];
+
+		if(target == 'bg'){
+			var alpha = $('#opacity-slider-agent').val();
+			if ( alpha == 0 ) { 
+				alpha = 1;
+				$('#opacity-slider-agent').val(1);
+			}
+			var color;
+			switch (value) {
+				case 'black': 
+					color = 'rgba(0,0,0,' + alpha + ')';
+					break;
+				case 'grey': 
+					color = 'rgba(128,128,128,' + alpha + ')';
+					break;
+				case 'white': 
+					color = 'rgba(255,255,255,' + alpha + ')';
+					break;
+			}
+			document.documentElement.style.setProperty('--caption-bg-color', color);
+		} else if(target == 'font'){
+			document.documentElement.style.setProperty('--caption-font-color', value);
+		} else {
+			document.documentElement.style.setProperty('--caption-font-size', id + 'rem');
+		}
+	}
+
+	$('#bg-transparent').click(function() {
+		$('#opacity-slider-agent').val(0);
+		$('#opacity-slider-agent').trigger('mousemove');
+	})	
+
+	$('#opacity-slider-agent').on('change mousemove', function() {
+		var alpha = $(this).val();
+		var current = document.documentElement.style.getPropertyValue('--caption-bg-color');
+		if (current == '') {current = 'rgba(128,128,128,0';}
+		var color = current.substring(0,current.lastIndexOf(',')+1) + alpha + ')';
+		document.documentElement.style.setProperty('--caption-bg-color', color);
+	})
+
+	var demo_running = false;
+	function testCaptions() {
+
+		if(!demo_running) {
+			demo_running = true;
+			var temp = document.createElement("div");
+			temp.classList.add("transcripttext");
+
+			document.getElementById("transcriptoverlay").appendChild(temp);
+			temp.innerHTML = 'Hi - I am having trouble with captions on my TV';
+
+			var count = 0;
+			var intervalId = window.setInterval(function() {	
+				switch (count) {
+					case 0: 
+						temp.innerHTML = "They were working fine all day yesterday, but, stopped at 4:00";
+						break;
+					case 1: 
+						temp.innerHTML = 'Do you think that will fix the problem?';
+						break;
+					case 2: 
+						temp.innerHTML = 'Looks like that did it, everything seems to be working again';
+						break;
+					case 3: 
+						temp.innerHTML = 'Thanks for the help and have a nice day';
+						break;
+				}
+				count++;
+
+				if(count > 4) {
+					window.clearInterval(intervalId);
+					temp.innerHTML = '';
+					demo_running = false;
+				}
+			}, 6000);
+		} else { console.log('demo running'); }
 	}

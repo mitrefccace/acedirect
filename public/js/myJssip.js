@@ -57,8 +57,6 @@
 		$('#recordicon').hide();
 		$('#record-progress-bar').css('width', '0%');
 		$('#record-progress-bar').hide();
-		// $('#callbutton').prop("disabled", true);
-		// $('#videomailbutton').prop("disabled", false);
 		$('#userformbtn').prop("disabled", false);
 		$('#vmsent').hide();
 		$('#vmwait').hide();
@@ -121,7 +119,6 @@
 				startRecordProgress();
 		});
 		ua.on('newRTCSession', function (e) {
-			//e.request.body = edit_request(e.request.body);
 			currentSession = e.session;
 
 			if (debug) console.log("\nUA - NEWRTCSESSION : \nORIGINATOR:\n" + e.originator + "\nSESSION:\n" + e.session + "\nREQUEST:\n" + e.request);
@@ -131,18 +128,15 @@
 				if (debug) console.log('\nCURRENTSESSION - PEER CONNECTION');
 			});
 			currentSession.on('connecting', function (e) {
-				//e.request.body = edit_request(e.request.body);
 				if (debug) console.log('\nCURRENTSESSION -  CONNECTING:\nREQUEST: \n' + e.request);
 			});
 			currentSession.on('sending', function (e) {
-				//e.request.body = edit_request(e.request.body);
 				if (debug) console.log('\nCURRENTSESSION - SENDING: \nREQUEST: \n' + e.request);
 			});
 			currentSession.on('progress', function (e) {
 				if (debug) console.log('\nCURRENTSESSION -  PROGRESS: \nRESPONSE: \n' + e.response);
 			});
 			currentSession.on('accepted', function (e) {
-				//e.response = edit_response(e.response);
 				if (debug) console.log('\nCURRENTSESSION -  ACCEPTED: \nRESPONSE: \n' + e.response + "\nORIGINATOR:\n" + e.originator);
 				toggle_incall_buttons(true);
 				start_self_video();
@@ -209,7 +203,6 @@
 				if (debug) console.log('\nCURRENTSESSION -  REPLACES ');
 			});
 			currentSession.on('sdp', function (e) {
-				//e.sdp = edit_request(e.sdp);
 				e.sdp = edit_request_with_packetizationmode(e.sdp);
 				if (debug) console.log('\nCURRENTSESSION -  SDP \nORIGINATOR:\n' + e.originator + "\nTYPE:\n" + e.type + "\nSDP:\n" + e.sdp);
 
@@ -231,7 +224,7 @@
 				if (debug) console.log('\nCURRENTSESSION - PEERCONNECTION : SET REMOTE DESCRIPTION FAILED ');
 			});
 
-			//event listener for remote video. Adds to html page when ready. 
+			//event listener for remote video. Adds to html page when ready.
 			//NOTE: has to be both here and in accept_call() because currentSession.connection is not established until after ua.answer() for incoming calls
 			if (currentSession.connection) currentSession.connection.ontrack = function (e) {
 				if (debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
@@ -299,7 +292,7 @@
 			currentSession.answer(options);
 
 
-			//event listener for remote video. Adds to html page when ready. 
+			//event listener for remote video. Adds to html page when ready.
 			//NOTE: needs to be both here and in the newRTCSession event listener because currentSession.connection is not established until after ua.answer() for incoming calls
 			if (currentSession.connection) currentSession.connection.ontrack = function (e) {
 				if (debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
@@ -328,7 +321,6 @@
 				navigator.mediaDevices.getUserMedia = function (constraints) {
 					// First get ahold of the legacy getUserMedia, if present
 					var getUserMedia = navigator.msGetUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-					//var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
 					// Some browsers just don't implement it - return a rejected promise with an error
 					// to keep a consistent interface
@@ -347,7 +339,7 @@
 					audio: true,
 					video: true
 				})
-				//navigator.mediaDevices.getUserMedia({ audio: false, video: true }) 
+				//navigator.mediaDevices.getUserMedia({ audio: false, video: true })
 				.then(function (stream) {
 					selfStream.removeAttribute("hidden");
 					// Older browsers may not have srcObject
@@ -404,7 +396,6 @@
 		$("#start-call-buttons").show();
 		$("#agent-name-box").hide();
 		$("#agent-name").text("");
-		// if(ua) ua.stop(); 
 	}
 
 	//terminates the call (if present) and unregisters the ua
@@ -427,7 +418,7 @@
 		selfStream.src = "";
 		remoteView.src = "";
 
-		//stops remote track	 
+		//stops remote track
 		if (remoteView.srcObject) {
 			if (remoteView.srcObject.getTracks()) {
 				if (remoteView.srcObject.getTracks()[0]) remoteView.srcObject.getTracks()[0].stop();
@@ -542,7 +533,7 @@
 	}
 
 
-	// times out and ends call after 30 or so seconds. agent gets event "ended" with cause "RTP Timeout". 
+	// times out and ends call after 30 or so seconds. agent gets event "ended" with cause "RTP Timeout".
 	// puts session on hold
 	function hold() {
 		if (currentSession) {
@@ -584,7 +575,7 @@
 					video_section = true;
 				}
 
-				//getting rid of h264 
+				//getting rid of h264
 				if (request_lines[i].includes("H264/90000")) {
 					request_lines.splice(i, 1);
 					i--; //preventing wrong index because line was deleted
@@ -602,7 +593,7 @@
 				if (video_section) {
 					//we want to add the lines in the correct order. "a=fmtp" lines should be added where all the other "a=fmtp" lines are
 					if (request_lines[i].includes("a=fmtp")) {
-						//we want to add the new line at the end of all the "a=fmtp" lines 
+						//we want to add the new line at the end of all the "a=fmtp" lines
 						if (request_lines[i + 1].includes("a=fmtp") == false) {
 							request_lines[i] = request_lines[i] + "\na=fmtp:97 profile-level-id=42e01f;level-asymmetry-allowed=1";
 							added_new_codec = true;

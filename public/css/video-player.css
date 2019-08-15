@@ -1,0 +1,105 @@
+#fullscreen-element {
+	padding: 0;
+	height: 100%;
+	overflow: hidden;
+}
+#webcam {
+	height: 100%;
+	position: relative;
+}
+
+#selfView { 
+  width: 25%; 
+  border: 2px solid #ccc;
+  top: 0;
+  right: 0 !important;
+  position: absolute;
+  z-index: 2147483647;
+}
+#remoteView { 
+  max-width: 100%;
+  height: 100% !important;
+  width: 100%;
+  object-fit: contain;
+  background-color:#fff;
+} 
+
+#call-option-buttons {
+  display: none;
+  width: 100%;
+  text-align: center;
+  position: absolute;
+  bottom: 5px;
+  left: 0px;
+  z-index: 2147483647;
+  padding: 10px;
+} 
+
+#call-option-buttons .btn {
+  width: 10%;
+  width:50px;
+  height: 35px;
+	margin: 5px 0px 0px 5px;
+	opacity: 0;
+	z-index: -2;
+}
+
+#mute-captions .fa-stack, #hide-video .fa-stack {
+  line-height: 1.5em;
+  position: relative;
+  left: -0.37em
+}
+
+#mute-captions .fa-stack-2x, #hide-video .fa-stack-2x {
+  line-height: 0.8em;
+}
+
+#mute-audio .fa-microphone-slash {
+  position: relative;
+  left: -0.03em;
+}
+
+/* button animations */
+
+@-webkit-keyframes fade-in {
+  0% { 
+    opacity: 0; 
+    -webkit-transform: translateY(50px); 
+            transform: translateY(50px);
+    z-index: -2;
+  }
+  75% { 
+    opacity: 1; 
+    -webkit-transform: translateY(-5px); 
+            transform: translateY(-5px); 
+    z-index: 2;
+  }
+  100% {
+    opacity: 1; 
+    -webkit-transform: translateY(0px); 
+            transform: translateY(0px); 
+    z-index: 2;
+  }
+}
+
+@-webkit-keyframes fade-out {
+  0% { 
+    opacity: 1; 
+    -webkit-transform: translateY(0px); 
+            transform: translateY(0px); 
+    z-index: 2;
+  }
+  25% {
+    opacity: 1; 
+    -webkit-transform: translateY(-5px); 
+            transform: translateY(-5px); 
+    z-index: 2;
+  }
+  100% { 
+    opacity: 0; 
+    -webkit-transform: translateY(50px); 
+            transform: translateY(50px);
+    z-index: -2;
+  }
+}
+

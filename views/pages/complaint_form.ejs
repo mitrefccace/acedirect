@@ -8,32 +8,30 @@
 	<!-- Tell the browser to be responsive to screen width -->
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-	<!-- Bootstrap 3.3.5 -->
-	<link rel="stylesheet" href="/bower_components/AdminLTE/bootstrap/css/bootstrap.css">
-	<!-- Bootstrap Toggle v2.2.0 -->
-	<link rel="stylesheet" href="/bower_components/bootstrap-toggle/css/bootstrap-toggle.css">
-	<!-- Font Awesome -->
-	<link rel="stylesheet" href="/bower_components/font-awesome/css/font-awesome.min.css">
-	<!-- Ionicons -->
-	<link rel="stylesheet" href="/bower_components/Ionicons/css/ionicons.min.css">
-	<!-- Theme style -->
-	<link rel="stylesheet" href="/bower_components/AdminLTE/dist/css/AdminLTE.css">
-	<!-- AdminLTE Skins  -->
-	<link rel="stylesheet" href="/bower_components/AdminLTE/dist/css/skins/_all-skins.min.css">
+
+	<link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+	<link rel="stylesheet" href="/assets/css/bootstrap-toggle.css">
+	<link rel="stylesheet" href="/assets/css/font-awesome.min.css">
+	<%# font awesome cdn: remove after add to assets %>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+	<link rel="stylesheet" href="/assets/css/ionicons.min.css">
+	<link rel="stylesheet" href="/assets/css/AdminLTE.min.css">
+	<link rel="stylesheet" href="/assets/css/skin-blue.min.css">
 	<!-- Custom Portal stylesheet -->
 	<link rel="stylesheet" href="/css/ca-portal.css">
-<script>
-var nginxPath = '<%= nginxPath %>';
-</script>
-<style>
-.blink {
-  animation: blinker 1s linear infinite;
-}
+	<link rel="stylesheet" href="/css/video-player.css">
+	<script>
+		var nginxPath = '<%= nginxPath %>';
+	</script>
+	<style>
+		.blink {
+			animation: blinker 1s linear infinite;
+		}
 
-@keyframes blinker {
-  50% { opacity: 0.0; }
-}
-</style>
+		@keyframes blinker {
+			50% { opacity: 0.0; }
+		}
+	</style>
 
 </head>
 
@@ -132,8 +130,8 @@ var nginxPath = '<%= nginxPath %>';
 										<div class="col-lg-12">
 											<div style="margin-bottom: 5px;">
 												<label class="control-label">Description of Complaint</label>
-												<textarea class="form-control" id="complaint" rows="10" maxlength="2000" required></textarea>
-												<p>You have <span id="complaintcounter"></span> characters left.</p>
+												<textarea class="form-control" id="complaint" maxlength="2000" rows="10" maxlength="2000" required></textarea>
+												<p>You have <span id="complaintcounter">2000</span> characters left.</p>
 											</div>
 										</div>
 									</div>
@@ -165,36 +163,41 @@ var nginxPath = '<%= nginxPath %>';
 
 							<div class="box-body" id="fullscreen-element">
 								<div id="webcam" hidden>
+
 									<video id="remoteView" autoplay poster="images/acedirect-logo.png"></video>
 									<video id="selfView" autoplay muted="true" hidden></video>
-									<!--div id="transcriptoverlay" class="transcriptoverlay"></div-->
+									<div id="transcriptoverlay" class="transcriptoverlay"></div> <!-- Caption code -->
+
 									<div id= "call-option-buttons">
 										<div id= "inner">
-											<!--button id="mute-captions" type="button" class="btn btn-gray" onclick="mute_captions()">
+
+											<!-- Caption code -->
+											<button id="mute-captions" type="button" class="btn btn-gray" onclick="mute_captions()">
 												<span class="fa-stack">
-                                									<i id="mute-captions-icon" class="fa fa-cc fa-stack-1x"></i>
-                                									<i id="mute-captions-off-icon" class="fa fa-ban fa-stack-2x text-danger" style="display:none;"></i>
-                             									</span>
-											</button-->
+														<i id="mute-captions-icon" class="fa fa-cc fa-lg fa-stack-1x"></i>
+														<i id="mute-captions-off-icon" class="fa fa-ban fa-stack-2x text-danger" style="display:none;"></i>
+												</span>
+											</button>
+
 											<button  id="mute-audio" type = "button" class = "btn btn-gray" onclick = "mute_audio()"> <i id= "mute-audio-icon" class="call-btn-icon fa fa-microphone"></i> </button>
 											<button  id="hide-video" type = "button" class = "btn btn-gray" onclick = "enable_video_privacy()">
-											<span class="fa-stack">
-											    <i class="fa fa-video-camera fa-stack-1x"></i>
-											    <i id="mute-camera-off-icon" class="fa fa-ban fa-stack-2x text-danger" style="display:none;"></i>
-                                                                                                </span>
+												<span class="fa-stack">
+														<i class="fa fa-video-camera fa-stack-1x"></i>
+														<i id="mute-camera-off-icon" class="fa fa-ban fa-stack-2x text-danger" style="display:none;"></i>
+												</span>
+											</button> <!-- hack for hide video button since there's no fa-icon for it. we overlay an x and hide and show it when needed-->
 
-												<!-- hack for hide video button since there's no fa-icon for it. we overlay an x and hide and show it when needed-->
-											</button>
 											<button type="button" class = "btn btn-gray" onclick = "enterFullscreen()"><i id= "fullscreen-icon" class="call-btn-icon fa fa-expand"></i> </button>
 											<button id="end-call" type = "button" class = "btn btn-danger" onclick = "terminate_call()"> <i class="call-btn-icon fa fa-phone fa-rotate-135"></i> </button>
+
 									</div>
 
 								</div>
 							</div>
 
-	                            <div class = "row">
-		                            <div class = "col-xs-12 text-center" id = "start-call-buttons" style="margin-top: 10px; margin-bottom: 10px;">
-					                	<button class="btn btn-primary" id="callbutton" style = "width: 80px;" type="button">
+								<div class = "row">
+									<div class = "col-xs-12 text-center" id = "start-call-buttons" style="margin-top: 10px; margin-bottom: 10px;">
+										<button class="btn btn-primary" id="callbutton" style = "width: 80px;" type="button">
 											Call
 										</button>
 										<button class="btn btn-primary" id="videomailbutton" type="button">
@@ -226,20 +229,42 @@ var nginxPath = '<%= nginxPath %>';
 					<!-- Right Col -->
 					<section class="col-lg-5" id="chat-section">
 						<div class="box direct-chat direct-chat-primary">
-							<div class="box-header with-border">
-								<i class="fa fa-comments"></i>
-								<h3 class="box-title">Agent Chat</h3>
+							<div class="box-header with-border" id="chat-header">
+
+								<div class="tab-container">
+
+									<div id="chat-tab" class="tab active-tab">
+										<i class="fa fa-comments"></i>
+										<h3 class="box-title">Agent Chat</h3>
+									</div>
+
+									<div id="trans-tab" class="tab">
+										<h3 class="box-title">Transcript</h3>
+									</div>
+
+								</div>
+
 								<div class="box-tools pull-right">
-									<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-										</button>
+									<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
 								</div>
 							</div>
+
 							<div class="box-body">
 								<!-- Conversations are loaded here -->
-								<div class="direct-chat-messages" id="chat-messages"></div>
-								<div class="direct-chat-timestamp text-bold" id="rtt-typing" style="margin-left: 10px; min-height: 20px"></div>
+								<div id="chat-body">
+									<div class="direct-chat-messages" id="chat-messages"></div>
+									<div class="direct-chat-timestamp text-bold" id="rtt-typing" style="margin-left: 10px; min-height: 20px"></div>
+								</div>
+
+								<div id="trans-body">
+									<div class="direct-chat-messages" id="caption-messages">
+
+									</div>
+								</div>
+
 							</div>
-							<div class="box-footer">
+
+							<div id="chat-footer" class="box-footer">
 								<form name="chatsend" id="chatsend">
 									<div class="input-group">
 										<input type="hidden" id="displayname">
@@ -250,10 +275,67 @@ var nginxPath = '<%= nginxPath %>';
 											</span>
 									</div>
 								</form>
-								<p hidden id="characters-left">You have <span id="chatcounter"></span> characters left.</p>
+								<p hidden id="characters-left">You have <span id="chatcounter">500</span> characters left.</p>
+							</div>
+
+						</div>
+
+						<div id="caption-settings" class="box direct-chat direct-chat-primary">
+							<div class="box-header with-border">
+								<i class="fa fa-comments"></i>
+								<h3 class="box-title">Caption Settings</h3>
+								<div class="box-tools pull-right">
+									<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+										</button>
+								</div>
+							</div>
+							<div class="box-body">
+
+							<li class="cap-setting">
+								<span>Enable Captions:</span>
+								<div class="form-check">
+									<input class="form-check-input position-static" type="checkbox" id="enable-captions" onclick="mute_captions()" checked>
+								</div>
+							</li>
+
+								<li id="cap-font-size" class="cap-setting">
+									<span>Font size:</span>
+									<select id="font-select" class="font-select" type="select" name="font-select" onchange="changeCaption(this.value)">
+										<option value="2.5">Default</option>
+										<option value="1.5">Small</option>
+										<option value="3">Large</option>
+									</select>
+								</li>
+
+								<li id="cap-font-color" class="cap-setting">
+										<span>Font color:</span>
+										<div class="color-select-container">
+												<div id="font-grey" class="color-select" onclick="changeCaption(this.id)"></div>
+												<div id="font-black" class="color-select" onclick="changeCaption(this.id)"></div>
+												<div id="font-white" class="color-select" onclick="changeCaption(this.id)"></div>
+										</div>
+								</li>
+
+								<li id="cap-bg-color" class="cap-setting">
+										<span>Background color:</span>
+										<div class="color-select-container">
+											<i id="bg-transparent" class="far fa-times-circle"></i>
+											<div id="bg-grey" class="color-select" onclick="changeCaption(this.id)"></div>
+											<div id="bg-black" class="color-select" onclick="changeCaption(this.id)"></div>
+											<div id="bg-white" class="color-select" onclick="changeCaption(this.id)"></div>
+										</div>
+										<input type = "range" min = "0" max = "1" step = .01 value = "1" id = "opacity-slider-consumer">
+								</li>
+
+							</div>
+							<div class="box-footer">
+
+								<button class="btn btn-primary center-block" type="button" onclick = "testCaptions()">Preview</button>
+
 							</div>
 						</div>
 					</section>
+
 				</div>
 				<!-- /.row -->
 			</section>
@@ -397,7 +479,7 @@ var nginxPath = '<%= nginxPath %>';
 					<h2>Servers under heavy traffic</h2>
 				</div>
 				<div class="modal-body text-center">
-					<h4 id="queue-msg"> Automatically trying again in <span id="newExtensionRetryCounter">10 seconds</span>. <h4>
+					<h4 id="queue-msg"> Automatically trying again in <span id="newExtensionRetryCounter">10</span> seconds. <h4>
 				</div>
 				<div class = "text-center" style = "border-top: 1px solid #f4f4f4; padding: 10px;">
 			        <!-- This URL action should invoke DTMF Tone 1 -->
@@ -419,27 +501,16 @@ var nginxPath = '<%= nginxPath %>';
         <div id="pc_config" > </div>
 		</div>
 
-	<!-- ==================Le javascript ================================ -->
-	<!-- jQuery v2.1.4 -->
-	<script type="text/javascript" src="/bower_components/AdminLTE/plugins/jQuery/jquery-2.2.3.min.js"></script>
-	<!-- socket.io-client -->
+	<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
 	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
-	<!-- Bootstrap 3.3.5 -->
-	<script type="text/javascript" src="/bower_components/bootstrap/dist/js/bootstrap.js"></script>
-	<!-- Decode JWT tokens -->
-	<script type="text/javascript" src="/bower_components/jwt-decode/build/jwt-decode.min.js"></script>
-	<!-- timer.jquery 0.6.3 -->
-	<script type="text/javascript" src='/bower_components/timer.jquery/dist/timer.jquery.min.js'></script>
-	<!-- simply countable -->
-	<script type="text/javascript" src='/bower_components/jquery-simply-countable/jquery.simplyCountable.js'></script>
-	<!-- moment.js 2.15.1 -->
-	<script type="text/javascript" src='/bower_components/moment/moment.js'></script>
-	<!-- AdminLTE App -->
-	<script type="text/javascript" src="/bower_components/AdminLTE/dist/js/app.min.js"></script>
-	<!-- Jquery input mask -->
-	<script type="text/javascript" src="/bower_components/AdminLTE/plugins/input-mask/jquery.inputmask.js"></script>
-	<!--JSSIP-->
-	<script type="text/javascript" src="/bower_components/jssip/dist/jssip.min.js"></script>
+	<script type="text/javascript" src="/assets/js/bootstrap.js"></script>
+	<script type="text/javascript" src="/assets/js/jwt-decode.min.js"></script>
+	<script type="text/javascript" src='/assets/js/moment.js'></script>
+	<script type="text/javascript" src="/assets/js/adminlte.min.js"></script>
+	<script type="text/javascript" src="/assets/js/inputmask.min.js"></script>
+	<script type="text/javascript" src="/assets/js/jquery.inputmask.min.js"></script>
+	<script type="text/javascript" src="/assets/js/jssip.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/timer.jquery/0.9.0/timer.jquery.min.js"></script>
   <script>
   var complaintForm = true;
   var complaintRedirectActive = true;

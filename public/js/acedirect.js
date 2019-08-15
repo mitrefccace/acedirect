@@ -282,7 +282,7 @@ function connect_socket() {
 								case "AWAY":
 									sColor = away_color;
 									sBlinking = away_blinking;
-									statusTxt = "Away"
+									statusTxt = "Away";
 									break;
 								case "INCALL":
 									sColor = in_call_color;
@@ -306,7 +306,6 @@ function connect_socket() {
 									break;
 								default:
 									sColor = "gray";
-									sBlinking = false;
 									statusTxt = "Unknown";
 							}
 
@@ -357,8 +356,15 @@ function connect_socket() {
 					debugtxt('lightcode-configs', data);
 					updateColors(data);
 					busylight.updateConfigs(data);
+				}).on('caption-config', function (data) {
+					if(data == 'false') {
+						console.log('captions off');
+						$('.config-hide').css('display', 'none');
+						$('#transcriptoverlay').css('display', 'none');
+						$('#mute-captions').css('display', 'none');
+					}
 				}).on('skinny-config', function (data) {
-					if (data == "true") {
+					if (data === "true") {
 						$("#gsscriptbox").attr("hidden", true);
 						$("#gsdetailsbox").attr("hidden", true);
 					} else {
@@ -376,15 +382,15 @@ function connect_socket() {
 					$('#videomailErrorModal').modal('show');
 					stopVideomail();
 				}).on('queue-caller-join', function (data) {
-					if (data.queue == "ComplaintsQueue") {
+					if (data.queue === "ComplaintsQueue") {
 						$("#complaints-queue-num").text(data.count);
-					} else if (data.queue == "GeneralQuestionsQueue") {
+					} else if (data.queue === "GeneralQuestionsQueue") {
 						$("#general-queue-num").text(data.count);
 					}
 				}).on('queue-caller-leave', function (data) {
-					if (data.queue == "ComplaintsQueue") {
+					if (data.queue === "ComplaintsQueue") {
 						$("#complaints-queue-num").text(data.count);
-					} else if (data.queue == "GeneralQuestionsQueue") {
+					} else if (data.queue === "GeneralQuestionsQueue") {
 						$("#general-queue-num").text(data.count);
 					}
 				});
@@ -423,7 +429,7 @@ $('#agenttable').DataTable({
 });
 
 $("#ivrsnum").keyup(function (event) {
-	if (event.keyCode == 13) {
+	if (event.keyCode === 13) {
 		$("#submitvrs").click();
 	}
 });
@@ -508,11 +514,7 @@ function logout(msg) {
 	if (socket)
 		socket.disconnect();
 	//display the login screen to the user.
-	if (msg) {
-		window.location.href = './logout';
-	} else {
-		window.location.href = './logout';
-	}
+	window.location.href = './logout';
 
 }
 
@@ -580,8 +582,10 @@ function inCallADComplaints(endpoint_type) {
 	if (endpoint_type === "Provider_Complaints") {
 		disable_chat_buttons();
 		$("#newchatmessage").attr("placeholder", "Chat disabled for Provider endpoints");
-	} else { //should be webrtc 
+		$('#remoteView').css('object-fit', ' contain');
+	} else { //should be webrtc
 		enable_chat_buttons();
+		$('#remoteView').css('object-fit', ' cover');
 	}
 
 
@@ -599,8 +603,10 @@ function inCallADGeneral(endpoint_type) {
 	if (endpoint_type === "Provider_General_Questions") {
 		disable_chat_buttons();
 		$("#newchatmessage").attr("placeholder", "Chat disabled for provider endpoints");
-	} else { //should be webrtc 
+		$('#remoteView').css('object-fit', ' contain');
+	} else { //should be webrtc
 		enable_chat_buttons();
+		$('#remoteView').css('object-fit', ' cover');
 	}
 }
 
@@ -624,7 +630,7 @@ function unpauseQueues() {
 function finished(i) {
 	$('#destexten').val('');
 	clearScreen();
-	if (i == 1)
+	if (i === 1)
 		unpauseQueues();
 	else
 		pauseQueues();
@@ -715,33 +721,33 @@ function updateColors(data) {
 
 	//get new colors from json config file, save to local variables
 	for (var status in data) {
-		if (data[status].color.toLowerCase() == "off") {
+		if (data[status].color.toLowerCase() === "off") {
 			data[status].color = "gray";
 			data[status].blink = false;
 		}
 
-		if (data[status].id.toLowerCase() == "away") {
+		if (data[status].id.toLowerCase() === "away") {
 			away_color = data[status].color;
 			away_blinking = data[status].blink;
-		} else if (data[status].id.toLowerCase() == "ready") {
+		} else if (data[status].id.toLowerCase() === "ready") {
 			ready_color = data[status].color;
 			ready_blinking = data[status].blink;
-		} else if (data[status].id.toLowerCase() == "in_call") {
+		} else if (data[status].id.toLowerCase() === "in_call") {
 			in_call_color = data[status].color;
 			in_call_blinking = data[status].blink;
-		} else if (data[status].id.toLowerCase() == "hold") {
+		} else if (data[status].id.toLowerCase() === "hold") {
 			hold_color = data[status].color;
 			hold_blinking = data[status].blink;
-		} else if (data[status].id.toLowerCase() == "incoming_call") {
+		} else if (data[status].id.toLowerCase() === "incoming_call") {
 			incoming_call_color = data[status].color;
 			incoming_call_blinking = data[status].blink;
-		} else if (data[status].id.toLowerCase() == "transferred_call") {
+		} else if (data[status].id.toLowerCase() === "transferred_call") {
 			transferred_call_color = data[status].color;
 			transferred_call_blinking = data[status].blink;
-		} else if (data[status].id.toLowerCase() == "wrap_up") {
+		} else if (data[status].id.toLowerCase() === "wrap_up") {
 			wrap_up_color = data[status].color;
 			wrap_up_blinking = data[status].blink;
-		} else if (data[status].id.toLowerCase() == "need_assistance") {
+		} else if (data[status].id.toLowerCase() === "need_assistance") {
 			need_assistance_color = data[status].color;
 			need_assistance_blinking = data[status].blink;
 		} else {
@@ -774,11 +780,11 @@ function updateColors(data) {
 		$("#ready-icon").removeClass("status-margin");
 	}
 	//add colors to wrapup model
-	if (wrap_up_color == "white") $('#wrapup-color').addClass("text-gray");
+	if (wrap_up_color === "white") $('#wrapup-color').addClass("text-gray");
 	else $('#wrapup-color').addClass("text-" + wrap_up_color);
-	if (away_color == "white") $('#away-color').addClass("text-gray");
+	if (away_color === "white") $('#away-color').addClass("text-gray");
 	else $('#away-color').addClass("text-" + away_color);
-	if (ready_color == "white") $('#ready-color').addClass("text-gray");
+	if (ready_color === "white") $('#ready-color').addClass("text-gray");
 	else $('#ready-color').addClass("text-" + ready_color);
 	$('#away-btn').addClass("btn-" + away_color);
 	$('#ready-btn').addClass("btn-" + ready_color);
@@ -821,6 +827,7 @@ function changeStatusIcon(newColor, statusName, blinking) {
 
 
 function testLightConnection() {
+        console.log('\n\nChecking for BusyLight... Ignore this error if no BusyLight...');
 	$('#busylightModalBody').html(" ");
 	$('#busylightModalTestBtn').prop("disabled", true);
 	$('#busylightModalBody').html("Checking BusyLight server...");
@@ -830,7 +837,7 @@ function testLightConnection() {
 		timeout: 2000,
 		dataType: "jsonp xml",
 		success: function (data, text) {
-
+                  busyLightEnabled = true;
 		},
 		error: function (request, status, error) {
 			$('#busylightModalTestBtn').prop("disabled", false);
@@ -850,11 +857,12 @@ function testLightConnection() {
 				}
 			} else {
 				$('#busylightModalBody').html('Connected to busylight!!!!');
-
+                                busyLightEnabled = true;
 				setTimeout(function () {
 					$('#busylightModal').modal('hide');
 				}, 1500);
 			}
+                        console.log('');
 		}
 	});
 }
@@ -889,9 +897,9 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
 //Sorting the videomail table
 $('#vmail-vrs-number').on('click', function () {
 	var sort = sortButtonToggle($(this).children("i"));
-	if (sort == "asc") {
+	if (sort === "asc") {
 		sortFlag = "callbacknumber asc";
-	} else if (sort == "desc") {
+	} else if (sort === "desc") {
 		sortFlag = "callbacknumber desc";
 	}
 	socket.emit('get-videomail', {
@@ -903,9 +911,9 @@ $('#vmail-vrs-number').on('click', function () {
 
 $('#vmail-date').on('click', function () {
 	var sort = sortButtonToggle($(this).children("i"));
-	if (sort == "asc") {
+	if (sort === "asc") {
 		sortFlag = "unix_timestamp(received) asc";
-	} else if (sort == "desc") {
+	} else if (sort === "desc") {
 		sortFlag = "unix_timestamp(received) desc";
 	}
 	socket.emit('get-videomail', {
@@ -917,9 +925,9 @@ $('#vmail-date').on('click', function () {
 
 $('#vmail-duration').on('click', function () {
 	var sort = sortButtonToggle($(this).children("i"));
-	if (sort == "asc") {
+	if (sort === "asc") {
 		sortFlag = "video_duration asc";
-	} else if (sort == "desc") {
+	} else if (sort === "desc") {
 		sortFlag = "video_duration desc";
 	}
 	socket.emit('get-videomail', {
@@ -931,9 +939,9 @@ $('#vmail-duration').on('click', function () {
 
 $('#vmail-status').on('click', function () {
 	var sort = sortButtonToggle($(this).children("i"));
-	if (sort == "asc") {
+	if (sort === "asc") {
 		sortFlag = "status asc";
-	} else if (sort == "desc") {
+	} else if (sort === "desc") {
 		sortFlag = "status desc";
 	}
 	socket.emit('get-videomail', {
@@ -944,13 +952,13 @@ $('#vmail-status').on('click', function () {
 });
 
 function sortButtonToggle(buttonid) {
-	if ($(buttonid).attr("class") == 'fa fa-sort') {
+	if ($(buttonid).attr("class") === 'fa fa-sort') {
 		$(buttonid).addClass('fa-sort-asc').removeClass('fa-sort');
 		return ("asc");
-	} else if ($(buttonid).attr("class") == 'fa fa-sort-desc') {
+	} else if ($(buttonid).attr("class") === 'fa fa-sort-desc') {
 		$(buttonid).addClass('fa-sort-asc').removeClass('fa-sort-desc');
 		return ("asc");
-	} else if ($(buttonid).attr("class") == 'fa fa-sort-asc') {
+	} else if ($(buttonid).attr("class") === 'fa fa-sort-asc') {
 		$(buttonid).addClass('fa-sort-desc').removeClass('fa-sort-asc');
 		return ("desc");
 	}
@@ -1019,7 +1027,7 @@ function filterVideomail(mailFilter) {
 }
 
 function processFilter(filter) {
-	if (filter == 'ALL') {
+	if (filter === 'ALL') {
 		return ('');
 	} else {
 		return ('AND status = ' + filter);
@@ -1189,6 +1197,7 @@ function enterFullscreen() {
 	var webcam_container = document.getElementById("fullscreen-element");
 
 	if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {
+
 		if (webcam_container.requestFullscreen) {
 			webcam_container.requestFullscreen();
 		} else if (webcam_container.msRequestFullscreen) {
@@ -1199,6 +1208,7 @@ function enterFullscreen() {
 			webcam_container.webkitRequestFullscreen();
 		}
 	} else {
+
 		if (document.exitFullscreen) {
 		  	document.exitFullscreen();
 		} else if (document.msExitFullscreen) {
@@ -1210,6 +1220,47 @@ function enterFullscreen() {
 		}
 	}
 }
+
+function toggleDisplay(){
+	var video_display = $('#remoteView');
+
+	if(video_display.css('object-fit') == 'contain') {
+		video_display.css('object-fit: cover');
+	} else {
+		video_display.css('object-fit: contain');
+	}
+}
+
+var fade_timer = null;
+function clearFadeTimer(){
+	if(fade_timer) {
+		clearTimeout(fade_timer);
+		fade_timer = 0;
+	}
+}
+
+function fade(type='out'){
+	$('#call-option-buttons button').each(function(i){
+		$(this).css('animation', `fade-${type} 0.${i+2}s ease-out forwards`);
+	});
+
+	if(type == 'out') {
+		$('#transcriptoverlay').css('bottom', '10px');
+	} else {
+		$('#transcriptoverlay').css('bottom', '65px');
+	}
+}
+
+$('#fullscreen-element').mousemove(function(){
+	clearFadeTimer();
+	fade('in');
+	fade_timer = setTimeout(fade, 3000);
+});
+
+$('#fullscreen-element').mouseleave(function(){
+	clearFadeTimer();
+	fade_timer = setTimeout(fade, 500);
+});
 
 function showDialpad() {
 	$('#modalDialpad').modal({
@@ -1237,7 +1288,7 @@ $(".keypad-button").click(function (e) {
 	var etemp = $(e.currentTarget);
 	etemp.css("background-color", "Gray");
 	setTimeout(() => {
-		etemp.css("background-color", "White")
+		etemp.css("background-color", "White");
 	}, 500);
 	var el = etemp.find('.big');
 	var text = el.text().trim();
@@ -1249,7 +1300,7 @@ $('#phone-number-delete-btn').click(function (e) {
 	$('#phone-number').val(
 		function (index, value) {
 			return value.substr(0, value.length - 1);
-		})
+		});
 });
 
 $("#button-call").click(function () {
@@ -1293,7 +1344,7 @@ function saveGridLayout() {
 	socket.emit('save-grid-layout', {
 		'gridLayout': serializedGridData
 	});
-};
+}
 
 function loadGridLayout(layout) {
 	sessionStorage.layout = JSON.stringify(layout);
@@ -1302,7 +1353,7 @@ function loadGridLayout(layout) {
 	grid.batchUpdate();
 
 	layout.forEach(function (el) {
-		grid.update($('#' + el.id), el.x, el.y, el.width, el.height)
+		grid.update($('#' + el.id), el.x, el.y, el.width, el.height);
 	});
 
 	grid.commit();
@@ -1369,7 +1420,7 @@ function enable_chat_buttons() {
 
 }
 
-//disables chat buttons 
+//disables chat buttons
 function disable_chat_buttons() {
 	$("#newchatmessage").attr("disabled", "disabled");
 	$("#chat-send").attr("disabled", "disabled");

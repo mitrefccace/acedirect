@@ -18,23 +18,38 @@ $(document).ready(function () {
 	$('#login-box').hide();
 	$('#webcam').show();
 
-	$('#complaint').simplyCountable({
-		counter: '#complaintcounter',
-		maxCount: 2000,
-		strictMax: true
+	$('#complaint').keyup(function () {
+		var left = 2000 - $(this).val().length;
+		if (left < 0) {
+			left = 0;
+		}
+		$('#complaintcounter').text(left);
 	});
-	$('#newchatmessage').simplyCountable({
-		counter: '#chatcounter',
-		maxCount: 500,
-		strictMax: true
+
+	$('#newchatmessage').keyup(function () {
+		var left = 500 - $(this).val().length;
+		if (left < 0) {
+			left = 0;
+		}
+		$('#chatcounter').text(left);
 	});
 	connect_socket();
+
+	// chat-transcript toggle
+	$('#chat-tab').on('click', function(){
+		$('#chat-body').css('display', 'block')
+		$('#chat-footer').css('display', 'block')
+		$('#trans-body').css('display', 'none')
+	});
+	$('#trans-tab').on('click', function(){
+		$('#chat-body').css('display', 'none')
+		$('#chat-footer').css('display', 'none')
+		$('#trans-body').css('display', 'block')
+	});
 });
 
 
 function connect_socket() {
-	//if (sessionStorage.getItem('accesstoken') === null)
-	//	logout();
 	console.log('connect_socket to ');
 	console.log(window.location.host);
 	$.ajax({
@@ -45,7 +60,7 @@ function connect_socket() {
 			console.log(JSON.stringify(data));
 			if (data.message === "success") {
 				socket = io.connect('https://' + window.location.host, {
-					path: nginxPath+'/socket.io',
+					path: nginxPath + '/socket.io',
 					query: 'token=' + data.token,
 					forceNew: true
 				});
@@ -61,7 +76,6 @@ function connect_socket() {
 					console.log('authenticated');
 
 					var payload = jwt_decode(data.token);
-					//alert(JSON.stringify(payload));
 					$('#firstName').val(payload.first_name);
 					$('#lastName').val(payload.last_name);
 					$('#callerPhone').val(payload.vrs);
@@ -86,29 +100,25 @@ function connect_socket() {
 					socket.emit('register-client', {
 						"hello": "hello"
 					});
-					//console.log("register-client");
 					socket.emit('register-vrs', {
 						"hello": "hello"
 					});
-					//onsole.log("register-vrs");
 				}).on('ad-ticket-created', function (data) {
 					console.log("got ad-ticket-created");
 					$('#userformoverlay').removeClass("overlay").hide();
-					// $('#callbutton').prop("disabled", false);
 					if (data.zendesk_ticket) {
 						$('#firstName').val(data.first_name);
 						$('#lastName').val(data.last_name);
 						$('#callerPhone').val(data.vrs);
 						$('#callerEmail').val(data.email);
 						$('#ticketNumber').text(data.zendesk_ticket);
-						// $('#callbutton').prop("disabled", false);
 					} else {
 						$("#ZenDeskOutageModal").modal('show');
 						$('#userformbtn').prop("disabled", false);
 					}
 				}).on('extension-created', function (data) {
 					console.log("got extension-created");
-					if (data.message == 'success') {
+					if (data.message === 'success') {
 						$('#outOfExtensionsModal').modal('hide');
 						var extension = data.extension; //returned extension to use for WebRTC
 						exten = data.extension;
@@ -140,7 +150,7 @@ function connect_socket() {
 						$("#pc_config").attr("name", "stun:" + data.stun_server);
 						register_jssip(); //register with the given extension
 						start_call(asterisk_sip_uri); //calling asterisk to get into the queue
-					} else if (data.message == 'OutOfExtensions'){
+					} else if (data.message === 'OutOfExtensions') {
 						console.log('out of extensions...')
 						//Try again in 10 seconds.
 						$('#outOfExtensionsModal').modal({
@@ -148,15 +158,12 @@ function connect_socket() {
 							backdrop: 'static',
 							keyboard: false
 						});
-						$('#newExtensionRetryCounter').timer({
-							duration: '10s',
-							format: '%s seconds',
-							countdown: true,
-							callback: function() {
-								extensionRetry();
-							},
-							repeat: false
-						});
+						let i = 10;
+						var newExtensionRetryCounter = setInterval(function () {
+
+								document.getElementById("newExtensionRetryCounter").innerHTML =  i;
+								i-- || (clearInterval(newExtensionRetryCounter), extensionRetry());
+							}, 1000);
 					} else {
 						console.log('Something went wrong when getting an extension')
 					}
@@ -208,8 +215,16 @@ function connect_socket() {
 					if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
 						logout("Session has expired");
 					}
+				}).on("caption-config", function (data) {
+					if(data == 'false'){
+						$('#caption-settings').css('display', 'none');
+						$('#transcriptoverlay').css('display', 'none');
+						$('#mute-captions').css('display', 'none');
+						$('#trans-tab').css('display', 'none');
+						$('#chat-tab').removeClass('tab active-tab');
+					}
 				}).on("skinny-config", function (data) {
-					if (data == "true") {
+					if (data === "true") {
 						$("#ticket-section").attr("hidden", true);
 						$("#vrs-info-box").attr("hidden", true);
 						$("#video-section").removeClass(function (index, className) {
@@ -278,9 +293,6 @@ function connect_socket() {
 					//reset buttons and ticket form
 					$('#ticketNumber').text('');
 					$('#complaintcounter').text('2,000');
-					// $("#callbutton").prop("disabled",true);
-					// $('#videomailbutton').prop("disabled", false);
-					// $('#userformbtn').prop("disabled", false);
 					$('#complaint').val('');
 					$('#subject').val('');
 
@@ -374,8 +386,9 @@ $('#userform').submit(function (evt) {
 
 });
 
-function extensionRetry(){
-	$('#newExtensionRetryCounter').timer('remove');
+function extensionRetry() {
+	//$('#newExtensionRetryCounter').timer('remove');
+	clearInterval(newExtensionRetryCounter);
 	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
 	socket.emit('call-initiated', {
 		"vrs": vrs
@@ -383,8 +396,8 @@ function extensionRetry(){
 }
 
 //Logout the user
-$("#notMyInfoLink").click(function(e) {
-	e.preventDefault(); 
+$("#notMyInfoLink").click(function (e) {
+	e.preventDefault();
 	//clear the token from session storage
 	sessionStorage.clear();
 	//disconnect socket.io connection
@@ -392,7 +405,7 @@ $("#notMyInfoLink").click(function(e) {
 		socket.disconnect();
 	//display the login screen to the user.
 	window.location.href = './logout'
-  });
+});
 
 $("#newchatmessage").on('change keydown paste input', function () {
 	var value = $("#newchatmessage").val();
@@ -431,8 +444,9 @@ $('#chatsend').submit(function (evt) {
 // Event listener for the full-screen button
 function enterFullscreen() {
 	var webcam_container = document.getElementById("fullscreen-element");
+	var consumer_view = document.getElementById("remoteView");
 
-	if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {
+	if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
 		if (webcam_container.requestFullscreen) {
 			webcam_container.requestFullscreen();
 		} else if (webcam_container.msRequestFullscreen) {
@@ -442,19 +456,55 @@ function enterFullscreen() {
 		} else if (webcam_container.webkitRequestFullscreen) {
 			webcam_container.webkitRequestFullscreen();
 		}
+
+		$("#remoteView").css("object-fit", "cover");
 	} else {
+
 		if (document.exitFullscreen) {
-		  	document.exitFullscreen();
+			document.exitFullscreen();
 		} else if (document.msExitFullscreen) {
-		  	document.msExitFullscreen();
+			document.msExitFullscreen();
 		} else if (document.mozCancelFullScreen) {
-		  	document.mozCancelFullScreen();
+			document.mozCancelFullScreen();
 		} else if (document.webkitExitFullscreen) {
-		  	document.webkitExitFullscreen();
+			document.webkitExitFullscreen();
 		}
+
+		$("#remoteView").css("object-fit", "contain");
 	}
 }
 
+var fade_timer = null;
+
+function clearFadeTimer() {
+	if (fade_timer) {
+		clearTimeout(fade_timer);
+		fade_timer = 0;
+	}
+}
+
+function fade(type = 'out') {
+	$('#call-option-buttons button').each(function (i) {
+		$(this).css('animation', `fade-${type} 0.${i+2}s ease-out forwards`);
+	});
+
+	if(type == 'out') {
+		$('#transcriptoverlay').css('bottom', '10px')
+	} else {
+		$('#transcriptoverlay').css('bottom', '65px')
+	}
+}
+
+$('#fullscreen-element').mousemove(function () {
+	clearFadeTimer();
+	fade('in');
+	fade_timer = setTimeout(fade, 3000);
+});
+
+$('#fullscreen-element').mouseleave(function () {
+	clearFadeTimer();
+	fade_timer = setTimeout(fade, 500);
+});
 
 function exit_queue() {
 	$('#queueModal').modal('hide');

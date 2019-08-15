@@ -1,4 +1,4 @@
-<div id="VideoBox">
+<div id="VideoBox"> 
     <div class="box-header with-border">
         <i class="fa fa-video-camera"></i>
         <h3 class="box-title">Video</h3>
@@ -11,18 +11,22 @@
 
     <div class="box-body" id="fullscreen-element">
         <div id="webcam" >
+
             <video id="remoteView" class="remoteView" autoplay poster="images/acedirect-logo-trim.png"></video>
-            <!--div id="transcriptoverlay" class="transcriptoverlay"></div-->
+            <div id="transcriptoverlay" class="transcriptoverlay"></div> <!-- Caption code -->
             <video id="selfView" autoplay muted="true" hidden></video>
 
-       		 <div id="call-option-buttons">
-       		     <div id="inner">
-			<!--button id="mute-captions" type="button" class="btn btn-gray" onclick="mute_captions()">
-                             <span class="fa-stack">
-				<i id="mute-captions-icon" class="fa fa-cc fa-stack-1x"></i>
-				<i id="mute-captions-off-icon" class="fa fa-ban fa-stack-2x text-danger" style="display:none;"></i>
-			     </span>
-                         </button-->
+       		<div id="call-option-buttons">
+       		    <div id="inner">
+
+					<!-- Caption code -->
+					<button id="mute-captions" type="button" class="btn btn-gray" onclick="mute_captions()">
+						<span class="fa-stack">
+							<i id="mute-captions-icon" class="fa fa-cc fa-lg fa-stack-1x"></i>
+							<i id="mute-captions-off-icon" class="fa fa-ban fa-stack-2x text-danger" style="display:none;"></i>
+						</span>
+                    </button>
+
        		         <button id="mute-audio" type="button" class="btn btn-gray" onclick="mute_audio()">
        		             <i id="mute-audio-icon" class="call-btn-icon fa fa-microphone"></i>
        		         </button>
