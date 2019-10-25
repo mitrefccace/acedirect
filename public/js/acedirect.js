@@ -40,6 +40,18 @@ $(document).ready(function () {
 	$("#complaintstab").hide();
 	$("[data-mask]").inputmask();
 
+	// chat-transcript toggle
+	$('#chat-tab').on('click', function(){
+		$('#chat-body').css('display', 'block');
+		$('#chat-footer').css('display', 'block');
+		$('#trans-body').css('display', 'none');
+	});
+	$('#trans-tab').on('click', function(){
+		$('#chat-body').css('display', 'none');
+		$('#chat-footer').css('display', 'none');
+		$('#trans-body').css('display', 'block');
+	});
+
 	clearScreen();
 
 	$.getJSON("./resources/licenses.json", function (data) {
@@ -652,6 +664,7 @@ function clearScreen() {
 	$('#duration').timer('reset');
 	$('#duration').timer('pause');
 
+	$('#caption-messages').html('');
 	$('#chat-messages').html('');
 	$('#rtt-typing').html('');
 	$('#newchatmessage').val('');

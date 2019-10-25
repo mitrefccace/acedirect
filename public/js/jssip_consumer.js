@@ -354,6 +354,8 @@
 		selfStream.src = "";
 		remoteView.src = "";
 
+                $('#transcriptoverlay').html('');
+
 		console.log('Disabling video privacy button');
                 hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
 		hide_video_icon.style.display = "none";

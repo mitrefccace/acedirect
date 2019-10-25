@@ -71,15 +71,18 @@
 			 			tDiv.innerHTML = transcripts.transcript;
 
 			 			if(transcripts.final) {
-			 				setTimeout(function(){ tDiv.remove() },5000);
+							 setTimeout(function(){ tDiv.remove() },5000);
+
+							 $('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>"+transcripts.transcript+"</div></div>");
+							 $("#caption-messages").scrollTop($("#caption-messages")[0].scrollHeight);
 			 			}
 			 		}
 			 	}
 
 			 } catch (err) {
 			 	console.log(err);
-			 }	
-			
+			 }
+
 		}); // Caption block end -------------
 
 
@@ -305,6 +308,9 @@
 		remoteStream.pause();
 		selfStream.src = "";
 		remoteView.src = "";
+
+                // Clear transcripts at the end of the call
+                $('#transcriptoverlay').html('');
 
                 console.log('Disabling video privacy button');
                 hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
@@ -711,19 +717,19 @@
 
 		if(target == 'bg'){
 			var alpha = $('#opacity-slider-agent').val();
-			if ( alpha == 0 ) { 
+			if ( alpha == 0 ) {
 				alpha = 1;
 				$('#opacity-slider-agent').val(1);
 			}
 			var color;
 			switch (value) {
-				case 'black': 
+				case 'black':
 					color = 'rgba(0,0,0,' + alpha + ')';
 					break;
-				case 'grey': 
+				case 'grey':
 					color = 'rgba(128,128,128,' + alpha + ')';
 					break;
-				case 'white': 
+				case 'white':
 					color = 'rgba(255,255,255,' + alpha + ')';
 					break;
 			}
@@ -738,7 +744,7 @@
 	$('#bg-transparent').click(function() {
 		$('#opacity-slider-agent').val(0);
 		$('#opacity-slider-agent').trigger('mousemove');
-	})	
+	})
 
 	$('#opacity-slider-agent').on('change mousemove', function() {
 		var alpha = $(this).val();
@@ -760,18 +766,18 @@
 			temp.innerHTML = 'Hi - I am having trouble with captions on my TV';
 
 			var count = 0;
-			var intervalId = window.setInterval(function() {	
+			var intervalId = window.setInterval(function() {
 				switch (count) {
-					case 0: 
+					case 0:
 						temp.innerHTML = "They were working fine all day yesterday, but, stopped at 4:00";
 						break;
-					case 1: 
+					case 1:
 						temp.innerHTML = 'Do you think that will fix the problem?';
 						break;
-					case 2: 
+					case 2:
 						temp.innerHTML = 'Looks like that did it, everything seems to be working again';
 						break;
-					case 3: 
+					case 3:
 						temp.innerHTML = 'Thanks for the help and have a nice day';
 						break;
 				}

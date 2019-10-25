@@ -39,9 +39,7 @@
     "socketio-jwt": "4.5.0",
     "util": "0.10.3"
   },
-  "devDependencies": {
-    "bootstrap": "^3.4.1"
-  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./adserver.js",

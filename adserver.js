@@ -186,7 +186,7 @@ redisClient.on('connect', function () {
 	redisClient.del(rConsumerToCsr);
 	redisClient.del(rAgentInfoMap);
 
-	// Populate the consumerExtensions map
+        // Populate the consumerExtensions map
 	prepareExtensions();
 });
 

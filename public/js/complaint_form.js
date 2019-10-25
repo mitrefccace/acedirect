@@ -235,6 +235,8 @@ function connect_socket() {
 							return (className.match(/\bcol-\S+/g) || []).join(' ');
 						});
 						$("#chat-section").addClass("col-lg-5");
+						$("#caption-settings").attr("hidden", true);
+						$("#trans-tab").attr("hidden", true);
 						skinny = true;
 					} else {
 						$("#ticket-section").removeAttr("hidden");
@@ -250,6 +252,8 @@ function connect_socket() {
 						$("#callbutton").attr("disabled", "disabled");
 						$("#newchatmessage").attr("disabled", "disabled");
 						$("#chat-send").attr("disabled", "disabled");
+						$("#caption-settings").removeAttr("hidden");
+						$("#trans-tab").removeAttr("hidden");
 						skinny = false;
 					}
 				}).on('queue-caller-join', function (data) {
@@ -287,6 +291,7 @@ function connect_socket() {
 					//clear chat
 					$('#chatcounter').text('500');
 					$('#chat-messages').html('');
+					$('#caption-messages').html('');
 					$('#rtt-typing').html('');
 					$('#newchatmessage').val('');
 
