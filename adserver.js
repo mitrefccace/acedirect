@@ -2865,3 +2865,4 @@ app.use(function (err, req, res, next) {
 
 //do it here, after socket is established
 loadColorConfigs();
+
