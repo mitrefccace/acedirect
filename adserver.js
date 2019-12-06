@@ -20,6 +20,7 @@ var randomstring = require("randomstring");
 var csrf = require('csurf');
 var cors = require('cors');
 var mysql = require('mysql');
+var MongoClient = require('mongodb').MongoClient;
 
 //after hours vars
 var isOpen = true;
@@ -136,6 +137,17 @@ if (nginxPath.length === 0) {
   nginxPath = "/ACEDirect";
 }
 
+//Variables for referring to routes from config file
+var agentRoute = getConfigVal('nginx:agent_route');
+if(agentRoute.length === 0) {
+  agentRoute = "/agent";
+}
+
+var consumerRoute = getConfigVal('nginx:consumer_route');
+if(consumerRoute.length === 0){
+  consumerRoute = "/complaint";
+}
+
 var queuesVideomailNumber = getConfigVal('asterisk:queues:videomail:number');
 
 //get complaint redirect options
@@ -246,6 +258,74 @@ dbConnection.connect(function(err) {
     //SUCCESSFUL connection
   }
 });
+
+// Pull MongoDB configuration from config.json file
+var mongodbUriEncoded = nconf.get('database_servers:mongodb:connection_uri');
+var logCallData = nconf.get('database_servers:mongodb:logCallData');
+var mongodb;
+var colCallData = null;
+
+//Connect to MongoDB
+if (typeof mongodbUriEncoded !== 'undefined' && mongodbUriEncoded) {
+	var mongodbUri = getConfigVal('database_servers:mongodb:connection_uri');
+	// Initialize connection once
+	MongoClient.connect(mongodbUri, {forceServerObjectId:true, useNewUrlParser: true}, function (err, database) {
+		if (err) {
+			logger.error('*** ERROR: Could not connect to MongoDB. Please make sure it is running.');
+			console.error('*** ERROR: Could not connect to MongoDB. Please make sure it is running.');
+			process.exit(-99);
+		}
+
+		console.log('MongoDB Connection Successful');
+		mongodb = database.db();
+
+		// Start the application after the database connection is ready
+		//httpsServer.listen(port);
+		//console.log('https web server listening on ' + port);
+
+		// prepare an entry into MongoDB to log the acedirect restart
+		var ts = new Date();
+		var data = {
+				"Timestamp": ts.toISOString(),
+				"Role":"acedirect",
+				"Purpose": "Restarted"
+		};
+
+		if (logCallData) {
+			// first check if collection "events" already exist, if not create one
+			mongodb.listCollections({name: 'calldata'}).toArray((err, collections) => {
+				console.log("try to find calldata collection, colCallData length: " + collections.length);
+				if (collections.length == 0) {	// "stats" collection does not exist
+					console.log("Creating new calldata colleciton in MongoDB");
+					mongodb.createCollection("calldata",{capped: true, size:1000000, max:5000}, function(err, result) {
+						if (err) throw err;
+        					console.log("Collection calldata is created capped size 100000, max 5000 entries");
+						colCallData = mongodb.collection('calldata');
+					});
+				}
+				else {
+					// events collection exist already
+					console.log("Collection calldata exist");
+					colCallData = mongodb.collection('calldata');
+					// insert an entry to record the start of ace direct
+					colCallData.insertOne(data, function(err, result) {
+						if(err){
+							console.log("Insert a record into calldata collection of MongoDB, error: " + err);
+							logger.debug("Insert a record into calldata collection of MongoDB, error: " + err);
+							throw err;
+						}
+					});
+				}
+
+			});
+		}
+	});
+} else {
+	console.log('Missing MongoDB Connection URI in config');
+
+	//httpsServer.listen(port);
+	//console.log('https web server listening on ' + port);
+}
 
 var credentials = {
 	key: fs.readFileSync(getConfigVal('common:https:private_key')),
@@ -2343,7 +2423,7 @@ app.get('/fcc', function(req,res,next){
  * @param {string} '/Complaint'
  * @param {function} function(req, res)
  */
-app.get('/Complaint', function (req, res, next) {
+app.get(consumerRoute, function (req, res, next) {
 
 
 	if (req.session.role === 'VRS') {
@@ -2507,7 +2587,7 @@ app.get('/token', function (req, res) {
  * @param {function} function(req, res)
  */
 app.get(nginxPath+'*', agent.shield(cookieShield), function (req, res) {
-	res.redirect(nginxPath+'/agent');
+	res.redirect(nginxPath+agentRoute);
 });
 
 
@@ -2517,13 +2597,13 @@ app.get(nginxPath+'*', agent.shield(cookieShield), function (req, res) {
  * @param {function} function(req, res, next)
  */
 
-app.get('/agent', function (req, res, next) {
+app.get(agentRoute, function (req, res, next) {
 	if (req.session.data) {
 		if (req.session.data.uid) {
 			return next(); //user is logged in go to next()
 		}
 	}
-	res.redirect('.' + nginxPath + '/agent');
+	res.redirect('.' + nginxPath + agentRoute);
 });
 
 /**
@@ -2534,7 +2614,7 @@ app.get('/agent', function (req, res, next) {
  * @param {function} 'agent.shield(cookieShield)'
  * @param {function} function(req, res)
  */
-app.get('/agent', agent.shield(cookieShield), function (req, res) {
+app.get(agentRoute, agent.shield(cookieShield), function (req, res) {
 	if (req.session.role === 'AD Agent') {
 		res.render('pages/agent_home');
 	} else {
@@ -2556,7 +2636,7 @@ app.get('/login', function (req, res, next) {
 			return next(); //user is logged in go to next()
 		}
 	}
-	res.redirect('.' + nginxPath + '/agent');
+	res.redirect('.' + nginxPath + agentRoute);
 });
 
 /**
@@ -2639,7 +2719,7 @@ app.get('/login', agent.shield(cookieShield), function (req, res) {
 						req.session.extensionPassword = extensionPassword;
 						req.session.complaint_queue_count = complaint_queue_count;
 						req.session.general_queue_count = general_queue_count;
-						res.redirect('./agent');
+						res.redirect('.' + agentRoute);
 					});
 				} else {
 					res.render('pages/agent_account_pending', {
