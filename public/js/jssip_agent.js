@@ -140,6 +140,7 @@
 	//makes a call
 	//@param other_sip_uri: is the sip uri of the person to call
 	function start_call(other_sip_uri) {
+		disable_persist_view();
 		var options = {
 			'mediaConstraints': {
 				'audio': true,
@@ -170,6 +171,9 @@
 
 	//answers an incoming call
 	function accept_call() {
+		stopVideomail();
+		disable_persist_view();
+		document.getElementById("persistCameraCheck").disabled = true;
 		if (currentSession) {
 			var options = {
 				'mediaConstraints': {
@@ -198,6 +202,76 @@
 				toggleSelfview()
 			};
 		}
+	}
+
+	//Functions for enabling and disabling persist view
+	function enable_persist_view(){
+		document.getElementById("persistCameraCheck").disabled = false;
+		if(navigator.mediaDevices === undefined){
+			navigator.mediaDevices = {};
+		}
+
+		navigator.mediaDevices.getUserMedia({
+			audio: false,
+			video: true
+		}).then(function(stream){
+			if("srcObject" in selfStream){
+				remoteStream.srcObject = stream;
+			} else{
+				remoteStream.src = window.URL.createObjectURL(stream);
+			}
+
+			backupStream = stream;
+			window.self_stream = stream;
+				
+		}).catch(function (err) {
+			console.log(err.name + ": " + err.message);
+		});
+		//document.getElementById("persistCameraCheck").checked = true;
+	}
+
+	function disable_persist_view(){
+		selfStream.setAttribute("hidden", true);
+		selfStream.pause();
+		selfStream.src = "";
+                // Clear transcripts at the end of the call
+                $('#transcriptoverlay').html('');
+
+                hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
+                hide_video_icon.style.display = "none";
+
+		//stops remote track
+		if (remoteView.srcObject) {
+			if (remoteView.srcObject.getTracks()) {
+				if (remoteView.srcObject.getTracks()[0]) remoteView.srcObject.getTracks()[0].stop();
+				if (remoteView.srcObject.getTracks()[1]) remoteView.srcObject.getTracks()[1].stop();
+			}
+		}
+
+		//stops the camera from being active
+		if (window.self_stream) {
+			if (window.self_stream.getVideoTracks()) {
+				if (window.self_stream.getVideoTracks()[0]) {
+					window.self_stream.getVideoTracks()[0].stop();
+				}
+			}
+		}
+		removeElement("selfView");
+		removeElement("remoteView");
+		addElement("webcam", "video", "remoteView");
+		remoteView.setAttribute("autoplay", "autoplay");
+		remoteView.setAttribute("poster", "images/acedirect-logo-trim.png");
+		addElement("webcam", "video", "selfView");
+		selfView.setAttribute("style", "right: 11px");
+		selfView.setAttribute("autoplay", "autoplay");
+		selfView.setAttribute("muted", true);
+		selfView.setAttribute("hidden", true);
+		selfView.muted = true;
+		remoteStream = document.getElementById("remoteView");
+		selfStream = document.getElementById("selfView");
+
+		toggle_incall_buttons(false);
+		//document.getElementById("persistCameraCheck").checked = false;
 	}
 
 
@@ -287,6 +361,12 @@
 		$("#transcriptoverlay").html('');
 
 		exitFullscreen();
+		//Check if persist needs to be enabled and undisable the status dropdown
+		document.getElementById("statusDropdownMenuButton").disabled = false;
+		if(document.getElementById("persistCameraCheck").checked == true){
+			enable_persist_view();
+		}
+		document.getElementById("persistCameraCheck").disabled = false;
 	}
 
 	//terminates the call (if present) and unregisters the ua

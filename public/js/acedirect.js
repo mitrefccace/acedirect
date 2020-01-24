@@ -27,6 +27,7 @@ var videomail_status_buttons = document.getElementById("videomail-status-buttons
 var sortFlag = "id desc";
 var filter = "ALL";
 var telNumber;
+var playingVideomail = false;
 
 setInterval(function () {
 	busylight.light(this.agentStatus);
@@ -56,9 +57,11 @@ $(document).ready(function () {
 
 	$.getJSON("./resources/licenses.json", function (data) {
 		$.each(data.license, function (i) {
-			$("#licModalBody").append("<h3>" + data.license[i].name + "<h3><pre>" + data.license[i].pre + "</pre>");
+			$("#licModalBody").append("<h3>" + data.license[i].name + "</h3><pre>" + data.license[i].pre + "</pre>");
 		});
 	});
+
+	enable_persist_view();
 });
 
 function connect_socket() {
@@ -98,6 +101,7 @@ function connect_socket() {
 
 					//populate call agent information
 					$('#displayname').val("CSR " + payload.first_name);
+					console.log("The agent sidebar is " + $('#agentname-sidebar'));
 					$('#agentname-sidebar').html(payload.first_name + " " + payload.last_name);
 					$('#agentname-header').html(payload.first_name + " " + payload.last_name);
 					$('#agentname-headerdropdown').html(payload.first_name + " " + payload.last_name);
@@ -110,10 +114,10 @@ function connect_socket() {
 					$("#general-queue-num").text(payload.general_queue_count);
 
 					if (payload.queue_name === "ComplaintsQueue" || payload.queue2_name === "ComplaintsQueue") {
-						$('#sidebar-complaints').show();
+						$('#sidebar-complaints').removeAttr('hidden');
 					}
 					if (payload.queue_name === "GeneralQuestionsQueue" || payload.queue2_name === "GeneralQuestionsQueue") {
-						$('#sidebar-geninfo').show();
+						$('#sidebar-geninfo').removeAttr('hidden');
 					}
 
 					if (payload.layout || sessionStorage.layout) {
@@ -161,7 +165,8 @@ function connect_socket() {
 					debugtxt('error', reason);
 
 					if (reason.code === "invalid_token") {
-						logout("Session has expired");
+					//	logout("Session has expired");
+					 	location.reload();
 					} else {
 						logout("An Error Occurred: " + JSON.stringify(reason));
 					}
@@ -586,6 +591,8 @@ function inCallADComplaints(endpoint_type) {
 	socket.emit('pause-queues', null);
 	$('#myRingingModalPhoneNumber').html('');
 	$('#myRingingModal').modal('hide');
+	//Make sure dropdown is disabled while in call
+	document.getElementById("statusDropdownMenuButton").disabled = true;
 	$('#user-status').text('In Call');
 	$('#complaintsInCall').show();
 	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
@@ -600,7 +607,6 @@ function inCallADComplaints(endpoint_type) {
 		$('#remoteView').css('object-fit', ' cover');
 	}
 
-
 }
 
 function inCallADGeneral(endpoint_type) {
@@ -609,6 +615,8 @@ function inCallADGeneral(endpoint_type) {
 	$('#myRingingModal').modal('hide');
 	$('#user-status').text('In Call');
 	$('#geninfoInCall').show();
+	//Disable dropdown while in a call
+	document.getElementById("statusDropdownMenuButton").disabled = true;
 	changeStatusLight('IN_CALL');
 	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	socket.emit('incall', null);
@@ -636,6 +644,9 @@ function unpauseQueues() {
 	changeStatusLight('READY');
 	socket.emit('unpause-queues', null);
 	socket.emit('ready', null);
+	if(this.agentStatus == 'READY' && playingVideomail == true){
+		stopVideomail();
+	}
 }
 
 //i == 1: go to Ready; i == 0: go to Away
@@ -904,7 +915,10 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
 	console.log('vidId: ' + tableData[5]);
 	$("#videomailId").attr("name", tableData[5]);
 	$("#callbacknum").attr("name", tableData[0]);
-	playVideomail(tableData[5], tableData[2], tableData[3]); //vidId, vidDuration vidStatus);
+	//Make sure you are not in a call
+	if(agentStatus != 'IN_CALL'){
+		playVideomail(tableData[5], tableData[2], tableData[3]); //vidId, vidDuration vidStatus);
+	}
 });
 
 //Sorting the videomail table
@@ -1071,15 +1085,25 @@ function showAgentsTab() {
 
 //Play the selected videomail
 function playVideomail(id, duration, vidStatus) {
+	//Start by removing the persist camera
+	disable_persist_view();
+	document.getElementById("persistCameraCheck").disabled = true;
+	playingVideomail = true;
+
+	//Set agent to away to avoid taking call
+	pauseQueues();
+	
 	console.log('Playing video mail with id ' + id);
 	remoteView.removeAttribute("autoplay");
 	remoteView.removeAttribute("poster");
 	remoteView.setAttribute("src", './getVideomail?id=' + id + '&ext=' + extensionMe);
-	remoteView.setAttribute("onended", "change_play_button()");
-	if (document.getElementById("play-video-icon").classList.contains("fa-pause")) {
-		document.getElementById("play-video-icon").classList.add("fa-play");
-		document.getElementById("play-video-icon").classList.remove("fa-pause");
-	}
+	//New attribute for control
+	remoteView.setAttribute("controls","controls");
+	//remoteView.setAttribute("onended", "change_play_button()");
+	//if (document.getElementById("play-video-icon").classList.contains("fa-pause")) {
+	//	document.getElementById("play-video-icon").classList.add("fa-play");
+	//	document.getElementById("play-video-icon").classList.remove("fa-pause");
+	//}
 	toggle_videomail_buttons(true);
 	updateVideoTime(duration, "vmail-total-time");
 	if (vidStatus === "UNREAD") {
@@ -1114,9 +1138,15 @@ function stopVideomail() {
 	remoteView.setAttribute("src", "");
 	remoteView.removeAttribute("src");
 	remoteView.removeAttribute("onended");
+	remoteView.removeAttribute("controls");
 	remoteView.setAttribute("autoplay", "autoplay");
 	remoteView.setAttribute("poster", "images/acedirect-logo.png");
 	toggle_videomail_buttons(false);
+	playingVideomail = false;
+	document.getElementById("persistCameraCheck").disabled = false;
+	if(document.getElementById("persistCameraCheck").checked == true){
+		enable_persist_view();
+	}
 }
 
 //Callback for videomail
@@ -1296,6 +1326,15 @@ $("#decline-btn").click(function () {
 	$('#myRingingModal').modal('hide');
 });
 
+//Functionality for videomail hover while in call
+$("#videomailTbody").hover(function(){
+    if(agentStatus == 'IN_CALL'){
+        document.getElementById("videomailTbody").style.cursor = "not-allowed";
+    }else{
+        document.getElementById("videomailTbody").style.cursor = "pointer";
+    }
+});
+
 //Dialpad functionality
 $(".keypad-button").click(function (e) {
 	var etemp = $(e.currentTarget);
@@ -1307,6 +1346,7 @@ $(".keypad-button").click(function (e) {
 	var text = el.text().trim();
 	telNumber = $('#phone-number');
 	$(telNumber).val(telNumber.val() + text);
+        $("#phone-number").focus();
 });
 
 $('#phone-number-delete-btn').click(function (e) {
@@ -1314,6 +1354,15 @@ $('#phone-number-delete-btn').click(function (e) {
 		function (index, value) {
 			return value.substr(0, value.length - 1);
 		});
+  $("#phone-number").focus();
+});
+
+
+//pressing Enter in dialpad will dial
+$("#phone-number").keyup(function(event) {
+    if (event.keyCode === 13) {
+        $("#button-call").click();
+    }
 });
 
 $("#button-call").click(function () {
@@ -1322,6 +1371,8 @@ $("#button-call").click(function () {
 	start_call($(telNumber).val());
 	$(telNumber).val('');
 	$('#duration').timer('reset');
+	//Disable dropdown while in a call
+	document.getElementById("statusDropdownMenuButton").disabled = true;
 	$('#user-status').text('In Call');
 	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	changeStatusLight('IN_CALL');
@@ -1329,6 +1380,15 @@ $("#button-call").click(function () {
 	toggle_incall_buttons(true);
 	$('#outboundCallAlert').show();
 });
+
+//Functionlaity for persist camera
+$("#persistCameraCheck").click(function(){
+	if(document.getElementById("persistCameraCheck").checked == true){
+		enable_persist_view();
+	}else if(document.getElementById("persistCameraCheck").checked == false){
+		disable_persist_view();
+	}
+})
 
 var options = {
 	cellHeight: 40,
@@ -1429,6 +1489,7 @@ function enable_chat_buttons() {
 	$("#newchatmessage").removeAttr("disabled");
 	$("#chat-send").removeAttr("disabled");
 	$("#newchatmessage").attr("placeholder", "Type Message ...");
+	$("#characters-left").removeAttr("hidden");
 	$("#characters-left").show();
 
 }

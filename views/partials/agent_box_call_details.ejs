@@ -1,147 +1,156 @@
-<div class="box nav-tabs-custom" id="CallinfoBox">
+<div class="card card-outline" id="CallinfoBox">
     <!-- Tabs within a box -->
-    <ul class="nav nav-tabs pull-right">
-        <li id="ticketTab">
-            <a id="ticketTabTitle" href="#ticketinfo" data-toggle="tab" aria-expanded="true">Ticket Info.</a>
-        </li>
-        <li class="active">
-            <a href="#vrsinfo" data-toggle="tab" aria-expanded="false">VRS Info.</a>
-        </li>
-        <li class="pull-left header">
-            <i class="fa fa-info-circle"></i>Call Details
-            <small id="notickettxt" class="text-danger" hidden>(no ticket)</small>
-        </li>
-    </ul>
-
-    <div class="tab-content">
-        <div class="tab-pane active" id="vrsinfo">
-            <form name="userform" id="userform" autocomplete="off">
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="control-label">First Name</label>
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fa fa-info-circle"></i>
+            Call Details
+            <!-- <small id="notickettxt" class="text-danger" hidden>(no ticket)</small> -->
+        </h3>
+    </div>
+    <div class="card-body">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+                <a id="vrsTab" href="#vrsinfo" class="nav-link active" data-toggle="pill" role="tab" aria-expanded="true">VRS Info.</a>
+            </li>
+            <li class="nav-item">
+                <a id="ticketTab" class="nav-link" href="#ticketinfo" data-toggle="pill" role="tab" aria-expanded="false">Ticket Info.</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="vrsinfo" aria-labelledby="vrsTab" role="tabpanel">
+                <form name="userform" id="userform" autocomplete="off">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="control-label">First Name</label>
+                                <div>
+                                    <input type="text" class="form-control" id="callerFirstName" name="fname"
+                                        autocomplete="off" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="control-label">Last Name</label>
+                                <input type="text" class="form-control" id="callerLastName" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <label class="control-label">Phone</label>
                             <div>
-                                <input type="text" class="form-control" id="callerFirstName" name="fname" autocomplete="off" />
+                                <input type="text" class="form-control" id="callerPhone" name="phone" autocomplete="off" />
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="control-label">Last Name</label>
-                            <input type="text" class="form-control" id="callerLastName" autocomplete="off" />
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <label class="control-label">Phone</label>
-                        <div>
-                            <input type="text" class="form-control" id="callerPhone" name="phone" autocomplete="off" />
-                        </div>
-                    </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="form-group">
-                            <label class="control-label">Address</label>
-                            <input type="text" class="form-control" id="callerAddress1" autocomplete="off" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="control-label">City/Town</label>
-                            <input type="text" class="form-control" id="callerCity" autocomplete="off" />
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="control-label">State</label>
-                            <input type="text" class="form-control" id="callerState" autocomplete="off" />
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="control-label">Zip Code</label>
-                            <input type="text" class="form-control" id="callerZipcode" autocomplete="off" />
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="form-group">
-                            <label class="control-label">Email</label>
-                            <div>
-                                <input type="email" class="form-control" id="callerEmail" name="email" autocomplete="off" required/>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="control-label">Address</label>
+                                <input type="text" class="form-control" id="callerAddress1" autocomplete="off" />
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="form-group pull-right">
-                            <input type="button" class="btn btn-danger" id="btnClear" value="Save" onclick="finished(1);" />
+
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="control-label">City/Town</label>
+                                <input type="text" class="form-control" id="callerCity" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="control-label">State</label>
+                                <input type="text" class="form-control" id="callerState" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <label class="control-label">Zip Code</label>
+                                <input type="text" class="form-control" id="callerZipcode" autocomplete="off" />
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
-        </div>
+
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="control-label">Email</label>
+                                <div>
+                                    <input type="email" class="form-control" id="callerEmail" name="email"
+                                        autocomplete="off" required />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group pull-right">
+                                <input type="button" class="btn btn-danger" id="btnClear" value="Save"
+                                    onclick="finished(1);" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
 
 
-        <div class="tab-pane" id="ticketinfo">
-            <form name="ticketForm" id="ticketForm" autocomplete="off">
-                <div class="row">
-                    <div class="col-lg-4 form-group">
-                        <label class="control-label">Assignee</label>
-                        <input type="text" class="form-control" id="assignee" autocomplete="off" />
-                    </div>
-                    <div class="col-lg-4 form-group">
-                        <label class="control-label">Requester</label>
-                        <input type="text" class="form-control" id="requester" autocomplete="off" />
-                    </div>
-                    <div class="col-lg-4 form-group">
-                        <label class="control-label">Last Updated</label>
-                        <input type="text" id="lastupdated" class="form-control" autocomplete="off" disabled/>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-8 form-group">
-                        <label class="control-label">Subject</label>
-                        <input type="text" id="subject" class="form-control" name="subject" autocomplete="off" required/>
-                    </div>
-                    <div class="col-lg-4 form-group">
-                        <label class="control-label">Ticket ID</label>
-                        <input type="text" id="ticketId" class="form-control" autocomplete="off" disabled/>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-12 form-group">
-                        <label class="control-label text-left">Problem Description</label>
-                        <textarea rows="3" id="problemdesc" class="form-control" name="desc" required></textarea>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="form-group">
-                            <label class="control-label text-left">Resolution</label>
-                            <textarea rows="3" id="resolution" class="form-control"></textarea>
+            <div class="tab-pane fade" id="ticketinfo" aria-labelledby="ticketTab" role="tabpanel">
+                <form name="ticketForm" id="ticketForm" autocomplete="off">
+                    <div class="row">
+                        <div class="col-lg-4 form-group">
+                            <label class="col-form-label">Assignee</label>
+                            <input type="text" class="form-control" id="assignee" autocomplete="off" />
+                        </div>
+                        <div class="col-lg-4 form-group">
+                            <label class="col-form-label">Requester</label>
+                            <input type="text" class="form-control" id="requester" autocomplete="off" />
+                        </div>
+                        <div class="col-lg-4 form-group">
+                            <label class="col-form-label">Last Updated</label>
+                            <input type="text" id="lastupdated" class="form-control" autocomplete="off" disabled />
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="form-group pull-right">
-                            <input type="button" class="btn btn-danger" id="btnModifyTicket" value="Save" onclick="modifyTicket()" />
+                    <div class="row">
+                        <div class="col-lg-8 form-group">
+                            <label class="col-form-label">Subject</label>
+                            <input type="text" id="subject" class="form-control" name="subject" autocomplete="off"
+                                required />
+                        </div>
+                        <div class="col-lg-4 form-group">
+                            <label class="col-form-label">Ticket ID</label>
+                            <input type="text" id="ticketId" class="form-control" autocomplete="off" disabled />
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div id="alertPlaceholder" class="col-lg-12">
+                    <div class="row">
+                        <div class="col-lg-12 form-group">
+                            <label class="col-form-label text-left">Problem Description</label>
+                            <textarea rows="3" id="problemdesc" class="form-control" name="desc" required></textarea>
+                        </div>
                     </div>
-                </div>
-            </form>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label class="col-form-label text-left">Resolution</label>
+                                <textarea rows="3" id="resolution" class="form-control"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group pull-right">
+                                <input type="button" class="btn btn-danger" id="btnModifyTicket" value="Save"
+                                    onclick="modifyTicket()" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div id="alertPlaceholder" class="col-lg-12">
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

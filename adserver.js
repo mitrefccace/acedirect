@@ -2756,11 +2756,15 @@ app.get('/getVideomail', function (req, res) {
 			logger.error('GET VIDEOMAIL ERROR: '+ err.code);
 		} else {
 			var videoFile = result[0].filepath + result[0].filename;
+			
+			//var videoFile = '/home/ekosinski2/acedirect/upload_204d2a03f4b6f14368d85e4162cb8369.webm'
+			console.log("Using", videoFile)
 			try {
 				var stat = fs.statSync(videoFile);
 				res.writeHead(200, {
 					'Content-Type': 'video/webm',
-					'Content-Length': stat.size
+					'Content-Length': stat.size,
+					'Accept-Ranges': 'bytes'
 				});
 				var readStream = fs.createReadStream(videoFile);
 				readStream.pipe(res);
@@ -2865,4 +2869,3 @@ app.use(function (err, req, res, next) {
 
 //do it here, after socket is established
 loadColorConfigs();
-

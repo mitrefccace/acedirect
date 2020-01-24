@@ -4,7 +4,7 @@
   "description": "The ACE Direct Project",
   "main": "adserver.js",
   "dependencies": {
-    "admin-lte": "^2.4.8",
+    "admin-lte": "^3.0.1",
     "asterisk-manager": "0.1.16",
     "body-parser": "^1.18.3",
     "bootstrap-toggle": "^2.2.2",
@@ -16,11 +16,12 @@
     "ejs": "2.5.7",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
+    "font-awesome": "^4.7.0",
     "fresh": "^0.5.2",
     "gridstack": "^0.3.0",
-    "handlebars": "^4.1.2",
+    "handlebars": "^4.5.3",
     "hoek": "^4.2.1",
-    "jquery": "^3.4.0",
+    "ionicons": "^4.6.3",
     "jsonwebtoken": "^8.4.0",
     "jssip": "3.0.13",
     "jwt-decode": "^2.2.0",
@@ -44,7 +45,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./adserver.js",
-    "build": "node ./build.js || true"
+    "build": "find ./public/assets/ ! -type d ! -name '*.gitignore' -exec rm '{}' + && node ./build.js || true"
   },
   "author": "",
   "license": "ISC",

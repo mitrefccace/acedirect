@@ -16,6 +16,7 @@ $(document).ready(function () {
 	//JSSIP components
 	$('#login-full-background').hide();
 	$('#login-box').hide();
+	$('#webcam').removeAttr("hidden");
 	$('#webcam').show();
 
 	$('#complaint').keyup(function () {
@@ -528,6 +529,7 @@ function enable_chat_buttons() {
 	$("#newchatmessage").removeAttr("disabled");
 	$("#chat-send").removeAttr("disabled");
 	$("#newchatmessage").attr("placeholder", "Type Message ...");
+	$("#characters-left").removeAttr("hidden");
 	$("#characters-left").show();
 
 }
