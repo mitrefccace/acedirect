@@ -436,7 +436,7 @@
 		removeElement("remoteView");
 		addElement("webcam", "video", "remoteView");
 		remoteView.setAttribute("autoplay", "autoplay");
-		remoteView.setAttribute("poster", "images/acedirect-logo-trim.png");
+		remoteView.setAttribute("poster", "images/acedirect-logo.png");
 		addElement("webcam", "video", "selfView");
 		selfView.setAttribute("style", "right: 11px");
 		selfView.setAttribute("autoplay", "autoplay");
