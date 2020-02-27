@@ -105,27 +105,31 @@
 			}  else { // Caption block start -----------
 
 		 		try {
-		 			var transcripts = JSON.parse(e.message.content);
+                                        if (typeof e.message.content === "undefined") {
+                                          console.log('NO CAPTIONS SENT');
+                                        } else {
+		 			  var transcripts = JSON.parse(e.message.content);
 
-		 			if(transcripts.transcript){
-		 				var tDiv = document.getElementById(transcripts.msgid);
+		 			  if(transcripts.transcript){
+		 				  var tDiv = document.getElementById(transcripts.msgid);
 
-		 				if(!tDiv) {
-		 					var temp = document.createElement("div");
+		 				  if(!tDiv) {
+		 					  var temp = document.createElement("div");
 
-		 					temp.id = transcripts.msgid;
-		 					temp.innerHTML = transcripts.transcript;
-		 					temp.classList.add("transcripttext");
-		 					document.getElementById("transcriptoverlay").appendChild(temp);
-		 				} else {
-		 					tDiv.innerHTML = transcripts.transcript;
+		 					  temp.id = transcripts.msgid;
+		 					  temp.innerHTML = transcripts.transcript;
+		 					  temp.classList.add("transcripttext");
+		 					  document.getElementById("transcriptoverlay").appendChild(temp);
+		 				  } else {
+		 					  tDiv.innerHTML = transcripts.transcript;
 
-		 					if(transcripts.final){
+		 					  if(transcripts.final){
 								$('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>"+transcripts.transcript+"</div></div>")
 		 						setTimeout(function(){tDiv.remove()},5000);
-		 					}
-		 				}
-		 			}
+		 					  }
+		 				  }
+		 			  }
+                                        }
 		 		} catch (err) {
 		 			console.log(err);
 		 		}
@@ -166,10 +170,8 @@
 			if (currentSession.connection) currentSession.connection.ontrack = function (e) {
 				if (debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
 				remoteStream.srcObject = e.streams[0];
-				remoteStream.play();
-
-				toggleSelfview();
-
+				//remoteStream.play(); //trying without, per VATRP example
+				//toggleSelfview(); //THIS WILL GET CALLED; COMMENTING OUT FOR NOW
 			};
 
 		});
@@ -234,7 +236,7 @@
 				remoteStream.srcObject = e.streams[0];
 				remoteStream.play();
 
-				toggleSelfview()
+				//toggleSelfview();  //THIS BLOCK DOES NOT SEEM TO EVER GET CALLED
 			};
 		}
 	}
@@ -519,7 +521,20 @@
 
 			selfStream.type = 'type="video/webm"';
 			selfStream.setAttribute("loop","true");
-                        selfStream.play();
+
+                        //important - play() returns a Promise (async)
+                        var playPromise = selfStream.play();
+                        if (playPromise !== undefined) {
+                          playPromise.then(function() {
+                            //do not unmute until play() Promise returns
+                            currentSession.unmute({
+                              audio: false,
+                              video: true
+                            });
+                          }).catch(function(error) {
+                            console.error('ERROR - this browser does not support play() Promise');
+                          });
+                        }
 
 			selfStream.onplay = function() {
   				// Set the source of one <video> element to be a stream from another.
@@ -533,12 +548,6 @@
 					console.log("Replaced tracks with recorded privacy video");
 				}
   			};
-
-
-			currentSession.unmute({
-				audio: false,
-				video: true
-			});
 		}
 	}
 

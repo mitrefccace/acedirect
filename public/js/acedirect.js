@@ -1199,7 +1199,7 @@ function play_video() {
 		document.getElementById("play-video-icon").classList.remove("fa-play");
 		document.getElementById("play-video-icon").classList.add("fa-pause");
 	} else { // pause the video
-		remoteView.pause();
+		//remoteView.pause(); //not needed? was potentially causing an exception 
 		document.getElementById("play-video-icon").classList.add("fa-play");
 		document.getElementById("play-video-icon").classList.remove("fa-pause");
 	}

@@ -1,0 +1,36 @@
+           const that = this;            // 20200225-add_begin
+           setTimeout(function()
+           {
+           if (connection.iceGatheringState === 'complete')
+             {
+               return;
+             }
+           const candidate = event.candidate;    //20200226 - candidate information
+             console.log(event.candidate);       //20200226 - print the timed out candidate
+             console.log("STUN/ICE candidate timeout reached");  //20200226 - print status
+             debug('ICE Candidates Timeout reached!');
+             connection.removeEventListener('icecandidate', iceCandidateListener);
+             that._rtcReady = true;
+             const e = {
+               originator: 'local',
+               type: type,
+               sdp: connection.localDescription.sdp
+             };
+             debug('emit "sdp"');
+             that.emit('sdp', e);
+             resolve(e.sdp);
+           }, 2000);                     // 20200225-add_end
+           const candidate = event.candidate;
+           if (! candidate)      // 20200225-add_begin
+           {
+             connection.removeEventListener('icecandidate', iceCandidateListener);
+             this._rtcReady = true;
+             const e = {
+               originator: 'local',
+               type: type,
+               sdp: connection.localDescription.sdp
+             };
+             debug('emit "sdp"');
+             this.emit('sdp', e);
+             resolve(e.sdp);
+           }                     // 20200225-add_end

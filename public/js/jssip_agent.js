@@ -113,7 +113,13 @@
 				});
 			});
 			currentSession.on('failed', function (e) {
-				if (debug) console.log('\nCURRENTSESSION -  FAILED: \nMESSAGE:\n' + e.message + "\nCAUSE:\n" + e.cause + "\nORIGINATOR:\n" + e.originator);
+                                sc1 = '';
+                                rs1 = '';
+                                if (e.response) {
+                                  sc1 = e.response.status_code;
+                                  rs1 = e.response.reason_phrase;
+                                } 
+				if (debug) console.log('\nCURRENTSESSION -  FAILED: \nMESSAGE:\n' + e.message + "\nCAUSE:\n" + e.cause + "\nORIGINATOR:\n" + e.originator + "\nRESPONSE.status_code:\n" + sc1 + "\nRESPONSE.reason_phrase:\n" + rs1);
 				terminate_call();
 				$('#user-status').text('Ready');
 				changeStatusIcon(ready_color, "ready", ready_blinking);
@@ -132,7 +138,7 @@
 				remoteStream.srcObject = e.streams[0];
 				remoteStream.play();
 
-				toggleSelfview();
+				//toggleSelfview(); //THIS BLOCK DOES NOT SEEM TO EVER GET CALLED
 			};
 		});
 	}
@@ -197,9 +203,8 @@
 			if (currentSession.connection) currentSession.connection.ontrack = function (e) {
 				if (debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
 				remoteStream.srcObject = e.streams[0];
-				remoteStream.play();
-
-				toggleSelfview()
+				//remoteStream.play(); //trying without, per VATRP example
+				//toggleSelfview(); //THIS WILL GET CALLED; COMMENTED OUT FOR NOW
 			};
 		}
 	}
@@ -232,8 +237,9 @@
 
 	function disable_persist_view(){
 		selfStream.setAttribute("hidden", true);
-		selfStream.pause();
-		selfStream.src = "";
+		//selfStream.pause();  //not needed? was potentially causing an exception
+                //selfStream.src = ""; //removing; may not need it. it is causing the play() exception
+
                 // Clear transcripts at the end of the call
                 $('#transcriptoverlay').html('');
 
@@ -384,10 +390,10 @@
 	//removes both the remote and self video streams and replaces it with default image. stops allowing camera to be active. also hides call_options_buttons.
 	function remove_video() {
 		selfStream.setAttribute("hidden", true);
-		selfStream.pause();
-		remoteStream.pause();
-		selfStream.src = "";
-		remoteView.src = "";
+		//selfStream.pause();  //not needed? was potentially causing an exception
+		//remoteStream.pause();  //not needed? was potentially causing an exception
+		//selfStream.src = "";  //not needed? was potentially causing an exception
+		//remoteView.src = "";  //not needed? was potentially causing an exception
 
                 // Clear transcripts at the end of the call
                 $('#transcriptoverlay').html('');
@@ -553,7 +559,20 @@
 
 			selfStream.type = 'type="video/webm"';
 			selfStream.setAttribute("loop","true");
-                        selfStream.play();
+                        
+                        //important - play() returns a Promise (async)
+                        var playPromise = selfStream.play();
+                        if (playPromise !== undefined) {
+                          playPromise.then(function() {
+                            //do not unmute until play() Promise returns
+                            currentSession.unmute({
+                              audio: false,
+                              video: true
+                            });
+                          }).catch(function(error) {
+                            console.error('ERROR - this browser does not support play() Promise');
+                          });
+                        }
 
 			selfStream.onplay = function() {
   				// Set the source of one <video> element to be a stream from another.
@@ -567,12 +586,6 @@
 					console.log("Replaced tracks with recorded privacy video");
 				}
   			};
-
-
-			currentSession.unmute({
-				audio: false,
-				video: true
-			});
 		}
 	}
 
@@ -780,7 +793,7 @@
 
 	// Used to exit fullscreen if active when call is teminated
 	function exitFullscreen() {
-		if (document.exitFullscreen) {
+                if(document.fullscreenElement) {
 		  	document.exitFullscreen();
 		} else if (document.msExitFullscreen) {
 		  	document.msExitFullscreen();
