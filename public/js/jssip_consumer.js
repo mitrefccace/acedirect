@@ -353,8 +353,8 @@
 		selfStream.setAttribute("hidden", true);
 		selfStream.pause();
 		remoteStream.pause();
-		selfStream.src = "";
-		remoteView.src = "";
+		//selfStream.src = ""; //removed- causing exceptions on hangup
+		//remoteView.src = ""; //removed- causing exceptions on hangup
 
                 $('#transcriptoverlay').html('');
 
