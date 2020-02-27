@@ -171,7 +171,7 @@
 				if (debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
 				remoteStream.srcObject = e.streams[0];
 				//remoteStream.play(); //trying without, per VATRP example
-				//toggleSelfview(); //THIS WILL GET CALLED; COMMENTING OUT FOR NOW
+				toggleSelfview();
 			};
 
 		});
@@ -236,7 +236,7 @@
 				remoteStream.srcObject = e.streams[0];
 				remoteStream.play();
 
-				//toggleSelfview();  //THIS BLOCK DOES NOT SEEM TO EVER GET CALLED
+				toggleSelfview();
 			};
 		}
 	}
