@@ -137,6 +137,16 @@ if (nginxPath.length === 0) {
   nginxPath = "/ACEDirect";
 }
 
+//busylight paramete
+var busyLightEnabled = getConfigVal('busylight:enabled');
+if (busyLightEnabled.length === 0) {
+  //default for backwards compatibility
+  busyLightEnabled = true;
+} else {
+  busyLightEnabled = (busyLightEnabled === 'true')
+}
+logger.debug('busyLightEnabled: ' + busyLightEnabled);
+
 //Variables for referring to routes from config file
 var agentRoute = getConfigVal('nginx:agent_route');
 if(agentRoute.length === 0) {
@@ -2390,7 +2400,8 @@ app.post('/consumer_login', function (req, res) {
 
 app.use(function (req, res, next) {
         res.locals = {
-                "nginxPath":nginxPath
+                "nginxPath":nginxPath,
+                "busyLightEnabled":busyLightEnabled
         }
         next();
 });

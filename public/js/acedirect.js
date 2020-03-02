@@ -891,7 +891,8 @@ function testLightConnection() {
 	});
 }
 
-testLightConnection();
+if (busyLightEnabled)
+  testLightConnection();
 
 //####################################################################
 //Videomail functionality: mostly sending socket.io events to adserver
