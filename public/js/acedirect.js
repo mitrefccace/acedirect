@@ -1009,7 +1009,7 @@ function updateVideomailTable(data) {
 			if (vidNumber[0] === '1') vidNumber = vidNumber.slice(1, vidNumber.length);
 			vidNumber = '(' + vidNumber.substring(0, 3) + ') ' + vidNumber.substring(3, 6) + '-' + vidNumber.substring(6, vidNumber.length);
 		}
-		var vidReceived = data[i].received;
+		var vidReceived = moment.utc(data[i].received).local().format('ddd MM/DD/YYYY hh:mm A');
 		var vidDuration = data[i].video_duration;
 		var vidStatus = data[i].status;
 		var vidFilepath = data[i].video_filepath;

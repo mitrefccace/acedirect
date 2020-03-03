@@ -288,7 +288,13 @@ function connect_socket() {
 						$("#agent-name").text(firstname[0]);
 						$("#agent-name-box").show();
 					}
-				}).on("chat-leave", function (error) {
+				}).on("agents", function (data) {
+                                  if (data.agents_logged_in) {
+	                            $("#agents-avail").text('');
+                                  } else {
+	                            $("#agents-avail").text('No representatives are available to take your call at this time.');
+                                  }
+                                }).on("chat-leave", function (error) {
 					//clear chat
 					$('#chatcounter').text('500');
 					$('#chat-messages').html('');
