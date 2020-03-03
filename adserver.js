@@ -859,7 +859,7 @@ io.sockets.on('connection', function (socket) {
 		}
 
 		let vm_sql_query = `${vm_sql_select} ${vm_sql_where} ${vm_sql_order};`
-		dbConnection.query(vm_sql_query, m_sql_params, function (err, result) {
+		dbConnection.query(vm_sql_query, vm_sql_params, function (err, result) {
 			if (err) {
 				logger.error("GET-VIDEOMAIL ERROR: " + err.code);
 			} else {
