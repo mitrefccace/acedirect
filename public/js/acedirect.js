@@ -170,7 +170,13 @@ function connect_socket() {
 					} else {
 						logout("An Error Occurred: " + JSON.stringify(reason));
 					}
-				}).on('typing', function (data) {
+				}).on("call-center-closed", function (data) {
+                                  if (data.closed) {
+                                    $("#closed-label").text('Call Center Closed');
+                                  } else {
+                                    $("#closed-label").text('');
+                                  }
+                                }).on('typing', function (data) {
 					debugtxt('typing', data);
 					if ($("#displayname").val() !== data.displayname) {
 						$('#rtt-typing').html(data.displayname + ": " + data.rttmsg);

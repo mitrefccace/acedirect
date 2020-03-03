@@ -1707,9 +1707,10 @@ setInterval(function () {
       endTimeUTC = data.end; //hh:mm in UTC
 
     }
+    sendEmit("call-center-closed", {'closed':!isOpen});
   });
 
-}, 15000);
+}, 5000);
 
 /**
  * Calls the RESTful service running on the provider host to verify the agent
