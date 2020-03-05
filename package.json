@@ -46,7 +46,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./adserver.js",
-    "build": "find ./public/assets/ ! -type d ! -name '*.gitignore' -exec rm '{}' + && node ./build.js || true"
+    "build": "mkdir -p public/assets; find ./public/assets/ ! -type d ! -name '*.gitignore' -exec rm '{}' + && node ./build.js || true"
   },
   "author": "",
   "license": "ISC",
