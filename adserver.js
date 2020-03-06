@@ -1300,23 +1300,12 @@ function handle_manager_event(evt) {
 
         redisClient.hget(rLinphoneToAgentMap, Number(linphoneExtension[1]), function (err, agentExtension) {
           if (agentExtension !== null) {
-            logger.info('if - sending chat leave to agent extension: ' + agentExtension + ', ' + evt.calleridnum);
-            io.to(Number(agentExtension)).emit('chat-leave', {
-              "extension": agentExtension,
-              "vrs": evt.calleridnum
-            });
             // Remove the entry
             redisClient.hdel(rLinphoneToAgentMap, Number(linphoneExtension[1]));
           } else {
             redisClient.hget(rConsumerToCsr, Number(evt.calleridnum), function (err, agentExtension) {
               logger.info('consumerToCsr else if()');
-              logger.info('agentExtension: ' + agentExtension);
-              logger.info('if - else sending chat leave to agent extension: ' + agentExtension + ', ' + evt.calleridnum);
 
-              io.to(Number(agentExtension)).emit('chat-leave', {
-                "extension": agentExtension,
-                "vrs": evt.calleridnum
-              });
               //Remove rConsumerToCsr redis map on hangups.
               redisClient.hdel(rConsumerToCsr, Number(evt.calleridnum));
             });
@@ -1354,13 +1343,6 @@ function handle_manager_event(evt) {
 
         redisClient.hget(rExtensionToVrs, Number(evt.calleridnum), function (err, vrsNum) {
           if (!err && vrsNum) {
-
-            /**
-            logger.info('Sending chat-leave for socket id ' + vrsNum);
-            io.to(Number(vrsNum)).emit('chat-leave', {
-              "vrs": vrsNum
-            });
-            **/
 
             // Remove the extension when we're finished
             redisClient.hdel(rExtensionToVrs, Number(evt.calleridnum));
@@ -1684,7 +1666,7 @@ setInterval(function () {
 
 setInterval(function () {
   //query for after hours
-  logger.info('GET operatinghours...');
+  logger.debug('GET operatinghours...');
   var ohurl = 'https://' + getConfigVal('common:private_ip') + ":" + parseInt(getConfigVal('agent_service:port')) + '/operatinghours';
   request({
     method: 'GET',
@@ -1697,10 +1679,10 @@ setInterval(function () {
     if (error) {
       logger.error("GET operatinghours: " + error);
     } else {
-      logger.info("GET operatinghours success:");
-      logger.info(JSON.stringify(data));
+      logger.debug("GET operatinghours success:");
+      logger.debug(JSON.stringify(data));
       isOpen = data.isOpen;
-      logger.info("isOpen is: " + isOpen);
+      logger.debug("isOpen is: " + isOpen);
 
       //operating hours
       startTimeUTC = data.start; //hh:mm in UTC

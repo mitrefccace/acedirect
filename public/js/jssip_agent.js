@@ -17,6 +17,7 @@
 	var hold_button = document.getElementById("hold-call");
 	var debug = true; //console logs event info if true
 	var jssip_debug = false; //enables debugging logs from jssip library if true NOTE: may have to refresh a lot to update change
+        var socket_js = null;
 
 
 	//setup for the call. creates and starts the User Agent (UA) and registers event handlers
@@ -25,10 +26,10 @@
 		else JsSIP.debug.disable('JsSIP:*');
 
 		// Create our JsSIP instance and run it:
-		var socket = new JsSIP.WebSocketInterface(ws_servers.getAttribute("name"));
+		socket_js = new JsSIP.WebSocketInterface(ws_servers.getAttribute("name"));
 
 		var configuration = {
-			sockets: [socket],
+			sockets: [socket_js],
 			uri: my_sip_uri.getAttribute("name"),
 			password: sip_password.getAttribute("name"),
 		};
@@ -105,6 +106,9 @@
 
 				$('#duration').timer('pause');
 				$('#user-status').text('Wrap Up');
+                                $('#complaintsInCall').hide();
+                                $('#geninfoInCall').hide();
+                                socket.emit('wrapup', null);
 				changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
 				changeStatusLight('WRAP_UP');
 				$('#modalWrapup').modal({
