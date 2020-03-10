@@ -12,6 +12,7 @@
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Main content -->
+            <div id="helpalert_placeholder"></div>
             <section class="content pt-4">
                 <div class="container-fluid">
                     <div class="grid-stack">
@@ -103,7 +104,7 @@
 
                 <!-- Mail tab content -->
                 <div class="tab-pane" id="control-sidebar-videomail-tab">
-                    <div class="form-group" style='height: 90vh; max-height:90vh; overflow-y:scroll;'>
+                    <div class="form-group" style='height: 80vh; max-height:90vh; overflow-y:scroll;'>
                         <label>Mailbox Messages</label>
                         <button type="button" class="btn btn-secondary" onclick="getVideomailRecs();">
                             <i id="refresh-icon" class="fas fa-sync-alt"></i>
@@ -166,7 +167,7 @@
 
     <!-- License Modal -->
     <div class="modal fade" id="licModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 class="modal-title" id="licModalLabel">Copyright Notices</h4>

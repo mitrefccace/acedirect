@@ -141,7 +141,7 @@
 				if (debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
 				remoteStream.srcObject = e.streams[0];
 				remoteStream.play();
-
+			  	
 				toggleSelfview();
 			};
 		});
@@ -204,9 +204,11 @@
 
 			//event listener for remote video. Adds to html page when ready.
 			//NOTE: needs to be both here and in the newRTCSession event listener because currentSession.connection is not established until after ua.answer() for incoming calls
-			if (currentSession.connection) currentSession.connection.ontrack = function (e) {
+			if (currentSession.connection) currentSession.connection.ontrack = function(e) {
 				if (debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
+				remoteStream.classList.remove("mirror-mode");
 				remoteStream.srcObject = e.streams[0];
+
 				//remoteStream.play(); //trying without, per VATRP example
 				toggleSelfview();
 			};
@@ -233,6 +235,7 @@
 			backupStream = stream;
 			window.self_stream = stream;
 				
+			remoteStream.classList.add("mirror-mode")
 		}).catch(function (err) {
 			console.log(err.name + ": " + err.message);
 		});
@@ -243,7 +246,6 @@
 		selfStream.setAttribute("hidden", true);
 		//selfStream.pause();  //not needed? was potentially causing an exception
                 //selfStream.src = ""; //removing; may not need it. it is causing the play() exception
-
                 // Clear transcripts at the end of the call
                 $('#transcriptoverlay').html('');
 
@@ -253,7 +255,11 @@
 		//stops remote track
 		if (remoteView.srcObject) {
 			if (remoteView.srcObject.getTracks()) {
-				if (remoteView.srcObject.getTracks()[0]) remoteView.srcObject.getTracks()[0].stop();
+				//Below line specifically releases webcam light
+				if (remoteView.srcObject.getTracks()[0]){ 
+					console.log("Stopping stream");
+					remoteView.srcObject.getTracks()[0].stop();
+				}
 				if (remoteView.srcObject.getTracks()[1]) remoteView.srcObject.getTracks()[1].stop();
 			}
 		}
@@ -261,24 +267,48 @@
 		//stops the camera from being active
 		if (window.self_stream) {
 			if (window.self_stream.getVideoTracks()) {
-				if (window.self_stream.getVideoTracks()[0]) {
+				if (window.self_stream.getVideoTracks()[0]) 
+				{
 					window.self_stream.getVideoTracks()[0].stop();
 				}
 			}
 		}
+
+		let tracks = remoteView.srcObject.getTracks();
+		tracks.forEach(function(track) {
+			if (track.kind === 'video') {
+				if (track.enabled) {
+					track.stop();
+					track.enabled = false; 
+				}
+			}
+		});
+		window.self_stream = null;
+
+		JsSIP.Utils.closeMediaStream(selfStream);
+		JsSIP.Utils.closeMediaStream(remoteStream);
+		JsSIP.Utils.closeMediaStream(window.self_stream);
+		console.log("Current session " + currentSession);
+		if(currentSession){
+		console.log("Current session connection " + currentSession.connection);
+		}
+
 		removeElement("selfView");
 		removeElement("remoteView");
 		addElement("webcam", "video", "remoteView");
 		remoteView.setAttribute("autoplay", "autoplay");
 		remoteView.setAttribute("poster", "images/acedirect-logo.png");
+		remoteView.classList.remove("mirror-mode");
 		addElement("webcam", "video", "selfView");
 		selfView.setAttribute("style", "right: 11px");
 		selfView.setAttribute("autoplay", "autoplay");
 		selfView.setAttribute("muted", true);
 		selfView.setAttribute("hidden", true);
+		selfView.classList.add("mirror-mode");
 		selfView.muted = true;
 		remoteStream = document.getElementById("remoteView");
 		selfStream = document.getElementById("selfView");
+		console.log("All streams " + selfStream + "\n" + remoteStream + "\n" + window.self_stream);
 
 		toggle_incall_buttons(false);
 		//document.getElementById("persistCameraCheck").checked = false;
@@ -419,7 +449,6 @@
 			if (window.self_stream.getVideoTracks()) {
 				if (window.self_stream.getVideoTracks()[0]) {
 					window.self_stream.getVideoTracks()[0].stop();
-					console.log("Agent removed camera");
 				}
 			}
 		}
@@ -467,6 +496,9 @@
 	// Removes an element from the document
 	function removeElement(elementId) {
 		var element = document.getElementById(elementId);
+		element.pause();
+		element.removeAttribute('src');
+		element.load();	
 		element.parentNode.removeChild(element);
 	}
 
@@ -556,7 +588,7 @@
 			}
 
 			selfStream.srcObject = null;
-
+			selfStream.classList.remove('mirror-mode');
 			selfStream.src = "images/videoPrivacy.webm";
 			console.log("Using self-constructed 30sec video audio clip with SAR 1:1 DAR 4:3 resolution 640:480");
 
@@ -651,7 +683,8 @@
 			 			Promise.all(currentSession.connection.getSenders().map(sender =>
 							sender.replaceTrack(stream.getTracks().find(t => t.kind == sender.track.kind), stream)));
 					};
-					console.log("Replaced tracks with user media");
+					selfStream.classList.add("mirror-mode");
+ 					console.log("Replaced tracks with user media");
 				})
 				.catch(function (err) {
 					console.log(err.name + ": " + err.message);

@@ -388,6 +388,7 @@
 		selfView.setAttribute("style", "right: 11px");
 		selfView.setAttribute("autoplay", "autoplay");
 		selfView.setAttribute("muted", true);
+		selfView.classList.add("mirror-mode");
 		selfView.muted = true;
 		selfView.setAttribute("hidden", true);
 		remoteStream = document.getElementById("remoteView");
@@ -514,7 +515,7 @@
 			}
 
 			selfStream.srcObject = null;
-
+			selfStream.classList.remove("mirror-mode");
 			selfStream.src = "images/videoPrivacy.webm";
 			console.log("Using self-constructed 30sec video audio clip with SAR 1:1 DAR 4:3 resolution 640:480");
 
@@ -609,6 +610,7 @@
 			 			Promise.all(currentSession.connection.getSenders().map(sender =>
 							sender.replaceTrack(stream.getTracks().find(t => t.kind == sender.track.kind), stream)));
 					};
+					selfStream.classList.add("mirror-mode")
 					console.log("Replaced tracks with user media");
 				})
 				.catch(function (err) {

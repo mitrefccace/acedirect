@@ -5,6 +5,28 @@
 				<i class="fas fa-video"></i>
 				Video
 			</h3>
+			<div id="videomailButtons" style="float:right">
+				<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+				<span id = "videomail-status-dropdown" class="btn-group dropup">
+					<span><i id="status-icon" class="call-btn-icon fas fa-envelope"></i></span>&nbsp;&nbsp;&nbsp;
+					<span id="user-status" >Mark as...</span>
+					<span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'UNREAD')"><a href="#"><span>Unread</span></a></li>
+					<li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'READ')"><a href="#"><span>Read</span></a></li>
+					<li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'IN PROGRESS')"><a href="#"><span>In Progress</span></a></li>
+					<li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'CLOSED')"><a href="#"><span>Closed</span></a></li>
+					<li onclick="videomail_deleted(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>Deleted</span></a></li>
+				</ul>
+				</span>
+				<button id="videomail callback" class="btn btn-primary" type="button" onclick="videomailCallback(document.getElementById('callbacknum').getAttribute('name'))">
+					<i class="fas fa-phone-square mr-1"></i>Callback
+				</button>
+				<button id="exit-btn" class="btn btn-primary" type="button" onclick="stopVideomail()">
+					<i class="fas fa-times-circle mr-1"></i>Exit
+				</button>
+			</div>
 			<!--div class="card-tools pull-right">
 				<button type="button" class="btn btn-tool" data-widget="collapse">
 					<i class="fa fa-minus"></i>
@@ -16,7 +38,7 @@
 			<div id="webcam" >
 				<video id="remoteView" class="remoteView" autoplay poster="images/acedirect-logo.png"></video>
 				<div id="transcriptoverlay" class="transcriptoverlay"></div> <!-- Caption code -->
-				<video id="selfView" autoplay muted="true" hidden></video>
+				<video id="selfView" class="mirror-mode" autoplay muted="true" hidden></video>
 
 				<div id="call-option-buttons">
 					<div id="inner">

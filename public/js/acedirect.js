@@ -24,6 +24,8 @@ var wrap_up_blinking;
 var need_assistance_blinking;
 var missed_call_blinking;
 var videomail_status_buttons = document.getElementById("videomail-status-buttons");
+var videomail_buttons = document.getElementById("videomailButtons");
+console.log("Videomail buttons are " + videomail_buttons);
 var sortFlag = "id desc";
 var filter = "ALL";
 var telNumber;
@@ -375,6 +377,14 @@ function connect_socket() {
 					unpauseQueues();
 				}).on('request-assistance-response', function (data) {
 					debugtxt('request-assistance-response', data);
+                                        console.log(JSON.stringify(data));
+                                        window.setTimeout(function() {
+                                          $("#helpalert_placeholder").append('<div id="helpalert" class="alert alert-info" role="alert" >Request received.</div>');
+                                          $("#helpalert").show();
+                                          $("#helpalert").fadeTo(3000, 0).slideUp(500, function(){
+                                            $(this).remove(); 
+                                          });
+                                        }, 0);
 				}).on('lightcode-configs', function (data) {
 					debugtxt('lightcode-configs', data);
 					updateColors(data);
@@ -1135,8 +1145,14 @@ function updateVideoTime(time, elementId) {
 
 //Display the videomail control buttons
 function toggle_videomail_buttons(make_visible) {
-	if (make_visible) videomail_status_buttons.style.display = "block";
-	else videomail_status_buttons.style.display = "none";
+	if (make_visible){
+		videomail_status_buttons.style.display = "none";
+		videomail_buttons.style.display = "block";
+	}
+	else{
+		 videomail_status_buttons.style.display = "none";
+		 videomail_buttons.style.display = "none";
+	}
 }
 
 //Exit videomail view and return to call view
@@ -1511,3 +1527,5 @@ function disable_chat_buttons() {
 }
 
 function enable_initial_buttons() {}
+
+$("#helpalert").hide();

@@ -54,31 +54,23 @@
                     </a>
                 </li>
                 <li class="nav-header">QUEUES</li>
-                <li id="sidebar-geninfo" class="nav-item" onclick="$('#geninfoanchor').click()" hidden>
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-question-circle nav-icon"></i>
-                        <p>
-                            General Info
-                            <span id="general-queue-num" class="badge bg-md-gray right">0</span>
-                        </p>
-                        <p id="geninfoInCall" hidden>
-                            <span class="badge right btn-red" style="margin-top: 3px;">in call</span>
-                        </p>
-                    </a>
-                </li>
-                <li id="sidebar-complaints" class="nav-item" onclick="$('#complaintsanchor').click()" hidden>
-                    <a href="#" class="nav-link">
-                        <i class="fas fa-thumbs-down nav-icon"></i>
-                        <p>
-                            Complaints
-                            <span id="complaints-queue-num" class="badge bg-md-gray right">0</span>
-                        </p>
 
-                        <p id="complaintsInCall" hidden>
-                            <span class="badge right btn-red" style='margin-top: 3px;'>in call</span>
-                        </p>
-                    </a>
+                <li id="sidebar-geninfo" class="cap-setting" onclick="" hidden>
+                    <span><i class="fas fa-question-circle nav-icon"></i>&nbsp;&nbsp;General Info</span>
+                    <span id="general-queue-num" style="color:black" class="badge bg-md-gray right">0</span>
+                    <p id="geninfoInCall" hidden>
+                      <span class="badge right btn-red" style="margin-top: 3px;">in call</span>
+                    </p>
                 </li>
+
+                <li id="sidebar-complaints" class="cap-setting" onclick="" hidden>
+                    <span><i class="fas fa-thumbs-down nav-icon"></i>&nbsp;&nbsp;Complaints</span>
+                    <span id="complaints-queue-num" style="color:black" class="badge bg-md-gray right">0</span>
+                    <p id="complaintsInCall" hidden>
+                      <span class="badge right btn-red" style='margin-top: 3px;'>in call</span>
+                    </p>
+                </li>
+
                 <li class="nav-header">TOOLS</li>
                 <li class="nav-item" id="sidebar-dialpad">
                     <a href="#" class="nav-link" onclick="showDialpad()">
@@ -87,9 +79,9 @@
                     </a>
                 </li>
 
-                <li class="nav-header config-hide">Caption Settings</li>
+                <li class="nav-header config-hide">CAPTION SETTINGS</li>
                 <li id="cap-font-size" class="cap-setting config-hide nav-item">
-                    <span>Font size:</span>
+                    <span>Font size</span>
                     <form role="form">
                         <div class="form-group">
                             <div class="ml-auto">
@@ -104,7 +96,7 @@
                 </li>
                 <li id="cap-font-color" class="cap-setting config-hide nav-item">
                     <span>
-                        Font color:
+                        Font color
                     </span>
                     <div class="color-select-container">
                         <div id="font-grey" class="color-select" onclick="changeCaption(this.id)"></div>
@@ -113,7 +105,7 @@
                     </div>
                 </li>
                 <li id="cap-bg-color" class="cap-setting config-hide nav-item">
-                    <span>Background color:</span>
+                    <span>Background color</span>
                     <div class="color-select-container">
                         <i id="bg-transparent" class="far fa-times-circle"></i>
                         <div id="bg-grey" class="color-select" onclick="changeCaption(this.id)"></div>
@@ -122,14 +114,17 @@
                     </div>
                     <input type="range" min="0" max="1" step=.01 value="1" id="opacity-slider-agent">
                 </li>
-                <li class="nav-header config-hide">Camera Options</li>
+                <li>
+                <div id="demo-btn-container" class="config-hide">
+                    <a id="demo-btn" href="#" onclick="testCaptions()">Preview</a>
+                    <p>&nbsp;</p>
+                </div>
+                </li>
+                <li class="nav-header config-hide">CAMERA OPTIONS</li>
                 <li id="cap-font-size" class="cap-setting config-hide nav-item">
                     <span>Enable / Disable Self-View</span><input id="persistCameraCheck" type="checkbox" checked>
                 </li>
             </ul>
-            <div id="demo-btn-container" class="config-hide">
-                <a id="demo-btn" href="#" onclick="testCaptions()">Preview</a>
-            </div>
         </nav>
     </div>
 </aside>

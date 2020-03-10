@@ -475,7 +475,7 @@ However, delay the fade out process for 2.5 seconds */
     margin-right: 2px;
 }
 
-#queueModal
+.modal
 {
   z-index: 2147483647;
 }
