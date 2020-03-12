@@ -50,6 +50,41 @@ $(document).ready(function () {
 });
 
 
+function clearScreen() {
+	$('#userform').find('input:text').val('');
+	$('#callerEmail').val('');
+
+	$('#callinfodiv').find('input:text').val('');
+
+	$('#inbounddhohlabel').hide();
+	$('#outbounddhohlabel').hide();
+
+	$('#outboundnumber').text('');
+	$('#inboundnumber').text('');
+
+	$('#duration').timer('reset');
+	$('#duration').timer('pause');
+
+	$('#caption-messages').html('');
+	$('#chat-messages').html('');
+	$('#rtt-typing').html('');
+	$('#newchatmessage').val('');
+
+	$('#ticketForm').find('input:text').val('');
+	$('#ticketForm').find('textarea').val('');
+
+	$('#complaintsInCall').hide();
+	$('#geninfoInCall').hide();
+
+	$('#ivrsnum').val('');
+	$('#ivrsmessage').hide();
+
+	$('#notickettxt').hide();
+	$('#ticketTab').removeClass("bg-pink");
+
+	$('#modalWrapup').modal('hide');
+}
+
 function connect_socket() {
 	console.log('connect_socket to ');
 	console.log(window.location.host);
@@ -521,6 +556,7 @@ $('#fullscreen-element').mouseleave(function () {
 function exit_queue() {
 	$('#queueModal').modal('hide');
 	terminate_call();
+        clearScreen();
 }
 
 function set_queue_text(position) {

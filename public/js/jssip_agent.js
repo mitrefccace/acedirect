@@ -103,6 +103,7 @@
 			currentSession.on('ended', function (e) {
 				if (debug) console.log('\nCURRENTSESSION -  ENDED: \nORIGINATOR: \n' + e.originator + '\nMESSAGE:\n' + e.message + "\nCAUSE:\n" + e.cause);
 				terminate_call();
+                                clearScreen();
 
 				$('#duration').timer('pause');
 				$('#user-status').text('Wrap Up');
