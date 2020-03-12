@@ -44,12 +44,12 @@ $(document).ready(function () {
 	$("[data-mask]").inputmask();
 
 	// chat-transcript toggle
-	$('#chat-tab').on('click', function(){
+	$('#chat-tab').on('click', function () {
 		$('#chat-body').css('display', 'block');
 		$('#chat-footer').css('display', 'block');
 		$('#trans-body').css('display', 'none');
 	});
-	$('#trans-tab').on('click', function(){
+	$('#trans-tab').on('click', function () {
 		$('#chat-body').css('display', 'none');
 		$('#chat-footer').css('display', 'none');
 		$('#trans-body').css('display', 'block');
@@ -77,7 +77,7 @@ function connect_socket() {
 			console.log(JSON.stringify(data));
 			if (data.message === "success") {
 				socket = io.connect('https://' + window.location.host, {
-					path: nginxPath+'/socket.io',
+					path: nginxPath + '/socket.io',
 					query: 'token=' + data.token,
 					forceNew: true
 				});
@@ -167,18 +167,18 @@ function connect_socket() {
 					debugtxt('error', reason);
 
 					if (reason.code === "invalid_token") {
-					//	logout("Session has expired");
-					 	location.reload();
+						//	logout("Session has expired");
+						location.reload();
 					} else {
 						logout("An Error Occurred: " + JSON.stringify(reason));
 					}
 				}).on("call-center-closed", function (data) {
-                                  if (data.closed) {
-                                    $("#closed-label").text('Call Center Closed');
-                                  } else {
-                                    $("#closed-label").text('');
-                                  }
-                                }).on('typing', function (data) {
+					if (data.closed) {
+						$("#closed-label").text('Call Center Closed');
+					} else {
+						$("#closed-label").text('');
+					}
+				}).on('typing', function (data) {
 					debugtxt('typing', data);
 					if ($("#displayname").val() !== data.displayname) {
 						$('#rtt-typing').html(data.displayname + ": " + data.rttmsg);
@@ -354,9 +354,10 @@ function connect_socket() {
 								"queues": queues
 							});
 						}
-
 						$('#agenttable').dataTable().fnClearTable();
-						$('#agenttable').dataTable().fnAddData(tabledata.data);
+						if (tabledata.data.length > 0) {
+							$('#agenttable').dataTable().fnAddData(tabledata.data);
+						}
 					}
 				}).on('new-caller-ringing', function (data) {
 					debugtxt('new-caller-ringing', data);
@@ -377,20 +378,20 @@ function connect_socket() {
 					unpauseQueues();
 				}).on('request-assistance-response', function (data) {
 					debugtxt('request-assistance-response', data);
-                                        console.log(JSON.stringify(data));
-                                        window.setTimeout(function() {
-                                          $("#helpalert_placeholder").append('<div id="helpalert" class="alert alert-info" role="alert" >Request received.</div>');
-                                          $("#helpalert").show();
-                                          $("#helpalert").fadeTo(3000, 0).slideUp(500, function(){
-                                            $(this).remove(); 
-                                          });
-                                        }, 0);
+					console.log(JSON.stringify(data));
+					window.setTimeout(function () {
+						$("#helpalert_placeholder").append('<div id="helpalert" class="alert alert-info" role="alert" >Request received.</div>');
+						$("#helpalert").show();
+						$("#helpalert").fadeTo(3000, 0).slideUp(500, function () {
+							$(this).remove();
+						});
+					}, 0);
 				}).on('lightcode-configs', function (data) {
 					debugtxt('lightcode-configs', data);
 					updateColors(data);
 					busylight.updateConfigs(data);
 				}).on('caption-config', function (data) {
-					if(data == 'false') {
+					if (data == 'false') {
 						console.log('captions off');
 						$('.config-hide').css('display', 'none');
 						$('#transcriptoverlay').css('display', 'none');
@@ -443,17 +444,17 @@ function connect_socket() {
 $('#agenttable').DataTable({
 	aaData: null,
 	aoColumns: [{
-			"mDataProp": "status"
-		},
-		{
-			"mDataProp": "name"
-		},
-		{
-			"mDataProp": "extension"
-		},
-		{
-			"mDataProp": "queues"
-		}
+		"mDataProp": "status"
+	},
+	{
+		"mDataProp": "name"
+	},
+	{
+		"mDataProp": "extension"
+	},
+	{
+		"mDataProp": "queues"
+	}
 	],
 	searching: false,
 	paging: false,
@@ -660,7 +661,7 @@ function unpauseQueues() {
 	changeStatusLight('READY');
 	socket.emit('unpause-queues', null);
 	socket.emit('ready', null);
-	if(this.agentStatus == 'READY' && playingVideomail == true){
+	if (this.agentStatus == 'READY' && playingVideomail == true) {
 		stopVideomail();
 	}
 }
@@ -867,7 +868,7 @@ function changeStatusIcon(newColor, statusName, blinking) {
 
 
 function testLightConnection() {
-        console.log('\n\nChecking for BusyLight... Ignore this error if no BusyLight...');
+	console.log('\n\nChecking for BusyLight... Ignore this error if no BusyLight...');
 	$('#busylightModalBody').html(" ");
 	$('#busylightModalTestBtn').prop("disabled", true);
 	$('#busylightModalBody').html("Checking BusyLight server...");
@@ -877,7 +878,7 @@ function testLightConnection() {
 		timeout: 2000,
 		dataType: "jsonp xml",
 		success: function (data, text) {
-                  busyLightEnabled = true;
+			busyLightEnabled = true;
 		},
 		error: function (request, status, error) {
 			$('#busylightModalTestBtn').prop("disabled", false);
@@ -897,18 +898,18 @@ function testLightConnection() {
 				}
 			} else {
 				$('#busylightModalBody').html('Connected to busylight!!!!');
-                                busyLightEnabled = true;
+				busyLightEnabled = true;
 				setTimeout(function () {
 					$('#busylightModal').modal('hide');
 				}, 1500);
 			}
-                        console.log('');
+			console.log('');
 		}
 	});
 }
 
 if (busyLightEnabled)
-  testLightConnection();
+	testLightConnection();
 
 //####################################################################
 //Videomail functionality: mostly sending socket.io events to adserver
@@ -933,7 +934,7 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
 	$("#videomailId").attr("name", tableData[5]);
 	$("#callbacknum").attr("name", tableData[0]);
 	//Make sure you are not in a call
-	if(agentStatus != 'IN_CALL'){
+	if (agentStatus != 'IN_CALL') {
 		playVideomail(tableData[5], tableData[2], tableData[3]); //vidId, vidDuration vidStatus);
 	}
 });
@@ -1109,13 +1110,13 @@ function playVideomail(id, duration, vidStatus) {
 
 	//Set agent to away to avoid taking call
 	pauseQueues();
-	
+
 	console.log('Playing video mail with id ' + id);
 	remoteView.removeAttribute("autoplay");
 	remoteView.removeAttribute("poster");
 	remoteView.setAttribute("src", './getVideomail?id=' + id + '&ext=' + extensionMe);
 	//New attribute for control
-	remoteView.setAttribute("controls","controls");
+	remoteView.setAttribute("controls", "controls");
 	//remoteView.setAttribute("onended", "change_play_button()");
 	//if (document.getElementById("play-video-icon").classList.contains("fa-pause")) {
 	//	document.getElementById("play-video-icon").classList.add("fa-play");
@@ -1145,13 +1146,13 @@ function updateVideoTime(time, elementId) {
 
 //Display the videomail control buttons
 function toggle_videomail_buttons(make_visible) {
-	if (make_visible){
+	if (make_visible) {
 		videomail_status_buttons.style.display = "none";
 		videomail_buttons.style.display = "block";
 	}
-	else{
-		 videomail_status_buttons.style.display = "none";
-		 videomail_buttons.style.display = "none";
+	else {
+		videomail_status_buttons.style.display = "none";
+		videomail_buttons.style.display = "none";
 	}
 }
 
@@ -1167,7 +1168,7 @@ function stopVideomail() {
 	toggle_videomail_buttons(false);
 	playingVideomail = false;
 	document.getElementById("persistCameraCheck").disabled = false;
-	if(document.getElementById("persistCameraCheck").checked == true){
+	if (document.getElementById("persistCameraCheck").checked == true) {
 		enable_persist_view();
 	}
 }
@@ -1262,7 +1263,7 @@ remoteView.addEventListener("timeupdate", function () {
 function enterFullscreen() {
 	var webcam_container = document.getElementById("fullscreen-element");
 
-	if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {
+	if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
 
 		if (webcam_container.requestFullscreen) {
 			webcam_container.requestFullscreen();
@@ -1276,21 +1277,21 @@ function enterFullscreen() {
 	} else {
 
 		if (document.exitFullscreen) {
-		  	document.exitFullscreen();
+			document.exitFullscreen();
 		} else if (document.msExitFullscreen) {
-		  	document.msExitFullscreen();
+			document.msExitFullscreen();
 		} else if (document.mozCancelFullScreen) {
-		  	document.mozCancelFullScreen();
+			document.mozCancelFullScreen();
 		} else if (document.webkitExitFullscreen) {
-		  	document.webkitExitFullscreen();
+			document.webkitExitFullscreen();
 		}
 	}
 }
 
-function toggleDisplay(){
+function toggleDisplay() {
 	var video_display = $('#remoteView');
 
-	if(video_display.css('object-fit') == 'contain') {
+	if (video_display.css('object-fit') == 'contain') {
 		video_display.css('object-fit: cover');
 	} else {
 		video_display.css('object-fit: contain');
@@ -1298,32 +1299,32 @@ function toggleDisplay(){
 }
 
 var fade_timer = null;
-function clearFadeTimer(){
-	if(fade_timer) {
+function clearFadeTimer() {
+	if (fade_timer) {
 		clearTimeout(fade_timer);
 		fade_timer = 0;
 	}
 }
 
-function fade(type='out'){
-	$('#call-option-buttons button').each(function(i){
-		$(this).css('animation', `fade-${type} 0.${i+2}s ease-out forwards`);
+function fade(type = 'out') {
+	$('#call-option-buttons button').each(function (i) {
+		$(this).css('animation', `fade-${type} 0.${i + 2}s ease-out forwards`);
 	});
 
-	if(type == 'out') {
+	if (type == 'out') {
 		$('#transcriptoverlay').css('bottom', '10px');
 	} else {
 		$('#transcriptoverlay').css('bottom', '65px');
 	}
 }
 
-$('#fullscreen-element').mousemove(function(){
+$('#fullscreen-element').mousemove(function () {
 	clearFadeTimer();
 	fade('in');
 	fade_timer = setTimeout(fade, 3000);
 });
 
-$('#fullscreen-element').mouseleave(function(){
+$('#fullscreen-element').mouseleave(function () {
 	clearFadeTimer();
 	fade_timer = setTimeout(fade, 500);
 });
@@ -1350,12 +1351,12 @@ $("#decline-btn").click(function () {
 });
 
 //Functionality for videomail hover while in call
-$("#videomailTbody").hover(function(){
-    if(agentStatus == 'IN_CALL'){
-        document.getElementById("videomailTbody").style.cursor = "not-allowed";
-    }else{
-        document.getElementById("videomailTbody").style.cursor = "pointer";
-    }
+$("#videomailTbody").hover(function () {
+	if (agentStatus == 'IN_CALL') {
+		document.getElementById("videomailTbody").style.cursor = "not-allowed";
+	} else {
+		document.getElementById("videomailTbody").style.cursor = "pointer";
+	}
 });
 
 //Dialpad functionality
@@ -1369,7 +1370,7 @@ $(".keypad-button").click(function (e) {
 	var text = el.text().trim();
 	telNumber = $('#phone-number');
 	$(telNumber).val(telNumber.val() + text);
-        $("#phone-number").focus();
+	$("#phone-number").focus();
 });
 
 $('#phone-number-delete-btn').click(function (e) {
@@ -1377,15 +1378,15 @@ $('#phone-number-delete-btn').click(function (e) {
 		function (index, value) {
 			return value.substr(0, value.length - 1);
 		});
-  $("#phone-number").focus();
+	$("#phone-number").focus();
 });
 
 
 //pressing Enter in dialpad will dial
-$("#phone-number").keyup(function(event) {
-    if (event.keyCode === 13) {
-        $("#button-call").click();
-    }
+$("#phone-number").keyup(function (event) {
+	if (event.keyCode === 13) {
+		$("#button-call").click();
+	}
 });
 
 $("#button-call").click(function () {
@@ -1405,10 +1406,10 @@ $("#button-call").click(function () {
 });
 
 //Functionlaity for persist camera
-$("#persistCameraCheck").click(function(){
-	if(document.getElementById("persistCameraCheck").checked == true){
+$("#persistCameraCheck").click(function () {
+	if (document.getElementById("persistCameraCheck").checked == true) {
 		enable_persist_view();
-	}else if(document.getElementById("persistCameraCheck").checked == false){
+	} else if (document.getElementById("persistCameraCheck").checked == false) {
 		disable_persist_view();
 	}
 })
@@ -1526,6 +1527,6 @@ function disable_chat_buttons() {
 
 }
 
-function enable_initial_buttons() {}
+function enable_initial_buttons() { }
 
 $("#helpalert").hide();

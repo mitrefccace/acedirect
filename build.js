@@ -137,7 +137,7 @@ function buildAssets() {
 //wdir is the working dir
 //return a Promise
 function execCommand(cmd,wdir) {
-  console.log('executing  ' + cmd + '  ...');
+  console.log('executing  ' + cmd + ' ...');
   const exec = require('child_process').exec;
   return new Promise((resolve, reject) => {
     exec(cmd, {cwd: wdir}, (error, stdout, stderr) => {
@@ -153,31 +153,36 @@ function execCommand(cmd,wdir) {
 async function go() {
   console.log('\n*** NOTE: make sure gulp is already installed (as root, npm install -g gulp-cli). ***\n');
 
-  s = await execCommand('rm -rf node_modules >/dev/null 2>&1','.');
+  s = await execCommand('rm -rf node_modules >/dev/null  # removing node_modules','.');
 
-  s = await execCommand('npm install','.');
-  console.log(s);
+  s = await execCommand('npm install >/dev/null  # main install','.');
 
-  s = await execCommand('npm install','./node_modules/jssip');
-  console.log(s);
+  s = await execCommand('npm install >/dev/null  # jssip install','./node_modules/jssip');
 
-  s = await execCommand('gulp dist','./node_modules/jssip');
-  console.log(s);
+  s = await execCommand('gulp dist >/dev/null  # jssip build','./node_modules/jssip');
 
-  s = await execCommand('rm -f public/assets/css/* public/assets/fonts/* public/assets/js/* public/assets/webfonts/* || true > /dev/null 2>&1','.');
-  console.log(s);
+  s = await execCommand('rm -f public/assets/css/* public/assets/fonts/* public/assets/js/* public/assets/webfonts/* || true > /dev/null 2>&1 ','.');
+
+  s = await execCommand('mkdir -p ../scripts  # init scripts','.');
+
+  s = await execCommand('cp scripts/itrslookup.sh ../scripts/.','.');
+
+  s = await execCommand('chmod 755 ../scripts/itrslookup.sh','.');
+
 
   //PATCH jssip.js per our findings, rename to jssip.min.js, let build proceed from there
   tempFile = '/tmp/ed' + secondsSinceEpoch + '.txt';
-  s = await execCommand('head -n 18197 node_modules/jssip/dist/jssip.js > ' + tempFile ,'.');
-  console.log(s);
+  s = await execCommand('head -n 18197 node_modules/jssip/dist/jssip.js > ' + tempFile + '  # modifying jssip','.');
+  
   s = await execCommand('cat patches/jssip_patch.txt >> ' + tempFile ,'.');
-  console.log(s);
+ 
   s = await execCommand('tail -n 8168 node_modules/jssip/dist/jssip.js >> ' + tempFile,'.');
-  console.log(s);
+
   s = await execCommand('mv ' + tempFile + ' node_modules/jssip/dist/jssip.min.js  ','.');
-  console.log(s);
+
   buildAssets();
+
+  console.log('Done.\n');
 }
 
 go(); //MAIN

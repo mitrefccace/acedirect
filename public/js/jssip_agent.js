@@ -274,15 +274,18 @@
 			}
 		}
 
-		let tracks = remoteView.srcObject.getTracks();
-		tracks.forEach(function(track) {
-			if (track.kind === 'video') {
-				if (track.enabled) {
-					track.stop();
-					track.enabled = false; 
+		if(remoteView.srcObject){
+			let tracks = remoteView.srcObject.getTracks();
+			tracks.forEach(function(track) {
+				if (track.kind === 'video') {
+					if (track.enabled) {
+						track.stop();
+						track.enabled = false; 
+					}
 				}
-			}
-		});
+			});
+		}
+		
 		window.self_stream = null;
 
 		JsSIP.Utils.closeMediaStream(selfStream);
