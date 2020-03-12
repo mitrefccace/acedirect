@@ -502,7 +502,6 @@
 		var element = document.getElementById(elementId);
 		element.pause();
 		element.removeAttribute('src');
-		element.load();	
 		element.parentNode.removeChild(element);
 	}
 
