@@ -51,6 +51,10 @@ $(document).ready(function () {
 
 
 function clearScreen() {
+        $('#ticketNumber').text('');
+        $('#complaintcounter').text('2,000');
+        $('#complaint').val('');
+        $('#subject').val('');
 	$('#userform').find('input:text').val('');
 	$('#callerEmail').val('');
 
@@ -618,4 +622,14 @@ function convertUTCtoLocal(hhmmutc) {
 	if (newhh > 11) ampm = "PM";
 	if (newhh > 12) newhh -= 12;
 	return newhh + ":" + newmin + " " + ampm + " " + arr[6].replace('(', '').replace(')', '');
+}
+
+function logout(msg) {
+  //clear the token from session storage
+  sessionStorage.clear();
+  //disconnect socket.io connection
+  if (socket)
+    socket.disconnect();
+  //display the login screen to the user.
+  window.location.href = './logout';
 }

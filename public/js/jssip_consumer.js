@@ -61,22 +61,20 @@
 		$('#record-progress-bar').css('width', '0%');
 		$('#record-progress-bar').hide();
 		$('#userformbtn').prop("disabled", false);
-		$('#vmsent').hide();
-                $('#vmwait').hide();
-
-
-		$('#vmsent').attr('hidden', false);
-		$('#vmsent').show();
-                setTimeout(function () {
-                    $("#vmsent").fadeTo(3000, 0).slideUp(500, function(){
-                    $(this).remove(); 
-                    //this append must be in sync with .ejs file element
-                    $("#vmsent_placeholder").append('<div class="alert alert-success" alert-dismissable id="vmsent" style="margin-top: 10px;" hidden> <a class="close" onclick="$(\'#vmsent\').hide();" style="text-decoration:none">×</a> <strong>Success!</strong> Videomail sent. </div>');
-                 });
-                }, 1000);
-
 
 		if (recordId) {
+                        $('#vmsent').hide();
+                        $('#vmwait').hide();
+                        $('#vmsent').attr('hidden', false);
+                        $('#vmsent').show();
+                        setTimeout(function () {
+                          $("#vmsent").fadeTo(3000, 0).slideUp(500, function(){
+                            $(this).remove(); 
+                            //this append must be in sync with .ejs file element
+                            $("#vmsent_placeholder").append('<div class="alert alert-success" alert-dismissable id="vmsent" style="margin-top: 10px;" hidden> <a class="close" onclick="$(\'#vmsent\').hide();" style="text-decoration:none">×</a> <strong>Success!</strong> Videomail sent. </div>');
+                          });
+                        }, 1000);
+
 			clearInterval(recordId);
 			recordId = null;
 			if (complaintRedirectActive) {
