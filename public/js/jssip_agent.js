@@ -194,7 +194,20 @@
 				}
 			};
 			currentSession.answer(options);
+			setInterval(()=>{
 
+				let body = `
+<?xml version="1.0" encoding="utf-8" ?>
+<media_control>
+  <vc_primitive>
+    <to_encoder>
+      <picture_fast_update/>
+    </to_encoder>
+  </vc_primitive>
+</media_control>`;
+				currentSession.sendInfo("application/media_control+xml", body)
+	
+			},5000);
 
 			//event listener for remote video. Adds to html page when ready.
 			//NOTE: needs to be both here and in the newRTCSession event listener because currentSession.connection is not established until after ua.answer() for incoming calls
@@ -229,6 +242,9 @@
 			backupStream = stream;
 			window.self_stream = stream;
 				
+			//remoteStream.classList.add("mirror-mode")
+			return new Promise(resolve => remoteStream.onplaying = resolve);
+		}).then(function(){
 			remoteStream.classList.add("mirror-mode")
 		}).catch(function (err) {
 			console.log(err.name + ": " + err.message);
