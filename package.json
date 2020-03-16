@@ -4,6 +4,7 @@
   "description": "The ACE Direct Project",
   "main": "adserver.js",
   "dependencies": {
+    "acorn": "^5.7.4",
     "admin-lte": "^3.0.1",
     "asterisk-manager": "0.1.16",
     "body-parser": "^1.18.3",
@@ -29,6 +30,7 @@
     "lodash": "^4.17.15",
     "log4js": "^3.0.6",
     "mime": "^1.4.1",
+    "minimist": "^1.2.2",
     "mongodb": "^3.3.4",
     "mysql": "2.14.1",
     "nconf": "0.8.4",

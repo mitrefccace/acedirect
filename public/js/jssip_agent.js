@@ -50,14 +50,7 @@
 			if (debug) console.log("\nUA - NEWMESSAGE");
 
 			 try {
-			 	var transcripts = JSON.parse(e.message.content)
-
-			// 	var transcripts = {
-			// 		transcript: e.message.content,
-			// 		msgid: 'test-id',
-			// 		final: true
-			// 	}
-
+			 	var transcripts = JSON.parse(e.message._request.body)
 			 	if(transcripts.transcript) {
 			 		var tDiv = document.getElementById(transcripts.msgid);
 

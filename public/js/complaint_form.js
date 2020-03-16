@@ -8,6 +8,7 @@ var isOpen = true;
 var startTimeUTC = "14:00"; //start time in UTC
 var endTimeUTC = "21:30"; //end time in UTC
 var skinny = false;
+var tz;
 
 $(document).ready(function () {
 	//formats the phone number.
@@ -122,20 +123,24 @@ function connect_socket() {
 					$('#callerEmail').val(payload.email);
 					$('#displayname').val(payload.first_name + ' ' + payload.last_name);
 					isOpen = payload.isOpen;
+                                        if (typeof isOpen === 'undefined') {
+                                          //default to true if the user hit back; they won't be able to get into queue if closed
+                                          //this will prevent the after hours dialog if they hit back (per customer requirement)
+                                          isOpen = true;
+                                        }
+
 					if (!isOpen) { //after hours processing; if after hours, then show this modal
 						$("#afterHoursModal").modal({
 							backdrop: "static"
 						});
 						$("#afterHoursModal").modal("show");
+                                                //get the start/end time strings for the after hours dialog
+                                                tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
+                                                startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0, 8); //start time in UTC
+                                                endTimeUTC = convertUTCtoLocal(payload.endTimeUTC).substring(0, 8); //end time in UTC
+                                                $('#ah-start-time').text(startTimeUTC);
+                                                $('#ah-end-time').text(endTimeUTC + " " + tz);
 					}
-
-					//get the start/end time strings for the after hours dialog
-					var tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
-					startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0, 8); //start time in UTC
-					endTimeUTC = convertUTCtoLocal(payload.endTimeUTC).substring(0, 8); //end time in UTC
-					$('#ah-start-time').text(startTimeUTC);
-					$('#ah-end-time').text(endTimeUTC + " " + tz);
-
 
 					socket.emit('register-client', {
 						"hello": "hello"
