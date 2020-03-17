@@ -21,6 +21,7 @@ var csrf = require('csurf');
 var cors = require('cors');
 var mysql = require('mysql');
 var MongoClient = require('mongodb').MongoClient;
+var dbconn = null;
 
 //after hours vars
 var isOpen = true;
@@ -119,6 +120,20 @@ if (typeof (nconf.get('common:cleartext')) !== "undefined"  && nconf.get('common
 
 var colorConfigs = {};
 
+//append a suffix to make REDIS maps specific to this server
+var pfx = process.env.LOGNAME;
+if (pfx == undefined)
+  pfx = '';
+else
+  pfx = pfx + '_';
+rStatusMap = pfx + rStatusMap;
+rVrsToZenId = pfx + rVrsToZenId;
+rConsumerExtensions = pfx + rConsumerExtensions;
+rExtensionToVrs = pfx + rExtensionToVrs;
+rLinphoneToAgentMap = pfx + rLinphoneToAgentMap;
+rConsumerToCsr = pfx + rConsumerToCsr;
+rAgentInfoMap = pfx + rAgentInfoMap;
+rTokenMap = pfx + rTokenMap;
 
 // Set log4js level from the config file
 logger.level = getConfigVal('common:debug_level'); //log level hierarchy: ALL TRACE DEBUG INFO WARN ERROR FATAL OFF
@@ -146,6 +161,18 @@ if (busyLightEnabled.length === 0) {
   busyLightEnabled = (busyLightEnabled === 'true')
 }
 logger.debug('busyLightEnabled: ' + busyLightEnabled);
+
+//graceful shutdown, especially with node restarts
+process.on('exit', function() {
+  console.log('exit caught');
+  console.log('DESTROYING MySQL DB CONNECTION');
+  dbConnection.destroy(); //destroy db connection
+  if ( typeof dbconn !== 'undefined' && dbconn ) {
+    console.log('DESTROYING MongoDB CONNECTION');
+    dbconn.close();
+  }
+  process.exit(0);
+});
 
 //Variables for referring to routes from config file
 var agentRoute = getConfigVal('nginx:agent_route');
@@ -199,7 +226,8 @@ redisClient.auth(getConfigVal('database_servers:redis:auth'));
 redisClient.on('connect', function () {
 	logger.info("Connected to Redis");
 
-	//Delete all values in statusMap
+	//Delete all values in REDIS maps at startup
+	redisClient.del(rTokenMap);
 	redisClient.del(rStatusMap);
 	redisClient.del(rVrsToZenId);
 	redisClient.del(rConsumerExtensions);
@@ -288,6 +316,7 @@ if (typeof mongodbUriEncoded !== 'undefined' && mongodbUriEncoded) {
 
 		console.log('MongoDB Connection Successful');
 		mongodb = database.db();
+                dbconn = database;
 
 		// Start the application after the database connection is ready
 		//httpsServer.listen(port);
