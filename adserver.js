@@ -145,6 +145,11 @@ logger.error('ERROR messages enabled.');
 logger.fatal('FATAL messages enabled.');
 logger.info('Using config file: ' + cfile);
 
+//global vars that don't need to be read every time
+var jwtKey = getConfigVal('web_security:json_web_token:secret_key');
+var jwtEnc = getConfigVal('web_security:json_web_token:encoding');
+
+
 //NGINX path parameter
 var nginxPath = getConfigVal('nginx:ad_path');
 if (nginxPath.length === 0) {
@@ -454,7 +459,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 // Validates the token, if valid go to connection.
 // If token is not valid, no connection will be established.
 io.use(socketioJwt.authorize({
-	secret: new Buffer(getConfigVal('web_security:json_web_token:secret_key'), getConfigVal('web_security:json_web_token:encoding')),
+	secret: Buffer.alloc(jwtKey.length,jwtKey,jwtEnc),
 	timeout: parseInt(getConfigVal('web_security:json_web_token:timeout')), // seconds to send the authentication message
 	handshake: getConfigVal('web_security:json_web_token:handshake')
 }));
@@ -2334,7 +2339,7 @@ function decodeBase64(encodedString) {
 	if (clearText) {
 		decodedString = encodedString;
 	} else {
-		decodedString = new Buffer(encodedString, 'base64');
+		decodedString = Buffer.alloc(encodedString.length, encodedString, 'base64');
 	}
 	return (decodedString.toString());
 }
@@ -2353,7 +2358,7 @@ function getConfigVal(param_name) {
     if (clearText) {
       decodedString = val;
     } else {
-      decodedString = new Buffer(val, 'base64');
+      decodedString = Buffer.alloc(val.length, val, 'base64');
     }
   } else {
     //did not find value for param_name
@@ -2378,7 +2383,7 @@ function createToken() {
 
 var ctoken = jwt.sign({
 	tokenname: "servertoken"
-}, new Buffer(getConfigVal('web_security:json_web_token:secret_key'), getConfigVal('web_security:json_web_token:encoding')));
+}, Buffer.alloc(jwtKey.length, jwtKey, jwtEnc));
 
 
 app.use(function (err, req, res, next) {
@@ -2531,7 +2536,7 @@ app.get('/token', function (req, res) {
                     vrs.data[0].startTimeUTC = startTimeUTC; //hh:mm in UTC
                     vrs.data[0].endTimeUTC = endTimeUTC; //hh:mm in UTC
 
-					var token = jwt.sign(vrs.data[0], new Buffer(getConfigVal('web_security:json_web_token:secret_key'), getConfigVal('web_security:json_web_token:encoding')), {
+					var token = jwt.sign(vrs.data[0], Buffer.alloc(jwtKey.length, jwtKey, jwtEnc), {
 						expiresIn: "2000"
 					});
 					res.status(200).json({
@@ -2594,7 +2599,7 @@ app.get('/token', function (req, res) {
 		redisClient.hset(rAgentInfoMap, payload.username, JSON.stringify(agentInfo));
 		sendAgentStatusList(payload.username, "AWAY");
 
-		var token = jwt.sign(payload, new Buffer(getConfigVal('web_security:json_web_token:secret_key'), getConfigVal('web_security:json_web_token:encoding')), {
+		var token = jwt.sign(payload, Buffer.alloc(jwtKey.length, jwtKey, jwtEnc), {
 			expiresIn: "2000"
 		});
 		res.status(200).json({

@@ -32,7 +32,7 @@
     "mime": "^1.4.1",
     "minimist": "^1.2.2",
     "mongodb": "^3.3.4",
-    "mysql": "2.14.1",
+    "mysql": "^2.18.1",
     "nconf": "0.8.4",
     "node-zendesk": "^1.4.0",
     "openam-agent": "3.1.2",
