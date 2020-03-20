@@ -88,6 +88,7 @@
 			currentSession.on('accepted', function (e) {
 				if (debug) console.log('\nCURRENTSESSION -  ACCEPTED: \nRESPONSE: \n' + e.response + "\nORIGINATOR:\n" + e.originator);
 				toggle_incall_buttons(true);
+				$('#remoteView').removeClass('mirror-mode');
 				start_self_video();
 				$("#start-call-buttons").hide();
 				$('#outboundCallAlert').hide();// Does Not Exist - ybao: recover this to remove the Calling screen
@@ -194,27 +195,12 @@
 				}
 			};
 			currentSession.answer(options);
-/*			setInterval(()=>{
-
-				let body = `
-<?xml version="1.0" encoding="utf-8" ?>
-<media_control>
-  <vc_primitive>
-    <to_encoder>
-      <picture_fast_update/>
-    </to_encoder>
-  </vc_primitive>
-</media_control>`;
-				currentSession.sendInfo("application/media_control+xml", body)
-	
-			},5000);
-
-*/
 			//event listener for remote video. Adds to html page when ready.
 			//NOTE: needs to be both here and in the newRTCSession event listener because currentSession.connection is not established until after ua.answer() for incoming calls
 			if (currentSession.connection) currentSession.connection.ontrack = function(e) {
 				if (debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
 				remoteStream.classList.remove("mirror-mode");
+				$('#remoteView').removeClass("mirror-mode");
 				remoteStream.srcObject = e.streams[0];
 
 				//remoteStream.play(); //trying without, per VATRP example
@@ -243,7 +229,6 @@
 			backupStream = stream;
 			window.self_stream = stream;
 				
-			//remoteStream.classList.add("mirror-mode")
 			return new Promise(resolve => remoteStream.onplaying = resolve);
 		}).then(()=>{
 			remoteStream.classList.add("mirror-mode")
@@ -313,6 +298,7 @@
 		remoteView.setAttribute("autoplay", "autoplay");
 		remoteView.setAttribute("poster", "images/acedirect-logo.png");
 		remoteView.classList.remove("mirror-mode");
+		$('#remoteView').removeClass("mirror-mode");
 		addElement("webcam", "video", "selfView");
 		selfView.setAttribute("style", "right: 11px");
 		selfView.setAttribute("autoplay", "autoplay");
@@ -601,7 +587,7 @@
 			}
 
 			selfStream.srcObject = null;
-			selfStream.classList.remove('mirror-mode');
+			selfStream.classList.remove('mirror-mode');	
 			selfStream.src = "images/videoPrivacy.webm";
 			console.log("Using self-constructed 30sec video audio clip with SAR 1:1 DAR 4:3 resolution 640:480");
 
