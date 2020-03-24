@@ -957,9 +957,9 @@ $('#vmail-vrs-number').on('click', function () {
 $('#vmail-date').on('click', function () {
 	var sort = sortButtonToggle($(this).children("i"));
 	if (sort === "asc") {
-		sortFlag = "unix_timestamp(received) asc";
+		sortFlag = "received asc";
 	} else if (sort === "desc") {
-		sortFlag = "unix_timestamp(received) desc";
+		sortFlag = "received desc";
 	}
 	socket.emit('get-videomail', {
 		"extension": extensionMe,
