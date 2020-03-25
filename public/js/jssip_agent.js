@@ -136,7 +136,7 @@
 				if (debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
 				remoteStream.srcObject = e.streams[0];
 				remoteStream.play();
-			  	
+			  	$('#remoteView').removeClass('mirror-mode');	
 				toggleSelfview();
 			};
 		});

@@ -25,7 +25,7 @@
     "hoek": "^4.2.1",
     "ionicons": "^4.6.3",
     "jsonwebtoken": "^8.4.0",
-    "jssip": "^3.3.11",
+    "jssip": "3.3.11",
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.15",
     "log4js": "^3.0.6",

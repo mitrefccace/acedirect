@@ -38,24 +38,35 @@ $(document).ready(function () {
 	connect_socket();
 
 	// chat-transcript toggle
-	$('#chat-tab').on('click', function(){
+	$('#chat-tab').on('click', function () {
 		$('#chat-body').css('display', 'block')
 		$('#chat-footer').css('display', 'block')
 		$('#trans-body').css('display', 'none')
+		$('#caption-settings-body').css('display', 'none')
+		$('#caption-settings-footer').css('display', 'none')
 	});
-	$('#trans-tab').on('click', function(){
+	$('#trans-tab').on('click', function () {
 		$('#chat-body').css('display', 'none')
 		$('#chat-footer').css('display', 'none')
+		$('#caption-settings-body').css('display', 'none')
+		$('#caption-settings-footer').css('display', 'none')
 		$('#trans-body').css('display', 'block')
+	});
+	$('#caption-settings-tab').on('click', function () {
+		$('#chat-body').css('display', 'none')
+		$('#chat-footer').css('display', 'none')
+		$('#trans-body').css('display', 'none')
+		$('#caption-settings-body').css('display', 'block')
+		$('#caption-settings-footer').css('display', 'block')
 	});
 });
 
 
 function clearScreen() {
-        $('#ticketNumber').text('');
-        $('#complaintcounter').text('2,000');
-        $('#complaint').val('');
-        $('#subject').val('');
+	$('#ticketNumber').text('');
+	$('#complaintcounter').text('2,000');
+	$('#complaint').val('');
+	$('#subject').val('');
 	$('#userform').find('input:text').val('');
 	$('#callerEmail').val('');
 
@@ -123,23 +134,23 @@ function connect_socket() {
 					$('#callerEmail').val(payload.email);
 					$('#displayname').val(payload.first_name + ' ' + payload.last_name);
 					isOpen = payload.isOpen;
-                                        if (typeof isOpen === 'undefined') {
-                                          //default to true if the user hit back; they won't be able to get into queue if closed
-                                          //this will prevent the after hours dialog if they hit back (per customer requirement)
-                                          isOpen = true;
-                                        }
+					if (typeof isOpen === 'undefined') {
+						//default to true if the user hit back; they won't be able to get into queue if closed
+						//this will prevent the after hours dialog if they hit back (per customer requirement)
+						isOpen = true;
+					}
 
 					if (!isOpen) { //after hours processing; if after hours, then show this modal
 						$("#afterHoursModal").modal({
 							backdrop: "static"
 						});
 						$("#afterHoursModal").modal("show");
-                                                //get the start/end time strings for the after hours dialog
-                                                tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
-                                                startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0, 8); //start time in UTC
-                                                endTimeUTC = convertUTCtoLocal(payload.endTimeUTC).substring(0, 8); //end time in UTC
-                                                $('#ah-start-time').text(startTimeUTC);
-                                                $('#ah-end-time').text(endTimeUTC + " " + tz);
+						//get the start/end time strings for the after hours dialog
+						tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
+						startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0, 8); //start time in UTC
+						endTimeUTC = convertUTCtoLocal(payload.endTimeUTC).substring(0, 8); //end time in UTC
+						$('#ah-start-time').text(startTimeUTC);
+						$('#ah-end-time').text(endTimeUTC + " " + tz);
 					}
 
 					socket.emit('register-client', {
@@ -206,9 +217,9 @@ function connect_socket() {
 						let i = 10;
 						var newExtensionRetryCounter = setInterval(function () {
 
-								document.getElementById("newExtensionRetryCounter").innerHTML =  i;
-								i-- || (clearInterval(newExtensionRetryCounter), extensionRetry());
-							}, 1000);
+							document.getElementById("newExtensionRetryCounter").innerHTML = i;
+							i-- || (clearInterval(newExtensionRetryCounter), extensionRetry());
+						}, 1000);
 					} else {
 						console.log('Something went wrong when getting an extension')
 					}
@@ -261,7 +272,7 @@ function connect_socket() {
 						logout("Session has expired");
 					}
 				}).on("caption-config", function (data) {
-					if(data == 'false'){
+					if (data == 'false') {
 						$('#caption-settings').css('display', 'none');
 						$('#transcriptoverlay').css('display', 'none');
 						$('#mute-captions').css('display', 'none');
@@ -280,8 +291,8 @@ function connect_socket() {
 							return (className.match(/\bcol-\S+/g) || []).join(' ');
 						});
 						$("#chat-section").addClass("col-lg-5");
-						$("#caption-settings").attr("hidden", true);
-						$("#trans-tab").attr("hidden", true);
+						//$("#caption-settings").attr("hidden", true);
+						//$("#trans-tab").attr("hidden", true);
 						skinny = true;
 					} else {
 						$("#ticket-section").removeAttr("hidden");
@@ -333,12 +344,12 @@ function connect_socket() {
 						$("#agent-name-box").show();
 					}
 				}).on("agents", function (data) {
-                                  if (data.agents_logged_in) {
-	                            $("#agents-avail").text('');
-                                  } else {
-	                            $("#agents-avail").text('No representatives are available to take your call at this time.');
-                                  }
-                                }).on("chat-leave", function (error) {
+					if (data.agents_logged_in) {
+						$("#agents-avail").text('');
+					} else {
+						$("#agents-avail").text('No representatives are available to take your call at this time.');
+					}
+				}).on("chat-leave", function (error) {
 					//clear chat
 					$('#chatcounter').text('500');
 					$('#chat-messages').html('');
@@ -541,10 +552,10 @@ function clearFadeTimer() {
 
 function fade(type = 'out') {
 	$('#call-option-buttons button').each(function (i) {
-		$(this).css('animation', `fade-${type} 0.${i+2}s ease-out forwards`);
+		$(this).css('animation', `fade-${type} 0.${i + 2}s ease-out forwards`);
 	});
 
-	if(type == 'out') {
+	if (type == 'out') {
 		$('#transcriptoverlay').css('bottom', '10px')
 	} else {
 		$('#transcriptoverlay').css('bottom', '65px')
@@ -565,7 +576,7 @@ $('#fullscreen-element').mouseleave(function () {
 function exit_queue() {
 	$('#queueModal').modal('hide');
 	terminate_call();
-        clearScreen();
+	clearScreen();
 }
 
 function set_queue_text(position) {
@@ -630,11 +641,11 @@ function convertUTCtoLocal(hhmmutc) {
 }
 
 function logout(msg) {
-  //clear the token from session storage
-  sessionStorage.clear();
-  //disconnect socket.io connection
-  if (socket)
-    socket.disconnect();
-  //display the login screen to the user.
-  window.location.href = './logout';
+	//clear the token from session storage
+	sessionStorage.clear();
+	//disconnect socket.io connection
+	if (socket)
+		socket.disconnect();
+	//display the login screen to the user.
+	window.location.href = './logout';
 }
