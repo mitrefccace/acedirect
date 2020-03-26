@@ -145,7 +145,6 @@ function connect_socket() {
 							backdrop: "static"
 						});
 						$("#afterHoursModal").modal("show");
-						//get the start/end time strings for the after hours dialog
 						tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
 						startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0, 8); //start time in UTC
 						endTimeUTC = convertUTCtoLocal(payload.endTimeUTC).substring(0, 8); //end time in UTC
@@ -153,14 +152,6 @@ function connect_socket() {
 						$('#ah-end-time').text(endTimeUTC + " " + tz);
 					}
 
-					socket.emit('register-client', {
-						"hello": "hello"
-					});
-					socket.emit('register-vrs', {
-						"hello": "hello"
-					});
-				}).on('ad-ticket-created', function (data) {
-					console.log("got ad-ticket-created");
 					$('#userformoverlay').removeClass("overlay").hide();
 					if (data.zendesk_ticket) {
 						$('#firstName').val(data.first_name);
@@ -577,6 +568,18 @@ function exit_queue() {
 	$('#queueModal').modal('hide');
 	terminate_call();
 	clearScreen();
+}
+
+function afterHourVoicemail(){
+	$("#afterHoursModal").modal("hide");
+	$('#videomailModal').modal('show');
+}
+
+function afterHoursHideVoicemail(){
+	if(isOpen){
+		$("#afterHoursModal").modal("show");
+	}
+	$('#videomailModal').modal('hide');
 }
 
 function set_queue_text(position) {

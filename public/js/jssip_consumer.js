@@ -342,7 +342,7 @@ function terminate_call() {
 	exitFullscreen();
 	$('#transcriptoverlay').html('');
 
-        if (complaintRedirectActive) {
+        if (complaintRedirectActive || !isOpen) {
           $("#redirecttag").attr("href", complaintRedirectUrl);
           $("#redirectdesc").text("Redirecting to " + complaintRedirectDesc + " ...");
           $("#callEndedModal").modal('show');

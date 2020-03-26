@@ -524,7 +524,7 @@
 						<button id="start-recording-btn" type="button"
 							onclick="startRecordingVideomail(switchQueueFlag);" class="btn btn-success btn-style"
 							style="width: 50%; height: 50px;"> Record </button>
-						<button id="cancel-recording-btn" type="button" onclick="$('#videomailModal').modal('hide');"
+						<button id="cancel-recording-btn" type="button" onclick=afterHoursHideVoicemail()
 							class="btn btn-danger btn-style" style="width: 50%; height: 50px;"> Cancel </button>
 					</div>
 				</div>
@@ -547,7 +547,7 @@
 				<div style="border-top: 1px solid #f4f4f4; padding: 10px;" class="text-center">
 				</div>
 				<!-- This URL action should invoke DTMF Tone 1 -->
-				<h3>&nbsp;To leave a videomail <a href="#" onclick="">click here</a>.</h3>
+				<h3>&nbsp;To leave a videomail <a href="#" onclick=afterHourVoicemail()>click here</a>.</h3>
 			</div>
 		</div>
 	</div>
