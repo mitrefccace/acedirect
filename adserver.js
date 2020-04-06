@@ -704,6 +704,15 @@ io.sockets.on('connection', function (socket) {
 		});
 	});
 
+	socket.on('sipUriLookup', function(phoneNumber){
+		getCallerInfo(phoneNumber, function(data){
+			if(data.message == "success"&&data.data[0]){
+				io.to(token.extension).emit('sip-uri-info', {message: 'Success', sipUri:data.data[0].sipuri});
+			}else{
+			  	io.to(token.extension).emit('sip-uri-info', {message: 'Error'}); 
+			}
+		})
+	});
 	// Handler catches a Socket.IO disconnect
 	socket.on('disconnect', function () {
 		logger.info('DISCONNECTED');
@@ -726,6 +735,8 @@ io.sockets.on('connection', function (socket) {
 						val.inuse = false;
 						redisClient.hset(rConsumerExtensions, Number(ext), JSON.stringify(val));
 						redisClient.hset(rTokenMap, token.lightcode, "OFFLINE");
+                                                redisClient.hdel(rExtensionToVrs, Number(ext));
+                                                redisClient.hdel(rExtensionToVrs, Number(token.vrs));
 					}
 				});
 			});

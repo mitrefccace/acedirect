@@ -6,6 +6,7 @@ var ticketTabFade;
 var busylight = new Busylight();
 var agentStatus = 'OFF';
 var away_color;
+var sipUri;
 var ready_color;
 var in_call_color;
 var hold_color;
@@ -252,6 +253,8 @@ function connect_socket() {
 						if (data.data[i].id === 2)
 							$('#complaints_script_content').val(data.data[i].text);
 					}
+				}).on('sip-uri-info', function (data) {
+					sipUri = (data.message == "Success") ? data.sipUri : "Unknown";
 				}).on('ad-zendesk', function (data) {
 					debugtxt('ad-zendesk', data);
 					$('#ticketId').val(data.id);
@@ -1393,6 +1396,7 @@ $("#button-call").click(function () {
 	$('#modalDialpad').modal('hide');
 	telNumber = $('#phone-number');
 	start_call($(telNumber).val());
+	socket.emit('sipUriLookup',$('#phone-number').val()) 
 	$(telNumber).val('');
 	$('#duration').timer('reset');
 	//Disable dropdown while in a call

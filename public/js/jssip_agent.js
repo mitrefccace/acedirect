@@ -92,6 +92,9 @@
 				start_self_video();
 				$("#start-call-buttons").hide();
 				$('#outboundCallAlert').hide();// Does Not Exist - ybao: recover this to remove the Calling screen
+				if(sipUri && sipUri.indexOf("purple")>0)
+					setTimeout(function(){toggleSelfview()},13000);
+				sipUri = ''; // Only used to check if call is purple.
 			});
 
 			currentSession.on('ended', function (e) {
@@ -136,7 +139,7 @@
 				if (debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
 				remoteStream.srcObject = e.streams[0];
 				remoteStream.play();
-			  	$('#remoteView').removeClass('mirror-mode');	
+			  	
 				toggleSelfview();
 			};
 		});

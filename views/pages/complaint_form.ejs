@@ -259,35 +259,32 @@
 									</div>
 									<div id="secsremain" style="display:inline;"></div>
 
-									<div class="progress">
-										<div class="progress-bar progress-bar-danger progress-bar-striped"
-											id="record-progress-bar" role="progressbar" aria-valuenow="0"
-											aria-valuemin="0" aria-valuemax="90"
-											style="width:0%;background-color:red !important;">
-										</div>
+                                                                        <div class="progress">
+                                                                        <div class="progress-bar progress-bar-danger progress-bar-striped" id="record-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="90" style="width:0%;background-color:red !important;" >
+                                                                        </div>
+                                                                        </div>
+
+                                                                        <div id="vmwait_placeholder">
+									<div class="alert alert-info" alert-dismissable id="vmwait"
+										style="margin-top: 10px;" hidden>
+										<a class="close" onclick="$('#vmwait').hide();"
+											style="text-decoration:none">×</a>
+										<strong>Videomail request sent.</strong> Please wait.
 									</div>
+                                                                        <div>
 
-									<div id="vmwait_placeholder">
-										<div class="alert alert-info" alert-dismissable id="vmwait"
-											style="margin-top: 10px;" hidden>
-											<a class="close" onclick="$('#vmwait').hide();"
-												style="text-decoration:none">×</a>
-											<strong>Videomail request sent.</strong> Please wait.
-										</div>
-										<div>
-
-											<div id="vmsent_placeholder">
-												<div class="alert alert-success" alert-dismissable id="vmsent"
-													style="margin-top: 10px;" hidden>
-													<a class="close" onclick="$('#vmsent').hide();"
-														style="text-decoration:none">×</a>
-													<strong>Success!</strong> Videomail sent.
-												</div>
-											</div>
-
-
-										</div>
+                                                                        <div id="vmsent_placeholder">
+									<div class="alert alert-success" alert-dismissable id="vmsent"
+										style="margin-top: 10px;" hidden>
+										<a class="close" onclick="$('#vmsent').hide();"
+											style="text-decoration:none">×</a>
+										<strong>Success!</strong> Videomail sent.
 									</div>
+                                                                        </div>
+
+
+								</div>
+							</div>
 						</section>
 						<!-- Right Col -->
 						<section class="col-lg-5" id="chat-section">
@@ -308,93 +305,26 @@
 								<div class="card-body">
 									<ul class="nav nav-tabs" role="tablist">
 										<li class="nav-item">
-											<a href="#chat-body" class="nav-link active" data-toggle="pill" role="tab"
-												aria-expanded="true" id="chat-tab">
+											<a href="#chat-body" class="nav-link active" data-toggle="pill" role="tab" aria-expanded="true" id="chat-tab">
 												<i class="fa fa-comments"></i>
 												Chat
 											</a>
 										</li>
 										<li class="nav-item">
-											<a href="#trans-body" class="nav-link" data-toggle="pill" role="tab"
-												aria-expanded="false" id="trans-tab">
+											<a href="#trans-body" class="nav-link" data-toggle="pill" role="tab" aria-expanded="false" id="trans-tab">
 												<i class="fas fa-file-alt"></i>
 												Transcript
 											</a>
 										</li>
-										<li class="nav-item">
-											<a href="#caption-settings" class="nav-link" data-toggle="pill" role="tab"
-												aria-expanded="false" id="caption-settings-tab">
-												<i class="fa fa-cogs"></i>
-												Caption Settings
-											</a>
-										</li>
 									</ul>
 									<div class="tab-content">
-										<div class="tab-pane active" id="chat-body" role="tabpanel"
-											aria-labelledby="chat-tab">
+										<div class="tab-pane fade show active" id="chat-body" role="tabpanel" aria-labelledby="chat-tab">
 											<div class="direct-chat-messages" id="chat-messages"></div>
 											<div class="direct-chat-timestamp text-bold" id="rtt-typing"
 												style="margin-left: 10px; min-height: 20px"></div>
 										</div>
-										<div class="tab-pane" id="trans-body" role="tabpanel"
-											aria-labelledby="trans-tab">
+										<div class="tab-pane fade" id="trans-body" role="tabpanel" aria-labelledby="trans-tab">
 											<div class="direct-chat-messages" id="caption-messages"></div>
-										</div>
-										<div class="tab-pane" id="caption-settings-body" role="tabpanel"
-											aria-labelledby="caption-settings-tab">
-											<li class="cap-setting">
-												<span>Enable Captions:</span>
-												<div class="form-check">
-													<input class="form-check-input position-static" type="checkbox"
-														id="enable-captions" onclick="mute_captions()" checked>
-												</div>
-											</li>
-
-											<li id="cap-font-size" class="cap-setting">
-												<span>Font size:</span>
-												<select id="font-select" class="font-select" type="select"
-													name="font-select" onchange="changeCaption(this.value)">
-													<option value="2.5">Default</option>
-													<option value="1.5">Small</option>
-													<option value="3">Large</option>
-												</select>
-											</li>
-
-											<li id="cap-font-color" class="cap-setting">
-												<span>Font color:</span>
-												<div class="color-select-container">
-													<div id="font-grey" class="color-select"
-														onclick="changeCaption(this.id)">
-													</div>
-													<div id="font-black" class="color-select"
-														onclick="changeCaption(this.id)">
-													</div>
-													<div id="font-white" class="color-select"
-														onclick="changeCaption(this.id)">
-													</div>
-												</div>
-											</li>
-
-											<li id="cap-bg-color" class="cap-setting">
-												<span>Background color:</span>
-												<div class="color-select-container">
-													<i id="bg-transparent" class="far fa-times-circle"></i>
-													<div id="bg-grey" class="color-select"
-														onclick="changeCaption(this.id)">
-													</div>
-													<div id="bg-black" class="color-select"
-														onclick="changeCaption(this.id)">
-													</div>
-													<div id="bg-white" class="color-select"
-														onclick="changeCaption(this.id)">
-													</div>
-												</div>
-												<input type="range" min="0" max="1" step=.01 value="1"
-													id="opacity-slider-consumer">
-											</li>
-
-
-
 										</div>
 									</div>
 								</div>
@@ -416,18 +346,75 @@
 										left.</p>
 								</div>
 
+							</div>
 
+							<div id="caption-settings" class="card direct-chat direct-chat-primary">
+								<div class="card-header with-border">
+									<h3 class="card-title">
+										<i class="fa fa-comments"></i>
+										Caption Settings
+									</h3>
 
-								<div id="caption-settings-footer" class="card-footer text-center" style="display:none;">
+									<div class="card-tools pull-right">
+										<button type="button" class="btn btn-tool" data-card-widget="collapse"><i
+												class="fa fa-minus"></i>
+										</button>
+									</div>
+								</div>
+								<div class="card-body">
+
+									<li class="cap-setting">
+										<span>Enable Captions:</span>
+										<div class="form-check">
+											<input class="form-check-input position-static" type="checkbox"
+												id="enable-captions" onclick="mute_captions()" checked>
+										</div>
+									</li>
+
+									<li id="cap-font-size" class="cap-setting">
+										<span>Font size:</span>
+										<select id="font-select" class="font-select" type="select" name="font-select"
+											onchange="changeCaption(this.value)">
+											<option value="2.5">Default</option>
+											<option value="1.5">Small</option>
+											<option value="3">Large</option>
+										</select>
+									</li>
+
+									<li id="cap-font-color" class="cap-setting">
+										<span>Font color:</span>
+										<div class="color-select-container">
+											<div id="font-grey" class="color-select" onclick="changeCaption(this.id)">
+											</div>
+											<div id="font-black" class="color-select" onclick="changeCaption(this.id)">
+											</div>
+											<div id="font-white" class="color-select" onclick="changeCaption(this.id)">
+											</div>
+										</div>
+									</li>
+
+									<li id="cap-bg-color" class="cap-setting">
+										<span>Background color:</span>
+										<div class="color-select-container">
+											<i id="bg-transparent" class="far fa-times-circle"></i>
+											<div id="bg-grey" class="color-select" onclick="changeCaption(this.id)">
+											</div>
+											<div id="bg-black" class="color-select" onclick="changeCaption(this.id)">
+											</div>
+											<div id="bg-white" class="color-select" onclick="changeCaption(this.id)">
+											</div>
+										</div>
+										<input type="range" min="0" max="1" step=.01 value="1"
+											id="opacity-slider-consumer">
+									</li>
+
+								</div>
+								<div class="card-footer text-center">
 									<button class="btn btn-primary center-block mx-auto" type="button"
 										onclick="testCaptions()">Preview</button>
 
 								</div>
-
-
-
 							</div>
-
 						</section>
 
 					</div>
@@ -566,7 +553,7 @@
 								onclick="exit_queue()"> Hangup </button>
 				</div>
 				<div class="text-center" style="border-top: 1px solid #f4f4f4; padding: 10px;">
-					<h5><span style="color:red" id="agents-avail"></span></h5>
+                                        <h5><span style="color:red" id="agents-avail"></span></h5>
 					<!-- This URL action should invoke DTMF Tone 1 -->
 					<h5>&nbsp;To exit the queue and leave a videomail <a href="#"
 							onclick="switchQueueFlag=true;$('#queueModal').modal('hide');$('#videomailModal').modal('show');">click
