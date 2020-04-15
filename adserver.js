@@ -727,6 +727,24 @@ io.sockets.on('connection', function (socket) {
 		//Remove the consumer from the extension map.
 		if (token.vrs) {
 			redisClient.hget(rExtensionToVrs, Number(token.vrs), function (err, ext) {
+
+                          //if consumer portal is in queue and closes browser or refreshes, hang them up in Asterisk
+                          if (ext) {
+                            regex_str =  "/^PJSIP/" + ext + "-.*$/";
+                            logger.info("REGEX: " + regex_str);
+                            ami.action({
+                                    "Action": "Hangup",
+                                    "ActionID": "4",
+                                    "Channel": regex_str
+                            }, function (err, res) {
+                              if (err) {
+                                logger.info('ERROR in hangup');
+                              } else {
+                                logger.info('SUCCESS hangup');
+                              }
+                            });
+                          }
+
 				redisClient.hget(rConsumerExtensions, Number(ext), function (err, reply) {
 					if (err) {
 						logger.error("Redis Error" + err);

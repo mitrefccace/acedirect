@@ -128,6 +128,9 @@
 .control-sidebar li .dropdown-item:hover {
   color: #16181b;
 }
+.control-sidebar tbody tr:hover {
+  color: #FFFFFF;
+}
 .direct-chat-text {
     margin: 5px 0 0 5px;
 }

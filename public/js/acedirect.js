@@ -418,6 +418,10 @@ function connect_socket() {
 					$('#videomailErrorBody').html('Unable to locate videomail with ID ' + data + '.');
 					$('#videomailErrorModal').modal('show');
 					stopVideomail();
+					document.getElementById("persistCameraCheck").disabled = false;
+					if (document.getElementById("persistCameraCheck").checked == true) {
+						enable_persist_view();
+					}
 				}).on('queue-caller-join', function (data) {
 					if (data.queue === "ComplaintsQueue") {
 						$("#complaints-queue-num").text(data.count);
@@ -666,6 +670,10 @@ function unpauseQueues() {
 	socket.emit('ready', null);
 	if (this.agentStatus == 'READY' && playingVideomail == true) {
 		stopVideomail();
+		document.getElementById("persistCameraCheck").disabled = false;
+		if (document.getElementById("persistCameraCheck").checked == true) {
+			enable_persist_view();
+		}
 	}
 }
 
@@ -1160,6 +1168,14 @@ function toggle_videomail_buttons(make_visible) {
 }
 
 //Exit videomail view and return to call view
+function exitVideomail() {
+	stopVideomail()
+	document.getElementById("persistCameraCheck").disabled = false;
+	if (document.getElementById("persistCameraCheck").checked == true) {
+		enable_persist_view();
+	}
+}
+
 function stopVideomail() {
 	console.log("Videomail view has been stopped, back to call view");
 	remoteView.setAttribute("src", "");
@@ -1170,15 +1186,15 @@ function stopVideomail() {
 	remoteView.setAttribute("poster", "images/acedirect-logo.png");
 	toggle_videomail_buttons(false);
 	playingVideomail = false;
-	document.getElementById("persistCameraCheck").disabled = false;
-	if (document.getElementById("persistCameraCheck").checked == true) {
-		enable_persist_view();
-	}
 }
 
 //Callback for videomail
 function videomailCallback(callbacknum) {
 	stopVideomail();
+	document.getElementById("persistCameraCheck").disabled = false;
+	if (document.getElementById("persistCameraCheck").checked == true) {
+		enable_persist_view();
+	}
 	var videophoneNumber = callbacknum.match(/\d/g);
 	videophoneNumber = videophoneNumber.join('');
 	start_call(videophoneNumber);
@@ -1396,7 +1412,7 @@ $("#button-call").click(function () {
 	$('#modalDialpad').modal('hide');
 	telNumber = $('#phone-number');
 	start_call($(telNumber).val());
-	socket.emit('sipUriLookup',$('#phone-number').val()) 
+	socket.emit('sipUriLookup', $('#phone-number').val())
 	$(telNumber).val('');
 	$('#duration').timer('reset');
 	//Disable dropdown while in a call
