@@ -412,6 +412,11 @@ function connect_socket() {
 					updateVideomailTable(data);
 				}).on('got-unread-count', function (data) {
 					updateVideomailNotification(data);
+				}).on('new-peer', function (data) {
+					//new peer is required for out going videomail on purple and zrvs networks
+					// if this is done on a convo provider call it could cause black/green video issues.
+					console.log("New peer joined the call for purple and zvrs only");
+					toggleSelfview(200);
 				}).on('changed-status', function () {
 					getVideomailRecs();
 				}).on('videomail-retrieval-error', function (data) {

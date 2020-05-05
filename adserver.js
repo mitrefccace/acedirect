@@ -1138,6 +1138,16 @@ function handle_manager_event(evt) {
 
   switch (evt.event) {
 
+	// Sent by Asterisk when call is bridged
+	case ('VarSet'):
+		let channel = evt.channel.split(/[\/,-]/);
+		if(channel[1]  && (channel[1].startsWith("ProviderPurple") || channel[1].startsWith("ProviderZVRS")) && evt.variable && evt.variable.bridgepeer == ''){
+			let agentExt = evt.value.split(/[\/,-]/);
+			if(agentExt[1])
+				io.to(agentExt[1]).emit('new-peer',{});
+		}		
+		break;
+
     // Sent by Asterisk when the call is answered
     case ('DialEnd'):
 
@@ -1680,6 +1690,7 @@ function init_ami() {
       ami.on('queuecallerabandon',handle_manager_event);
       ami.on('queuecallerjoin',handle_manager_event);
       ami.on('queuecallerleave',handle_manager_event);
+      ami.on('varset',handle_manager_event);
 
       //handle the response
 			ami.on('response', handle_action_response);

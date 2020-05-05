@@ -92,19 +92,6 @@ function register_jssip() {
 			start_self_video();
 			$("#start-call-buttons").hide();
 			$('#outboundCallAlert').hide();// Does Not /Exist - ybao: recover this to remove the Calling screen
-			currentSession.mute({ audio: false, video: true });
-			clearInterval(toggleInterval);
-			if (sipUri) {
-				if ((sipUri.indexOf("purple") > 0) || (sipUri.indexOf("champvrs") > 0)) {
-					setTimeout(function () {
-						toggleInterval = setInterval(function () { toggleSelfview(7) }, 3000);
-						setTimeout(function () {
-							clearInterval(toggleInterval);
-						}, 30000);
-					}, 1000);
-				}
-			}
-			sipUri = ''; // Only used to check if call is purple.
 		});
 
 		currentSession.on('ended', function (e) {
@@ -151,9 +138,8 @@ function register_jssip() {
 			remoteStream.srcObject = e.streams[0];
 			let rPromise = remoteStream.play();
 			rPromise.then(function () {
-				setTimeout(function () {
-					currentSession.unmute({ audio: false, video: true });
-				}, 500)
+				console.log("Video stream has started.");
+				setTimeout(function(){calibrateVideo(2000)}, 1000)
 			})
 		};
 	});
@@ -181,13 +167,31 @@ function start_call(other_sip_uri) {
 	ua.call(other_sip_uri, options);
 }
 
+function calibrateVideo(duration) {
+	if (currentSession) {
+			let muted = currentSession.isMuted();
+			if (!muted.video){
+					console.log("Calibrate Start Video Stream for " + duration + "ms");
+					enable_video_calibrate()
+					setTimeout(function () {
+							console.log("Calibrate End  video stream.")
+							disable_video_calibrate();
+					}, duration)
+			}
+	}
+}
+
 
 function toggleSelfview(duration) {
 	if (currentSession) {
-		currentSession.mute({ audio: false, video: true });
-		setTimeout(function () {
-			currentSession.unmute({ audio: false, video: true })
-		}, duration)
+		let muted = currentSession.isMuted();
+		if (!muted.video) {
+			console.log("Toggle Video Stream for " + duration + "ms");
+			currentSession.mute({ audio: false, video: true });
+			setTimeout(function () {
+				currentSession.unmute({ audio: false, video: true })
+			}, duration)
+		}
 	}
 }
 
@@ -217,13 +221,11 @@ function accept_call() {
 		if (currentSession.connection) currentSession.connection.ontrack = function (e) {
 			if (debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
 			mirrorMode('remoteView', false);
-			currentSession.mute({ audio: false, video: true });
 			remoteStream.srcObject = e.streams[0];
 			let remotePlayPromise = remoteStream.play();
 			remotePlayPromise.then(function () {
-				setTimeout(function () {
-					currentSession.unmute({ audio: false, video: true });
-				}, 500);
+				console.log("Video stream has started.");
+				setTimeout(function(){calibrateVideo(2000)}, 1000)
 			});
 		}
 	}
@@ -327,6 +329,89 @@ function disable_persist_view() {
 
 	toggle_incall_buttons(false);
 }
+
+
+
+
+function enable_video_calibrate() {
+	if (currentSession) {
+			currentSession.mute({audio: false,video: true});
+			// the following piece of code does not seem to stop the video at remote side
+			if (window.self_stream) {
+					if (window.self_stream.getVideoTracks()) {
+							if (window.self_stream.getVideoTracks()[0]) {
+									window.self_stream.getVideoTracks()[0].stop();
+							}
+					}
+			}
+			selfStream.srcObject = null;
+			mirrorMode("selfView", false);
+			selfStream.src = "images/calibrate5.webm";
+			//selfStream.src = "images/videoPrivacy.webm";
+			selfStream.type = 'type="video/webm"';
+			selfStream.setAttribute("loop", "true");
+
+			var playPromise = selfStream.play();
+			if (playPromise !== undefined) {
+					playPromise.then(function () {
+							currentSession.unmute({audio: false, video: true});
+					}).catch(function (error) {
+							console.error('ERROR - this browser does not support play() Promise');
+					});
+			}
+
+			selfStream.onplay = function () {
+					var stream = selfStream.captureStream();
+					stream.onactive = function () {         // without onactive the tracks of captured stream may be empty
+							var tracks = stream.getTracks();
+							Promise.all(currentSession.connection.getSenders().map(sender =>
+									sender.replaceTrack(stream.getTracks().find(t => t.kind == sender.track.kind), stream)));
+					}
+			};
+	}
+}
+
+function disable_video_calibrate(){
+	if (currentSession) {
+			currentSession.mute({audio: false,video: true});
+			if (navigator.mediaDevices === undefined) {
+					navigator.mediaDevices = {};
+			}
+			if (navigator.mediaDevices.getUserMedia === undefined) {
+					navigator.mediaDevices.getUserMedia = function (constraints) {
+							var getUserMedia = navigator.msGetUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+							if (!getUserMedia) {
+									return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+							}
+							return new Promise(function (resolve, reject) {
+									getUserMedia.call(navigator, constraints, resolve, reject);
+							});
+					}
+			}
+
+			navigator.mediaDevices.getUserMedia({audio: true,video: true})
+			  .then(function (stream) {
+				   selfStream.removeAttribute("hidden");
+				   if ("srcObject" in selfStream) {
+					  selfStream.srcObject = stream;
+				   } else {
+					  selfStream.src = window.URL.createObjectURL(stream);
+				   }
+				   window.self_stream = stream;
+				   selfStream.onloadedmetadata = function (e) {
+					 selfStream.play();
+					 Promise.all(currentSession.connection.getSenders().map(sender =>
+					   sender.replaceTrack(stream.getTracks().find(t => t.kind == sender.track.kind), stream)));
+				   };
+				   mirrorMode("selfView", true);
+			  }).catch(function (err) {
+				   console.log(err.name + ": " + err.message);
+			  });
+			currentSession.unmute({audio: false,video: true});
+	}
+}
+
+
 
 
 //starts the local streaming video. Works with some older browsers, if it is incompatible it logs an error message, and the selfStream html box stays hidden
