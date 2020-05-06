@@ -1299,6 +1299,57 @@ function handle_manager_event(evt) {
             io.to(Number(agentExtension[1])).emit('new-caller-general', evt.context);
 
           }
+        } else {
+          //if it's not the previous two cases (Complaints  call or General Questions call), ASSUME Complaints call (WebRTC).
+          logger.info('*** WARNING *** unexpected context from Asterisk DialEnd event, ANSWER dial status: evt.context: >' + evt.context + '<');
+          logger.info('*** ASSUMING TREAT THIS LIKE A WEB CALL...');
+
+          // Format is PJSIP/nnnnn-xxxxxx, we want to strip out the nnnnn only
+          var extString = evt.channel;
+          var extension = extString.split(/[\/,-]/);
+          var isOurPhone = false;
+
+          //is this one of our phones? one that we expect?
+          if ( extension[1].startsWith(PROVIDER_STR) ) {
+            isOurPhone = true;
+            logger.info('Matched on ' + extension[1] + ', setting extension[1] to ' + evt.calleridnum);
+            extension[1] = evt.calleridnum;
+          } else {
+            logger.info("No phone match, but this could be a WebRTC extension: " + extension[1] + ". leaving extension[1] alone to continue processing...");
+          }
+
+          var destExtString = evt.destchannel;
+          var destExtension = destExtString.split(/[\/,-]/);
+          redisClient.hset(rConsumerToCsr, Number(extension[1]), Number(destExtension[1]));
+          logger.info('Populating consumerToCsr: ' + extension[1] + ' => ' + destExtension[1]);
+          logger.info('Extension number: ' + extension[1]);
+          logger.info('Dest extension number: ' + destExtension[1]);
+
+          if (extension[1].length >= 10) {
+            //pop here, because we already have the consumer phone number
+            popZendesk(evt.destuniqueid,extension[1],destExtension[1],destExtension[1],"","","","");
+          }
+
+          redisClient.hget(rExtensionToVrs, Number(extension[1]), function (err, vrsNum) {
+            if (!err && vrsNum) {
+              // Call new function
+              logger.info('Calling vrsAndZenLookup with ' + vrsNum + ' and ' + destExtension[1]);
+
+              //mapped consumer extension to a vrs num. so now we can finally pop
+              popZendesk(evt.destuniqueid,vrsNum,destExtension[1],destExtension[1],"","","","");
+
+              vrsAndZenLookup(Number(vrsNum), Number(destExtension[1]));
+            } else if ( isOurPhone ) {
+              vrsAndZenLookup(Number(extension[1]), Number(destExtension[1]));
+              io.to(Number(destExtension[1])).emit('no-ticket-info', {});
+            } else {
+              // Trigger to agent to indicate that we don't have a valid VRS, agent will prompt user for VRS
+              io.to(Number(destExtension[1])).emit('missing-vrs', {});
+            }
+
+          });
+          //tell CSR portal that a complaints queue call has connected
+          io.to(Number(destExtension[1])).emit('new-caller-complaints', evt.context);
         }
       }
 
