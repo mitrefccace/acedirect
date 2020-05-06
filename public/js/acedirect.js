@@ -649,7 +649,7 @@ function inCallADGeneral(endpoint_type) {
 	changeStatusLight('IN_CALL');
 	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	socket.emit('incall', null);
-	if (endpoint_type === "Provider_General_Questions") {
+	if ( endpoint_type === "Provider_General_Questions" || endpoint_type === "General_Questions" ) {
 		disable_chat_buttons();
 		$("#newchatmessage").attr("placeholder", "Chat disabled for provider endpoints");
 		$('#remoteView').css('object-fit', ' contain');
