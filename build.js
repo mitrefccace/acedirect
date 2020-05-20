@@ -1,20 +1,20 @@
 const path = require('path');
-const now = new Date()  
-const secondsSinceEpoch = Math.round(now.getTime() / 1000)  
+const now = new Date()
+const secondsSinceEpoch = Math.round(now.getTime() / 1000)
 
 var fs = require('fs');
 
 const CSS = [
+    'bootstrap/dist/css/bootstrap.min.css',
     'bootstrap-toggle/css/bootstrap-toggle.css',
-    // font awesome 5
-    'admin-lte/plugins/fontawesome-free/css/all.min.css',
-    // font awesome 4
     'font-awesome/css/font-awesome.min.css',
     'inputmask/css/inputmask.css',
-    'admin-lte/dist/css/adminlte.min.css',
-    'admin-lte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css',
+    'admin-lte/dist/css/AdminLTE.min.css',
+    'admin-lte/dist/css/skins/skin-blue.min.css',
+    'admin-lte/dist/css/skins/skin-purple.min.css',
     'ionicons/dist/css/ionicons.min.css',
     'gridstack/dist/gridstack.min.css',
+    'datatables.net-bs/css/dataTables.bootstrap.min.css',
 
 
     /*
@@ -23,41 +23,28 @@ const CSS = [
     */
 ];
 const FONT = [
-    // font awesome 4 fonts
-    'font-awesome/fonts/fontawesome-webfont.woff',
     'font-awesome/fonts/fontawesome-webfont.woff2',
-    // 'bootstrap/fonts/glyphicons-halflings-regular.woff',
-    // 'bootstrap/fonts/glyphicons-halflings-regular.woff2',
-    // 'bootstrap/fonts/glyphicons-halflings-regular.ttf',
-    //ionicons
-    'ionicons/dist/fonts/ionicons.woff',
-    'ionicons/dist/fonts/ionicons.woff2',
-    'ionicons/dist/fonts/ionicons.ttf',
+    'bootstrap/fonts/glyphicons-halflings-regular.woff',
+    'bootstrap/fonts/glyphicons-halflings-regular.woff2',
+    'bootstrap/fonts/glyphicons-halflings-regular.ttf'
 ];
-const WEB_FONT = [
-    'admin-lte/plugins/fontawesome-free/webfonts/fa-solid-900.woff',
-    'admin-lte/plugins/fontawesome-free/webfonts/fa-solid-900.woff2',
-    'admin-lte/plugins/fontawesome-free/webfonts/fa-regular-400.woff',
-    'admin-lte/plugins/fontawesome-free/webfonts/fa-regular-400.woff2'
-]
 
 const JS = [
-    'admin-lte/dist/js/adminlte.min.js',
-    'admin-lte/plugins/jquery/jquery.min.js',
-    'admin-lte/plugins/jquery-ui/jquery-ui.min.js',
-    'admin-lte/plugins/bootstrap/js/bootstrap.min.js',
-    'admin-lte/plugins/popper/umd/popper.min.js',
+    'bootstrap/dist/js/bootstrap.js',
     'bootstrap-toggle/js/bootstrap-toggle.js',
-    'admin-lte/plugins/datatables/jquery.dataTables.min.js',
-    'admin-lte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js',
+    'jquery/dist/jquery.min.js',
     'inputmask/dist/min/inputmask/inputmask.min.js',
     'inputmask/dist/min/inputmask/jquery.inputmask.min.js',
     'jwt-decode/build/jwt-decode.min.js',
     'moment/moment.js',
+    'admin-lte/dist/js/adminlte.min.js',
     'jssip/dist/jssip.min.js',
+    'admin-lte/plugins/jQueryUI/jquery-ui.min.js',
     'gridstack/dist/gridstack.min.js',
     'gridstack/dist/gridstack.jQueryUI.min.js',
     'lodash/lodash.min.js',
+    'datatables.net/js/jquery.dataTables.min.js',
+    'datatables.net-bs/js/dataTables.bootstrap.min.js',
     /*
     'admin-lte/plugins/bootstrap-slider/bootstrap-slider.js',
     'bootstrap-daterangepicker/daterangepicker.js',
@@ -69,81 +56,66 @@ const JS = [
 
 function buildAssets() {
   if (!fs.existsSync('./public/assets')) {
-      fs.mkdirSync('./public/assets');
+    fs.mkdirSync('./public/assets');
   }
   if (!fs.existsSync('./public/assets/js')) {
-      fs.mkdirSync('./public/assets/js');
+    fs.mkdirSync('./public/assets/js');
   }
   if (!fs.existsSync('./public/assets/css')) {
-      fs.mkdirSync('./public/assets/css');
+    fs.mkdirSync('./public/assets/css');
   }
   if (!fs.existsSync('./public/assets/fonts')) {
-      fs.mkdirSync('./public/assets/fonts');
-  }
-  if (!fs.existsSync('./public/assets/webfonts')) {
-      fs.mkdirSync('./public/assets/webfonts');
+    fs.mkdirSync('./public/assets/fonts');
   }
   JS.map(asset => {
-      let filename = asset.substring(asset.lastIndexOf("/") + 1);
-      let from = path.resolve(__dirname, `./node_modules/${asset}`)
-      let to = path.resolve(__dirname, `./public/assets/js/${filename}`)
-      if (fs.existsSync(from)) {
-          fs.createReadStream(from).pipe(fs.createWriteStream(to));
-      } else {
-          console.log(`${from} does not exist.\nUpdate the build.js script with the correct file paths.`)
-          process.exit(1)
-      }
+    let filename = asset.substring(asset.lastIndexOf("/") + 1);
+    let from = path.resolve(__dirname, `./node_modules/${asset}`)
+    let to = path.resolve(__dirname, `./public/assets/js/${filename}`)
+    if (fs.existsSync(from)) {
+      fs.createReadStream(from).pipe(fs.createWriteStream(to));
+    } else {
+      console.log(`${from} does not exist.\nUpdate the build.js script with the correct file paths.`)
+      process.exit(1)
+    }
   });
 
   CSS.map(asset => {
-      let filename = asset.substring(asset.lastIndexOf("/") + 1);
-      let from = path.resolve(__dirname, `./node_modules/${asset}`)
-      let to = path.resolve(__dirname, `./public/assets/css/${filename}`)
-      if (fs.existsSync(from)) {
-          fs.createReadStream(from).pipe(fs.createWriteStream(to));
-      } else {
-          console.log(`${from} does not exist.\nUpdate the build.js script with the correct file paths.`)
-          process.exit(1)
-      }
+    let filename = asset.substring(asset.lastIndexOf("/") + 1);
+    let from = path.resolve(__dirname, `./node_modules/${asset}`)
+    let to = path.resolve(__dirname, `./public/assets/css/${filename}`)
+    if (fs.existsSync(from)) {
+      fs.createReadStream(from).pipe(fs.createWriteStream(to));
+    } else {
+      console.log(`${from} does not exist.\nUpdate the build.js script with the correct file paths.`)
+      process.exit(1)
+    }
   });
 
   FONT.map(asset => {
-      let filename = asset.substring(asset.lastIndexOf("/") + 1);
-      let from = path.resolve(__dirname, `./node_modules/${asset}`)
-      let to = path.resolve(__dirname, `./public/assets/fonts/${filename}`)
-      if (fs.existsSync(from)) {
-          fs.createReadStream(from).pipe(fs.createWriteStream(to));
-      } else {
-          console.log(`${from} does not exist.\nUpdate the build.js script with the correct file paths.`)
-          process.exit(1)
-      }
-  });
-  WEB_FONT.map(asset => {
-      let filename = asset.substring(asset.lastIndexOf("/") + 1);
-      let from = path.resolve(__dirname, `./node_modules/${asset}`)
-      let to = path.resolve(__dirname, `./public/assets/webfonts/${filename}`)
-      if (fs.existsSync(from)) {
-          fs.createReadStream(from).pipe(fs.createWriteStream(to));
-      } else {
-          console.log(`${from} does not exist.\nUpdate the build.js script with the correct file paths.`)
-          process.exit(1)
-      }
+    let filename = asset.substring(asset.lastIndexOf("/") + 1);
+    let from = path.resolve(__dirname, `./node_modules/${asset}`)
+    let to = path.resolve(__dirname, `./public/assets/fonts/${filename}`)
+    if (fs.existsSync(from)) {
+      fs.createReadStream(from).pipe(fs.createWriteStream(to));
+    } else {
+      console.log(`${from} does not exist.\nUpdate the build.js script with the correct file paths.`)
+      process.exit(1)
+    }
   });
 }
-
 
 //function to execute shell command as a promise
 //cmd is the shell command
 //wdir is the working dir
 //return a Promise
 function execCommand(cmd,wdir) {
-  console.log('executing  ' + cmd + ' ...');
+  console.log('executing  ' + cmd + '  ...');
   const exec = require('child_process').exec;
   return new Promise((resolve, reject) => {
     exec(cmd, {cwd: wdir}, (error, stdout, stderr) => {
       if (error) {
         console.warn(error);
-        process.exit(99); 
+        process.exit(99);
       }
       resolve(stdout? stdout : stderr);
     });
@@ -169,7 +141,6 @@ async function go() {
 
   s = await execCommand('chmod 755 ../scripts/itrslookup.sh','.');
 
-
   //PATCH jssip.js per our findings, rename to jssip.min.js, let build proceed from there
   tempFile = '/tmp/ed' + secondsSinceEpoch + '.txt';
   s = await execCommand('head -n 18197 node_modules/jssip/dist/jssip.js > ' + tempFile + '  # modifying jssip','.');
@@ -177,12 +148,10 @@ async function go() {
   s = await execCommand('cat patches/jssip_patch.txt >> ' + tempFile ,'.');
  
   s = await execCommand('tail -n 8168 node_modules/jssip/dist/jssip.js >> ' + tempFile,'.');
-
+ 
   s = await execCommand('mv ' + tempFile + ' node_modules/jssip/dist/jssip.min.js  ','.');
 
   buildAssets();
-
-  console.log('Done.\n');
 }
 
 go(); //MAIN

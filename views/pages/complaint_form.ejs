@@ -9,13 +9,15 @@
 	<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
 
-	<!-- <link rel="stylesheet" href="/assets/css/bootstrap.min.css"> -->
-
-	<link rel="stylesheet" href="/assets/css/adminlte.min.css">
+	<link rel="stylesheet" href="/assets/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/assets/css/bootstrap-toggle.css">
-	<link rel="stylesheet" href="/assets/css/all.min.css">
+	<link rel="stylesheet" href="/assets/css/font-awesome.min.css">
+	<%# font awesome cdn: remove after add to assets %>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+		integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
 	<link rel="stylesheet" href="/assets/css/ionicons.min.css">
-	<link rel="stylesheet" href="/assets/css/adminlte.min.css">
+	<link rel="stylesheet" href="/assets/css/AdminLTE.min.css">
+	<link rel="stylesheet" href="/assets/css/skin-blue.min.css">
 	<!-- Custom Portal stylesheet -->
 	<link rel="stylesheet" href="/css/ca-portal.css">
 	<link rel="stylesheet" href="/css/video-player.css">
@@ -42,327 +44,266 @@
 		<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
 			<!-- Content Header (Page header) -->
-			<div class="content-header">
-				<div class="container-fluid">
-					<div class="row mb-2">
-						<div class="col-sm-12">
-							<h1 class="m-0 text-dark">FCC ASL Consumer Support</h1>
-						</div>
-					</div>
-				</div>
-			</div>
+			<section class="content-header">
+				<h1>FCC ASL Consumer Support</h1>
+
+			</section>
 			<!-- Main content -->
 			<section class="content">
-				<div class="container-fluid">
-					<!-- Main Row -->
-					<div class="row">
-						<section class="col-lg-12">
-							<div id="vrs-info-box" class="card" hidden>
-								<div class="card-header">
-									<h3 class="card-title">VRS Information</h3>&nbsp;<small>(<a href="/logout"
-											id="notMyInfoLink">not my info</a>)</small>
-									<div class="card-tools">
-										<button class="btn btn-tool" data-card-widget="collapse">
-											<i class="fa fa-minus"></i>
-										</button>
+				<!-- Main Row -->
+				<div class="row">
+					<section class="col-lg-12">
+						<div id="vrs-info-box" class="box" hidden>
+							<div class="box-header with-border">
+								<h3 class="box-title">VRS Information</h3>&nbsp;<small>(<a href="/logout"
+										id="notMyInfoLink">not my info</a>)</small>
+								<div class="box-tools pull-right">
+									<button class="btn btn-box-tool" data-widget="collapse"><i
+											class="fa fa-minus"></i></button>
+								</div>
+							</div>
+							<!-- /.box-header -->
+							<div class="box-body">
+								<div class="row">
+									<div class="col-lg-3">
+										<div class="form-group">
+											<label class="control-label">First Name</label>
+											<div>
+												<input type="text" class="form-control" id="firstName" name="fname"
+													readonly />
+											</div>
+										</div>
+									</div>
+									<div class="col-lg-3">
+										<div class="form-group">
+											<label class="control-label">Last Name</label>
+											<input type="text" class="form-control" id="lastName" readonly />
+										</div>
+									</div>
+									<div class="col-lg-3">
+										<div class="form-group">
+											<label class="control-label">Phone</label>
+											<div id="input-group" class="input-group">
+												<div class="input-group-addon">
+													<i class="fa fa-phone"></i>
+												</div>
+												<input type="text" class="form-control" id="callerPhone" name="phone"
+													data-inputmask="'mask': '(999) 999-9999'" data-mask readonly />
+											</div>
+										</div>
+									</div>
+									<div class="col-lg-3">
+										<div class="form-group">
+											<label class="control-label">Email</label>
+											<div id="input-group" class="input-group">
+												<div class="input-group-addon">
+													<i class="fa fa-envelope"></i>
+												</div>
+												<input type="email" class="form-control" id="callerEmail" name="email"
+													required readonly />
+											</div>
+										</div>
 									</div>
 								</div>
-								<!-- /.box-header -->
-								<div class="card-body">
+							</div>
+						</div>
+					</section>
+				</div>
+				<div class="row">
+					<!-- Left Col -->
+					<section class="col-lg-4" id="ticket-section" hidden>
+						<div class="box">
+							<div class="box-header with-border">
+								<h3 class="box-title">
+									<i class="fa fa-exclamation-triangle"></i>
+									Complaint Ticket
+									Complaint Ticket&nbsp;<span id="ticketNumber"></span>
+								</h3>
+								<div class="box-tools pull-right">
+									<button class="btn btn-box-tool" data-widget="collapse"><i
+											class="fa fa-minus"></i></button>
+								</div>
+							</div>
+							<!-- /.box-header -->
+							<div class="box-body">
+								<form name="userform" id="userform">
 									<div class="row">
-										<div class="col-lg-3">
+										<div class="col-lg-12">
 											<div class="form-group">
-												<label class="control-label">First Name</label>
-												<div>
-													<input type="text" class="form-control" id="firstName" name="fname"
-														readonly />
-												</div>
-											</div>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label class="control-label">Last Name</label>
-												<input type="text" class="form-control" id="lastName" readonly />
-											</div>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label class="control-label">Phone</label>
-												<div id="input-group" class="input-group">
-													<div class="input-group-prepend">
-														<span class="input-group-text">
-															<i class="fas fa-phone-alt"></i>
-														</span>
-													</div>
-													<input type="text" class="form-control" id="callerPhone"
-														name="phone" data-inputmask="'mask': '(999) 999-9999'" data-mask
-														readonly />
-												</div>
-											</div>
-										</div>
-										<div class="col-lg-3">
-											<div class="form-group">
-												<label class="control-label">Email</label>
-												<div id="input-group" class="input-group">
-													<div class="input-group-prepend">
-														<span class="input-group-text">
-															<i class="fa fa-envelope"></i>
-														</span>
-													</div>
-													<input type="email" class="form-control" id="callerEmail"
-														name="email" required readonly />
-												</div>
+												<label class="control-label">Subject</label>
+												<input type="text" class="form-control" id="subject" autocomplete="off"
+													maxlength="150" placeholder="Max of 150 characters" required />
 											</div>
 										</div>
 									</div>
-								</div>
-							</div>
-						</section>
-					</div>
-					<div class="row">
-						<!-- Left Col -->
-						<section class="col-lg-4" id="ticket-section" hidden>
-							<div class="card">
-								<div class="card-header">
-									<h3 class="card-title">
-										<i class="fa fa-exclamation-triangle"></i>
-										Complaint Ticket&nbsp;<span id="ticketNumber"></span>
-									</h3>
-									<div class="card-tools pull-right">
-										<button class="btn btn-tool" data-card-widget="collapse">
-											<i class="fa fa-minus"></i>
-										</button>
-									</div>
-								</div>
-								<!-- /.box-header -->
-								<div class="card-body">
-									<form name="userform" id="userform">
-										<div class="row">
-											<div class="col-lg-12">
-												<div class="form-group">
-													<label class="control-label">Subject</label>
-													<input type="text" class="form-control" id="subject"
-														autocomplete="off" maxlength="150"
-														placeholder="Max of 150 characters" required />
-												</div>
+									<div class="row">
+										<div class="col-lg-12">
+											<div style="margin-bottom: 5px;">
+												<label class="control-label">Description of Complaint</label>
+												<textarea class="form-control" id="complaint" maxlength="2000" rows="10"
+													maxlength="2000" required></textarea>
+												<p>You have <span id="complaintcounter">2000</span> characters left.</p>
 											</div>
-										</div>
-										<div class="row">
-											<div class="col-lg-12">
-												<div style="margin-bottom: 5px;">
-													<label class="control-label">Description of Complaint</label>
-													<textarea class="form-control" id="complaint" maxlength="2000"
-														rows="10" maxlength="2000" required></textarea>
-													<p>You have <span id="complaintcounter">2000</span> characters left.
-													</p>
-												</div>
-											</div>
-										</div>
-										<div class="row justify-content-center">
-											<div class="form-group text-center">
-												<button id='userformbtn' class="btn btn-success" type="submit">
-													Submit
-												</button>
-											</div>
-										</div>
-									</form>
-								</div>
-								<div id="userformoverlay" hidden>
-									<i class="fa fa-refresh fa-spin"></i>
-								</div>
-							</div>
-						</section>
-						<!-- Middle Col -->
-						<section class="col-lg-7" id="video-section">
-							<div class="card">
-								<div class="card-header">
-									<h3 class="card-title">
-										<i class="fa fa-video"></i>
-										Video
-									</h3>
-									<div class="card-tools">
-										<button type="button" class="btn btn-tool" data-card-widget="collapse">
-											<i class="fa fa-minus"></i>
-										</button>
-									</div>
-								</div>
-
-								<div class="card-body" id="fullscreen-element">
-									<div id="webcam" hidden>
-										<video id="remoteView" autoplay poster="images/acedirect-logo.png"></video>
-										<video id="selfView" class="mirror-mode" autoplay muted="true" hidden></video>
-										<div id="transcriptoverlay" class="transcriptoverlay"></div>
-										<!-- Caption code -->
-
-										<div id="call-option-buttons">
-											<div id="inner">
-
-												<!-- Caption code -->
-												<button id="mute-captions" type="button" class="btn btn-gray"
-													onclick="mute_captions()">
-													<span class="fa-stack">
-														<i id="mute-captions-icon"
-															class="far fa-closed-captioning fa-lg fa-stack-1x"></i>
-														<i id="mute-captions-off-icon"
-															class="fa fa-ban fa-stack-2x text-danger"
-															style="display:none;"></i>
-													</span>
-												</button>
-
-												<button id="mute-audio" type="button" class="btn btn-gray"
-													onclick="mute_audio()"> <i id="mute-audio-icon"
-														class="call-btn-icon fa fa-microphone"></i> </button>
-												<button id="hide-video" type="button" class="btn btn-gray"
-													onclick="enable_video_privacy()">
-													<span class="fa-stack">
-														<i class="fas fa-video fa-stack-1x"></i>
-														<i id="mute-camera-off-icon"
-															class="fa fa-ban fa-stack-2x text-danger"
-															style="display:none;"></i>
-													</span>
-												</button>
-												<!-- hack for hide video button since there's no fa-icon for it. we overlay an x and hide and show it when needed-->
-
-												<button type="button" class="btn btn-gray"
-													onclick="enterFullscreen()"><i id="fullscreen-icon"
-														class="call-btn-icon fa fa-expand"></i>
-												</button>
-												<button id="end-call" type="button" class="btn btn-danger"
-													onclick="terminate_call()"> <i
-														class="call-btn-icon fa fa-phone fa-rotate-135"></i> </button>
-
-											</div>
-
 										</div>
 									</div>
-
-									<div class="row justify-content-center">
-										<div class="col-xs-12 text-center" id="start-call-buttons"
-											style="margin-top: 10px; margin-bottom: 10px;">
-											<button class="btn btn-primary" id="callbutton" style="width: 80px;"
-												type="button">
-												Call
-											</button>
-											<button class="btn btn-primary" id="videomailbutton" type="button">
-												Videomail
+									<div class="row">
+										<div class="form-group text-center">
+											<button id='userformbtn' class="btn btn-success" type="submit">
+												Submit
 											</button>
 										</div>
 									</div>
-									<div class="col-xs-12 text-center" id="agent-name-box"
-										style="margin-bottom: 5px; margin-top: 5px;" hidden>
-										<p> You are talking to CSR <strong id="agent-name"> </strong>.</p>
-									</div>
-									<div id="recordicon" hidden>&nbsp;&nbsp;
-										<span id="recordicon" class="glyphicon glyphicon-facetime-video blink"
-											style="color:#FF0000;"></span>
-										<label class="blink" style="color:#FF0000;">&nbsp;&nbsp;RECORDING</label>
-									</div>
-									<div id="secsremain" style="display:inline;"></div>
-
-                                                                        <div class="progress">
-                                                                        <div class="progress-bar progress-bar-danger progress-bar-striped" id="record-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="90" style="width:0%;background-color:red !important;" >
-                                                                        </div>
-                                                                        </div>
-
-                                                                        <div id="vmwait_placeholder">
-									<div class="alert alert-info" alert-dismissable id="vmwait"
-										style="margin-top: 10px;" hidden>
-										<a class="close" onclick="$('#vmwait').hide();"
-											style="text-decoration:none">×</a>
-										<strong>Videomail request sent.</strong> Please wait.
-									</div>
-                                                                        <div>
-
-                                                                        <div id="vmsent_placeholder">
-									<div class="alert alert-success" alert-dismissable id="vmsent"
-										style="margin-top: 10px;" hidden>
-										<a class="close" onclick="$('#vmsent').hide();"
-											style="text-decoration:none">×</a>
-										<strong>Success!</strong> Videomail sent.
-									</div>
-                                                                        </div>
-
-
+								</form>
+							</div>
+							<div id="userformoverlay" hidden>
+								<i class="fa fa-refresh fa-spin"></i>
+							</div>
+						</div>
+					</section>
+					<!-- Middle Col -->
+					<section class="col-lg-7" id="video-section">
+						<div class="box">
+							<div class="box-header with-border">
+								<i class="fa fa-video-camera"></i>
+								<h3 class="box-title">Video</h3>
+								<div class="box-tools pull-right">
+									<button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+											class="fa fa-minus"></i>
+									</button>
 								</div>
 							</div>
-						</section>
-						<!-- Right Col -->
-						<section class="col-lg-5" id="chat-section">
-							<div class="card card-outline direct-chat direct-chat-primary">
-								<div class="card-header" id="chat-header">
-									<h3 class="card-title">
-										<i class="fas fa-comment"></i>
-										Messaging
-										<!-- <small id="notickettxt" class="text-danger" hidden>(no ticket)</small> -->
-									</h3>
-									<div class="card-tools">
-										<button type="button" class="btn btn-tool" data-card-widget="collapse">
-											<i class="fa fa-minus"></i>
+
+							<div class="box-body" id="fullscreen-element">
+								<div id="webcam" hidden>
+
+									<video id="remoteView" autoplay poster="images/acedirect-logo.png"></video>
+									<video id="selfView" autoplay muted="true" class="mirror-mode" hidden></video>
+									<div id="transcriptoverlay" class="transcriptoverlay"></div> <!-- Caption code -->
+
+									<div id="call-option-buttons">
+										<div id="inner">
+
+											<!-- Caption code -->
+											<button id="mute-captions" type="button" class="btn btn-gray"
+												onclick="mute_captions()">
+												<span class="fa-stack">
+													<i id="mute-captions-icon" class="fa fa-cc fa-lg fa-stack-1x"></i>
+													<i id="mute-captions-off-icon"
+														class="fa fa-ban fa-stack-2x text-danger"
+														style="display:none;"></i>
+												</span>
+											</button>
+
+											<button id="mute-audio" type="button" class="btn btn-gray"
+												onclick="mute_audio()"> <i id="mute-audio-icon"
+													class="call-btn-icon fa fa-microphone"></i> </button>
+											<button id="hide-video" type="button" class="btn btn-gray"
+												onclick="enable_video_privacy()">
+												<span class="fa-stack">
+													<i class="fa fa-video-camera fa-stack-1x"></i>
+													<i id="mute-camera-off-icon"
+														class="fa fa-ban fa-stack-2x text-danger"
+														style="display:none;"></i>
+												</span>
+											</button>
+											<!-- hack for hide video button since there's no fa-icon for it. we overlay an x and hide and show it when needed-->
+
+											<button type="button" class="btn btn-gray" onclick="enterFullscreen()"><i
+													id="fullscreen-icon" class="call-btn-icon fa fa-expand"></i>
+											</button>
+											<button id="end-call" type="button" class="btn btn-danger"
+												onclick="terminate_call()"> <i
+													class="call-btn-icon fa fa-phone fa-rotate-135"></i> </button>
+
+										</div>
+
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-xs-12 text-center" id="start-call-buttons"
+										style="margin-top: 10px; margin-bottom: 10px;">
+										<button class="btn btn-primary" id="callbutton" style="width: 80px;"
+											type="button">
+											Call
+										</button>
+										<button class="btn btn-primary" id="videomailbutton" type="button">
+											Videomail
 										</button>
 									</div>
 								</div>
+								<div class="col-xs-12 text-center" id="agent-name-box"
+									style="margin-bottom: 5px; margin-top: 5px;" hidden>
+									<p> You are talking to CSR <strong id="agent-name"> </strong>.</p>
+								</div>
+								<div id="recordicon" hidden>&nbsp;&nbsp;
+									<span id="recordicon" class="glyphicon glyphicon-facetime-video blink"
+										style="color:#FF0000;"></span>
+									<label class="blink" style="color:#FF0000;">&nbsp;&nbsp;RECORDING</label>
+								</div>
+								<div id="secsremain" style="display:inline;"></div>
 
-								<div class="card-body">
-									<ul class="nav nav-tabs" role="tablist">
-										<li class="nav-item">
-											<a href="#chat-body" class="nav-link active" data-toggle="pill" role="tab" aria-expanded="true" id="chat-tab">
-												<i class="fa fa-comments"></i>
-												Chat
-											</a>
-										</li>
-										<li class="nav-item">
-											<a href="#trans-body" class="nav-link" data-toggle="pill" role="tab" aria-expanded="false" id="trans-tab">
-												<i class="fas fa-file-alt"></i>
-												Transcript
-											</a>
-										</li>
-									</ul>
-									<div class="tab-content">
-										<div class="tab-pane fade show active" id="chat-body" role="tabpanel" aria-labelledby="chat-tab">
-											<div class="direct-chat-messages" id="chat-messages"></div>
-											<div class="direct-chat-timestamp text-bold" id="rtt-typing"
-												style="margin-left: 10px; min-height: 20px"></div>
-										</div>
-										<div class="tab-pane fade" id="trans-body" role="tabpanel" aria-labelledby="trans-tab">
-											<div class="direct-chat-messages" id="caption-messages"></div>
-										</div>
+								<div class="alert alert-info" alert-dismissable id="vmwait" style="margin-top: 10px;"
+									hidden>
+									<a class="close" onclick="$('#vmwait').hide();" style="text-decoration:none">×</a>
+									<strong>Videomail request sent.</strong> Please wait.
+								</div>
+
+								<div class="alert alert-success" alert-dismissable id="vmsent" style="margin-top: 10px;"
+									hidden>
+									<a class="close" onclick="$('#vmsent').hide();" style="text-decoration:none">×</a>
+									<strong>Success!</strong> Videomail sent.
+								</div>
+							</div>
+						</div>
+					</section>
+					<!-- Right Col -->
+					<section class="col-lg-5" id="chat-section">
+						<div class="box direct-chat direct-chat-primary">
+							<div class="box-header with-border" id="chat-header">
+
+								<div class="tab-container">
+
+									<div id="chat-tab" class="tab active-tab">
+										<h3 class="box-title">Agent Chat</h3>
 									</div>
+
+									<div id="trans-tab" class="tab">
+										<h3 class="box-title">Transcript</h3>
+									</div>
+
+
+									<div id="caption-settings-tab" class="tab">
+										<h3 class="box-title">Caption Settings</h3>
+									</div>
+
 								</div>
 
-								<div id="chat-footer" class="card-footer">
-									<form name="chatsend" id="chatsend">
-										<div class="input-group">
-											<input type="hidden" id="displayname">
-											<input type="text" id="newchatmessage" placeholder="Chat disabled"
-												class="form-control" maxlength="500" autocomplete="off" required
-												disabled>
-											<span class="input-group-btn">
-												<button id="chat-send" class="btn btn-primary btn-flat" type="submit"
-													disabled>Send</button>
-											</span>
-										</div>
-									</form>
-									<p hidden id="characters-left">You have <span id="chatcounter">500</span> characters
-										left.</p>
+								<div class="box-tools pull-right">
+									<button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+											class="fa fa-minus"></i></button>
 								</div>
-
 							</div>
 
-							<div id="caption-settings" class="card direct-chat direct-chat-primary">
-								<div class="card-header with-border">
-									<h3 class="card-title">
-										<i class="fa fa-comments"></i>
-										Caption Settings
-									</h3>
+							<div class="box-body">
+								<!-- Conversations are loaded here -->
+								<div id="chat-body">
+									<div class="direct-chat-messages" id="chat-messages"></div>
+									<div class="direct-chat-timestamp text-bold" id="rtt-typing"
+										style="margin-left: 10px; min-height: 20px"></div>
+								</div>
 
-									<div class="card-tools pull-right">
-										<button type="button" class="btn btn-tool" data-card-widget="collapse"><i
-												class="fa fa-minus"></i>
-										</button>
+								<div id="trans-body" style="display:none;">
+									<div class="direct-chat-messages" id="caption-messages">
+
 									</div>
 								</div>
-								<div class="card-body">
 
+
+
+
+								<div class="tab-pane" id="caption-settings-body" role="tabpanel"
+									aria-labelledby="caption-settings-tab"  style="display:none;">
 									<li class="cap-setting">
 										<span>Enable Captions:</span>
 										<div class="form-check">
@@ -408,16 +349,58 @@
 											id="opacity-slider-consumer">
 									</li>
 
-								</div>
-								<div class="card-footer text-center">
-									<button class="btn btn-primary center-block mx-auto" type="button"
-										onclick="testCaptions()">Preview</button>
 
+
+
+
+
+
+
+
+
+								</div>
+
+							</div>
+
+							<div id="chat-footer" class="box-footer">
+								<form name="chatsend" id="chatsend">
+									<div class="input-group">
+										<input type="hidden" id="displayname">
+										<input type="text" id="newchatmessage" placeholder="Chat disabled"
+											class="form-control" maxlength="500" autocomplete="off" required disabled>
+										<span class="input-group-btn">
+											<button id="chat-send" class="btn btn-primary btn-flat" type="submit"
+												disabled>Send</button>
+										</span>
+									</div>
+								</form>
+								<p hidden id="characters-left">You have <span id="chatcounter">500</span> characters
+									left.</p>
+							</div>
+							<div id="caption-settings-footer" class="card-footer text-center" style="display:none;">
+								<button class="btn btn-primary center-block mx-auto" type="button"
+									onclick="testCaptions()">Preview</button>
+
+							</div>
+							<div class = "row">
+								<div class = "col-xs-12 " style="margin-top: 10px; margin-bottom: 10px;">
+									<a class="btn btn-primary" id="screenshareButton" disabled>Request Screenshare</a>
+									<p id="requestAck" hidden>Screenshare Request Sent</p>
+									<div id="screenshareButtonGroup" hidden>
+										<a class="btn btn-primary" id="startScreenshare">Start Screenshare</a>
+										<a class="btn btn-primary" id="stopScreenshare">Stop Screenshare</a>
+									</div>
+									<input type="file" id="fileInput" name="fileInput" class="form-control-file" disabled>
+									<a class="btn btn-primary" id="shareFileConsumer" href="#" onclick="shareFileConsumer()" disabled>Send File</a>
+									<div class="demo-btn-container config-hide mb-2">
+										<a class="btn btn-primary" id="downloadButton" href="./downloadFile" disabled>Download File</a><br>
+									</div>
 								</div>
 							</div>
-						</section>
+						</div>
 
-					</div>
+					</section>
+
 				</div>
 				<!-- /.row -->
 			</section>
@@ -444,10 +427,10 @@
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h4 class="modal-title" id="licModalLabel">Copyright Notices</h4>
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">&times;</span>
 					</button>
+					<h4 class="modal-title" id="licModalLabel">Copyright Notices</h4>
 				</div>
 				<div class="modal-body">
 					<div id="licModalBody"></div>
@@ -466,7 +449,7 @@
 		<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-body" style="text-align: center">
-					<h2>CALL HAS ENDED</h2>
+					<h1>CALL HAS ENDED</h1>
 					<h4 id="redirectdesc"> Redirecting to FCC.gov ...</h4>
 				</div>
 				<div class="modal-footer">
@@ -497,10 +480,8 @@
 		<div class="modal-dialog modal-sm">
 			<div class="modal-content">
 				<div class="modal-header">
-					<h4 class="modal-title">Ready to record?</h4>
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-						<span aria-hidden="true">&times;</span>
-					</button>
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h2 class="modal-title">Ready to record?</h2>
 				</div>
 				<div class="modal-body text-center">
 					<span class="glyphicon glyphicon-facetime-video" style="font-size: 100px;"></span>
@@ -526,7 +507,7 @@
 				<div class="modal-header text-center" style="padding-top: 0; padding-bottom:0;">
 					<h2>The FCC ASL Consumer Support Line is Closed.</h2>
 				</div>
-				<div class="modal-body text-center" style="display:none">
+				<div class="modal-body text-center">
 					<h4>Hours of Operation: <span id="ah-start-time"></span> to <span id="ah-end-time"></span>
 						Mondays-Fridays (excluding Federal holidays)<h4>
 							<img src="/images/fccColor.png" class="user-image" alt="FCC">
@@ -543,8 +524,8 @@
 	<div class="modal fade" id="queueModal" tabindex="-1" role="dialog">
 		<div class="modal-dialog" style="max-width: 500px;">
 			<div class="modal-content">
-				<div class="modal-header text-center">
-					<h3 class="w-100">Waiting for the next available agent</h3>
+				<div class="modal-header text-center" style="padding-top: 0; padding-bottom:0;">
+					<h2>Waiting for the next available agent</h2>
 				</div>
 				<div class="modal-body text-center">
 					<h4 id="queue-msg"> There are <span id="pos-in-queue">no</span> callers ahead of you. <h4>
@@ -553,7 +534,7 @@
 								onclick="exit_queue()"> Hangup </button>
 				</div>
 				<div class="text-center" style="border-top: 1px solid #f4f4f4; padding: 10px;">
-                                        <h5><span style="color:red" id="agents-avail"></span></h5>
+					<h5><span style="color:red" id="agents-avail"></span></h5>
 					<!-- This URL action should invoke DTMF Tone 1 -->
 					<h5>&nbsp;To exit the queue and leave a videomail <a href="#"
 							onclick="switchQueueFlag=true;$('#queueModal').modal('hide');$('#videomailModal').modal('show');">click
@@ -598,8 +579,7 @@
 
 	<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
 	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
-	<script type="text/javascript" src="/assets/js/popper.min.js"></script>
-	<script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/assets/js/bootstrap.js"></script>
 	<script type="text/javascript" src="/assets/js/jwt-decode.min.js"></script>
 	<script type="text/javascript" src='/assets/js/moment.js'></script>
 	<script type="text/javascript" src="/assets/js/adminlte.min.js"></script>
@@ -625,6 +605,9 @@
 	<script type="text/javascript" src="/js/jssip_consumer.js"></script>
 	<!-- Custom Javascript for ACEDirect complaint_form.html page -->
 	<script type="text/javascript" src="/js/complaint_form.js"></script>
+
+	<!-- Copy this from acedirect-kurento repo to acedirect/public/js -->
+	<script src="/js/ACEKurento-1.0.0.js"></script>
 </body>
 
 </html>

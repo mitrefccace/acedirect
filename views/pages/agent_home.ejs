@@ -5,47 +5,59 @@
     <% include ../partials/agent_page_head %>
 </head>
 
-<body class="hold-transition skin-purple sidebar-mini layout-fixed">
+<body class="hold-transition skin-purple sidebar-mini">
     <div class="wrapper">
-        <% include ../partials/agent_page_header %>
-        <% include ../partials/agent_page_sidebar_main %>
+        <header class="main-header">
+            <% include ../partials/agent_page_header %>
+        </header>
+        <!-- Left side column. contains the logo and sidebar -->
+        <aside class="main-sidebar">
+            <% include ../partials/agent_page_sidebar_main %>
+        </aside>
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
+
             <!-- Main content -->
             <div id="helpalert_placeholder"></div>
-            <section class="content pt-4">
-                <div class="container-fluid">
-                    <div class="grid-stack">
-                        <!-- VideoBox -->
-                        <div class="grid-stack-item" data-gs-x="0" data-gs-width="10" data-gs-max-width="10"
-                            data-gs-min-width="2" data-gs-height="14" data-gs-max-height="14" data-gs-id="gsvideobox"
-                            id='gsvideobox'>
-                            <div class="grid-stack-item-content">
+            <section class="content">
+                <div class="grid-stack">
+                    <!-- VideoBox -->
+                    <div class="grid-stack-item" data-gs-x="0" data-gs-width="10" data-gs-max-width="10" data-gs-min-width="2" data-gs-height="14" data-gs-max-height="14" data-gs-id="gsvideobox" id='gsvideobox'>
+                        <div class="grid-stack-item-content">
+                            <!--div class="col-xs-12 col-sm-12 col-md-12 col-lg-9"-->
+                            <div class="box">
                                 <% include ../partials/agent_box_video %>
                             </div>
+                            <!--/div-->
                         </div>
+                    </div>
 
-                        <div class="grid-stack-item" data-gs-x="9" data-gs-width="4" data-gs-height="10" id='gschatbox'>
-                            <div class="grid-stack-item-content">
+                    <div class="grid-stack-item" data-gs-x="9" data-gs-width="4" data-gs-height="10" id='gschatbox'>
+                        <div class="grid-stack-item-content">
+                            <!--div class="col-xs-12 col-sm-12 col-md-12 col-lg-3"-->
+                            <div class="box">
                                 <% include ../partials/agent_box_chat %>
                             </div>
+                            <!--/div-->
                         </div>
-                        <div class="grid-stack-item" data-gs-x="0" data-gs-width="6" data-gs-height="0" id='gsscriptbox'
-                            hidden>
-                            <div class="grid-stack-item-content">
-                                <!--div class = "row" id = "scripts-and-details"-->
-                                <!--div class="col-xs-12 col-sm-12 col-md-12 col-lg-6"-->
+                    </div>
+                    <div class="grid-stack-item" data-gs-x="0" data-gs-width="6" data-gs-height="0" id='gsscriptbox' hidden>
+                        <div class="grid-stack-item-content">
+                            <!--div class = "row" id = "scripts-and-details"-->
+                            <!--div class="col-xs-12 col-sm-12 col-md-12 col-lg-6"-->
+                            <div class="box">
                                 <% include ../partials/agent_box_scripts %>
-                                <!--/div-->
                             </div>
+                            <!--/div-->
                         </div>
-                        <div class="grid-stack-item" data-gs-x="7" data-gs-width="6" data-gs-height="0"
-                            id='gsdetailsbox' hidden>
-                            <div class="grid-stack-item-content">
-                                <!--div class="col-xs-12 col-sm-12 col-md-12 col-lg-6"-->
+                    </div>
+                    <div class="grid-stack-item" data-gs-x="7" data-gs-width="6" data-gs-height="0" id='gsdetailsbox' hidden>
+                        <div class="grid-stack-item-content">
+                            <!--div class="col-xs-12 col-sm-12 col-md-12 col-lg-6"-->
+                            <div class="box">
                                 <% include ../partials/agent_box_call_details %>
-                                <!--/div-->
                             </div>
+                            <!--/div-->
                         </div>
                     </div>
                 </div>
@@ -56,108 +68,123 @@
 
         <% include ../partials/acedirect_footer %>
 
-        <!-- Control Sidebar -->
-        <aside id="ctrl-sidebar" class="control-sidebar control-sidebar-dark">
-            <!-- Create the tabs -->
-            <ul class="nav nav-tabs nav-justified control-sidebar-tabs" role="tablist">
-                <li id="agents-tab" class="nav-item">
-                    <a href="#control-sidebar-agents-tab" class="active nav-link" data-toggle="pill">
-                        <i class="fa fa-users"></i>&nbsp;&nbsp;Agents</a>
-                </li>
-                <li id="videomail-tab" class="nav-item">
-                    <a href="#control-sidebar-videomail-tab" class="nav-link" data-toggle="pill">
-                        <i class="fa fa-envelope-o"></i>&nbsp;&nbsp;Video Mail</a>
-                </li>
-                <li id="debugtab" class="nav-item">
-                    <a href="#control-sidebar-debug-tab" class="nav-link" data-toggle="pill">
-                        <i class="fa fa-bug"></i>
-                    </a>
-                </li>
-            </ul>
-            <!-- Tab panes -->
-            <div class="tab-content">
-                <!-- Agent Status tab content -->
-                <div class="tab-pane active" id="control-sidebar-agents-tab">
-                    <div class="form-group">
-                        <table id='agenttable' class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Status</th>
-                                    <th>Agent</th>
-                                    <th>Ext</th>
-                                    <th>Queues</th>
-                                </tr>
-                            </thead>
-                        </table>
-                    </div>
-                </div>
-                <!-- /.Agent Status tab content -->
-
-                <!-- Debug tab content -->
-                <div class="tab-pane" id="control-sidebar-debug-tab">
-                    <input type="button" class="btn btn-danger" id="btndbgclear" value="Clear Debug Text"
-                        onclick='cleardbgtxt();' />
-                    <br>
-                    <div id="dbgtxt" style='height:400px;max-height: 400px;overflow-y:scroll;'></div>
-                </div>
-                <!-- /.Debug tab content -->
-
-                <!-- Mail tab content -->
-                <div class="tab-pane" id="control-sidebar-videomail-tab">
-                    <div class="form-group" style='height: 80vh; max-height:90vh; overflow-y:scroll;'>
-                        <label>Mailbox Messages</label>
-                        <button type="button" class="btn btn-secondary" onclick="getVideomailRecs();">
-                            <i id="refresh-icon" class="fas fa-sync-alt"></i>
-                        </button>
-                        <div id="videomail-filter-dropdown" class="mb-2 dropdown dropdown-menu-left" style='float:right'>
-                            <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false" aria-haspopup="true">
-                                Filter Messages
-                            </button>
-                            <div class="dropdown-menu dropdown-dark" aria-labelledby="videomail-filter-dropdown">
-                                <li onclick="filterVideomail('ALL');">
-                                    <a href="#" class="dropdown-item">All</a>
-                                </li>
-                                <li onclick="filterVideomail('UNREAD');">
-                                    <a href="#" class="dropdown-item">Unread</a>
-                                </li>
-                                <li onclick="filterVideomail('READ');">
-                                    <a href="#" class="dropdown-item">Read</a>
-                                </li>
-                                <li onclick="filterVideomail('IN PROGRESS');">
-                                    <a href="#" class="dropdown-item">In Progress</a>
-                                </li>
-                                <li onclick="filterVideomail('CLOSED');">
-                                    <a href="#" class="dropdown-item">Closed</a>
-                                </li>
-                            </div>
+            <!-- Control Sidebar -->
+            <aside id="ctrl-sidebar" class="control-sidebar control-sidebar-dark" style="width: 500px; right:-500px">
+                <!-- Create the tabs -->
+                <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
+                    <li id="agents-tab" class="active">
+                        <a href="#control-sidebar-agents-tab" data-toggle="tab">
+                            <i class="fa fa-users"></i>&nbsp;&nbsp;Agents</a>
+                    </li>
+                    <li id="videomail-tab">
+                        <a href="#control-sidebar-videomail-tab" data-toggle="tab">
+                            <i class="fa fa-envelope-o"></i>&nbsp;&nbsp;Video Mail</a>
+                    </li>
+                    <li id="debugtab">
+                        <a href="#control-sidebar-debug-tab" data-toggle="tab">
+                            <i class="fa fa-bug"></i>
+                        </a>
+                    </li>
+                </ul>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <!-- Agent Status tab content -->
+                    <div class="tab-pane active" id="control-sidebar-agents-tab">
+                        <div class="form-group">
+                            <table id='agenttable' class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Status&nbsp;&nbsp;&nbsp;</th>
+                                        <th>Agent</th>
+                                        <th>Ext</th>
+                                        <th>Queues</th>
+                                        <th>Multi-Party Invite</th>
+                                    </tr>
+                                </thead>
+                            </table>
                         </div>
-                        <table class="table table-hover" id="Videomail_Table">
-                            <thead>
-                                <tr>
-                                    <th id="vmail-vrs-number">Videophone No.
-                                        <i id="video-id-sort" class="fa fa-sort"> </i>
-                                    </th>
-                                    <th id="vmail-date">Date
-                                        <i id="video-id-sort" class="fa fa-sort"> </i>
-                                    </th>
-                                    <th id="vmail-duration">Duration (sec)
-                                        <i id="video-id-sort" class="fa fa-sort"> </i>
-                                    </th>
-                                    <th id="vmail-status">Status
-                                        <i id="video-id-sort" class="fa fa-sort"> </i>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody id='videomailTbody'>
-                            </tbody>
-                        </table>
                     </div>
+                    <!-- /.Agent Status tab content -->
+
+                    <!-- Debug tab content -->
+                    <div class="tab-pane" id="control-sidebar-debug-tab">
+                        <input type="button" class="btn btn-danger" id="btndbgclear" value="Clear Debug Text" onclick='cleardbgtxt();' />
+                        <br>
+                        <div id="dbgtxt" style='height:400px;max-height: 400px;overflow-y:scroll;'></div>
+                    </div>
+                    <!-- /.Debug tab content -->
+
+                    <!-- Mail tab content -->
+                    <div class="tab-pane" id="control-sidebar-videomail-tab">
+                        <div class="form-group" style='height: 90vh; max-height:90vh; overflow-y:scroll;'>
+                            <label>Mailbox Messages</label>
+                            <button type="button" class="btn btn-default" onclick="getVideomailRecs();">
+                                <i id="refresh-icon" class="fa fa-refresh"></i>
+                            </button>
+                            <span id="videomail-filter-dropdown" class="dropdown dropdown-menu-left" style='float:right'>
+                                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                    <!--span><i id="status-icon" class="call-btn-icon fa fa-envelope"></i></span-->&nbsp;&nbsp;&nbsp;
+                                    <span id="videomail-filter">Filter Messages
+                                        <span>
+                                            <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li onclick="filterVideomail('ALL');">
+                                        <a href="#">
+                                            <span>All</span>
+                                        </a>
+                                    </li>
+                                    <li onclick="filterVideomail('UNREAD');">
+                                        <a href="#">
+                                            <span>Unread</span>
+                                        </a>
+                                    </li>
+                                    <li onclick="filterVideomail('READ');">
+                                        <a href="#">
+                                            <span>Read</span>
+                                        </a>
+                                    </li>
+                                    <li onclick="filterVideomail('IN PROGRESS');">
+                                        <a href="#">
+                                            <span>In Progress</span>
+                                        </a>
+                                    </li>
+                                    <li onclick="filterVideomail('CLOSED');">
+                                        <a href="#">
+                                            <span>Closed</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                </span>
+                                <table class="table table-hover" id="Videomail_Table">
+                                    <thead>
+                                        <tr>
+                                            <th id="vmail-vrs-number">Videophone No.
+                                                <i id="video-id-sort" class="fa fa-sort"> </i>
+                                            </th>
+                                            <th id="vmail-date">Date
+                                                <i id="video-id-sort" class="fa fa-sort"> </i>
+                                            </th>
+                                            <th id="vmail-duration">Duration (sec)
+                                                <i id="video-id-sort" class="fa fa-sort"> </i>
+                                            </th>
+                                            <th id="vmail-status">Status
+                                                <i id="video-id-sort" class="fa fa-sort"> </i>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id='videomailTbody'>
+                                    </tbody>
+                                </table>
+                        </div>
+                    </div>
+                    <!-- /.Mail tab content -->
                 </div>
-                <!-- /.Mail tab content -->
-            </div>
-            <!-- /.Tab panes -->
-        </aside>
-        <!-- /.control-sidebar -->
+                <!-- /.Tab panes -->
+            </aside>
+            <!-- /.control-sidebar -->
+            <!-- Add the sidebar's background. This div must be placed immediately after the control sidebar -->
+            <div class="control-sidebar-bg" style="width:400px; right:-400px"></div>
 
     </div>
     <!-- ./wrapper -->
@@ -170,16 +197,16 @@
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="licModalLabel">Copyright Notices</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
+                    <h4 class="modal-title" id="licModalLabel">Copyright Notices</h4>
                 </div>
                 <div class="modal-body">
                     <div id="licModalBody"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -196,268 +223,342 @@
                     <div class="alert alert-danger" id="ivrsmessage" hidden></div>
                     <div class="form-group">
                         <label for="usr">VRS number:</label>
-                        <input type="text" class="form-control form-control-lg" id="ivrsnum" placeholder="VRS Number"
-                            data-inputmask="'mask': '(999) 999-9999'" data-mask>
+                        <input type="text" class="form-control input-lg" id="ivrsnum" placeholder="VRS Number" data-inputmask="'mask': '(999) 999-9999'"
+                            data-mask>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" id="submitvrs">Submit</button>
+                    <button type="button" class="btn btn-default" id="submitvrs">Submit</button>
                 </div>
             </div>
         </div>
     </div>
     <!-- Incoming Call Modal -->
     <% include ../partials/agent_modal_wrapup %>
-    <!-- Incoming Call Modal -->
-    <div id="myRingingModal" class="modal fade">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Incoming call...</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body text-center">
-                    <img src="/images/phoneRinging.gif" alt="Phone Ringing" height="100">
-                    <h2 id='myRingingModalPhoneNumber' class="modal-title text-center"></h2>
-                </div>
-                <div class="modal-footer">
-                    <div class="btn-group" style="width: 100%;">
-                        <button id="accept-btn" type="button" onclick="accept_call()" class="btn btn-success btn-style"
-                            style="width: 50%; height: 50px;">
-                            Accept </button>
-                        <button id="decline-btn" type="button" onclick="terminate_call()"
-                            class="btn btn-danger btn-style" style="width: 50%; height: 50px;">
-                            Decline </button>
+        <!-- Incoming Call Modal -->
+        <div id="myRingingModal" class="modal fade">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h2 class="modal-title">Incoming call...</h2>
                     </div>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- Missed Call Modal -->
-    <div id="myMissedCallModal" class="modal fade">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h2 class="modal-title">Missed Call</h2>
-                </div>
-                <div class="modal-body text-center">
-                    <img src="/images/missed-call.png" alt="Missed Call" height="100">
-                </div>
-                <div style="border-top-color: #f4f4f4;">
-                    <h2 id='myMissedCallModalPhoneNumber' class="modal-title text-center">
-                    </h2>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dialpad Modal -->
-    <div class="modal fade" id="modalDialpad">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Dialpad</h4>
-                </div>
-                <div class="modal-body">
-                    <div id="callCard" class="card">
-                        <div class="container-fluid ">
-
-                            <div id="call-controls">
-
-                                <div id="button_menu_panel" class="center bottomspace" style="display: none">
-                                    <button class="button_menu" id="dial">
-                                        <img class="button-icon" src="/images/dial.png">
-                                    </button>
-                                </div>
-
-                                <div class="phone" id="keypad">
-                                    <div class="input-group">
-                                        <input id="phone-number" type="text" class="form-control form-control-lg"
-                                            placeholder="Enter a phone #" autofocus />
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">
-                                                <img id="phone-number-delete-btn" src="/images/backspace.png"
-                                                    height=25 />
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div class="num-pad">
-                                            <% var key=[ 1, 2, 3 , 4 ,5 ,6, 7, 8, 9, "*", 0, "#"]; var label=[ "", "ABC", "DEF", "GHI", "JKL", "MNO", "PQRS", "TUV", "WXYZ", "", "", "" ] ; if (key.length === label.length) label.forEach( (x,i)=>{ %>
-                                            <div class="span4">
-                                                <div class="txt keypad-button">
-                                                    <div class="big">
-                                                        <%=key[i] %>
-                                                    </div>
-                                                    <div class="small">
-                                                        <%= label[i] %>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <% }); else {%>
-                                            <div>INTERNAL ERROR: mismatched arrays</div>
-                                            <% } %>
-                                            <div class="clearfix"></div>
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <div></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div id="log"></div>
-                                    </div>
-                                </div>
-
-                                <div class="center">
-                                    <button id="button-call">
-                                        <img class="button-icon" src="/images/call.png">
-                                    </button>
-                                </div>
-                            </div>
-
+                    <div class="modal-body text-center">
+                        <img src="/images/phoneRinging.gif" alt="Phone Ringing" height="100">
+                        <h2 id='myRingingModalPhoneNumber' class="modal-title text-center"></h2>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="btn-group" style="width: 100%;">
+                            <button id="accept-btn" type="button" onclick="accept_call()" class="btn btn-success btn-style" style="width: 50%; height: 50px;">
+                                Accept </button>
+                            <button id="decline-btn" type="button" onclick="terminate_call()" class="btn btn-danger btn-style" style="width: 50%; height: 50px;">
+                                Decline </button>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                </div>
-            </div>
-            <!-- /.modal-content -->
-        </div>
-        <!-- /.modal-dialog -->
-    </div>
-    <!-- Videomail Retrieval Error Modal -->
-    <div id="videomailErrorModal" class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Videomail Retrieval Error</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body text-center">
-                    <h4 class="modal-title" id="videomailErrorBody"></h4>
 
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- BusyLight Modal -->
-    <div class="modal fade" id="busylightModal" tabindex="-1" role="dialog" aria-labelledby="busylightModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="myModalLabel">Busy Light</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                </div>
-                <div class="modal-body" id='busylightModalBody'>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" id='busylightModalTestBtn'
-                        onclick="testLightConnection()">Test BusyLight Connection</button>
+        <!-- Missed Call Modal -->
+        <div id="myMissedCallModal" class="modal fade">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h2 class="modal-title">Missed Call</h2>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img src="/images/missed-call.png" alt="Missed Call" height="100">
+                    </div>
+                    <div style="border-top-color: #f4f4f4;"><h2 id='myMissedCallModalPhoneNumber' class="modal-title text-center">
+                        </h2>
+                    </div>
                 </div>
             </div>
-            <!-- /.modal-content -->
         </div>
-        <!-- /.modal-dialog -->
-    </div>
 
-    <!-- Jssip hidden data -->
-    <div hidden>
-        <div id="my_sip_uri"> </div>
-        <div id="ws_servers"> </div>
-        <div id="sip_password"> </div>
-        <div id="pc_config"> </div>
-    </div>
+        <!--Multi Party Extension Modal-->
+        <div class="modal fade" id="modalMultiPartyExt">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Multi-Party Invite</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input id="inviteExtension" class="form-control input-lg" placeholder="Enter the extension of who you want to invite to the call" autofocus>
+                        <table id="availableAgents" cellpadding="15">
+                            <tr>
+                                    <th>Agent</th>
+                                    <th>Extension</th>
+                                    <th>Status</th>
+                                    <th>Invite Agent</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" onclick=multiPartyClick()>Invite</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <!-- Videomail hidden data -->
-    <div hidden>
-        <div id="videomailId"> </div>
-        <div id="callbacknum"> </div>
-    </div>
+        <!--Call Transfer Modal-->
+        <div class="modal fade" id="modalCallTransfer">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Call Transfer</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input id="transferExtension" class="form-control input-lg" placeholder="Enter the extension you want to transfer to" autofocus>
+                        <button class="btn btn-default" onclick=transferCall(true)>Blind Transfer</button>
+                        <button class="btn btn-default" onclick=transferCall(false)>Warm Transfer</button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <div id="snackbar">Default Text</div>
+        <!-- Dialpad Modal -->
+        <div class="modal fade" id="modalDialpad">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Dialpad</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div id="callCard" class="card">
+                            <div class="container-fluid ">
 
-    <% include ../partials/agent_page_javascript %>
+                                <div id="call-controls">
 
-    <script>
+                                    <div id="button_menu_panel" class="center bottomspace" style="display: none">
+                                        <button class="button_menu" id="dial">
+                                            <img class="button-icon" src="/images/dial.png">
+                                        </button>
+                                    </div>
+
+                                    <div class="phone" id="keypad">
+                                        <div class="input-group">
+                                            <input id="phone-number" type="text" class="form-control input-lg" placeholder="Enter a phone #" autofocus />
+                                            <span class="input-group-addon">
+                                                <img id="phone-number-delete-btn" src="/images/backspace.png" height=25 />
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <div class="num-pad">
+                                                <% var key=[ 1, 2, 3 , 4 ,5 ,6, 7, 8, 9, "*", 0, "#"]; var label=[ "", "ABC", "DEF", "GHI", "JKL", "MNO", "PQRS", "TUV", "WXYZ", "", "", "" ] ; if (key.length === label.length) label.forEach( (x,i)=>{ %>
+                                                    <div class="span4">
+                                                        <div class="txt keypad-button">
+                                                            <div class="big">
+                                                                <%=key[i] %>
+                                                            </div>
+                                                            <div class="small">
+                                                                <%= label[i] %>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <% }); else {%>
+                                                        <div>INTERNAL ERROR: mismatched arrays</div>
+                                                        <% } %>
+                                                            <div class="clearfix"></div>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <div></div>
+                                                                </div>
+                                                            </div>
+                                            </div>
+                                            <div id="log"></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="center">
+                                        <button id="button-call">
+                                            <img class="button-icon" src="/images/call.png">
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+
+        <!-- Outbound Call Modal -->
+        <div id="modalOutboundCall" class="modal fade">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 text-align="center" class="modal-title">Ringing...</h2>
+                        </div>
+                            <div class="modal-body text-center">
+                                <img src="/images/phoneRinging.gif" alt="Phone Ringing" height="100">
+                            </div>
+                                <div class="modal-footer">
+                                    <div class="btn-group" style="width: 100%;">
+                                        <button id="end-outCall-btn" type="button" onclick="terminate_call()" class="btn btn-danger btn-style" data-dismiss="modal"  style="width: 100%; height: 50px;">End Call</button>
+                                    </div>
+                                </div>
+
+                    </div>
+                </div>
+        </div>
+
+        <!--Outbound Call Failed Modal-->
+        <div id="modalOutboundFailed" class="modal fade">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 text-align="center" class="modal-title">Call Failed</h2>
+                    </div>
+                    <div class="modal-body text-center">
+                        <h4 class="modal-title" id="outboundFailedBody"></h4>
+
+                    </div>  
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>      
+                </div>
+            </div>
+     </div>
+
+        <!-- Videomail Retrieval Error Modal -->
+        <div id="videomailErrorModal" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h2 class="modal-title">Videomail Retrieval Error</h2>
+                    </div>
+                    <div class="modal-body text-center">
+                        <h4 class="modal-title" id="videomailErrorBody"></h4>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BusyLight Modal -->
+        <div class="modal fade" id="busylightModal" tabindex="-1" role="dialog" aria-labelledby="busylightModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel">Busy Light</h4>
+                    </div>
+                    <div class="modal-body" id='busylightModalBody'>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id='busylightModalTestBtn' onclick="testLightConnection()">Test BusyLight Connection</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+
+        <!-- Jssip hidden data -->
+        <div hidden>
+            <div id="my_sip_uri"> </div>
+            <div id="ws_servers"> </div>
+            <div id="sip_password"> </div>
+            <div id="pc_config"> </div>
+            <div id="signaling_server_public"> </div>
+            <div id="signaling_server_port"> </div>
+            <div id="pc_config"> </div>
+        </div>
+
+        <!-- Videomail hidden data -->
+        <div hidden>
+            <div id="videomailId"> </div>
+            <div id="callbacknum"> </div>
+        </div>
+
+        <div id="snackbar">Default Text</div>
+
+        <% include ../partials/agent_page_javascript %>
+
+	<script>
 
 
-        /*
-        var call_option_buttons = document.getElementById("call-option-buttons");
-        call_option_buttons.style.display = "block";
-        var remoteStream = document.getElementById("remoteView");
-        var selfStream = document.getElementById("selfView");
-        start_video(selfStream)
-        start_video(remoteStream)
+/*
+var call_option_buttons = document.getElementById("call-option-buttons");
+call_option_buttons.style.display = "block";
+var remoteStream = document.getElementById("remoteView");
+var selfStream = document.getElementById("selfView");
+start_video(selfStream)
+start_video(remoteStream)
 
-        function start_video(video) {
-            // Older browsers might not implement mediaDevices at all, so we set an empty object first
-            if (navigator.mediaDevices === undefined) {
-                navigator.mediaDevices = {};
-            }
+function start_video(video) {
+	// Older browsers might not implement mediaDevices at all, so we set an empty object first
+	if (navigator.mediaDevices === undefined) {
+		navigator.mediaDevices = {};
+	}
 
-            // Some browsers partially implement mediaDevices. We can't just assign an object
-            // with getUserMedia as it would overwrite existing properties.
-            // Here, we will just add the getUserMedia property if it's missing.
-            if (navigator.mediaDevices.getUserMedia === undefined) {
-                navigator.mediaDevices.getUserMedia = function (constraints) {
-                    // First get ahold of the legacy getUserMedia, if present
-                    var getUserMedia = navigator.msGetUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+	// Some browsers partially implement mediaDevices. We can't just assign an object
+	// with getUserMedia as it would overwrite existing properties.
+	// Here, we will just add the getUserMedia property if it's missing.
+	if (navigator.mediaDevices.getUserMedia === undefined) {
+		navigator.mediaDevices.getUserMedia = function (constraints) {
+			// First get ahold of the legacy getUserMedia, if present
+			var getUserMedia = navigator.msGetUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-                    // Some browsers just don't implement it - return a rejected promise with an error
-                    // to keep a consistent interface
-                    if (!getUserMedia) {
-                        return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
-                    }
+			// Some browsers just don't implement it - return a rejected promise with an error
+			// to keep a consistent interface
+			if (!getUserMedia) {
+				return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+			}
 
-                    // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
-                    return new Promise(function (resolve, reject) {
-                        getUserMedia.call(navigator, constraints, resolve, reject);
-                    });
-                }
-            }
+			// Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
+			return new Promise(function (resolve, reject) {
+				getUserMedia.call(navigator, constraints, resolve, reject);
+			});
+		}
+	}
 
-            navigator.mediaDevices.getUserMedia({
-                    audio: true,
-                    video: true
-                })
-                //navigator.mediaDevices.getUserMedia({ audio: false, video: true })
-                .then(function (stream) {
-                    video.removeAttribute("hidden");
-                    // Older browsers may not have srcObject
-                    if ("srcObject" in video) {
-                        video.srcObject = stream;
-                    } else {
-                        // Avoid using this in new browsers, as it is going away.
-                        video.src = window.URL.createObjectURL(stream);
-                    }
-                    window.video = stream;
-                    video.onloadedmetadata = function (e) {
-                        video.play();
-                    };
-                })
-                .catch(function (err) {
-                    console.log(err.name + ": " + err.message);
-                });
-        }
+	navigator.mediaDevices.getUserMedia({
+			audio: true,
+			video: true
+		})
+		//navigator.mediaDevices.getUserMedia({ audio: false, video: true }) 
+		.then(function (stream) {
+			video.removeAttribute("hidden");
+			// Older browsers may not have srcObject
+			if ("srcObject" in video) {
+				video.srcObject = stream;
+			} else {
+				// Avoid using this in new browsers, as it is going away.
+				video.src = window.URL.createObjectURL(stream);
+			}
+			window.video = stream;
+			video.onloadedmetadata = function (e) {
+				video.play();
+			};
+		})
+		.catch(function (err) {
+			console.log(err.name + ": " + err.message);
+		});
+}
 
 
-        */
+*/
 
-    </script>
+	</script>
 </body>
 
 </html>
