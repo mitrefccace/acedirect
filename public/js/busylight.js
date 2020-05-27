@@ -54,6 +54,8 @@ Busylight.prototype.light = function (status) {
     }
 };
 
+
+
 function PostLightCode(color) {
 
     if (!busyLightEnabled)
@@ -78,5 +80,17 @@ function PostLightCode(color) {
             "stop": color.stop
         };
     }
-    $.post('https://localhost:6298/setbusylight', JSON.stringify(lightcode));
+
+  $.ajax({
+    url: 'http://127.0.0.1:6298/setbusylight',
+    method: 'POST',
+    data: JSON.stringify(lightcode),
+    dataType: 'json',
+    beforeSend: function(x) {
+      if (x && x.overrideMimeType) {
+        x.overrideMimeType("application/j-son;charset=UTF-8");
+      }
+    }
+  }).done(function( msg ) { ; });
+
 }

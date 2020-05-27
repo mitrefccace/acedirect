@@ -130,10 +130,10 @@ function connect_socket() {
                                         }
 
 					if (!isOpen) { //after hours processing; if after hours, then show this modal
-						$("#afterHoursModal").modal({
+						/*$("#afterHoursModal").modal({
 							backdrop: "static"
 						});
-						$("#afterHoursModal").modal("show");
+						$("#afterHoursModal").modal("show");*/
                                                 //get the start/end time strings for the after hours dialog
                                                 tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
                                                 startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0, 8); //start time in UTC
@@ -575,9 +575,9 @@ function afterHourVoicemail(){
 }
 
 function afterHoursHideVoicemail(){
-	if(isOpen){
+	/*if(isOpen){
 		$("#afterHoursModal").modal("show");
-	}
+	}*/
 	$('#videomailModal').modal('hide');
 }
 

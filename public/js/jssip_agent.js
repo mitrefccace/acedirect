@@ -490,6 +490,9 @@ function toggle_incall_buttons(make_visible) {
 
 //handles cleanup from jssip call. removes the session if it is active and removes video.
 function terminate_call() {
+	mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
+    mute_audio_icon.classList.add("fa-microphone");
+    mute_audio_icon.classList.remove("fa-microphone-slash");
 	if (currentSession) {
 		if (!currentSession.isEnded()) currentSession.terminate();
 	}

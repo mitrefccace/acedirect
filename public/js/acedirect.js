@@ -884,48 +884,10 @@ function changeStatusIcon(newColor, statusName, blinking) {
 
 
 function testLightConnection() {
-	console.log('\n\nChecking for BusyLight... Ignore this error if no BusyLight...');
-	$('#busylightModalBody').html(" ");
-	$('#busylightModalTestBtn').prop("disabled", true);
-	$('#busylightModalBody').html("Checking BusyLight server...");
-	$.ajax({
-		type: "get",
-		url: "https://localhost:6298/",
-		timeout: 2000,
-		dataType: "jsonp xml",
-		success: function (data, text) {
-			busyLightEnabled = true;
-		},
-		error: function (request, status, error) {
-			$('#busylightModalTestBtn').prop("disabled", false);
-			if (status === 'timeout') {
-				$('#busylightModalBody').html("BusyLight app is not running.");
-				$('#busylightModal').modal('show');
-			} else if (status === 'error') {
-				var win = window.open('https://localhost:6298/', '_blank');
-				if (win) {
-					//browser allows popups
-					win.focus();
-				} else {
-					//no pop ups display modal
-					$('#busylightModalBody').html(
-						"<a href='https://localhost:6298/' target='_blank'>Please visit the Busylight Test Page</a>");
-					$('#busylightModal').modal('show');
-				}
-			} else {
-				$('#busylightModalBody').html('Connected to busylight!!!!');
-				busyLightEnabled = true;
-				setTimeout(function () {
-					$('#busylightModal').modal('hide');
-				}, 1500);
-			}
-			console.log('');
-		}
-	});
+  //no longer needed
+  ;
 }
 
-if (busyLightEnabled)
-	testLightConnection();
 
 //####################################################################
 //Videomail functionality: mostly sending socket.io events to adserver
