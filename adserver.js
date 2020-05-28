@@ -157,7 +157,7 @@ if (nginxPath.length === 0) {
   nginxPath = "/ACEDirect";
 }
 
-//busylight paramete
+//busylight parameter
 var busyLightEnabled = getConfigVal('busylight:enabled');
 if (busyLightEnabled.length === 0) {
   //default for backwards compatibility
@@ -166,6 +166,16 @@ if (busyLightEnabled.length === 0) {
   busyLightEnabled = (busyLightEnabled === 'true')
 }
 logger.debug('busyLightEnabled: ' + busyLightEnabled);
+
+//busylight awayBlink parameter (blink while Away, if callers are in queue)
+var awayBlink= getConfigVal('busylight:awayBlink');
+if (awayBlink.length === 0) {
+  //default to on 
+  awayBlink = true;
+} else {
+  awayBlink = (awayBlink === 'true');
+}
+logger.debug('awayBlink: ' + awayBlink);
 
 //graceful shutdown, especially with node restarts
 process.on('exit', function() {
@@ -2518,7 +2528,8 @@ app.post('/consumer_login', function (req, res) {
 app.use(function (req, res, next) {
         res.locals = {
                 "nginxPath":nginxPath,
-                "busyLightEnabled":busyLightEnabled
+                "busyLightEnabled":busyLightEnabled,
+                "awayBlink":awayBlink
         }
         next();
 });
