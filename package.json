@@ -1,6 +1,6 @@
 {
   "name": "acedirect",
-  "version": "1.0.0",
+  "version": "4.0.0",
   "description": "The ACE Direct Project",
   "main": "adserver.js",
   "dependencies": {
@@ -18,16 +18,19 @@
     "express-session": "^1.15.6",
     "fresh": "^0.5.2",
     "gridstack": "^0.3.0",
-    "handlebars": "^4.1.2",
+    "handlebars": "^4.7.3",
     "hoek": "^4.2.1",
-    "jquery": "^3.4.0",
+    "jquery": "^3.5.0",
     "jsonwebtoken": "^8.4.0",
-    "jssip": "3.0.13",
+    "jssip": "3.3.11",
     "jwt-decode": "^2.2.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.13",
     "log4js": "^3.0.6",
     "mime": "^1.4.1",
-    "mysql": "2.14.1",
+    "minimist": "^1.2.3",
+    "mongodb": "^3.5.7",
+    "multer": "^1.4.2",
+    "mysql": "^2.18.1",
     "nconf": "0.8.4",
     "node-zendesk": "^1.4.0",
     "openam-agent": "3.1.2",
@@ -39,11 +42,13 @@
     "socketio-jwt": "4.5.0",
     "util": "0.10.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "bootstrap": "^3.4.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ./adserver.js",
-    "build": "node ./build.js || true"
+    "build": "mkdir -p public/assets; node ./build.js || true"
   },
   "author": "",
   "license": "ISC",

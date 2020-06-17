@@ -3,12 +3,9 @@
     <section class="sidebar">
         <!-- Sidebar user panel -->
         <div class="user-panel" style="overflow: visible;">
-            <div class="pull-left image">
-                <img src="/images/anon.png" class="img-circle" alt="User Image">
-            </div>
             <div class="pull-left info">
                 <p style="margin-bottom: 0; padding-bottom: 0;">
-                    <span id="agentname-sidebar">Franklin Pierce</span>
+                    <span id="agentname-sidebar"></span>
                 </p>
                 <span id="status-dropdown" class="dropdown dropdown-menu-left">
                     <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
@@ -34,6 +31,9 @@
                     </ul>
                 </span>
             </div>
+            <div class="pull-left image">
+                <img src="/images/anon.png" class="img-circle" alt="User Image">
+            </div>
         </div>
         <!-- sidebar menu: : style can be found in sidebar.less -->
         <ul class="sidebar-menu">
@@ -48,30 +48,22 @@
                 <span id="nav-desktop">QUEUES</span>
             </li>
 
-            <li id="sidebar-geninfo" onclick="$('#geninfoanchor').click()" hidden>
-                <a href="#">
-                    <i class="fa fa-question-circle"></i>
-                    <span>General Info</span>
-                    <span>
-                        <small id="general-queue-num" class="label pull-right bg-md-gray" ;>0</small>
-                    </span>
-                    <span id="geninfoInCall" hidden>
-                        <small class="label pull-right bg-red" style="margin-top: 3px;">in call</small>
-                    </span>
-                </a>
+            <li id="sidebar-geninfo" class="cap-setting" onclick="" hidden>
+                <span><i class="fa fa-question-circle nav-icon"></i>&nbsp;&nbsp;General Info</span>
+                <span id="general-queue-num" style="color:black" class="badge bg-md-gray right">0</span>
+                <p id="geninfoInCall" hidden>
+                  <span class="badge right btn-red" style="margin-top: 3px;">in call</span>
+                </p>
             </li>
-            <li id="sidebar-complaints" onclick="$('#complaintsanchor').click()" hidden>
-                <a href="#">
-                    <i class="fa fa-thumbs-down"></i>
-                    <span>Complaints</span>
-                    <span>
-                        <small id="complaints-queue-num" class="label pull-right bg-md-gray" ;>0</small>
-                    </span>
-                    <span id="complaintsInCall" hidden>
-                        <small class="label pull-right bg-red" style='margin-top: 3px;'>in call</small>
-                    </span>
-                </a>
+
+            <li id="sidebar-complaints" class="cap-setting" onclick="" hidden>
+                <span><i class="fa fa-thumbs-down nav-icon"></i>&nbsp;&nbsp;Complaints</span>
+                <span id="complaints-queue-num" style="color:black" class="badge bg-md-gray right">0</span>
+                <p id="complaintsInCall" hidden>
+                  <span class="badge right btn-red" style='margin-top: 3px;'>in call</span>
+                </p>
             </li>
+
             <li class="header">TOOLS</li>
 
             <li id="sidebar-dialpad">
@@ -82,9 +74,9 @@
 
             </li>
 
-            <li class="header config-hide">Caption Settings</li>
+            <li class="header config-hide">CAPTION SETTINGS</li>
             <li id="cap-font-size" class="cap-setting config-hide">
-                <span>Font size:</span>
+                <span>Font size</span>
                 <select id="font-select" class="font-select" type="select" name="font-select" onchange="changeCaption(this.value)">
                     <option value="2">Default</option>
                     <option value="1.5">Small</option>
@@ -93,7 +85,7 @@
             </li>
 
             <li id="cap-font-color" class="cap-setting config-hide">
-                <span>Font color:</span>
+                <span>Font color</span>
                 <div class="color-select-container">
                     <div id="font-grey" class="color-select" onclick="changeCaption(this.id)"></div>
                     <div id="font-black" class="color-select" onclick="changeCaption(this.id)"></div>
@@ -102,7 +94,7 @@
             </li>
 
             <li id="cap-bg-color" class="cap-setting config-hide">
-                <span>Background color:</span>
+                <span>Background color</span>
                 <div class="color-select-container">
                     <i id="bg-transparent" class="far fa-times-circle"></i>
                     <div id="bg-grey" class="color-select" onclick="changeCaption(this.id)"></div>
@@ -111,12 +103,54 @@
                 </div>
                 <input type = "range" min = "0" max = "1" step = .01 value = "1" id = "opacity-slider-agent">
             </li>
+            <li>
+              <div class="demo-btn-container config-hide">
+                <a class="demo-btn" href="#" onclick="testCaptions()">Preview</a>
+                <p>&nbsp;</p>
+              </div>
+            </li>
+
+            <li class="header config-hide">CAMERA OPTIONS</li>
+            <li id="cap-font-size" class="cap-setting config-hide nav-item">
+                <span>Enable / Disable Self-View</span><input id="persistCameraCheck" type="checkbox" checked>
+            </li>
+
+            <!--<li id="sidebar-multiparty" class="cap-setting config-hide nav-item">
+                <a href="#" onclick=multipartyModal()>
+                    <i class="fas fa-phone-volume"></i>
+                <span>Multi-Party Invite</span>
+                </a>
+            </li>-->
+            <li class="header config-hide">IN CALL FEATURES</li>
+            <li id="sidebar-fileShare" class="cap-setting config-hide nav-item">
+                <input type="file" id="fileInput" name="fileInput" class="form-control-file" disabled>
+            </li>
+
+            <div class="demo-btn-container config-hide mb-2">
+                <!--<input type="submit" value="Send File" class="btn btn-default" onclick="ShareFile()">-->
+                <a class="btn btn-primary" href="#" onclick="ShareFile()" id="sendFileButton" disabled>Send File</a>
+            </div>
+
+            <div class="demo-btn-container config-hide mb-2">
+                <!--<a class="btn btn-primary" href="./downloadFile?id=27" id="downloadButton" disabled>Download File</a><br>-->
+                <a class="btn btn-primary" href="./downloadFile" id="downloadButton" disabled>Download File</a><br>
+            </div>
+
+            <div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
+                <a class="close" onclick="$('#fileSent').hide();" style="text-decoration:none">×</a>
+                <strong>Success!</strong> File Sent
+              </div>
+
+            <!--<div class="demo-btn-container config-hide mb-2" id="retriveFiles">
+                <a class="demo-btn" id="retreiveFileButton" href="#" onclick="retreiveFiles()">Get Files</a>
+            </div>-->
+
+            <div class="demo-btn-container config-hide mb-2">
+                <a class="btn btn-primary" id="screenShareButton" href="#" onclick="shareScreen()" disabled>Enable / Disable Screenshare</a>
+            </div>
 
         </ul>
 
-        <div class="demo-btn-container config-hide">
-            <a class="demo-btn" href="#" onclick="testCaptions()">Preview</a>
-        </div>
 
     </section>
     <!-- /.sidebar -->

@@ -68,7 +68,7 @@
 			clearInterval(recordId);
 			recordId = null;
 			$('#vmsent').show();
-			if (complaintRedirectActive) {
+			if (complaintRedirectActive || isOpen) {
 				$("#redirecttag").attr("href", complaintRedirectUrl);
 				$("#redirectdesc").text("Redirecting to " + complaintRedirectDesc + " ...");
 				$("#callEndedModal").modal('show');
@@ -79,124 +79,132 @@
 		}
 	}
 
-
 	//setup for the call. creates and starts the User Agent (UA) and registers event handlers
-	function register_jssip() {
-		if (jssip_debug) JsSIP.debug.enable('JsSIP:*');
-		else JsSIP.debug.disable('JsSIP:*');
+	// This uses the new ACE Kurento object rather than JsSIP
+	function register_jssip(myExtension, myPassword) {
+		console.log('Registering: ' + myExtension + ',' + myPassword);
 
-		// Create our JsSIP instance and run it:
-		var socket = new JsSIP.WebSocketInterface(ws_servers.getAttribute("name"));
-
-		var configuration = {
-			sockets: [socket],
-			uri: my_sip_uri.getAttribute("name"),
-			password: sip_password.getAttribute("name"),
-		};
-
-		ua = new JsSIP.UA(configuration);
-		ua.start();
-
-		ua.on('newMessage', function (e) {
-			if (debug) console.log("\nUA - NEWMESSAGE");
-
-			if (complaintForm && e.message.content == 'STARTRECORDING'){
-				startRecordProgress();
-			}  else { // Caption block start -----------
-
+		var eventHandlers = {
+			'connected': function (e) {
+				console.log('--- WV: Connected ---\n');
+			},
+			'accepted': function (e) {
+				console.log('--- WV: UA accepted ---\n');
+			},
+			'newMessage': function (e) {
+				console.log('--- WV: New Message ---\n');
 		 		try {
-		 			var transcripts = JSON.parse(e.message.content);
-
+					var transcripts = JSON.parse(e.msg);
+					//var transcripts = JSON.parse(e.msg._request.body)
+					//var transcripts = JSON.parse(e.message._request.body)
 		 			if(transcripts.transcript){
+						console.log('--- WV: transcripts.transcript ---\n');
 		 				var tDiv = document.getElementById(transcripts.msgid);
-
 		 				if(!tDiv) {
 		 					var temp = document.createElement("div");
-
 		 					temp.id = transcripts.msgid;
 		 					temp.innerHTML = transcripts.transcript;
 		 					temp.classList.add("transcripttext");
 		 					document.getElementById("transcriptoverlay").appendChild(temp);
 		 				} else {
 		 					tDiv.innerHTML = transcripts.transcript;
-
 		 					if(transcripts.final){
-								$('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>"+transcripts.transcript+"</div></div>")
-		 						setTimeout(function(){tDiv.remove()},5000);
+								setTimeout(function(){tDiv.remove();},5000);
+
+								//var captionBubble = '<div><b>' +transcripts.timestamp + ':</b>&nbsp;'+transcripts.transcript+'<br/><div>';
+								//$(captionBubble).appendTo($("#caption-messages"));
+								$('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>"+transcripts.transcript+"</div></div>");
+								$("#caption-messages").scrollTop($("#caption-messages")[0].scrollHeight);
 		 					}
 		 				}
 		 			}
 		 		} catch (err) {
 		 			console.log(err);
 		 		}
-		    } //Caption block end --------------
+			},
+			'registerResponse': function (error) {
+				console.log('--- WV: Register response:', error || 'Success ---');
+				if(!error) {
+				}
+			},
+			'pausedQueue': function (e) {
+				console.log('--- WV: Paused Agent Member in Queue ---\n');
+			},
+			'unpausedQueue': function (e) {
+				console.log('--- WV: Unpaused Agent Member in Queue ---\n');
+			},
+			'callResponse': function (e) {
+				console.log('--- WV: Call response ---\n', e);
+			},
+			'incomingCall': function (call) {
+				console.log('--- WV: Incoming call ---\n');
+			},
+			'progress': function(e) {
+				console.log('--- WV: Calling... ---\n');
+			},
+			'startedRecording': function (e) {
+				console.log('--- WV: Started Recording:', (e.success) ? 'Success ---' : 'Error ---');
+				if (e.success) {
+				}
+			},
+			'stoppedRecording': function (e) {
+				console.log('--- WV: Stopped Recording:', (e.success) ? 'Success ---' : 'Error ---');
+				if (e.success) {
+				}
+			},
+			'failed': function(e) {
+				console.log('--- WV: Failed ---\n' + e);
+			},
+			'ended': function(e) {
+				console.log('--- WV: Call ended ---\n');
 
-		});
+                                terminate_call();
+                                clearScreen();
+				disable_chat_buttons();
+				enable_initial_buttons();
+				$("#start-call-buttons").show();
+				$("#agent-name-box").hide();
+				$("#agent-name").text("");
 
-		ua.on('newRTCSession', function (e) {
+			},
+			'participantsUpdate': function(e) {
+				console.log('--- WV: Participants Update ---\n');
+				console.log('--- WV: ' + JSON.stringify(e));
+				console.log('--- WV: e.participants.length: ' + e.participants.length);
+				var partCount = e.participants.filter(t=>t.type == "participant:webrtc").length;
 
-			currentSession = e.session;
+				console.log("--- WV: partCount: " + partCount);
 
-			currentSession.on('accepted', function (e) {
+				if (partCount >=2 ) {
+					console.log("--- WV: CONNECTED");
+					$("#queueModal").modal("hide");
 
-				if (debug) console.log('\nCURRENTSESSION -  ACCEPTED: \nRESPONSE: \n' + e.response + "\nORIGINATOR:\n" + e.originator);
-				toggle_incall_buttons(true);
-				start_self_video();
-				$("#start-call-buttons").hide();
-			});
-			currentSession.on('ended', function (e) {
-				if (debug) console.log('\nCURRENTSESSION -  ENDED: \nORIGINATOR: \n' + e.originator + '\nMESSAGE:\n' + e.message + "\nCAUSE:\n" + e.cause);
-				terminate_call();
+					toggle_incall_buttons(true);
+					start_self_video();
+					$("#start-call-buttons").hide();
+				}
 
-				unregister_jssip();
-				stopRecordProgress();
+			}
 
-			});
-			currentSession.on('failed', function (e) {
-				if (debug) console.log('\nCURRENTSESSION -  FAILED: \nMESSAGE:\n' + e.message + "\nCAUSE:\n" + e.cause + "\nORIGINATOR:\n" + e.originator);
-				terminate_call();
-
-			});
-			currentSession.on('reinvite', function (e) {
-				if (debug) console.log('\nCURRENTSESSION -  REINVITE ');
-				$("#queueModal").modal("hide"); //reinvite is the only flag we get that the call is fully connected. so we have to hide the modal here.
-			});
-			//event listener for remote video. Adds to html page when ready.
-			//NOTE: has to be both here and in accept_call() because currentSession.connection is not established until after ua.answer() for incoming calls
-			if (currentSession.connection) currentSession.connection.ontrack = function (e) {
-				if (debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
-				remoteStream.srcObject = e.streams[0];
-				remoteStream.play();
-
-				toggleSelfview();
-
-			};
-
-		});
+		};
+		acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, eventHandlers);
+		acekurento.register(myExtension, myPassword, false);
 	}
 
 	//makes a call
-	//@param other_sip_uri: is the sip uri of the person to call
-	function start_call(other_sip_uri) {
-		var options = {
-			'mediaConstraints': {
-				'audio': true,
-				'video': true
-			},
-			'pcConfig': {
-				'rtcpMuxPolicy': 'negotiate',
-				'iceServers': [{
-					'urls': [
-						pc_config.getAttribute('name')
-					]
-				}]
-			}
-		};
-
-		if (debug) console.log("CALL FROM " + my_sip_uri.getAttribute("name") + " TO " + other_sip_uri);
-		ua.call(other_sip_uri, options);
+	/*
+	* Use acekurento object to make the call. Not sure about the extension
+	*/
+	function start_call(other_sip_uri, myExtension) {
+          console.log("start_call: " + other_sip_uri);
+		  selfStream.removeAttribute("hidden");
+		  $("#screenshareButton").removeAttr('disabled');
+		  $("#fileInput").removeAttr('disabled');
+		  $("#shareFileConsumer").removeAttr('disabled');
+		  $("#downloadButton").removeAttr('disabled');
+          //acekurento.call(globalData.queues_complaint_number, false);
+          acekurento.call(other_sip_uri, false);
 	}
-
 
 	function toggleSelfview() {
 		setTimeout(function () {
@@ -207,91 +215,9 @@
 		}, 3000);
 	}
 
-	//answers an incoming call
-	function accept_call() {
-		if (currentSession) {
-			var options = {
-				'mediaConstraints': {
-					'audio': true,
-					'video': true
-				},
-				'pcConfig': {
-					'rtcpMuxPolicy': 'negotiate',
-					'iceServers': [{
-						'urls': [
-							pc_config.getAttribute('name')
-						]
-					}]
-				}
-			};
-			currentSession.answer(options);
-
-
-			//event listener for remote video. Adds to html page when ready.
-			//NOTE: needs to be both here and in the newRTCSession event listener because currentSession.connection is not established until after ua.answer() for incoming calls
-			if (currentSession.connection) currentSession.connection.ontrack = function (e) {
-				if (debug) console.log("STARTING REMOTE VIDEO\ne.streams: " + e.streams + "\ne.streams[0]: " + e.streams[0]);
-				remoteStream.srcObject = e.streams[0];
-				remoteStream.play();
-
-				toggleSelfview()
-			};
-		}
-	}
-
-
 	//starts the local streaming video. Works with some older browsers, if it is incompatible it logs an error message, and the selfStream html box stays hidden
 	function start_self_video() {
-		if (selfStream.hasAttribute("hidden")) //then the video wasn't already started
-		{
-			// Older browsers might not implement mediaDevices at all, so we set an empty object first
-			if (navigator.mediaDevices === undefined) {
-				navigator.mediaDevices = {};
-			}
-
-			// Some browsers partially implement mediaDevices. We can't just assign an object
-			// with getUserMedia as it would overwrite existing properties.
-			// Here, we will just add the getUserMedia property if it's missing.
-			if (navigator.mediaDevices.getUserMedia === undefined) {
-				navigator.mediaDevices.getUserMedia = function (constraints) {
-					// First get ahold of the legacy getUserMedia, if present
-					var getUserMedia = navigator.msGetUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-					// Some browsers just don't implement it - return a rejected promise with an error
-					// to keep a consistent interface
-					if (!getUserMedia) {
-						return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
-					}
-
-					// Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
-					return new Promise(function (resolve, reject) {
-						getUserMedia.call(navigator, constraints, resolve, reject);
-					});
-				}
-			}
-
-			navigator.mediaDevices.getUserMedia({
-					audio: true,
-					video: true
-				})
-				.then(function (stream) {
-					selfStream.removeAttribute("hidden");
-					// Older browsers may not have srcObject
-					if ("srcObject" in selfStream) {
-						selfStream.srcObject = stream;
-					} else {
-						// Avoid using this in new browsers, as it is going away.
-						selfStream.src = window.URL.createObjectURL(stream);
-					}
-					window.self_stream = stream;
-					selfStream.onloadedmetadata = function (e) {
-						selfStream.play();
-					};
-				})
-				.catch(function (err) {
-					console.log(err.name + ": " + err.message);
-				});
-		}
+          //not needed?
 	}
 
 	//toggles showing the call option buttons at the bottom of the video window (ie end call, mute, etc).
@@ -321,9 +247,17 @@
 
 	//handles cleanup from jssip call. removes the session if it is active and removes video.
 	function terminate_call() {
-		if (currentSession) {
-			if (!currentSession.isEnded()) currentSession.terminate();
+		if (acekurento !== null) {
+			acekurento.stop(false);
+			acekurento = null;
 		}
+		document.getElementById("screenshareButton").disabled = true;
+		$("#screenshareButton").prop('disabled',true);
+		$("#fileInput").prop('disabled',true);
+		$("#shareFileConsumer").prop('disabled',true);
+		$("#downloadButton").prop('disabled',true);
+		$("#screenshareButtonGroup").hide();
+		clearScreen();
 		remove_video();
 		disable_chat_buttons();
 		enable_initial_buttons();
@@ -386,13 +320,18 @@
 		selfView.setAttribute("style", "right: 11px");
 		selfView.setAttribute("autoplay", "autoplay");
 		selfView.setAttribute("muted", true);
+		selfView.classList.add("mirror-mode");
+
 		selfView.muted = true;
 		selfView.setAttribute("hidden", true);
 		remoteStream = document.getElementById("remoteView");
 		selfStream = document.getElementById("selfView");
 
 		toggle_incall_buttons(false);
-
+                if (acekurento !== null) {
+		  acekurento.remoteStream = document.getElementById('remoteView');
+                  acekurento.selfStream = document.getElementById('selfView');
+                }
 	}
 
 	//swaps remote and local videos for videomail recording
@@ -427,192 +366,71 @@
 
 	//mutes self audio so remote cannot hear you
 	function mute_audio() {
-		if (currentSession) {
-			currentSession.mute({
-				audio: true,
-				video: false
-			});
-			mute_audio_button.setAttribute("onclick", "javascript: unmute_audio();");
-			mute_audio_icon.classList.add("fa-microphone-slash");
-			mute_audio_icon.classList.remove("fa-microphone");
-		}
+                if (acekurento !== null) {
+                  acekurento.enableDisableTrack(true, true); //mute audio
+				  mute_audio_button.setAttribute("onclick", "javascript: unmute_audio();");
+                  mute_audio_icon.classList.add("fa-microphone-slash");
+                  mute_audio_icon.classList.remove("fa-microphone");
+                }
 	}
 
 	//unmutes self audio so remote can hear you
 	function unmute_audio() {
-		if (currentSession) {
-			currentSession.unmute({
-				audio: true,
-				video: false
-			});
-			mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
-			mute_audio_icon.classList.add("fa-microphone");
-			mute_audio_icon.classList.remove("fa-microphone-slash");
-		}
+                if (acekurento !== null) {
+                  acekurento.enableDisableTrack(false, true); //unmute audio
+                  mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
+                  mute_audio_icon.classList.add("fa-microphone");
+                  mute_audio_icon.classList.remove("fa-microphone-slash");
+                }
 	}
 
 	//hide/unhide captions
 	function mute_captions() {
                 if(mute_captions_icon.style.display === "none"){
                         mute_captions_icon.style.display = "block";
-                        transcript_overlay.style.display = "none"
-                }else{
+                        transcript_overlay.style.display = "none";
+                } else {
                         mute_captions_icon.style.display = "none";
                         transcript_overlay.style.display = "block";
                 }
         }
 
-
 	//hides self video so remote cannot see you
 	function hide_video() {
-
-		if (currentSession) {
-			currentSession.mute({
-				audio: false,
-				video: true
-			});
-			selfStream.setAttribute("hidden", true);
-		}
+                if (acekurento !== null) {
+                  acekurento.enableDisableTrack(true, false); //mute video
+                  selfStream.setAttribute("hidden", true);
+                }
 	}
 
 	//unhides self video so remote can see you
 	function unhide_video() {
-		if (currentSession) {
-			currentSession.unmute({
-				audio: false,
-				video: true
-			});
-			selfStream.removeAttribute("hidden");
-		}
+                if (acekurento !== null) {
+                  acekurento.enableDisableTrack(false, false); //unmute video
+                  selfStream.removeAttribute("hidden");
+                }
 	}
 
-
-
 	function enable_video_privacy() {
-
-		if (currentSession) {
-			currentSession.mute({
-				audio: false,
-				video: true
-			});
-
-
-			console.log('Enabling video privacy');
-			hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
-			hide_video_icon.style.display = "block";
-
-			// the following piece of code does not seem to stop the video at remote side
-			if (window.self_stream){
-				if (window.self_stream.getVideoTracks()){
-					if (window.self_stream.getVideoTracks()[0]){
-						window.self_stream.getVideoTracks()[0].stop();
-						console.log("videotrack[0] stopped");
-					}
-				}
-			}
-
-			selfStream.srcObject = null;
-
-			selfStream.src = "images/videoPrivacy.webm";
-			console.log("Using self-constructed 30sec video audio clip with SAR 1:1 DAR 4:3 resolution 640:480");
-
-
-			selfStream.type = 'type="video/webm"';
-			selfStream.setAttribute("loop","true");
-                        selfStream.play();
-
-			selfStream.onplay = function() {
-  				// Set the source of one <video> element to be a stream from another.
-				console.log("selfStream onPlay()");
-  				var stream = selfStream.captureStream();
-				stream.onactive = function() {		// without onactive the tracks of captured stream may be empty
-					// replace remote screen to be the captured stream
-					var tracks = stream.getTracks();
-				 	Promise.all(currentSession.connection.getSenders().map(sender =>
-						sender.replaceTrack(stream.getTracks().find(t => t.kind == sender.track.kind), stream)));
-					console.log("Replaced tracks with recorded privacy video");
-				}
-  			};
-
-
-			currentSession.unmute({
-				audio: false,
-				video: true
-			});
-		}
+                if (acekurento !== null) {
+				  selfStream.classList.remove("mirror-mode");
+                  acekurento.enableDisableTrack(true, false); //mute video
+                  hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
+                  hide_video_icon.style.display = "block";
+                  acekurento.privateMode(true, globalData.privacy_video_url);
+                }
 	}
 
 	function disable_video_privacy() {
-		if (currentSession) {
-			currentSession.mute({
-				audio: false,
-				video: true
-			});
-			console.log('Disabling video privacy');
-			hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
+                if (acekurento !== null) {
 
-			/* DO WE REALLY NEED TO GET USER MEDIA AGAIN? */
-
-			// Older browsers might not implement mediaDevices at all, so we set an empty object first
-			if (navigator.mediaDevices === undefined) {
-				navigator.mediaDevices = {};
-			}
-
-			// Some browsers partially implement mediaDevices. We can't just assign an object
-			// with getUserMedia as it would overwrite existing properties.
-			// Here, we will just add the getUserMedia property if it's missing.
-			if (navigator.mediaDevices.getUserMedia === undefined) {
-				navigator.mediaDevices.getUserMedia = function (constraints) {
-					// First get ahold of the legacy getUserMedia, if present
-					var getUserMedia = navigator.msGetUserMedia || navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-					// Some browsers just don't implement it - return a rejected promise with an error
-					// to keep a consistent interface
-					if (!getUserMedia) {
-						return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
-					}
-
-					// Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
-					return new Promise(function (resolve, reject) {
-						getUserMedia.call(navigator, constraints, resolve, reject);
-					});
-				}
-			}
-
-			navigator.mediaDevices.getUserMedia({
-					audio: true,
-					video: true
-				})
-				.then(function (stream) {
-					selfStream.removeAttribute("hidden");
-					// Older browsers may not have srcObject
-					if ("srcObject" in selfStream) {
-						selfStream.srcObject = stream;
-					} else {
-						// Avoid using this in new browsers, as it is going away.
-						selfStream.src = window.URL.createObjectURL(stream);
-					}
-					window.self_stream = stream;
-					selfStream.onloadedmetadata = function (e) {
-						// update selfStream to play camera stream
-						selfStream.play();
-						// replace remote track to camera stream
-			 			Promise.all(currentSession.connection.getSenders().map(sender =>
-							sender.replaceTrack(stream.getTracks().find(t => t.kind == sender.track.kind), stream)));
-					};
-					console.log("Replaced tracks with user media");
-				})
-				.catch(function (err) {
-					console.log(err.name + ": " + err.message);
-				});
-
-			hide_video_icon.style.display = "none";
-
-			currentSession.unmute({
-                                audio: false,
-                                video: true
-                        });
-		}
+				  selfStream.classList.add("mirror-mode");
+                  acekurento.enableDisableTrack(false, false); //unmute video
+                  hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
+                  hide_video_icon.style.display = "none";
+                  acekurento.privateMode(false);
+                  hide_video_icon.style.display = "none";
+                }
 	}
 	// times out and ends call after 30 or so seconds. agent gets event "ended" with cause "RTP Timeout".
 	// puts session on hold
@@ -637,7 +455,7 @@
 	}
 
 	// Used to exit fullscreen if active when call is teminated
-        function exitFullscreen() {
+	function exitFullscreen() {
           if (document.fullscreen) {
                 if (document.exitFullscreen) {
                         document.exitFullscreen();
@@ -649,7 +467,7 @@
                         document.webkitExitFullscreen();
                 }
            }
-        }
+	}
 
 	// Change the style of the video captions
 	function changeCaption(id) {
@@ -686,7 +504,7 @@
 	$('#bg-transparent').click(function() {
 		$('#opacity-slider-consumer').val(0);
 		$('#opacity-slider-consumer').trigger('mousemove');
-	})
+	});
 
 	$('#opacity-slider-consumer').on('change mousemove', function() {
 		var alpha = $(this).val();
@@ -694,7 +512,7 @@
 		if (current == '') {current = 'rgba(128,128,128,0';}
 		var color = current.substring(0,current.lastIndexOf(',')+1) + alpha + ')';
 		document.documentElement.style.setProperty('--caption-bg-color', color);
-	})
+	});
 
 	// Run caption demo
 	var demo_running = false;
@@ -728,11 +546,11 @@
 
 				if(count > 4) {
 					window.clearInterval(intervalId);
-					temp.innerHTML = ''
+					temp.innerHTML = '';
 					demo_running = false;
 				}
 			}, 6000);
-		} else { console.log('demo running') }
+		} else { console.log('demo running'); }
 
 
 	}

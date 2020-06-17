@@ -1,13 +1,12 @@
 <div class="direct-chat direct-chat-primary" id="userchat">
     <div class="box-header with-border" id="chat-header">
-        <div class="tab-container">
-            <div id="chat-tab" class="tab active-tab">
-                <i class="fa fa-comments"></i>
-                <h3 class="box-title">User Chat</h3>
-            </div>
-            <div id="trans-tab" class="tab">
-                <h3 class="box-title">Transcript</h3>
-            </div>
+	<div class="tab-container">
+          <div id="chat-tab" class="tab active-tab">
+            <h3 class="box-title"><i class="fa fa-comments"></i>User Chat</h3>
+          </div>
+          <div id="trans-tab" class="tab">
+            <h3 class="box-title"><i class="fas fa-file-alt"></i> Transcript</h3>
+          </div>
         </div>
         <div class="box-tools pull-right">
             <!--button type="button" class="btn btn-box-tool" data-widget="collapse">
@@ -17,14 +16,14 @@
     </div>
     <div class="box-body">
         <!-- Conversations are loaded here -->
-        <div id="chat-body">
-            <div class="direct-chat-messages" id="chat-messages"></div>
-            <div class="direct-chat-timestamp text-bold" id="rtt-typing" style="margin-left: 10px; min-height: 20px">
-            </div>
-        </div>
-        <div id="trans-body">
-            <div class="direct-chat-messages" id="caption-messages"></div>
-        </div>
+	<div id="chat-body">
+          <div class="direct-chat-messages" id="chat-messages"></div>
+          <div class="direct-chat-timestamp text-bold" id="rtt-typing" style="margin-left: 10px; min-height: 20px"></div>
+  	</div>
+	<div id="trans-body">
+	  <div class="direct-chat-messages" id="caption-messages"></div>
+	</div>
+
     </div>
     <div class="box-footer" id="chat-footer">
         <form name="chatsend" id="chatsend">
@@ -33,9 +32,63 @@
                 <input type="text" id="newchatmessage" placeholder="Chat disabled" class="form-control"
                     autocomplete="off" required disabled>
                 <span class="input-group-btn">
+                    <button id="chat-emoji" class="btn btn-primary btn-flat" type="button" data-toggle="dropdown"
+                        animation="true" disabled>&#128512;</button>
+                    <div class="dropdown-menu dropdown-multicol" id="emoji-selector"
+                        aria-labelledby="dropdownMenuButton" style="height:150px; overflow-y: scroll;">
+                        <li role="presentation" class="dropdown-header">Select an Emoji</li>
+                        <li role="presentation" class="divider"></li>
+                        <div class="dropdown-row">
+                            <button class="dropdown-item" type="button"
+                                style="background-color:transparent; border:none" onclick="addEmoji(this.value)"
+                                value="&#128512;">&#128512;</button>
+                            <button class="dropdown-item" type="button"
+                                style="background-color:transparent; border:none" onclick="addEmoji(this.value)"
+                                value="&#128513;">&#128513;</button>
+                            <button class="dropdown-item" type="button"
+                                style="background-color:transparent; border:none" onclick="addEmoji(this.value)"
+                                value="&#128516;">&#128516;</button>
+                        </div>
+                        <div class="dropdown-row">
+                            <button class="dropdown-item" type="button"
+                                style="background-color:transparent; border:none" onclick="addEmoji(this.value)"
+                                value="&#128547;">&#128547;</button>
+                            <button class="dropdown-item" type="button"
+                                style="background-color:transparent; border:none" onclick="addEmoji(this.value)"
+                                value="&#128577;">&#128577;</button>
+                            <button class="dropdown-item" type="button"
+                                style="background-color:transparent; border:none" onclick="addEmoji(this.value)"
+                                value="&#129320;">&#129320;</button>
+                        </div>
+                        <div class="dropdown-row">
+                            <button class="dropdown-item" type="button"
+                                style="background-color:transparent; border:none" onclick="addEmoji(this.value)"
+                                value="&#128077;">&#128077;</button>
+                            <button class="dropdown-item" type="button"
+                                style="background-color:transparent; border:none" onclick="addEmoji(this.value)"
+                                value="&#128078;">&#128078;</button>
+                            <button class="dropdown-item" type="button"
+                                style="background-color:transparent; border:none" onclick="addEmoji(this.value)"
+                                value="&#128075;">&#128075;</button>
+                        </div>
+                        <div class="dropdown-row">
+                            <button class="dropdown-item" type="button"
+                                style="background-color:transparent; border:none" onclick="addEmoji(this.value)"
+                                value="&#128263;">&#128263;</button>
+                            <button class="dropdown-item" type="button"
+                                style="background-color:transparent; border:none" onclick="addEmoji(this.value)"
+                                value="&#128264;">&#128264;</button>
+                            <button class="dropdown-item" type="button"
+                                style="background-color:transparent; border:none" onclick="addEmoji(this.value)"
+                                value="&#128266;">&#128266;</button>
+                        </div>
+                    </div>
                     <button class="btn btn-primary btn-flat" id="chat-send" type="submit" disabled>Send</button>
                 </span>
             </div>
         </form>
+        <div id="screenshareButtons" hidden>Screenshare Requested
+            <button class="btn btn-primary btn-flat" id="allowScreenshare">Allow</button>
+            <button class="btn btn-primary btn-flat" id="disallowScreenshare">Disallow</button></div>
     </div>
 </div>

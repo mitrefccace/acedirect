@@ -78,5 +78,25 @@ function PostLightCode(color) {
             "stop": color.stop
         };
     }
-    $.post('https://localhost:6298/setbusylight', JSON.stringify(lightcode));
+
+  //if callers are in queue, blink if Away and config enables this
+  if (awayBlink) {
+    var queue_count = parseInt( $("#complaints-queue-num").text() ) +  parseInt( $("#general-queue-num").text());
+    if (queue_count > 0) {
+      lightcode.blink = true;
+    }
+  }
+
+  $.ajax({
+    url: 'http://127.0.0.1:6298/setbusylight',
+    method: 'POST',
+    data: JSON.stringify(lightcode),
+    dataType: 'json',
+    beforeSend: function(x) {
+      if (x && x.overrideMimeType) {
+        x.overrideMimeType("application/j-son;charset=UTF-8");
+      }
+    }
+  }).done(function( msg ) { ; });
+
 }

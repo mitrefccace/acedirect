@@ -20,6 +20,9 @@ var randomstring = require("randomstring");
 var csrf = require('csurf');
 var cors = require('cors');
 var mysql = require('mysql');
+var MongoClient = require('mongodb').MongoClient;
+//For fileshare
+//var upload = multer();
 
 //after hours vars
 var isOpen = true;
@@ -38,7 +41,7 @@ var rVrsToZenId = 'vrsToZenId';
 // Contains the consumer extension mapped to {"secret":extensionpassword, "inuse":true|false}
 var rConsumerExtensions = 'consumerExtensions';
 
-// Contains the consumer extension(nnnnn) mapped to the VRS number(mmmmmmmmmm)
+// Contains the consumer extension(nnnnn) mapped to the VRS number (nnnnnnnnnn)
 // Redis will double map these key values meaning both will exist
 // key:value nnnnn:mmmmmmmmmm and mmmmmmmmmm:nnnnn
 var rExtensionToVrs = 'extensionToVrs';
@@ -80,7 +83,7 @@ log4js.configure({
 		level: 'error'
 	  }
 	}
-  })
+  });
 
 // Get the name of the config file from the command line (optional)
 nconf.argv().env();
@@ -118,6 +121,20 @@ if (typeof (nconf.get('common:cleartext')) !== "undefined"  && nconf.get('common
 
 var colorConfigs = {};
 
+//append a suffix to make REDIS maps specific to this server
+var pfx = process.env.LOGNAME;
+if (pfx == undefined)
+  pfx = '';
+else
+  pfx = pfx + '_';
+rStatusMap = pfx + rStatusMap;
+rVrsToZenId = pfx + rVrsToZenId;
+rConsumerExtensions = pfx + rConsumerExtensions;
+rExtensionToVrs = pfx + rExtensionToVrs;
+rLinphoneToAgentMap = pfx + rLinphoneToAgentMap;
+rConsumerToCsr = pfx + rConsumerToCsr;
+rAgentInfoMap = pfx + rAgentInfoMap;
+rTokenMap = pfx + rTokenMap;
 
 // Set log4js level from the config file
 logger.level = getConfigVal('common:debug_level'); //log level hierarchy: ALL TRACE DEBUG INFO WARN ERROR FATAL OFF
@@ -129,12 +146,61 @@ logger.error('ERROR messages enabled.');
 logger.fatal('FATAL messages enabled.');
 logger.info('Using config file: ' + cfile);
 
+//global vars that don't need to be read every time
+var jwtKey = getConfigVal('web_security:json_web_token:secret_key');
+var jwtEnc = getConfigVal('web_security:json_web_token:encoding');
+
 //NGINX path parameter
 var nginxPath = getConfigVal('nginx:ad_path');
 if (nginxPath.length === 0) {
   //default for backwards compatibility
   nginxPath = "/ACEDirect";
 }
+
+//busylight parameter
+var busyLightEnabled = getConfigVal('busylight:enabled');
+if (busyLightEnabled.length === 0) {
+  //default for backwards compatibility
+  busyLightEnabled = true;
+} else {
+  busyLightEnabled = (busyLightEnabled === 'true');
+}
+logger.debug('busyLightEnabled: ' + busyLightEnabled);
+
+//busylight awayBlink parameter (blink while Away, if callers are in queue)
+var awayBlink= getConfigVal('busylight:awayBlink');
+if (awayBlink.length === 0) {
+  //default to on 
+  awayBlink = true;
+} else {
+  awayBlink = (awayBlink === 'true');
+}
+logger.debug('awayBlink: ' + awayBlink);
+
+//graceful shutdown, especially with node restarts
+process.on('exit', function() {
+  console.log('exit caught');
+  console.log('DESTROYING DB CONNECTION');
+  dbConnection.destroy(); //destroy db connection
+  process.exit(0);
+});
+
+var agentPath = getConfigVal('nginx:agent_route');
+if (agentPath.length === 0) {
+  agentPath = "/agent";
+}
+
+var consumerPath = getConfigVal('nginx:consumer_route');
+console.log(consumerPath.length);
+if (consumerPath.length === 0) {
+  consumerPath = "/complaint";
+}
+
+//signaling server
+var signalingServerPublic = getConfigVal('signaling_server:public');
+var signalingServerPort = getConfigVal('signaling_server:port');
+var signalingServerProto = getConfigVal('signaling_server:proto');
+var signalingServerDevUrl = getConfigVal('signaling_server:dev_url');
 
 var queuesVideomailNumber = getConfigVal('asterisk:queues:videomail:number');
 
@@ -177,7 +243,8 @@ redisClient.auth(getConfigVal('database_servers:redis:auth'));
 redisClient.on('connect', function () {
 	logger.info("Connected to Redis");
 
-	//Delete all values in statusMap
+	//Delete all values in REDIS maps at startup
+	redisClient.del(rTokenMap);
 	redisClient.del(rStatusMap);
 	redisClient.del(rVrsToZenId);
 	redisClient.del(rConsumerExtensions);
@@ -186,7 +253,7 @@ redisClient.on('connect', function () {
 	redisClient.del(rConsumerToCsr);
 	redisClient.del(rAgentInfoMap);
 
-        // Populate the consumerExtensions map
+	// Populate the consumerExtensions map
 	prepareExtensions();
 });
 
@@ -214,7 +281,6 @@ var dbPassword = getConfigVal('database_servers:mysql:password');
 var dbName = getConfigVal('database_servers:mysql:ad_database_name');
 var dbPort = parseInt(getConfigVal('database_servers:mysql:port'));
 var vmTable = "videomail";
-
 
 // Create MySQL connection and connect to the database
 var dbConnection = mysql.createConnection({
@@ -246,6 +312,74 @@ dbConnection.connect(function(err) {
     //SUCCESSFUL connection
   }
 });
+
+// Pull MongoDB configuration from config.json file
+var mongodbUriEncoded = nconf.get('database_servers:mongodb:connection_uri');
+var logCallData = nconf.get('database_servers:mongodb:logCallData');
+var mongodb;
+var colCallData = null;
+
+//Connect to MongoDB
+if (typeof mongodbUriEncoded !== 'undefined' && mongodbUriEncoded) {
+	var mongodbUri = getConfigVal('database_servers:mongodb:connection_uri');
+	// Initialize connection once
+	MongoClient.connect(mongodbUri, {forceServerObjectId:true, useNewUrlParser: true}, function (err, database) {
+		if (err) {
+			logger.error('*** ERROR: Could not connect to MongoDB. Please make sure it is running.');
+			console.error('*** ERROR: Could not connect to MongoDB. Please make sure it is running.');
+			process.exit(-99);
+		}
+
+		console.log('MongoDB Connection Successful');
+		mongodb = database.db();
+                dbconn = database;
+
+		// Start the application after the database connection is ready
+		//httpsServer.listen(port);
+		//console.log('https web server listening on ' + port);
+
+		// prepare an entry into MongoDB to log the acedirect restart
+		var data = {
+				"Timestamp": new Date(),
+				"Role":"acedirect",
+				"Purpose": "Restarted"
+		};
+
+		if (logCallData) {
+			// first check if collection "events" already exist, if not create one
+			mongodb.listCollections({name: 'calldata'}).toArray((err, collections) => {
+				console.log("try to find calldata collection, colCallData length: " + collections.length);
+				if (collections.length == 0) {	// "stats" collection does not exist
+					console.log("Creating new calldata colleciton in MongoDB");
+					mongodb.createCollection("calldata",{capped: true, size:1000000, max:5000}, function(err, result) {
+						if (err) throw err;
+        					console.log("Collection calldata is created capped size 100000, max 5000 entries");
+						colCallData = mongodb.collection('calldata');
+					});
+				}
+				else {
+					// events collection exist already
+					console.log("Collection calldata exists");
+					colCallData = mongodb.collection('calldata');
+					// insert an entry to record the start of ace direct
+					colCallData.insertOne(data, function(err, result) {
+						if(err){
+							console.log("Insert a record into calldata collection of MongoDB, error: " + err);
+							logger.debug("Insert a record into calldata collection of MongoDB, error: " + err);
+							throw err;
+						}
+					});
+				}
+
+			});
+		}
+	});
+} else {
+	console.log('Missing MongoDB Connection URI in config');
+
+	//httpsServer.listen(port);
+	//console.log('https web server listening on ' + port);
+}
 
 var credentials = {
 	key: fs.readFileSync(getConfigVal('common:https:private_key')),
@@ -311,6 +445,16 @@ var fqdnUrl = 'https://' + fqdnTrimmed + ':*';
 
 logger.info('FQDN URL: ' + fqdnUrl);
 
+//Note: privacy video file must be configured and served by media server
+var privacy_video_url = '';
+if (nconf.get('media_server:privacy_video_url')) {
+  privacy_video_url = getConfigVal('media_server:privacy_video_url');
+} else {
+  privacy_video_url = 'file:///tmp/media/videoPrivacy.webm'; //default to this if not in config.json
+}
+// Remove the newline
+var privacy_video_url = privacy_video_url.trim();
+
 var httpsServer = https.createServer(credentials, app);
 
 //constant to identify provider devices in AMI messages
@@ -335,7 +479,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 // Validates the token, if valid go to connection.
 // If token is not valid, no connection will be established.
 io.use(socketioJwt.authorize({
-	secret: new Buffer(getConfigVal('web_security:json_web_token:secret_key'), getConfigVal('web_security:json_web_token:encoding')),
+	secret: Buffer.alloc(jwtKey.length, jwtKey , jwtEnc ),
 	timeout: parseInt(getConfigVal('web_security:json_web_token:timeout')), // seconds to send the authentication message
 	handshake: getConfigVal('web_security:json_web_token:handshake')
 }));
@@ -365,6 +509,71 @@ io.sockets.on('connection', function (socket) {
 		// Add this socket to the room
 		socket.join('my room');
 	});
+
+	//Handle multiple files
+	socket.on('get-file-list', function(data){
+		let vrsNum =  (token.vrs) ? token.vrs : data.vrs;
+		let  url = 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port');
+		url += '/fileListByVRS?vrs=' + vrsNum;
+			request({
+				url: url,
+				json: true
+			}, function (error, response, results) {
+				if (error) {
+					console.log("Error");
+				} else {
+					if(results.message == "Success"){
+						redisClient.hget(rConsumerToCsr, Number(data.vrs), function (err, agentExtension) {
+							var vrs = null;
+							console.log("Token is " + JSON.stringify(token) + "\n and data is " + JSON.stringify(data));
+							//if (token.vrs) {
+								//vrs = token.vrs;
+							if(token.phone){
+								vrs = token.phone.replace(/-/g,"");
+							} else {
+								vrs = data.vrs;
+							}
+							console.log("Sending file list message to " + vrs + " with " + JSON.stringify(results));
+							
+							io.to(Number(vrsNum)).emit('fileList', results);
+						});
+					}else{
+						console.log("ANother error");
+					}
+				}
+			});
+	});
+
+	//Handle new multi party invite since we need to manually tell the agent a call is coming.
+	socket.on('multiparty-invite', function (data){
+		io.to(Number(data.extensions)).emit('new-caller-ringing', {
+			'phoneNumber': data.extensions,
+			'callerNumber' : data.callerNumber
+		  });
+	});
+
+	socket.on('requestScreenshare', function(data){
+		console.log("Receiving screenshare request to " + data.agentNumber);
+		io.to(Number(data.agentNumber)).emit('screenshareRequest', {
+			'agentNumber' : data.agentNumber
+		});
+	});
+
+	socket.on('screenshareResponse', function(data){
+		console.log('Received agent screenshare reply');
+		io.to(Number(data.number)).emit('screenshareResponse', {
+			'permission' : data.permission
+		});
+	});
+
+	//Get all agents statuses and extensions.  Used for multi party option dropdown.
+	/*socket.on('ami-req', function(message){
+		if(message === 'agent'){
+			socket.emit('agent-resp', {
+				'agents' : Agents
+			});
+		}
+	});*/
 
 	// Handle incoming Socket.IO registration requests from an agent - add to the room
 	socket.on('register-agent', function (data) {
@@ -406,6 +615,25 @@ io.sockets.on('connection', function (socket) {
 		}
 	});
 
+
+        /* pause/unpause a queue
+           For example...
+           b: "true" , "false"
+           ext: "33001"
+           qname: "ComplaintsQueue"
+        */
+        function pauseQueue(b,ext,qname) {
+          logger.info('pauseQueue() , ' + b.toString() + ' , ' +  ext + ', ' + qname);
+          ami.action({
+            "Action": "QueuePause",
+            "ActionId": "1000",
+            "Interface": "PJSIP/" + ext,
+            "Paused": b.toString(),
+            "Queue": qname,
+            "Reason": "QueuePause in pause-queue event handler"
+          }, function (err, res) {});
+        }
+
 	/*
 	 * Handler catches a Socket.IO message to pause both queues. Note, we are
 	 * pausing both queues, but, the extension is the same for both.
@@ -414,30 +642,14 @@ io.sockets.on('connection', function (socket) {
 
 		// Pause the first queue
 		if (token.queue_name) {
-			logger.info('PAUSING QUEUE: PJSIP/' + token.extension + ', queue name ' + token.queue_name);
-
-			ami.action({
-				"Action": "QueuePause",
-				"ActionId": "1000",
-				"Interface": "PJSIP/" + token.extension,
-				"Paused": "true",
-				"Queue": token.queue_name,
-				"Reason": "QueuePause in pause-queue event handler"
-			}, function (err, res) {});
+                  logger.info('PAUSING QUEUE: PJSIP/' + token.extension + ', queue name ' + token.queue_name);
+                  pauseQueue(true,token.extension,token.queue_name);
 		}
 
 		// Pause the second queue (if not null)
 		if (token.queue2_name) {
-			logger.info('PAUSING QUEUE: PJSIP/' + token.extension + ', queue name ' + token.queue2_name);
-
-			ami.action({
-				"Action": "QueuePause",
-				"ActionId": "1000",
-				"Interface": "PJSIP/" + token.extension,
-				"Paused": "true",
-				"Queue": token.queue2_name,
-				"Reason": "QueuePause in pause-queue event handler"
-			}, function (err, res) {});
+                  logger.info('PAUSING QUEUE: PJSIP/' + token.extension + ', queue name ' + token.queue2_name);
+                  pauseQueue(true,token.extension,token.queue2_name);
 		}
 	});
 
@@ -462,6 +674,10 @@ io.sockets.on('connection', function (socket) {
 
 	// Sets the agent state to WRAPUP
 	socket.on('wrapup', function () {
+
+                pauseQueue(true,token.extension,token.queue_name); //pause agent during wrapup mode
+                pauseQueue(true,token.extension,token.queue2_name); //pause agent during wrapup mode
+
 		logger.info('State: WRAPUP - ' + token.username);
 		redisClient.hset(rStatusMap, token.username, "WRAPUP", function (err, res) {
 			sendAgentStatusList(token.username, "WRAPUP");
@@ -470,8 +686,12 @@ io.sockets.on('connection', function (socket) {
 	});
 
 	// Sets the agent state to INCALL
-	socket.on('incall', function () {
+	socket.on('incall', function (data) {
 		logger.info('State: INCALL - ' + token.username);
+		if (data.vrs) {
+			// Dealing with a WebRTC consumer, otherwise, it is a Linphone
+			socket.join(Number(data.vrs));
+		}
 		redisClient.hset(rStatusMap, token.username, "INCALL", function (err, res) {
 			sendAgentStatusList(token.username, "INCALL");
 			redisClient.hset(rTokenMap, token.lightcode, "INCALL");
@@ -526,29 +746,13 @@ io.sockets.on('connection', function (socket) {
 	socket.on('unpause-queues', function () {
 
 		if (token.queue_name) {
-			logger.info('UNPAUSING QUEUE: PJSIP/' + token.extension + ', queue name ' + token.queue_name);
-
-			ami.action({
-				"Action": "QueuePause",
-				"ActionId": "1000",
-				"Interface": "PJSIP/" + token.extension,
-				"Paused": "false",
-				"Queue": token.queue_name,
-				"Reason": "QueuePause in pause-queue event handler"
-			}, function (err, res) {});
+                  logger.info('UNPAUSING QUEUE: PJSIP/' + token.extension + ', queue name ' + token.queue_name);
+                  pauseQueue(false,token.extension,token.queue_name);
 		}
 
 		if (token.queue2_name) {
-			logger.info('UNPAUSING QUEUE: PJSIP/' + token.extension + ', queue name ' + token.queue2_name);
-
-			ami.action({
-				"Action": "QueuePause",
-				"ActionId": "1000",
-				"Interface": "PJSIP/" + token.extension,
-				"Paused": "false",
-				"Queue": token.queue2_name,
-				"Reason": "QueuePause in pause-queue event handler"
-			}, function (err, res) {});
+                  logger.info('UNPAUSING QUEUE: PJSIP/' + token.extension + ', queue name ' + token.queue2_name);
+                  pauseQueue(false,token.extension,token.queue2_name);
 		}
 	});
 
@@ -594,6 +798,20 @@ io.sockets.on('connection', function (socket) {
 		//Remove the consumer from the extension map.
 		if (token.vrs) {
 			redisClient.hget(rExtensionToVrs, Number(token.vrs), function (err, ext) {
+
+                        regex_str =  "/^PJSIP/" + ext + "-.*$/";
+                        ami.action({
+                                "Action": "Hangup",
+                                "ActionID": "4",
+                                "Channel": regex_str
+                        }, function (err, res) {
+                          if (err) {
+                            logger.info('ERROR in hangup');
+                          } else {
+                            logger.info('SUCCESS hangup');
+                          }
+                        });
+
 				redisClient.hget(rConsumerExtensions, Number(ext), function (err, reply) {
 					if (err) {
 						logger.error("Redis Error" + err);
@@ -602,6 +820,8 @@ io.sockets.on('connection', function (socket) {
 						val.inuse = false;
 						redisClient.hset(rConsumerExtensions, Number(ext), JSON.stringify(val));
 						redisClient.hset(rTokenMap, token.lightcode, "OFFLINE");
+                                                redisClient.hdel(rExtensionToVrs, Number(ext));
+                                                redisClient.hdel(rExtensionToVrs, Number(token.vrs));
 					}
 				});
 			});
@@ -745,119 +965,152 @@ io.sockets.on('connection', function (socket) {
 
 	//Retrieval of videomail records from the database
 	socket.on("get-videomail", function (data) {
-		console.log('entered get-videomail');
-		console.log('test');
-		var sortBy = data.sortBy;
-		var filterFlag = processFilter(data.filter);
-		if (filterFlag) {
-			if (sortBy.includes('asc')) {
-				sortStr = sortBy.slice(0, sortBy.length - 4);
-				queryStr = "SELECT id, extension, callbacknumber, recording_agent, processing_agent, DATE_FORMAT(convert_tz(received,@@session.time_zone,'-04:00'), '%a %m/%d/%Y %h:%i %p') as received, processed, video_duration, status, deleted, src_channel, dest_channel, unique_id, video_filename, video_filepath FROM " + vmTable + " WHERE deleted = 0 and status = " + filterFlag + " ORDER BY " + sortStr + " asc";
-				console.log(queryStr);
-				dbConnection.query(queryStr, function (err, result) {
-					if (err) {
-						console.log("GET-VIDEOMAIL ERROR: ", err.code);
-					} else {
-						io.to(Number(data.extension)).emit('got-videomail-recs', result);
-					}
-				});
-			} else if (sortBy.includes('desc')) {
-				sortStr = sortBy.slice(0, sortBy.length - 5);
-				queryStr = "SELECT id, extension, callbacknumber, recording_agent, processing_agent, DATE_FORMAT(convert_tz(received,@@session.time_zone,'-04:00'), '%a %m/%d/%Y %h:%i %p') as received, processed, video_duration, status, deleted, src_channel, dest_channel, unique_id, video_filename, video_filepath FROM " + vmTable + " WHERE deleted = 0 and status = " + filterFlag + " ORDER BY " + sortStr + " desc";
-				console.log(queryStr);
-				dbConnection.query(queryStr, function (err, result) {
-					if (err) {
-						console.log("GET-VIDEOMAIL ERROR: ", err.code);
-					} else {
-						io.to(Number(data.extension)).emit('got-videomail-recs', result);
-					}
-				});
-			}
+		logger.debug('entered get-videomail');
+		let filterFlag = (data.filter === "ALL"||typeof data.filter === 'undefined')?false:true;
+		let sort = (typeof data.sortBy === 'undefined')?[]:data.sortBy.split(" ");
 
-		} else {
-			if (sortBy.includes('asc')) {
-				sortStr = sortBy.slice(0, sortBy.length - 4);
-				queryStr = "SELECT id, extension, callbacknumber, recording_agent, processing_agent, DATE_FORMAT(convert_tz(received,@@session.time_zone,'-04:00'), '%a %m/%d/%Y %h:%i %p') as received, processed, video_duration, status, deleted, src_channel, dest_channel, unique_id, video_filename, video_filepath FROM " + vmTable + " WHERE deleted = 0 ORDER BY " + sortStr + " asc";
-				console.log(queryStr);
-				dbConnection.query(queryStr, function (err, result) {
-					if (err) {
-						console.log("GET-VIDEOMAIL ERROR: ", err.code);
-					} else {
-						io.to(Number(data.extension)).emit('got-videomail-recs', result);
-					}
-				});
-			} else if (sortBy.includes('desc')) {
-				sortStr = sortBy.slice(0, sortBy.length - 5);
-				queryStr = "SELECT id, extension, callbacknumber, recording_agent, processing_agent, DATE_FORMAT(convert_tz(received,@@session.time_zone,'-04:00'), '%a %m/%d/%Y %h:%i %p') as received, processed, video_duration, status, deleted, src_channel, dest_channel, unique_id, video_filename, video_filepath FROM " + vmTable + " WHERE deleted = 0 ORDER BY " + sortStr + " desc";
-				console.log(queryStr);
-				dbConnection.query(queryStr, function (err, result) {
-					if (err) {
-						console.log("GET-VIDEOMAIL ERROR: ", err.code);
-					} else {
-						io.to(Number(data.extension)).emit('got-videomail-recs', result);
-					}
-				});
-			}
+		let vm_sql_select = `SELECT id, extension, callbacknumber, recording_agent, processing_agent,
+			received, processed, video_duration, status, deleted, src_channel, dest_channel, unique_id,
+			video_filename, video_filepath FROM ${vmTable}`;
+		let vm_sql_where = `WHERE deleted = 0`;
+		let vm_sql_order = ``;
+		let vm_sql_params = [];
+
+		if(filterFlag){
+			vm_sql_where += ` and status = ?`;
+			vm_sql_params.push(data.filter);
 		}
-		queryStr = "SELECT COUNT(*) AS unreadMail FROM " + vmTable + " WHERE UPPER(status)='UNREAD';";
-		dbConnection.query(queryStr, function (err, result) {
+		if(sort.length == 2){
+			vm_sql_order = ` ORDER BY ??`;
+			vm_sql_params.push(sort[0]);
+			if(sort[1] == 'desc')
+				vm_sql_order += ` DESC`;
+		}
+
+		let vm_sql_query = `${vm_sql_select} ${vm_sql_where} ${vm_sql_order};`;
+		dbConnection.query(vm_sql_query, vm_sql_params, function (err, result) {
 			if (err) {
-				console.log("COUNT-UNREAD-MAIL ERROR: ", err.code);
+				logger.error("GET-VIDEOMAIL ERROR: " + err.code);
 			} else {
-				console.log(result);
-				io.to(Number(data.extension)).emit('got-unread-count', result[0].unreadMail);
+				io.to(token.extension).emit('got-videomail-recs', result);
 			}
 		});
-		queryStr = "UPDATE " + vmTable + " SET deleted = 1, deleted_time = CURRENT_TIMESTAMP, deleted_by = 'auto_delete' WHERE (UPPER(status)='READ' OR UPPER(status)='CLOSED') AND TIMESTAMPDIFF(DAY, processed, CURRENT_TIMESTAMP) >= 14;";
-		dbConnection.query(queryStr, function(err, result) {
+
+		let vm_sql_count_query = `SELECT COUNT(*) AS unreadMail FROM ${vmTable} WHERE UPPER(status)='UNREAD';`;
+		dbConnection.query(vm_sql_count_query, function (err, result) {
 			if (err) {
-				console.log('DELETE-OLD-VIDEOMAIL ERROR: ', err.code);
+				logger.error("COUNT-UNREAD-MAIL ERROR: "+ err.code);
 			} else {
-				console.log('Deleted old videomail');
+				logger.debug(result);
+				io.to(token.extension).emit('got-unread-count', result[0].unreadMail);
+			}
+		});
+
+		let vm_sql_deleteOld = `UPDATE ${vmTable} SET deleted = 1, deleted_time = CURRENT_TIMESTAMP,
+			deleted_by = 'auto_delete' WHERE (UPPER(status)='READ' OR UPPER(status)='CLOSED') AND
+			TIMESTAMPDIFF(DAY, processed, CURRENT_TIMESTAMP) >= 14;`;
+		dbConnection.query(vm_sql_deleteOld, function(err, result) {
+			if (err) {
+				logger.error('DELETE-OLD-VIDEOMAIL ERROR: '+ err.code);
+			} else {
+				logger.debug('Deleted old videomail');
 			}
 		});
 	});
 
 	//updates videomail records when the agent changes the status
 	socket.on("videomail-status-change", function (data) {
-		console.log('updating MySQL entry');
-		queryStr = "UPDATE " + vmTable + " SET status = '" + data.status + "', processed = CURRENT_TIMESTAMP, processing_agent = " + data.extension + " WHERE id = " + data.id;
-		console.log(queryStr);
-		dbConnection.query(queryStr, function (err, result) {
+		logger.debug('updating MySQL entry');
+
+		let vm_sql_query = `UPDATE ${vmTable} SET status = ?, processed = CURRENT_TIMESTAMP,
+			processing_agent = ? WHERE id = ?;`;
+		let vm_sql_params = [data.status, token.extension, data.id];
+
+		logger.debug(vm_sql_query + " " + vm_sql_params);
+
+		dbConnection.query(vm_sql_query, vm_sql_params,function (err, result) {
 			if (err) {
-				console.log('VIDEOMAIL-STATUS-CHANGE ERROR: ', err.code);
+				logger.error('VIDEOMAIL-STATUS-CHANGE ERROR: '+ err.code);
 			} else {
-				console.log(result);
-				io.to(Number(data.extension)).emit('changed-status', result);
+				logger.debug(result);
+				io.to(token.extension).emit('changed-status', result);
 			}
 		});
 	});
 	//changes the videomail status to READ if it was UNREAD before
 	socket.on("videomail-read-onclick", function (data) {
-		console.log('updating MySQL entry');
-		queryStr = "UPDATE " + vmTable + " SET status = 'READ', processed = CURRENT_TIMESTAMP, processing_agent = " + data.extension + " WHERE id = " + data.id;
-		console.log(queryStr);
-		dbConnection.query(queryStr, function (err, result) {
+		logger.debug('updating MySQL entry');
+
+		let vm_sql_query = `UPDATE ${vmTable} SET status = 'READ',
+			processed = CURRENT_TIMESTAMP, processing_agent = ? WHERE id = ?;`;
+		let vm_sql_params = [token.extension, data.id];
+
+		logger.debug(vm_sql_query + " " + vm_sql_params);
+
+		dbConnection.query(vm_sql_query, vm_sql_params,function (err, result) {
 			if (err) {
-				console.log('VIDEOMAIL-READ ERROR: ', err.code);
+				logger.error('VIDEOMAIL-READ ERROR: '+ err.code);
 			} else {
-				console.log(result);
-				io.to(Number(data.extension)).emit('changed-status', result);
+				logger.debug(result);
+				io.to(token.extension).emit('changed-status', result);
 			}
 		});
 	});
 	//updates videomail records when the agent deletes the videomail. Keeps it in db but with a deleted flag
 	socket.on("videomail-deleted", function (data) {
-		console.log('updating MySQL entry');
-		queryStr = "UPDATE " + vmTable + " SET deleted_time = CURRENT_TIMESTAMP, deleted_by = " + data.extension + ", deleted = 1 WHERE id = " + data.id;
-		dbConnection.query(queryStr, function (err, result) {
+		logger.debug('updating MySQL entry');
+
+		let vm_sql_query = `UPDATE ${vmTable} SET deleted_time = CURRENT_TIMESTAMP, deleted_by = ?, deleted = 1  WHERE id = ?;`;
+		let vm_sql_params = [token.extension, data.id];
+
+		logger.debug(vm_sql_query + " " + vm_sql_params);
+
+		dbConnection.query(vm_sql_query, vm_sql_params,function (err, result) {
 			if (err) {
-				console.log('VIDEOMAIL-DELETE ERROR: ', err.code);
+				logger.error('VIDEOMAIL-DELETE ERROR: '+ err.code);
 			} else {
-				console.log(result);
-				io.to(Number(data.extension)).emit('changed-status', result);
+				logger.debug(result);
+				io.to(token.extension).emit('changed-status', result);
 			}
 		});
+	});
+
+	/**
+	 * Socket call for request to obtain file from fileShare
+	 */
+	socket.on('uploadFile', function (data) {
+		console.log("RECEIVED EVENT FILE " + data);
+		logger.info("Adding agent socket to room named: " + token.extension);
+		logger.info(socket.id);
+		logger.info(socket.request.connection._peername);
+
+		// Add this socket to the room
+		socket.join(token.extension);
+
+		var url = 'https://' + getConfigVal('common:private_ip') + ':9905';
+		if (url) {
+			url += '/storeFileName';
+
+			request({
+				url: url,
+				method: 'POST'
+				//TODO Add the file body
+			}, function (error, response, data) {
+				if (error) {
+					logger.error("ERROR: /storeFileName/");
+					data = {
+						"message": "failed"
+					};
+					console.log('Error on file share');
+					//io.to(token.extension).emit('script-data', data);
+				} else {
+					//io.to(token.extension).emit('script-data', data);
+					console.log('File share connection successful.');
+					console.log('RESPONSE ' + JSON.stringify(response));
+					socket.emit('postFile', response);
+				}
+			});
+		}
 	});
 
 });
@@ -970,6 +1223,18 @@ function popZendesk(callId,ani,agentid,agentphonenum,skillgrpnum,skillgrpnam,cal
 	});
 }
 
+function insertCallDataRecord (eventType) {
+	if (logCallData) {
+		colCallData = mongodb.collection('calldata');
+		colCallData.insertOne({"Timestamp": new Date(), "Event": eventType}, function(err, result) {
+			if(err){
+				console.log("Insert a Web call record into calldata collection of MongoDB, error: " + err);
+				logger.debug("Insert a Web call record into calldata collection of MongoDB, error: " + err);
+			}
+		});
+	}
+}
+
 /**
  * Event handler to catch the incoming AMI events. Note, these are the
  * events that are auto-generated by Asterisk (don't require any AMI actions
@@ -986,15 +1251,38 @@ function handle_manager_event(evt) {
   logger.info('\n######################################');
   logger.info('Received an AMI event: ' + evt.event);
   logger.info(util.inspect(evt, false, null));
-
+  //console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>The event is " + evt.event);
   switch (evt.event) {
+
+	case ('VarSet'):
+		//let channel = evt.channel.split(/[\/,-]/);
+		//console.log(JSON.stringify(evt))
+		//if(channel[1]  && (channel[1].startsWith("ProviderPurple") || channel[1].startsWith("ProviderZVRS")) && 
+		if (evt.variable && evt.variable.bridgepeer == ''){
+			let agentExt = evt.value.split(/[\/,-]/);
+			console.log("sending new-peer to", agentExt[1])
+			if(agentExt[1])
+				io.to(agentExt[1]).emit('new-peer',{});
+		}		
+		break;
+
 
     // Sent by Asterisk when the call is answered
     case ('DialEnd'):
-
       // Make sure this is an ANSWER event only
       if (evt.dialstatus === 'ANSWER') {
 
+		insertCallDataRecord("Handled");
+
+        logger.info('DialEnd / ANSWER: evt.context is: >' + evt.context + '< , evt.channel is: >' + evt.channel + '<');
+		logger.info("Event is " + JSON.stringify(evt, null, 2));
+		
+		if (evt.context === 'from-internal' & evt.destchannel.includes(PROVIDER_STR)) {
+			
+			let channel = evt.channel;
+			let channelExt = channel.split(/[\/,-]/);
+			io.to(Number(channelExt[1])).emit('outbound-answered', {});
+		}
         /*
          * For the complaints queue, we do the following:
          * - Get the extension number (channel field?)
@@ -1005,7 +1293,7 @@ function handle_manager_event(evt) {
          * Note, calls from WebRTC go to the complaints queue, while calls from the Zphone go to the
          * 'Provider_Complaints' queue (corresponds to option #5 on the Zphone).
          */
-        if (evt.context === 'Complaints' || evt.context === 'Provider_Complaints') {
+        if (evt.context == 'from-internal' || evt.context === 'Complaints' || evt.context === 'Provider_Complaints') {
           // Case #5
 
           logger.info('DialEnd processing from a Complaints queue call. evt.context is: ' + evt.context + ' , evt.channel is: ' + evt.channel);
@@ -1021,8 +1309,10 @@ function handle_manager_event(evt) {
             logger.info('Matched on ' + extension[1] + ', setting extension[1] to ' + evt.calleridnum);
             extension[1] = evt.calleridnum;
           } else {
-            logger.info("No phone match, but this could be a WebRTC extension: " + extension[1] + ". leaving extension[1] alone to continue processing...");
-          }
+			logger.info("No phone match, but this could be a WebRTC extension: " + extension[1] + ". leaving extension[1] alone to continue processing...");
+		  }
+
+		  insertCallDataRecord("Web");
 
           var destExtString = evt.destchannel;
           var destExtension = destExtString.split(/[\/,-]/);
@@ -1140,6 +1430,57 @@ function handle_manager_event(evt) {
             io.to(Number(agentExtension[1])).emit('new-caller-general', evt.context);
 
           }
+        } else {
+          // if we don't recognize the evt.context, then we will assume a web call (and allow chat)
+          logger.info('DialEnd processing from a UNKNOWN queue call. evt.context is: ' + evt.context + ' , evt.channel is: ' + evt.channel);
+
+          // Format is PJSIP/nnnnn-xxxxxx, we want to strip out the nnnnn only
+          var extString = evt.channel;
+          var extension = extString.split(/[\/,-]/);
+          var isOurPhone = false;
+
+          //is this one of our phones? one that we expect?
+          if ( extension[1].startsWith(PROVIDER_STR) ) {
+            isOurPhone = true;
+            logger.info('Matched on ' + extension[1] + ', setting extension[1] to ' + evt.calleridnum);
+            extension[1] = evt.calleridnum;
+          } else {
+            logger.info("No phone match, but this could be a WebRTC extension: " + extension[1] + ". leaving extension[1] alone to continue processing...");
+          }
+
+          var destExtString = evt.destchannel;
+          var destExtension = destExtString.split(/[\/,-]/);
+          redisClient.hset(rConsumerToCsr, Number(extension[1]), Number(destExtension[1]));
+          logger.info('Populating consumerToCsr: ' + extension[1] + ' => ' + destExtension[1]);
+          logger.info('Extension number: ' + extension[1]);
+          logger.info('Dest extension number: ' + destExtension[1]);
+
+          if (extension[1].length >= 10) {
+            //pop here, because we already have the consumer phone number
+            popZendesk(evt.destuniqueid,extension[1],destExtension[1],destExtension[1],"","","","");
+          }
+
+          redisClient.hget(rExtensionToVrs, Number(extension[1]), function (err, vrsNum) {
+            if (!err && vrsNum) {
+              // Call new function
+              logger.info('Calling vrsAndZenLookup with ' + vrsNum + ' and ' + destExtension[1]);
+
+              //mapped consumer extension to a vrs num. so now we can finally pop
+              popZendesk(evt.destuniqueid,vrsNum,destExtension[1],destExtension[1],"","","","");
+
+              vrsAndZenLookup(Number(vrsNum), Number(destExtension[1]));
+            } else if ( isOurPhone ) {
+              vrsAndZenLookup(Number(extension[1]), Number(destExtension[1]));
+              io.to(Number(destExtension[1])).emit('no-ticket-info', {});
+            } else {
+              // Trigger to agent to indicate that we don't have a valid VRS, agent will prompt user for VRS
+              io.to(Number(destExtension[1])).emit('missing-vrs', {});
+            }
+
+          });
+          //tell CSR portal that a complaints queue call has connected
+          io.to(Number(destExtension[1])).emit('new-caller-complaints', evt.context);
+
         }
       }
 
@@ -1147,9 +1488,10 @@ function handle_manager_event(evt) {
 
       // Sent by Asterisk when the caller hangs up
     case ('Hangup'):
-
       var extString = evt.channel;
       var extension = extString.split(/[\/,-]/);
+
+      logger.info('HANGUP RECEIVED: evt.context:' + evt.context + ' , evt.channel:' + evt.channel);
 
       if (evt.context === 'Complaints' && extension[1].indexOf(PROVIDER_STR) === -1) {
         // Consumer portal ONLY! Zphone Complaint queue calls will go to the next if clause
@@ -1214,30 +1556,19 @@ function handle_manager_event(evt) {
 
         redisClient.hget(rLinphoneToAgentMap, Number(linphoneExtension[1]), function (err, agentExtension) {
           if (agentExtension !== null) {
-            logger.info('if - sending chat leave to agent extension: ' + agentExtension + ', ' + evt.calleridnum);
-            io.to(Number(agentExtension)).emit('chat-leave', {
-              "extension": agentExtension,
-              "vrs": evt.calleridnum
-            });
             // Remove the entry
             redisClient.hdel(rLinphoneToAgentMap, Number(linphoneExtension[1]));
           } else {
             redisClient.hget(rConsumerToCsr, Number(evt.calleridnum), function (err, agentExtension) {
-              logger.info('consumerToCsr else if()');
-              logger.info('agentExtension: ' + agentExtension);
-              logger.info('if - else sending chat leave to agent extension: ' + agentExtension + ', ' + evt.calleridnum);
-
-              io.to(Number(agentExtension)).emit('chat-leave', {
-                "extension": agentExtension,
-                "vrs": evt.calleridnum
-              });
               //Remove rConsumerToCsr redis map on hangups.
               redisClient.hdel(rConsumerToCsr, Number(evt.calleridnum));
             });
           }
         });
       } else if (evt.context === 'from-internal' && evt.connectedlinenum === queuesVideomailNumber) {
-        logger.info('Processing Hangup from a WebRTC Videomail call (Consumer hangup)');
+		logger.info('Processing Hangup from a WebRTC Videomail call (Consumer hangup)');
+
+		insertCallDataRecord("Videomail");
 
         logger.info('VIDEOMAIL Hangup extension number: ' + evt.calleridnum);
 
@@ -1268,14 +1599,6 @@ function handle_manager_event(evt) {
 
         redisClient.hget(rExtensionToVrs, Number(evt.calleridnum), function (err, vrsNum) {
           if (!err && vrsNum) {
-
-            /**
-            logger.info('Sending chat-leave for socket id ' + vrsNum);
-            io.to(Number(vrsNum)).emit('chat-leave', {
-              "vrs": vrsNum
-            });
-            **/
-
             // Remove the extension when we're finished
             redisClient.hdel(rExtensionToVrs, Number(evt.calleridnum));
             redisClient.hdel(rExtensionToVrs, Number(vrsNum));
@@ -1286,7 +1609,7 @@ function handle_manager_event(evt) {
 
       } else if (evt.context === 'from-internal') {
         if (evt.channelstatedesc === 'Ringing') {
-          //this is an abandoned call
+		  //this is an abandoned call
           var channelStr = evt.channel;
           var agentExtension = (channelStr.split(/[\/,-]/))[1];
 
@@ -1324,6 +1647,9 @@ function handle_manager_event(evt) {
             "vrs": ""
           });
         }
+      } else {
+          //SOFT ERROR- if we get here, then we didn't process the hangup. need to check evt string values with our if statements above
+          logger.error('ERROR!!! HANGUP NOT PROCESSED!!! VERIFY evt string values... evt.context:' + evt.context + ' , evt.channel:' + evt.channel);
       }
 
       break;
@@ -1496,12 +1822,14 @@ function handle_manager_event(evt) {
         });
 
       }
-      break;
+	  break;
 
       //sent by asterisk when a caller leaves the queue before they were connected
       case('QueueCallerAbandon'):
       	var data = {"position": evt.position, "extension": evt.calleridnum, "queue": evt.queue};
-      	sendEmit('queue-caller-abandon',data);
+		  sendEmit('queue-caller-abandon',data);
+
+		  insertCallDataRecord("Abandoned");
       	break;
       //sent by asterisk when a caller joins the queue
       case('QueueCallerJoin'):
@@ -1542,7 +1870,9 @@ function init_ami() {
 			// Define event handlers here
 
       //add only the manager ami events we care about
+      //ami.on('managerevent', handle_manager_event);
       ami.on('dialend', handle_manager_event);
+      ami.on('varset', handle_manager_event);
       ami.on('hangup', handle_manager_event);
       ami.on('attendedtransfer', handle_manager_event);
       ami.on('newstate', handle_manager_event);
@@ -1567,6 +1897,30 @@ function init_ami() {
 init_ami();
 
 //polling methods
+
+//for the consumer portal when a customer is waiting in queue and no agents are available (i.e., not AWAY)
+setInterval(function () {
+  redisClient.hgetall(rAgentInfoMap, function (err, data) {
+    if (data) {
+      agents_logged_in = false;
+      for (var prop in data) {
+        if (Object.prototype.hasOwnProperty.call(data, prop)) {
+          obj = JSON.parse(data[prop]);
+          astatus = obj.status;
+          astatus = astatus.toUpperCase();
+          if (astatus !== 'AWAY') {
+            agents_logged_in = true;
+            break;
+          }
+        }
+      }
+      sendEmit('agents',{'agents_logged_in': agents_logged_in});
+    } else {
+      sendEmit('agents',{'agents_logged_in':false});
+    }
+  });
+}, 5000);
+
 setInterval(function () {
   // Keeps connection from Inactivity Timeout
   dbConnection.ping();
@@ -1574,7 +1928,7 @@ setInterval(function () {
 
 setInterval(function () {
   //query for after hours
-  logger.info('GET operatinghours...');
+  logger.debug('GET operatinghours...');
   var ohurl = 'https://' + getConfigVal('common:private_ip') + ":" + parseInt(getConfigVal('agent_service:port')) + '/operatinghours';
   request({
     method: 'GET',
@@ -1587,19 +1941,20 @@ setInterval(function () {
     if (error) {
       logger.error("GET operatinghours: " + error);
     } else {
-      logger.info("GET operatinghours success:");
-      logger.info(JSON.stringify(data));
+      logger.debug("GET operatinghours success:");
+      logger.debug(JSON.stringify(data));
       isOpen = data.isOpen;
-      logger.info("isOpen is: " + isOpen);
+      logger.debug("isOpen is: " + isOpen);
 
       //operating hours
       startTimeUTC = data.start; //hh:mm in UTC
       endTimeUTC = data.end; //hh:mm in UTC
 
     }
+    sendEmit("call-center-closed", {'closed':!isOpen});
   });
 
-}, 15000);
+}, 5000);
 
 /**
  * Calls the RESTful service running on the provider host to verify the agent
@@ -1930,6 +2285,11 @@ function processExtension(data) {
 						"stun_server": stunServer,
 						"ws_port": wsPort,
 						"password": extensionPassword,
+						"signaling_server_public": signalingServerPublic,
+						"signaling_server_port": signalingServerPort,
+						"signaling_server_proto": signalingServerProto,
+						"signaling_server_dev_url": signalingServerDevUrl,
+					        "privacy_video_url": privacy_video_url,
 						"queues_complaint_number": queuesComplaintNumber,
 						"queues_videomail_number": queuesVideomailNumber,
 						"queues_videomail_maxrecordsecs": queuesVideomailMaxrecordsecs,
@@ -2162,28 +2522,6 @@ function setInitialLoginAsteriskConfigs(user) {
 	logger.info("queue_name: " + user.queue_name);
 	logger.info("queue2_name: " + user.queue2_name);
 
-	if (user.queue_name) {
-		logger.info('ADDING QUEUE: PJSIP/' + user.extension + ', queue name ' + user.queue_name);
-
-		ami.action({
-			"Action": "QueueAdd",
-			"Interface": "PJSIP/" + user.extension,
-			"Paused": "true",
-			"Queue": user.queue_name
-		}, function (err, res) {});
-	}
-
-	if (user.queue2_name) {
-
-		logger.info('ADDING QUEUE: PJSIP/' + user.extension + ', queue name ' + user.queue2_name);
-		ami.action({
-			"Action": "QueueAdd",
-			"Interface": "PJSIP/" + user.extension,
-			"Paused": "true",
-			"Queue": user.queue2_name
-		}, function (err, res) {});
-	}
-
 	var interfaceName = 'PJSIP/' + user.extension;
 	var queueList = {
 		"queue_name": user.queue_name,
@@ -2223,7 +2561,7 @@ function decodeBase64(encodedString) {
 	if (clearText) {
 		decodedString = encodedString;
 	} else {
-		decodedString = new Buffer(encodedString, 'base64');
+		decodedString = Buffer.alloc(encodedString.length, encodedString, 'base64');
 	}
 	return (decodedString.toString());
 }
@@ -2242,7 +2580,7 @@ function getConfigVal(param_name) {
     if (clearText) {
       decodedString = val;
     } else {
-      decodedString = new Buffer(val, 'base64');
+      decodedString = Buffer.alloc(val.length, val, 'base64');
     }
   } else {
     //did not find value for param_name
@@ -2256,6 +2594,26 @@ function getConfigVal(param_name) {
   return (decodedString.toString());
 }
 
+//Used for getting all agents for multi-party dropdown
+//Load available agents for multi-party
+//Need common_private_ip and agent_service_port
+function getAgentsFromProvider(callback){
+	var url = 'https://' + getConfigVal(COMMON_PRIVATE_IP) + ":" + parseInt(getConfigVal(AGENT_SERVICE_PORT)) + "/getallagentrecs";
+	request({
+		url: url,
+		json: true
+	}, function (err, res, data){
+		if(err) {
+			data = {
+				"message": "failed"
+			};
+		} else {
+			console.log(JSON.stringify(data));
+			callback(data);
+		}
+	});
+}
+
 function createToken() {
 	//should Check for duplicate tokens
 	return randomstring.generate({
@@ -2267,7 +2625,7 @@ function createToken() {
 
 var ctoken = jwt.sign({
 	tokenname: "servertoken"
-}, new Buffer(getConfigVal('web_security:json_web_token:secret_key'), getConfigVal('web_security:json_web_token:encoding')));
+}, Buffer.alloc(jwtKey.length, jwtKey , jwtEnc  ));
 
 // Allow cross-origin requests to be received from Management Portal
 // Used for the force logout functionality since we need to send a POST request from MP to acedirect outlining what user(s) to forcefully logout
@@ -2289,15 +2647,20 @@ app.use(function (err, req, res, next) {
  * Handles the forceful logout request from Management Portal
  */
 app.post('/forcelogout', function (req, res) {
-	console.log('in force logout post request');
 	let body = req.body;
 	let agents = body.agents;
-	console.log(JSON.stringify(agents, null, 2, true));
-	agents.forEach(function(agent){
-		// Emit the forceful logout event to each agent by extension
-		io.to(Number(agent.extension)).emit('force-logout');
-	})
+	let forceLogoutPassword = req.headers.force_logout_password;
+	// Check that the received force logout password matches the one we have in the config
+	// This verifies that the request is being made internally and is a valid request
+	if (forceLogoutPassword === getConfigVal('management_portal:force_logout_password')){
+		// Loop through all of the agents and log them out one by one
+		agents.forEach(function(agent){
+			// Emit the forceful logout event to each agent by extension
+			io.to(Number(agent.extension)).emit('force-logout');
+		})
+	}
 });
+
 /**
  * Calls the RESTful service to verify the VRS number.
  */
@@ -2330,7 +2693,9 @@ app.post('/consumer_login', function (req, res) {
 
 app.use(function (req, res, next) {
         res.locals = {
-                "nginxPath":nginxPath
+                "nginxPath":nginxPath,
+                "busyLightEnabled":busyLightEnabled,
+                "awayBlink":awayBlink
         }
         next();
 });
@@ -2363,7 +2728,7 @@ app.get('/fcc', function(req,res,next){
  * @param {string} '/Complaint'
  * @param {function} function(req, res)
  */
-app.get('/Complaint', function (req, res, next) {
+app.get(consumerPath, function (req, res, next) {
 
 
 	if (req.session.role === 'VRS') {
@@ -2439,7 +2804,7 @@ app.get('/token', function (req, res) {
                     vrs.data[0].startTimeUTC = startTimeUTC; //hh:mm in UTC
                     vrs.data[0].endTimeUTC = endTimeUTC; //hh:mm in UTC
 
-					var token = jwt.sign(vrs.data[0], new Buffer(getConfigVal('web_security:json_web_token:secret_key'), getConfigVal('web_security:json_web_token:encoding')), {
+					var token = jwt.sign(vrs.data[0], Buffer.alloc(jwtKey.length, jwtKey , jwtEnc  ), {
 						expiresIn: "2000"
 					});
 					res.status(200).json({
@@ -2473,6 +2838,11 @@ app.get('/token', function (req, res) {
 		payload.asteriskPublicHostname = req.session.asteriskPublicHostname;
 		payload.stunServer = req.session.stunServer;
 		payload.wsPort = req.session.wsPort;
+		payload.signalingServerPublic = req.session.signalingServerPublic;
+		payload.signalingServerPort = req.session.signalingServerPort;
+		payload.signalingServerProto= req.session.signalingServerProto;
+		payload.signalingServerDevUrl = req.session.signalingServerDevUrl;
+                payload.privacy_video_url = privacy_video_url;
 		payload.queuesComplaintNumber = req.session.queuesComplaintNumber;
 		payload.extensionPassword = req.session.extensionPassword;
 		payload.complaint_queue_count = complaint_queue_count;
@@ -2502,7 +2872,7 @@ app.get('/token', function (req, res) {
 		redisClient.hset(rAgentInfoMap, payload.username, JSON.stringify(agentInfo));
 		sendAgentStatusList(payload.username, "AWAY");
 
-		var token = jwt.sign(payload, new Buffer(getConfigVal('web_security:json_web_token:secret_key'), getConfigVal('web_security:json_web_token:encoding')), {
+		var token = jwt.sign(payload, Buffer.alloc(jwtKey.length, jwtKey  , jwtEnc  ), {
 			expiresIn: "2000"
 		});
 		res.status(200).json({
@@ -2527,7 +2897,7 @@ app.get('/token', function (req, res) {
  * @param {function} function(req, res)
  */
 app.get(nginxPath+'*', agent.shield(cookieShield), function (req, res) {
-	res.redirect(nginxPath+'/agent');
+	res.redirect(nginxPath+agentPath);
 });
 
 
@@ -2537,13 +2907,13 @@ app.get(nginxPath+'*', agent.shield(cookieShield), function (req, res) {
  * @param {function} function(req, res, next)
  */
 
-app.get('/agent', function (req, res, next) {
+app.get(agentPath, function (req, res, next) {
 	if (req.session.data) {
 		if (req.session.data.uid) {
 			return next(); //user is logged in go to next()
 		}
 	}
-	res.redirect('.' + nginxPath + '/agent');
+	res.redirect('.' + nginxPath + agentPath);
 });
 
 /**
@@ -2554,7 +2924,7 @@ app.get('/agent', function (req, res, next) {
  * @param {function} 'agent.shield(cookieShield)'
  * @param {function} function(req, res)
  */
-app.get('/agent', agent.shield(cookieShield), function (req, res) {
+app.get(agentPath, agent.shield(cookieShield), function (req, res) {
 	if (req.session.role === 'AD Agent') {
 		res.render('pages/agent_home');
 	} else {
@@ -2576,7 +2946,7 @@ app.get('/login', function (req, res, next) {
 			return next(); //user is logged in go to next()
 		}
 	}
-	res.redirect('.' + nginxPath + '/agent');
+	res.redirect('.' + nginxPath + agentPath);
 });
 
 /**
@@ -2655,11 +3025,16 @@ app.get('/login', agent.shield(cookieShield), function (req, res) {
 						req.session.asteriskPublicHostname = asteriskPublicHostname;
 						req.session.stunServer = stunServer;
 						req.session.wsPort = wsPort;
+						req.session.signalingServerPublic = signalingServerPublic;
+						req.session.signalingServerPort = signalingServerPort;
+						req.session.signalingServerProto= signalingServerProto;
+						req.session.signalingServerDevUrl= signalingServerDevUrl;
+						req.session.privacy_video_url = privacy_video_url;
 						req.session.queuesComplaintNumber = queuesComplaintNumber;
 						req.session.extensionPassword = extensionPassword;
 						req.session.complaint_queue_count = complaint_queue_count;
 						req.session.general_queue_count = general_queue_count;
-						res.redirect('./agent');
+						res.redirect('.' + agentPath);
 					});
 				} else {
 					res.render('pages/agent_account_pending', {
@@ -2685,22 +3060,24 @@ app.get('/updatelightconfigs', function (req, res) {
  * @param {string} '/getVideomail'
  * @param {function} function(req, res)
  */
-app.get('/getVideomail', function (req, res) {
-	console.log("/getVideomail");
+app.get('/getVideomail', agent.shield(cookieShield),function (req, res) {
+	logger.debug("/getVideomail");
 	var videoId = req.query.id;
-	console.log("id: " + videoId);
-	var agentExt = req.query.ext;
+	logger.debug("id: " + videoId);
+	var agentExt = req.session.extension;
 	//Wrap in mysql query
 	dbConnection.query('SELECT video_filepath AS filepath, video_filename AS filename FROM videomail WHERE id = ?', videoId, function (err, result) {
 		if (err) {
-			console.log('GET VIDEOMAIL ERROR: ', err.code);
+			logger.error('GET VIDEOMAIL ERROR: '+ err.code);
 		} else {
 			var videoFile = result[0].filepath + result[0].filename;
 			try {
 				var stat = fs.statSync(videoFile);
+				// Added Accept-Ranges bytes to header so seek bar & setting video.currentTime works in Chrome without always going to time zero.
 				res.writeHead(200, {
 					'Content-Type': 'video/webm',
-					'Content-Length': stat.size
+					'Content-Length': stat.size,
+					'Accept-Ranges': 'bytes'
 				});
 				var readStream = fs.createReadStream(videoFile);
 				readStream.pipe(res);
@@ -2709,6 +3086,72 @@ app.get('/getVideomail', function (req, res) {
 			}
 		}
 	});
+});
+
+//For fileshare
+//TODO Needs middleware for agent and consumer
+//Use app,get for cooki to see if auth,  If not kicked
+var multer = require('multer');
+var upload = multer({dest: 'uploads/'});
+app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
+	//console.log("File posted " + req.session.vrs);
+	let uploadedBy = req.session.vrs || ((req.session.role == 'AD Agent') ? req.body.vrs : false);
+	console.log("Valid agent " + uploadedBy);
+	console.log("SESSION " + JSON.stringify(req.session));
+	if(uploadedBy){
+		console.log("Valid agent " + uploadedBy);
+		let uploadMetadata = {};
+		uploadMetadata.vrs = uploadedBy;
+		uploadMetadata.filepath = __dirname + '/' + req.file.path;
+		uploadMetadata.originalFilename = req.file.originalname;
+		uploadMetadata.filename = req.file.filename;
+		uploadMetadata.encoding = req.file.encoding;
+		uploadMetadata.mimetype = req.file.mimetype;
+		uploadMetadata.size = req.file.size;
+		request({
+			method: 'POST',
+			url: 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port') + '/storeFileInfo',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: uploadMetadata,
+			json: true
+		}, function (error, response, data) {
+			if (error) {
+				res.status(500).send("Error");
+			} else {
+				res.status(200).send("Success");
+			}
+		});
+	}else{
+		console.log("Not valid agent");
+		res.status(403).send("Unauthorized");
+	}
+});
+
+//Download
+app.get('/downloadFile', function(req, res) {
+	let documentID = req.query.id;
+	let  url = 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port');
+	url += '/storeFileInfo?documentID=' + documentID;
+		request({
+			url: url,
+			json: true
+		}, function (error, response, data) {
+			if (error) {
+				res.status(500).send("Error");
+			} else {
+				if(data.message == "Success"){
+					let filepath = data.filepath;
+					let filename = data.filename;
+					var readStream = fs.createReadStream(filepath);
+					res.attachment(filename);
+					readStream.pipe(res);
+				}else{
+					res.status(500).send("Error");
+				}
+			}
+		});
 });
 
 

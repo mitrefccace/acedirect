@@ -478,7 +478,7 @@ However, delay the fade out process for 2.5 seconds */
     margin-right: 2px;
 }
 
-#queueModal
+.modal
 {
   z-index: 2147483647;
 }
@@ -558,8 +558,6 @@ However, delay the fade out process for 2.5 seconds */
   font-size: 20px;
 }
 
-
-
 .btn-gray
 {
   background-color: #ccc;
@@ -638,73 +636,15 @@ However, delay the fade out process for 2.5 seconds */
   padding: 0px 0px 0px 3px;
 }
 
-.#status-dropdown .dropdown-menu a
+#status-dropdown .dropdown-menu a
 {
   padding: 3px;
 }
 
-/*
-#seek-bar
-{
-  cursor: pointer;
-  height: 15px;
-  margin-bottom: 10px;
-  overflow: hidden;
-  position: relative;
-  width: 300px;
-}
-*/
-
-/*#seek-bar {
-   display:inline;
-   width:40%;
-   height:81%;
-   margin-top:0.125rem;
-   border:none;
-   color:#0095dd;
-   -moz-border-radius:2px;
-   -webkit-border-radius:2px;
-   border-radius:2px;
-}*/
-
-/* seekbar styling*/
-input[type=range] {
-  -webkit-appearance: none;
-  display: inline;
-  margin: 18px 0;
-}
-input[type=range]:focus {
-  outline: none;
-}
-input[type=range]::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 10px;
-  animate: 0.2s;
-  border-radius: 1.3px;
-  border: .5px solid grey;
-}
-#opacity-slider-consumer::-webkit-slider-runnable-track{
-  background-image: linear-gradient(to right, white,#0071bc);
-}
-#opacity-slider-agent::-webkit-slider-runnable-track{
-  background-image: linear-gradient(to right, white,darkslateblue);
-}
-input[type=range]::-webkit-slider-thumb {
-  box-shadow: 1px 1px 1px grey, 0px 0px 1px #0d0d0d;
-  border: 1px solid grey;
-  height: 16px;
-  width: 10px;
-  border-radius: 3px;
-  background: #ffffff;
-  -webkit-appearance: none;
-  margin-top: -4px;
-}
-
-/*seekbar styling for firefox and ie -- don't really need */
 input[type=range]::-moz-range-track {
   width: 100%;
   height: 10px;
-  animate: 0.2s;
+  /* animate: 0.2s; */
   background-image: linear-gradient(to right, white,#0071bc);
   border-radius: 1.3px;
   border: .5px solid grey;
@@ -721,7 +661,7 @@ input[type=range]::-ms-track {
   width: 100%;
   height: 10px;
   cursor: pointer;
-  animate: 0.2s;
+  /* animate: 0.2s; */
   background: transparent;
   border-color: transparent;
   border-width: 16px 0;
@@ -754,8 +694,79 @@ input[type=range]:focus::-ms-fill-upper {
   background: #367ebd;
 }
 
-/*Dialpad styling*/
+/* seekbar styling */
+#seek-bar {
+  margin: auto;
+  -webkit-appearance: none;
+  position: relative;
+  overflow: hidden;
+  height: 15px;
+  width: 80%;
+  cursor: pointer;
+  border-radius: 0;
+  margin-bottom: 10px;
+}
 
+#seek-bar::-webkit-slider-runnable-track {
+  background: #ddd;
+}
+
+#seek-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 1px;
+  height: 20px;
+  background: #fff;
+  box-shadow: -100vw 0 0 100vw dodgerblue;
+  border: 1px solid #999;
+}
+
+#seek-bar::-moz-range-track {
+  height: 20px;
+  background: #ddd;
+}
+
+#seek-bar::-moz-range-thumb {
+  background: #fff;
+  height: 20px;
+  width: 1px;
+  border: 3px solid #999;
+  border-radius: 0 !important;
+  box-shadow: -100vw 0 0 100vw dodgerblue;
+  box-sizing: border-box;
+}
+
+#seek-bar::-ms-fill-lower {
+  background: dodgerblue;
+}
+
+#seek-bar::-ms-thumb {
+  background: #fff;
+  border: 2px solid #999;
+  height: 20px;
+  width: 1px;
+  box-sizing: border-box;
+}
+
+#seek-bar::-ms-ticks-after {
+  display: none;
+}
+
+#seek-bar::-ms-ticks-before {
+  display: none;
+}
+
+#seek-bar::-ms-track {
+  background: #ddd;
+  color: transparent;
+  height: 20px;
+  border: none;
+}
+
+#seek-bar::-ms-tooltip {
+  display: none;
+}
+
+/*Dialpad styling*/
 p {
   margin: 0;
   padding: 0 0 5px 0;
@@ -832,7 +843,7 @@ p {
 }
 
 .button_menu_selected{
-	background-color : @msg-background;
+	/*background-color : @msg-background;*/
 	border: none;
 	color: #000;
 	padding: 0px 20px;
@@ -871,7 +882,6 @@ div#call-controls button#button-hangup {
 .bottomspace {
   margin-bottom: 10px;
 }
-
 
 .input-group{
 	/*margin-top: 20px;*/
@@ -1006,4 +1016,27 @@ div#call-controls button#button-hangup {
 .user-text {
   background-color: #3c8dbc;
   margin-right: 5px !important;
+}
+
+.dtmf-pad {
+  z-index: 10;
+  position: absolute;
+  margin: auto;
+  width: 523px;
+  text-align: center;
+  padding-left: 230px;
+  padding-top: 120px;
+}
+
+.round-button {
+  display:block;
+  height: 70px;
+  width: 70px;
+  border-radius: 50%;
+  border: 1px solid black;
+  z-index: 10;
+  float: left;
+  margin: 3px;
+  font-size: 2em;
+  background: rgba(255, 255, 255, 0.5);
 }

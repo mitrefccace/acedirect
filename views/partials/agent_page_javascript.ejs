@@ -18,9 +18,13 @@
 <script>
     var complaintForm = false; //What is this?
     var nginxPath = '<%= nginxPath %>';
-    var busyLightEnabled = false;
+    var busyLightEnabled = <%= busyLightEnabled %>;
+    var awayBlink = <%= awayBlink %>;
 </script>
 <!-- Custom Javascript for ACEDirect index.html page-->
 <script type="text/javascript" src="/js/jssip_agent.js"></script>
 <script type="text/javascript" src="/js/busylight.js"></script>
 <script type="text/javascript" src="/js/acedirect.js"></script>
+
+<!--  MUST COPY THIS FROM acedirect-kurento/static/js to acedirect/public/js -->
+<script src="/js/ACEKurento-1.0.0.js"></script>

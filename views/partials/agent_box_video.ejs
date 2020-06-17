@@ -1,23 +1,47 @@
-<div id="VideoBox"> 
-    <div class="box-header with-border">
-        <i class="fa fa-video-camera"></i>
-        <h3 class="box-title">Video</h3>
-        <!--div class="box-tools pull-right">
+<div id="VideoBox">
+	<div class="box-header with-border">
+		<i class="fa fa-video-camera"></i>
+		<h3 class="box-title">Video</h3>
+		<!--div class="box-tools pull-right">
             <button type="button" class="btn btn-box-tool" data-widget="collapse">
                 <i class="fa fa-minus"></i>
             </button>
         </div-->
-    </div>
+	</div>
 
-    <div class="box-body" id="fullscreen-element">
-        <div id="webcam" >
+	<div class="box-body" id="fullscreen-element">
+		<div id="webcam" >
+			<!--For in call DTMF-->
+			<div id="dtmfpad" class="dtmf-pad" hidden>
+				<div class="row">
+					<button class="round-button" onclick="DTMFpress(1)">1</button>
+					<button class="round-button" onclick="DTMFpress(2)">2</button>
+					<button class="round-button" onclick="DTMFpress(3)">3</button>
+				</div>
+				<div class="row">
+					<button class="round-button" onclick="DTMFpress(4)">4</button>
+					<button class="round-button" onclick="DTMFpress(5)">5</button>
+					<button class="round-button" onclick="DTMFpress(6)">6</button>
+				</div>
+				<div class="row">
+					<button class="round-button" onclick="DTMFpress(7)">7</button>
+					<button class="round-button" onclick="DTMFpress(8)">8</button>
+					<button class="round-button" onclick="DTMFpress(9)">9</button>
+				</div>
+				<div class="row">
+					<button class="round-button" onclick="DTMFpress(0)">*</button>
+					<button class="round-button" onclick="DTMFpress(0)">0</button>
+					<button class="round-button" onclick="DTMFpress(0)">#</button>
+				</div>
+			</div>
+			<!-- remoteView had autoplay-->
+			<video id="remoteView" class="remoteView" autoplay></video>
+			<video id="persistView" class="persistView">Persist View</video>
+			<div id="transcriptoverlay" class="transcriptoverlay"></div> <!-- Caption code -->
+			<video id="selfView" autoplay muted="true" hidden></video>
 
-            <video id="remoteView" class="remoteView" autoplay poster="images/acedirect-logo-trim.png"></video>
-            <div id="transcriptoverlay" class="transcriptoverlay"></div> <!-- Caption code -->
-            <video id="selfView" autoplay muted="true" hidden></video>
-
-       		<div id="call-option-buttons">
-       		    <div id="inner">
+			<div id="call-option-buttons">
+				<div id="inner">
 
 					<!-- Caption code -->
 					<button id="mute-captions" type="button" class="btn btn-gray" onclick="mute_captions()">
@@ -25,57 +49,65 @@
 							<i id="mute-captions-icon" class="fa fa-cc fa-lg fa-stack-1x"></i>
 							<i id="mute-captions-off-icon" class="fa fa-ban fa-stack-2x text-danger" style="display:none;"></i>
 						</span>
-                    </button>
+					</button>
 
-       		         <button id="mute-audio" type="button" class="btn btn-gray" onclick="mute_audio()">
-       		             <i id="mute-audio-icon" class="call-btn-icon fa fa-microphone"></i>
-       		         </button>
-       		         <button id="hide-video" type="button" class="btn btn-gray" onclick="enable_video_privacy()">
-       		            <span class="fa-stack">
-			      <i class="fa fa-video-camera fa-stack-1x"></i>
-			      <i id="mute-camera-off-icon" class="fa fa-ban fa-stack-2x text-danger" style="display:none;"></i>
-			    </span>
-       		         </button>
-       		         <button type="button" class="btn btn-gray" onclick="enterFullscreen()">
-       		             <i id="fullscreen-icon" class="call-btn-icon fa fa-expand"></i>
-       		         </button>
-       		         <button id="end-call" type="button" class="btn btn-danger" onclick="terminate_call()">
-       		             <i class="call-btn-icon fa fa-phone fa-rotate-135"></i>
-       		         </button>
-       		     </div>
+					<button id="mute-audio" type="button" class="btn btn-gray" onclick="mute_audio()">
+						<i id="mute-audio-icon" class="call-btn-icon fa fa-microphone"></i>
+					</button>
+					<button id="hide-video" type="button" class="btn btn-gray" onclick="enable_video_privacy()">
+						<span class="fa-stack">
+							<i class="fa fa-video-camera fa-stack-1x"></i>
+							<i id="mute-camera-off-icon" class="fa fa-ban fa-stack-2x text-danger" style="display:none;"></i>
+						</span>
+					</button>
+					<button id="toggleDTMF" type="button" class="btn btn-gray">
+						<i class="fa fa-phone-square"></i>
+					</button>
+					<button id="recordscreen" type="button" class="btn btn-gray" onclick="recordScreen()">
+						<i id="recordIcon" class="fa fa-circle text-red"></i>
+					</button>
+					<button type="button" class="btn btn-gray" onclick="enterFullscreen()">
+						<i id="fullscreen-icon" class="call-btn-icon fa fa-expand"></i>
+					</button>
+					<button id="end-call" type="button" class="btn btn-danger" onclick="terminate_call()">
+						<i class="call-btn-icon fa fa-phone fa-rotate-135"></i>
+					</button>
+				</div>
 
-       		 </div>
-        </div>
-
-		<div id= "videomail-status-buttons">
-			<div id= "inner-videomail">
-				<button  id="play-video" type = "button" class = "btn btn-gray" onclick = "play_video()"> <i id= "play-video-icon" class="call-btn-icon fa fa-play"></i> </button>
-				<button type="button" class = "btn btn-gray" onclick = "enterFullscreen()"><i id= "fullscreen-icon" class="call-btn-icon fa fa-expand"></i> </button>
-				<span id="vmail-current-time" class="text-gray">0:00</span>
-				<span class="text-gray"> / </span>
-				<input type="hidden" id="seek-bar" value="0" hidden />
-				<span id="vmail-total-time" class="text-gray">1:30</span>
-				<span id = "videomail-status-dropdown" class="btn-group dropup">
-				  <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
-					<span><i id="status-icon" class="call-btn-icon fa fa-envelope"></i></span>&nbsp;&nbsp;&nbsp;
-					<span id="user-status" >Mark as...</span>
-					<span class="caret"></span>
-				  </button>
-				  <ul class="dropdown-menu">
-					 <li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'UNREAD')"><a href="#"><span>Unread</span></a></li>
-					 <li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'READ')"><a href="#"><span>Read</span></a></li>
-					 <li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'IN PROGRESS')"><a href="#"><span>In Progress</span></a></li>
-					 <li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'CLOSED')"><a href="#"><span>Closed</span></a></li>
-					 <li onclick="videomail_deleted(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>Deleted</span></a></li>
-				  </ul>
-				</span>
-				<button id="videomail callback" class="btn btn-primary" type="button" onclick="videomailCallback(document.getElementById('callbacknum').getAttribute('name'))">Call Consumer</button>
-				<button id="exit-btn" class="btn btn-primary" type="button" onclick="stopVideomail()">Exit Videomail</button>
 			</div>
 		</div>
+
+			<div id="videomail-status-buttons">
+				<div>
+					<input type="range" id="seek-bar" value="0" hidden>
+				</div>
+				<div id="inner-videomail">
+					<!--<button  id="play-video" type = "button" class = "btn btn-gray" onclick = "play_video()"> <i id= "play-video-icon" class="call-btn-icon fa fa-play"></i> </button>
+					<button type="button" class = "btn btn-gray" onclick = "enterFullscreen()"><i id= "fullscreen-icon" class="call-btn-icon fa fa-expand"></i> </button>-->
+					<span id="vmail-current-time" class="text-gray" hidden>0:00</span>
+					<span class="text-gray" hidden> / </span>
+					<span id="vmail-total-time" class="text-gray" hidden>1:30</span>
+					<span id = "videomail-status-dropdown" class="btn-group dropup">
+						<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+							<span><i id="status-icon" class="call-btn-icon fa fa-envelope"></i></span>&nbsp;&nbsp;&nbsp;
+							<span id="user-status" >Mark as...</span>
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'UNREAD')"><a href="#"><span>Unread</span></a></li>
+							<li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'READ')"><a href="#"><span>Read</span></a></li>
+							<li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'IN PROGRESS')"><a href="#"><span>In Progress</span></a></li>
+							<li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'CLOSED')"><a href="#"><span>Closed</span></a></li>
+							<li onclick="videomail_deleted(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>Deleted</span></a></li>
+						</ul>
+					</span>
+					<button id="videomail callback" class="btn btn-primary" type="button" onclick="videomailCallback(document.getElementById('callbacknum').getAttribute('name'))">Call Consumer</button>
+					<button id="exit-btn" class="btn btn-primary" type="button" onclick="exitVideomail()">Exit Videomail</button>
+				</div>
+			</div>
 		<div class="alert alert-info" alert-dismissable id="outboundCallAlert" hidden>
 			<a class="close" onclick="$('#outboundCallAlert').hide();" style="text-decoration:none">×</a>
 			<strong>Calling...</strong>
 		</div>
-    </div>
+	</div>
 </div>

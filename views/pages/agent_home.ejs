@@ -18,7 +18,15 @@
         <div class="content-wrapper">
 
             <!-- Main content -->
+            <div id="helpalert_placeholder"></div>
             <section class="content">
+
+                <!--Alert message-->
+                <div id="generalAlert" class="alert alert-success alert-dismissible" role="alert" hidden>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <div id="alertText">Alert</div>
+                </div>
+
                 <div class="grid-stack">
                     <!-- VideoBox -->
                     <div class="grid-stack-item" data-gs-x="0" data-gs-width="10" data-gs-max-width="10" data-gs-min-width="2" data-gs-height="14" data-gs-max-height="14" data-gs-id="gsvideobox" id='gsvideobox'>
@@ -97,6 +105,7 @@
                                         <th>Agent</th>
                                         <th>Ext</th>
                                         <th>Queues</th>
+                                        <th>Multi-Party Invite</th>
                                     </tr>
                                 </thead>
                             </table>
@@ -169,6 +178,9 @@
                                             <th id="vmail-status">Status
                                                 <i id="video-id-sort" class="fa fa-sort"> </i>
                                             </th>
+                                            <th id="vmail-callback">Callback
+                                                <i id="video-id-sort" class="fa fa-sort"> </i>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody id='videomailTbody'>
@@ -192,7 +204,7 @@
 
     <!-- License Modal -->
     <div class="modal fade" id="licModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -276,6 +288,51 @@
             </div>
         </div>
 
+        <!--Multi Party Extension Modal-->
+        <div class="modal fade" id="modalMultiPartyExt">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Multi-Party Invite</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input id="inviteExtension" class="form-control input-lg" placeholder="Enter the extension of who you want to invite to the call" autofocus>
+                        <table id="availableAgents" cellpadding="15">
+                            <tr>
+                                    <th>Agent</th>
+                                    <th>Extension</th>
+                                    <th>Status</th>
+                                    <th>Invite Agent</th>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" onclick=multiPartyClick()>Invite</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Call Transfer Modal-->
+        <div class="modal fade" id="modalCallTransfer">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Call Transfer</h4>
+                    </div>
+                    <div class="modal-body">
+                        <input id="transferExtension" class="form-control input-lg" placeholder="Enter the extension you want to transfer to" autofocus>
+                        <button class="btn btn-default" onclick=transferCall(true)>Blind Transfer</button>
+                        <button class="btn btn-default" onclick=transferCall(false)>Warm Transfer</button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Dialpad Modal -->
         <div class="modal fade" id="modalDialpad">
             <div class="modal-dialog">
@@ -347,6 +404,45 @@
             </div>
             <!-- /.modal-dialog -->
         </div>
+
+        <!-- Outbound Call Modal -->
+        <div id="modalOutboundCall" class="modal fade">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 text-align="center" class="modal-title">Ringing...</h2>
+                        </div>
+                            <div class="modal-body text-center">
+                                <img src="/images/phoneRinging.gif" alt="Phone Ringing" height="100">
+                            </div>
+                                <div class="modal-footer">
+                                    <div class="btn-group" style="width: 100%;">
+                                        <button id="end-outCall-btn" type="button" onclick="terminate_call()" class="btn btn-danger btn-style" data-dismiss="modal"  style="width: 100%; height: 50px;">End Call</button>
+                                    </div>
+                                </div>
+
+                    </div>
+                </div>
+        </div>
+
+        <!--Outbound Call Failed Modal-->
+        <div id="modalOutboundFailed" class="modal fade">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 text-align="center" class="modal-title">Call Failed</h2>
+                    </div>
+                    <div class="modal-body text-center">
+                        <h4 class="modal-title" id="outboundFailedBody"></h4>
+
+                    </div>  
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>      
+                </div>
+            </div>
+     </div>
+
         <!-- Videomail Retrieval Error Modal -->
         <div id="videomailErrorModal" class="modal fade">
             <div class="modal-dialog">
@@ -391,6 +487,9 @@
             <div id="my_sip_uri"> </div>
             <div id="ws_servers"> </div>
             <div id="sip_password"> </div>
+            <div id="pc_config"> </div>
+            <div id="signaling_server_public"> </div>
+            <div id="signaling_server_port"> </div>
             <div id="pc_config"> </div>
         </div>
 
