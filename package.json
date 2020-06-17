@@ -4,6 +4,7 @@
   "description": "The ACE Direct Project",
   "main": "adserver.js",
   "dependencies": {
+    "acorn": "^6.4.1",
     "admin-lte": "^2.4.8",
     "asterisk-manager": "0.1.16",
     "body-parser": "^1.18.3",
