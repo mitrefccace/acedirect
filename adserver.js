@@ -20,8 +20,6 @@ var randomstring = require("randomstring");
 var csrf = require('csurf');
 var cors = require('cors');
 var mysql = require('mysql');
-var MongoClient = require('mongodb').MongoClient;
-var dbconn = null;
 
 //after hours vars
 var isOpen = true;
@@ -120,20 +118,6 @@ if (typeof (nconf.get('common:cleartext')) !== "undefined"  && nconf.get('common
 
 var colorConfigs = {};
 
-//append a suffix to make REDIS maps specific to this server
-var pfx = process.env.LOGNAME;
-if (pfx == undefined)
-  pfx = '';
-else
-  pfx = pfx + '_';
-rStatusMap = pfx + rStatusMap;
-rVrsToZenId = pfx + rVrsToZenId;
-rConsumerExtensions = pfx + rConsumerExtensions;
-rExtensionToVrs = pfx + rExtensionToVrs;
-rLinphoneToAgentMap = pfx + rLinphoneToAgentMap;
-rConsumerToCsr = pfx + rConsumerToCsr;
-rAgentInfoMap = pfx + rAgentInfoMap;
-rTokenMap = pfx + rTokenMap;
 
 // Set log4js level from the config file
 logger.level = getConfigVal('common:debug_level'); //log level hierarchy: ALL TRACE DEBUG INFO WARN ERROR FATAL OFF
@@ -145,49 +129,11 @@ logger.error('ERROR messages enabled.');
 logger.fatal('FATAL messages enabled.');
 logger.info('Using config file: ' + cfile);
 
-//global vars that don't need to be read every time
-var jwtKey = getConfigVal('web_security:json_web_token:secret_key');
-var jwtEnc = getConfigVal('web_security:json_web_token:encoding');
-
-
 //NGINX path parameter
 var nginxPath = getConfigVal('nginx:ad_path');
 if (nginxPath.length === 0) {
   //default for backwards compatibility
   nginxPath = "/ACEDirect";
-}
-
-//busylight paramete
-var busyLightEnabled = getConfigVal('busylight:enabled');
-if (busyLightEnabled.length === 0) {
-  //default for backwards compatibility
-  busyLightEnabled = true;
-} else {
-  busyLightEnabled = (busyLightEnabled === 'true')
-}
-logger.debug('busyLightEnabled: ' + busyLightEnabled);
-
-//graceful shutdown, especially with node restarts
-process.on('exit', function() {
-  console.log('exit caught');
-  console.log('DESTROYING MySQL DB CONNECTION');
-  dbConnection.destroy(); //destroy db connection
-  if ( typeof dbconn !== 'undefined' && dbconn ) {
-    console.log('DESTROYING MongoDB CONNECTION');
-    dbconn.close();
-  }
-  process.exit(0);
-});
-
-//Variables for referring to routes from config file
-var agentRoute = getConfigVal('nginx:agent_route');
-if(agentRoute.length === 0) {
-  agentRoute = "/agent";
-}
-
-var consumerRoute = getConfigVal('nginx:consumer_route');
-if(consumerRoute.length === 0){
-  consumerRoute = "/complaint";
 }
 
 var queuesVideomailNumber = getConfigVal('asterisk:queues:videomail:number');
@@ -231,8 +177,7 @@ redisClient.auth(getConfigVal('database_servers:redis:auth'));
 redisClient.on('connect', function () {
 	logger.info("Connected to Redis");
 
-	//Delete all values in REDIS maps at startup
-	redisClient.del(rTokenMap);
+	//Delete all values in statusMap
 	redisClient.del(rStatusMap);
 	redisClient.del(rVrsToZenId);
 	redisClient.del(rConsumerExtensions);
@@ -301,75 +246,6 @@ dbConnection.connect(function(err) {
     //SUCCESSFUL connection
   }
 });
-
-// Pull MongoDB configuration from config.json file
-var mongodbUriEncoded = nconf.get('database_servers:mongodb:connection_uri');
-var logCallData = nconf.get('database_servers:mongodb:logCallData');
-var mongodb;
-var colCallData = null;
-
-//Connect to MongoDB
-if (typeof mongodbUriEncoded !== 'undefined' && mongodbUriEncoded) {
-	var mongodbUri = getConfigVal('database_servers:mongodb:connection_uri');
-	// Initialize connection once
-	MongoClient.connect(mongodbUri, {forceServerObjectId:true, useNewUrlParser: true}, function (err, database) {
-		if (err) {
-			logger.error('*** ERROR: Could not connect to MongoDB. Please make sure it is running.');
-			console.error('*** ERROR: Could not connect to MongoDB. Please make sure it is running.');
-			process.exit(-99);
-		}
-
-		console.log('MongoDB Connection Successful');
-		mongodb = database.db();
-                dbconn = database;
-
-		// Start the application after the database connection is ready
-		//httpsServer.listen(port);
-		//console.log('https web server listening on ' + port);
-
-		// prepare an entry into MongoDB to log the acedirect restart
-		var ts = new Date();
-		var data = {
-				"Timestamp": ts.toISOString(),
-				"Role":"acedirect",
-				"Purpose": "Restarted"
-		};
-
-		if (logCallData) {
-			// first check if collection "events" already exist, if not create one
-			mongodb.listCollections({name: 'calldata'}).toArray((err, collections) => {
-				console.log("try to find calldata collection, colCallData length: " + collections.length);
-				if (collections.length == 0) {	// "stats" collection does not exist
-					console.log("Creating new calldata colleciton in MongoDB");
-					mongodb.createCollection("calldata",{capped: true, size:1000000, max:5000}, function(err, result) {
-						if (err) throw err;
-        					console.log("Collection calldata is created capped size 100000, max 5000 entries");
-						colCallData = mongodb.collection('calldata');
-					});
-				}
-				else {
-					// events collection exist already
-					console.log("Collection calldata exist");
-					colCallData = mongodb.collection('calldata');
-					// insert an entry to record the start of ace direct
-					colCallData.insertOne(data, function(err, result) {
-						if(err){
-							console.log("Insert a record into calldata collection of MongoDB, error: " + err);
-							logger.debug("Insert a record into calldata collection of MongoDB, error: " + err);
-							throw err;
-						}
-					});
-				}
-
-			});
-		}
-	});
-} else {
-	console.log('Missing MongoDB Connection URI in config');
-
-	//httpsServer.listen(port);
-	//console.log('https web server listening on ' + port);
-}
 
 var credentials = {
 	key: fs.readFileSync(getConfigVal('common:https:private_key')),
@@ -459,7 +335,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 // Validates the token, if valid go to connection.
 // If token is not valid, no connection will be established.
 io.use(socketioJwt.authorize({
-	secret: Buffer.alloc(jwtKey.length,jwtKey,jwtEnc),
+	secret: new Buffer(getConfigVal('web_security:json_web_token:secret_key'), getConfigVal('web_security:json_web_token:encoding')),
 	timeout: parseInt(getConfigVal('web_security:json_web_token:timeout')), // seconds to send the authentication message
 	handshake: getConfigVal('web_security:json_web_token:handshake')
 }));
@@ -704,15 +580,6 @@ io.sockets.on('connection', function (socket) {
 		});
 	});
 
-	socket.on('sipUriLookup', function(phoneNumber){
-		getCallerInfo(phoneNumber, function(data){
-			if(data.message == "success"&&data.data[0]){
-				io.to(token.extension).emit('sip-uri-info', {message: 'Success', sipUri:data.data[0].sipuri});
-			}else{
-			  	io.to(token.extension).emit('sip-uri-info', {message: 'Error'}); 
-			}
-		})
-	});
 	// Handler catches a Socket.IO disconnect
 	socket.on('disconnect', function () {
 		logger.info('DISCONNECTED');
@@ -727,24 +594,6 @@ io.sockets.on('connection', function (socket) {
 		//Remove the consumer from the extension map.
 		if (token.vrs) {
 			redisClient.hget(rExtensionToVrs, Number(token.vrs), function (err, ext) {
-
-                          //if consumer portal is in queue and closes browser or refreshes, hang them up in Asterisk
-                          if (ext) {
-                            regex_str =  "/^PJSIP/" + ext + "-.*$/";
-                            logger.info("REGEX: " + regex_str);
-                            ami.action({
-                                    "Action": "Hangup",
-                                    "ActionID": "4",
-                                    "Channel": regex_str
-                            }, function (err, res) {
-                              if (err) {
-                                logger.info('ERROR in hangup');
-                              } else {
-                                logger.info('SUCCESS hangup');
-                              }
-                            });
-                          }
-
 				redisClient.hget(rConsumerExtensions, Number(ext), function (err, reply) {
 					if (err) {
 						logger.error("Redis Error" + err);
@@ -753,8 +602,6 @@ io.sockets.on('connection', function (socket) {
 						val.inuse = false;
 						redisClient.hset(rConsumerExtensions, Number(ext), JSON.stringify(val));
 						redisClient.hset(rTokenMap, token.lightcode, "OFFLINE");
-                                                redisClient.hdel(rExtensionToVrs, Number(ext));
-                                                redisClient.hdel(rExtensionToVrs, Number(token.vrs));
 					}
 				});
 			});
@@ -898,113 +745,117 @@ io.sockets.on('connection', function (socket) {
 
 	//Retrieval of videomail records from the database
 	socket.on("get-videomail", function (data) {
-		logger.debug('entered get-videomail');
+		console.log('entered get-videomail');
+		console.log('test');
+		var sortBy = data.sortBy;
+		var filterFlag = processFilter(data.filter);
+		if (filterFlag) {
+			if (sortBy.includes('asc')) {
+				sortStr = sortBy.slice(0, sortBy.length - 4);
+				queryStr = "SELECT id, extension, callbacknumber, recording_agent, processing_agent, DATE_FORMAT(convert_tz(received,@@session.time_zone,'-04:00'), '%a %m/%d/%Y %h:%i %p') as received, processed, video_duration, status, deleted, src_channel, dest_channel, unique_id, video_filename, video_filepath FROM " + vmTable + " WHERE deleted = 0 and status = " + filterFlag + " ORDER BY " + sortStr + " asc";
+				console.log(queryStr);
+				dbConnection.query(queryStr, function (err, result) {
+					if (err) {
+						console.log("GET-VIDEOMAIL ERROR: ", err.code);
+					} else {
+						io.to(Number(data.extension)).emit('got-videomail-recs', result);
+					}
+				});
+			} else if (sortBy.includes('desc')) {
+				sortStr = sortBy.slice(0, sortBy.length - 5);
+				queryStr = "SELECT id, extension, callbacknumber, recording_agent, processing_agent, DATE_FORMAT(convert_tz(received,@@session.time_zone,'-04:00'), '%a %m/%d/%Y %h:%i %p') as received, processed, video_duration, status, deleted, src_channel, dest_channel, unique_id, video_filename, video_filepath FROM " + vmTable + " WHERE deleted = 0 and status = " + filterFlag + " ORDER BY " + sortStr + " desc";
+				console.log(queryStr);
+				dbConnection.query(queryStr, function (err, result) {
+					if (err) {
+						console.log("GET-VIDEOMAIL ERROR: ", err.code);
+					} else {
+						io.to(Number(data.extension)).emit('got-videomail-recs', result);
+					}
+				});
+			}
 
-		let filterFlag = (data.filter === "ALL"||typeof data.filter === 'undefined')?false:true;
-		let sort = (typeof data.sortBy === 'undefined')?[]:data.sortBy.split(" ");
-
-		let vm_sql_select = `SELECT id, extension, callbacknumber, recording_agent, processing_agent, 
-			received, processed, video_duration, status, deleted, src_channel, dest_channel, unique_id, 
-			video_filename, video_filepath FROM ${vmTable}`;
-		let vm_sql_where = `WHERE deleted = 0`;
-		let vm_sql_order = ``;
-		let vm_sql_params = [];
-
-		if(filterFlag){
-			vm_sql_where += ` and status = ?`;
-			vm_sql_params.push(data.filter);
+		} else {
+			if (sortBy.includes('asc')) {
+				sortStr = sortBy.slice(0, sortBy.length - 4);
+				queryStr = "SELECT id, extension, callbacknumber, recording_agent, processing_agent, DATE_FORMAT(convert_tz(received,@@session.time_zone,'-04:00'), '%a %m/%d/%Y %h:%i %p') as received, processed, video_duration, status, deleted, src_channel, dest_channel, unique_id, video_filename, video_filepath FROM " + vmTable + " WHERE deleted = 0 ORDER BY " + sortStr + " asc";
+				console.log(queryStr);
+				dbConnection.query(queryStr, function (err, result) {
+					if (err) {
+						console.log("GET-VIDEOMAIL ERROR: ", err.code);
+					} else {
+						io.to(Number(data.extension)).emit('got-videomail-recs', result);
+					}
+				});
+			} else if (sortBy.includes('desc')) {
+				sortStr = sortBy.slice(0, sortBy.length - 5);
+				queryStr = "SELECT id, extension, callbacknumber, recording_agent, processing_agent, DATE_FORMAT(convert_tz(received,@@session.time_zone,'-04:00'), '%a %m/%d/%Y %h:%i %p') as received, processed, video_duration, status, deleted, src_channel, dest_channel, unique_id, video_filename, video_filepath FROM " + vmTable + " WHERE deleted = 0 ORDER BY " + sortStr + " desc";
+				console.log(queryStr);
+				dbConnection.query(queryStr, function (err, result) {
+					if (err) {
+						console.log("GET-VIDEOMAIL ERROR: ", err.code);
+					} else {
+						io.to(Number(data.extension)).emit('got-videomail-recs', result);
+					}
+				});
+			}
 		}
-		if(sort.length == 2){
-			vm_sql_order = ` ORDER BY ??`;
-			vm_sql_params.push(sort[0])
-			if(sort[1] == 'desc')
-				vm_sql_order += ` DESC`
-		}
-
-		let vm_sql_query = `${vm_sql_select} ${vm_sql_where} ${vm_sql_order};`
-		dbConnection.query(vm_sql_query, vm_sql_params, function (err, result) {
+		queryStr = "SELECT COUNT(*) AS unreadMail FROM " + vmTable + " WHERE UPPER(status)='UNREAD';";
+		dbConnection.query(queryStr, function (err, result) {
 			if (err) {
-				logger.error("GET-VIDEOMAIL ERROR: " + err.code);
+				console.log("COUNT-UNREAD-MAIL ERROR: ", err.code);
 			} else {
-				io.to(token.extension).emit('got-videomail-recs', result);
+				console.log(result);
+				io.to(Number(data.extension)).emit('got-unread-count', result[0].unreadMail);
 			}
 		});
-
-		let vm_sql_count_query = `SELECT COUNT(*) AS unreadMail FROM ${vmTable} WHERE UPPER(status)='UNREAD';`;
-		dbConnection.query(vm_sql_count_query, function (err, result) {
+		queryStr = "UPDATE " + vmTable + " SET deleted = 1, deleted_time = CURRENT_TIMESTAMP, deleted_by = 'auto_delete' WHERE (UPPER(status)='READ' OR UPPER(status)='CLOSED') AND TIMESTAMPDIFF(DAY, processed, CURRENT_TIMESTAMP) >= 14;";
+		dbConnection.query(queryStr, function(err, result) {
 			if (err) {
-				logger.error("COUNT-UNREAD-MAIL ERROR: "+ err.code);
+				console.log('DELETE-OLD-VIDEOMAIL ERROR: ', err.code);
 			} else {
-				logger.debug(result);
-				io.to(token.extension).emit('got-unread-count', result[0].unreadMail);
-			}
-		});
-
-		let vm_sql_deleteOld = `UPDATE ${vmTable} SET deleted = 1, deleted_time = CURRENT_TIMESTAMP, 
-			deleted_by = 'auto_delete' WHERE (UPPER(status)='READ' OR UPPER(status)='CLOSED') AND 
-			TIMESTAMPDIFF(DAY, processed, CURRENT_TIMESTAMP) >= 14;`;
-		dbConnection.query(vm_sql_deleteOld, function(err, result) {
-			if (err) {
-				logger.error('DELETE-OLD-VIDEOMAIL ERROR: '+ err.code);
-			} else {
-				logger.debug('Deleted old videomail');
+				console.log('Deleted old videomail');
 			}
 		});
 	});
 
 	//updates videomail records when the agent changes the status
 	socket.on("videomail-status-change", function (data) {
-		logger.debug('updating MySQL entry');
-		
-		let vm_sql_query = `UPDATE ${vmTable} SET status = ?, processed = CURRENT_TIMESTAMP, 
-			processing_agent = ? WHERE id = ?;`
-		let vm_sql_params = [data.status, token.extension, data.id];
-
-		logger.debug(vm_sql_query + " " + vm_sql_params);
-
-		dbConnection.query(vm_sql_query, vm_sql_params,function (err, result) {
+		console.log('updating MySQL entry');
+		queryStr = "UPDATE " + vmTable + " SET status = '" + data.status + "', processed = CURRENT_TIMESTAMP, processing_agent = " + data.extension + " WHERE id = " + data.id;
+		console.log(queryStr);
+		dbConnection.query(queryStr, function (err, result) {
 			if (err) {
-				logger.error('VIDEOMAIL-STATUS-CHANGE ERROR: '+ err.code);
+				console.log('VIDEOMAIL-STATUS-CHANGE ERROR: ', err.code);
 			} else {
-				logger.debug(result);
-				io.to(token.extension).emit('changed-status', result);
+				console.log(result);
+				io.to(Number(data.extension)).emit('changed-status', result);
 			}
 		});
 	});
 	//changes the videomail status to READ if it was UNREAD before
 	socket.on("videomail-read-onclick", function (data) {
-		logger.debug('updating MySQL entry');
-		
-		let vm_sql_query = `UPDATE ${vmTable} SET status = 'READ', 
-			processed = CURRENT_TIMESTAMP, processing_agent = ? WHERE id = ?;`
-		let vm_sql_params = [token.extension, data.id];
-
-		logger.debug(vm_sql_query + " " + vm_sql_params);
-
-		dbConnection.query(vm_sql_query, vm_sql_params,function (err, result) {
+		console.log('updating MySQL entry');
+		queryStr = "UPDATE " + vmTable + " SET status = 'READ', processed = CURRENT_TIMESTAMP, processing_agent = " + data.extension + " WHERE id = " + data.id;
+		console.log(queryStr);
+		dbConnection.query(queryStr, function (err, result) {
 			if (err) {
-				logger.error('VIDEOMAIL-READ ERROR: '+ err.code);
+				console.log('VIDEOMAIL-READ ERROR: ', err.code);
 			} else {
-				logger.debug(result);
-				io.to(token.extension).emit('changed-status', result);
+				console.log(result);
+				io.to(Number(data.extension)).emit('changed-status', result);
 			}
 		});
 	});
 	//updates videomail records when the agent deletes the videomail. Keeps it in db but with a deleted flag
 	socket.on("videomail-deleted", function (data) {
-		logger.debug('updating MySQL entry');
-
-		let vm_sql_query = `UPDATE ${vmTable} SET deleted_time = CURRENT_TIMESTAMP, deleted_by = ?, deleted = 1  WHERE id = ?;`
-		let vm_sql_params = [token.extension, data.id];
-
-		logger.debug(vm_sql_query + " " + vm_sql_params);
-		
-		dbConnection.query(vm_sql_query, vm_sql_params,function (err, result) {
+		console.log('updating MySQL entry');
+		queryStr = "UPDATE " + vmTable + " SET deleted_time = CURRENT_TIMESTAMP, deleted_by = " + data.extension + ", deleted = 1 WHERE id = " + data.id;
+		dbConnection.query(queryStr, function (err, result) {
 			if (err) {
-				logger.error('VIDEOMAIL-DELETE ERROR: '+ err.code);
+				console.log('VIDEOMAIL-DELETE ERROR: ', err.code);
 			} else {
-				logger.debug(result);
-				io.to(token.extension).emit('changed-status', result);
+				console.log(result);
+				io.to(Number(data.extension)).emit('changed-status', result);
 			}
 		});
 	});
@@ -1137,16 +988,6 @@ function handle_manager_event(evt) {
   logger.info(util.inspect(evt, false, null));
 
   switch (evt.event) {
-
-	// Sent by Asterisk when call is bridged
-	case ('VarSet'):
-		let channel = evt.channel.split(/[\/,-]/);
-		if(channel[1]  && (channel[1].startsWith("ProviderPurple") || channel[1].startsWith("ProviderZVRS")) && evt.variable && evt.variable.bridgepeer == ''){
-			let agentExt = evt.value.split(/[\/,-]/);
-			if(agentExt[1])
-				io.to(agentExt[1]).emit('new-peer',{});
-		}		
-		break;
 
     // Sent by Asterisk when the call is answered
     case ('DialEnd'):
@@ -1299,57 +1140,6 @@ function handle_manager_event(evt) {
             io.to(Number(agentExtension[1])).emit('new-caller-general', evt.context);
 
           }
-        } else {
-          //if it's not the previous two cases (Complaints  call or General Questions call), ASSUME Complaints call (WebRTC).
-          logger.info('*** WARNING *** unexpected context from Asterisk DialEnd event, ANSWER dial status: evt.context: >' + evt.context + '<');
-          logger.info('*** ASSUMING TREAT THIS LIKE A WEB CALL...');
-
-          // Format is PJSIP/nnnnn-xxxxxx, we want to strip out the nnnnn only
-          var extString = evt.channel;
-          var extension = extString.split(/[\/,-]/);
-          var isOurPhone = false;
-
-          //is this one of our phones? one that we expect?
-          if ( extension[1].startsWith(PROVIDER_STR) ) {
-            isOurPhone = true;
-            logger.info('Matched on ' + extension[1] + ', setting extension[1] to ' + evt.calleridnum);
-            extension[1] = evt.calleridnum;
-          } else {
-            logger.info("No phone match, but this could be a WebRTC extension: " + extension[1] + ". leaving extension[1] alone to continue processing...");
-          }
-
-          var destExtString = evt.destchannel;
-          var destExtension = destExtString.split(/[\/,-]/);
-          redisClient.hset(rConsumerToCsr, Number(extension[1]), Number(destExtension[1]));
-          logger.info('Populating consumerToCsr: ' + extension[1] + ' => ' + destExtension[1]);
-          logger.info('Extension number: ' + extension[1]);
-          logger.info('Dest extension number: ' + destExtension[1]);
-
-          if (extension[1].length >= 10) {
-            //pop here, because we already have the consumer phone number
-            popZendesk(evt.destuniqueid,extension[1],destExtension[1],destExtension[1],"","","","");
-          }
-
-          redisClient.hget(rExtensionToVrs, Number(extension[1]), function (err, vrsNum) {
-            if (!err && vrsNum) {
-              // Call new function
-              logger.info('Calling vrsAndZenLookup with ' + vrsNum + ' and ' + destExtension[1]);
-
-              //mapped consumer extension to a vrs num. so now we can finally pop
-              popZendesk(evt.destuniqueid,vrsNum,destExtension[1],destExtension[1],"","","","");
-
-              vrsAndZenLookup(Number(vrsNum), Number(destExtension[1]));
-            } else if ( isOurPhone ) {
-              vrsAndZenLookup(Number(extension[1]), Number(destExtension[1]));
-              io.to(Number(destExtension[1])).emit('no-ticket-info', {});
-            } else {
-              // Trigger to agent to indicate that we don't have a valid VRS, agent will prompt user for VRS
-              io.to(Number(destExtension[1])).emit('missing-vrs', {});
-            }
-
-          });
-          //tell CSR portal that a complaints queue call has connected
-          io.to(Number(destExtension[1])).emit('new-caller-complaints', evt.context);
         }
       }
 
@@ -1424,12 +1214,23 @@ function handle_manager_event(evt) {
 
         redisClient.hget(rLinphoneToAgentMap, Number(linphoneExtension[1]), function (err, agentExtension) {
           if (agentExtension !== null) {
+            logger.info('if - sending chat leave to agent extension: ' + agentExtension + ', ' + evt.calleridnum);
+            io.to(Number(agentExtension)).emit('chat-leave', {
+              "extension": agentExtension,
+              "vrs": evt.calleridnum
+            });
             // Remove the entry
             redisClient.hdel(rLinphoneToAgentMap, Number(linphoneExtension[1]));
           } else {
             redisClient.hget(rConsumerToCsr, Number(evt.calleridnum), function (err, agentExtension) {
               logger.info('consumerToCsr else if()');
+              logger.info('agentExtension: ' + agentExtension);
+              logger.info('if - else sending chat leave to agent extension: ' + agentExtension + ', ' + evt.calleridnum);
 
+              io.to(Number(agentExtension)).emit('chat-leave', {
+                "extension": agentExtension,
+                "vrs": evt.calleridnum
+              });
               //Remove rConsumerToCsr redis map on hangups.
               redisClient.hdel(rConsumerToCsr, Number(evt.calleridnum));
             });
@@ -1467,6 +1268,13 @@ function handle_manager_event(evt) {
 
         redisClient.hget(rExtensionToVrs, Number(evt.calleridnum), function (err, vrsNum) {
           if (!err && vrsNum) {
+
+            /**
+            logger.info('Sending chat-leave for socket id ' + vrsNum);
+            io.to(Number(vrsNum)).emit('chat-leave', {
+              "vrs": vrsNum
+            });
+            **/
 
             // Remove the extension when we're finished
             redisClient.hdel(rExtensionToVrs, Number(evt.calleridnum));
@@ -1741,7 +1549,6 @@ function init_ami() {
       ami.on('queuecallerabandon',handle_manager_event);
       ami.on('queuecallerjoin',handle_manager_event);
       ami.on('queuecallerleave',handle_manager_event);
-      ami.on('varset',handle_manager_event);
 
       //handle the response
 			ami.on('response', handle_action_response);
@@ -1760,30 +1567,6 @@ function init_ami() {
 init_ami();
 
 //polling methods
-
-//for the consumer portal when a customer is waiting in queue and no agents are available (i.e., not AWAY)
-setInterval(function () {
-  redisClient.hgetall(rAgentInfoMap, function (err, data) {
-    if (data) {
-      agents_logged_in = false;
-      for (var prop in data) {
-        if (Object.prototype.hasOwnProperty.call(data, prop)) {
-          obj = JSON.parse(data[prop]);
-          astatus = obj.status;
-          astatus = astatus.toUpperCase(); 
-          if (astatus !== 'AWAY') {
-            agents_logged_in = true;
-            break;
-          }
-        }
-      }
-      sendEmit('agents',{'agents_logged_in': agents_logged_in});
-    } else {
-      sendEmit('agents',{'agents_logged_in':false});
-    }
-  });
-}, 5000);
-
 setInterval(function () {
   // Keeps connection from Inactivity Timeout
   dbConnection.ping();
@@ -1791,7 +1574,7 @@ setInterval(function () {
 
 setInterval(function () {
   //query for after hours
-  logger.debug('GET operatinghours...');
+  logger.info('GET operatinghours...');
   var ohurl = 'https://' + getConfigVal('common:private_ip') + ":" + parseInt(getConfigVal('agent_service:port')) + '/operatinghours';
   request({
     method: 'GET',
@@ -1804,20 +1587,19 @@ setInterval(function () {
     if (error) {
       logger.error("GET operatinghours: " + error);
     } else {
-      logger.debug("GET operatinghours success:");
-      logger.debug(JSON.stringify(data));
+      logger.info("GET operatinghours success:");
+      logger.info(JSON.stringify(data));
       isOpen = data.isOpen;
-      logger.debug("isOpen is: " + isOpen);
+      logger.info("isOpen is: " + isOpen);
 
       //operating hours
       startTimeUTC = data.start; //hh:mm in UTC
       endTimeUTC = data.end; //hh:mm in UTC
 
     }
-    sendEmit("call-center-closed", {'closed':!isOpen});
   });
 
-}, 5000);
+}, 15000);
 
 /**
  * Calls the RESTful service running on the provider host to verify the agent
@@ -2177,7 +1959,18 @@ function processExtension(data) {
 		logger.info('EMIT: extension-created: ' + resultJson);
 	}
 }
-
+/**
+ *
+ * @param {string} filter
+ * @returns {boolean} filter formatted for mysql query
+ */
+function processFilter(filter) {
+	if (filter === 'ALL') {
+		return (false);
+	} else {
+		return ("'" + filter + "'");
+	}
+}
 
 /**
  *
@@ -2430,7 +2223,7 @@ function decodeBase64(encodedString) {
 	if (clearText) {
 		decodedString = encodedString;
 	} else {
-		decodedString = Buffer.alloc(encodedString.length, encodedString, 'base64');
+		decodedString = new Buffer(encodedString, 'base64');
 	}
 	return (decodedString.toString());
 }
@@ -2449,7 +2242,7 @@ function getConfigVal(param_name) {
     if (clearText) {
       decodedString = val;
     } else {
-      decodedString = Buffer.alloc(val.length, val, 'base64');
+      decodedString = new Buffer(val, 'base64');
     }
   } else {
     //did not find value for param_name
@@ -2474,8 +2267,15 @@ function createToken() {
 
 var ctoken = jwt.sign({
 	tokenname: "servertoken"
-}, Buffer.alloc(jwtKey.length, jwtKey, jwtEnc));
+}, new Buffer(getConfigVal('web_security:json_web_token:secret_key'), getConfigVal('web_security:json_web_token:encoding')));
 
+// Allow cross-origin requests to be received from Management Portal
+// Used for the force logout functionality since we need to send a POST request from MP to acedirect outlining what user(s) to forcefully logout
+app.use(function (err, req, res, next) {
+	let mp = 'https://' + getConfigVal("common:private_ip") + ':' + getConfigVal("management_portal:https_listen_port");
+	res.setHeader('Access-Control-Allow-Origin', mp);
+	next();
+});
 
 app.use(function (err, req, res, next) {
 	if (err.code !== 'EBADCSRFTOKEN') return next(err);
@@ -2485,6 +2285,19 @@ app.use(function (err, req, res, next) {
 	});
 });
 
+/**
+ * Handles the forceful logout request from Management Portal
+ */
+app.post('/forcelogout', function (req, res) {
+	console.log('in force logout post request');
+	let body = req.body;
+	let agents = body.agents;
+	console.log(JSON.stringify(agents, null, 2, true));
+	agents.forEach(function(agent){
+		// Emit the forceful logout event to each agent by extension
+		io.to(Number(agent.extension)).emit('force-logout');
+	})
+});
 /**
  * Calls the RESTful service to verify the VRS number.
  */
@@ -2517,8 +2330,7 @@ app.post('/consumer_login', function (req, res) {
 
 app.use(function (req, res, next) {
         res.locals = {
-                "nginxPath":nginxPath,
-                "busyLightEnabled":busyLightEnabled
+                "nginxPath":nginxPath
         }
         next();
 });
@@ -2551,7 +2363,7 @@ app.get('/fcc', function(req,res,next){
  * @param {string} '/Complaint'
  * @param {function} function(req, res)
  */
-app.get(consumerRoute, function (req, res, next) {
+app.get('/Complaint', function (req, res, next) {
 
 
 	if (req.session.role === 'VRS') {
@@ -2627,7 +2439,7 @@ app.get('/token', function (req, res) {
                     vrs.data[0].startTimeUTC = startTimeUTC; //hh:mm in UTC
                     vrs.data[0].endTimeUTC = endTimeUTC; //hh:mm in UTC
 
-					var token = jwt.sign(vrs.data[0], Buffer.alloc(jwtKey.length, jwtKey, jwtEnc), {
+					var token = jwt.sign(vrs.data[0], new Buffer(getConfigVal('web_security:json_web_token:secret_key'), getConfigVal('web_security:json_web_token:encoding')), {
 						expiresIn: "2000"
 					});
 					res.status(200).json({
@@ -2690,7 +2502,7 @@ app.get('/token', function (req, res) {
 		redisClient.hset(rAgentInfoMap, payload.username, JSON.stringify(agentInfo));
 		sendAgentStatusList(payload.username, "AWAY");
 
-		var token = jwt.sign(payload, Buffer.alloc(jwtKey.length, jwtKey, jwtEnc), {
+		var token = jwt.sign(payload, new Buffer(getConfigVal('web_security:json_web_token:secret_key'), getConfigVal('web_security:json_web_token:encoding')), {
 			expiresIn: "2000"
 		});
 		res.status(200).json({
@@ -2715,7 +2527,7 @@ app.get('/token', function (req, res) {
  * @param {function} function(req, res)
  */
 app.get(nginxPath+'*', agent.shield(cookieShield), function (req, res) {
-	res.redirect(nginxPath+agentRoute);
+	res.redirect(nginxPath+'/agent');
 });
 
 
@@ -2725,13 +2537,13 @@ app.get(nginxPath+'*', agent.shield(cookieShield), function (req, res) {
  * @param {function} function(req, res, next)
  */
 
-app.get(agentRoute, function (req, res, next) {
+app.get('/agent', function (req, res, next) {
 	if (req.session.data) {
 		if (req.session.data.uid) {
 			return next(); //user is logged in go to next()
 		}
 	}
-	res.redirect('.' + nginxPath + agentRoute);
+	res.redirect('.' + nginxPath + '/agent');
 });
 
 /**
@@ -2742,7 +2554,7 @@ app.get(agentRoute, function (req, res, next) {
  * @param {function} 'agent.shield(cookieShield)'
  * @param {function} function(req, res)
  */
-app.get(agentRoute, agent.shield(cookieShield), function (req, res) {
+app.get('/agent', agent.shield(cookieShield), function (req, res) {
 	if (req.session.role === 'AD Agent') {
 		res.render('pages/agent_home');
 	} else {
@@ -2764,7 +2576,7 @@ app.get('/login', function (req, res, next) {
 			return next(); //user is logged in go to next()
 		}
 	}
-	res.redirect('.' + nginxPath + agentRoute);
+	res.redirect('.' + nginxPath + '/agent');
 });
 
 /**
@@ -2847,7 +2659,7 @@ app.get('/login', agent.shield(cookieShield), function (req, res) {
 						req.session.extensionPassword = extensionPassword;
 						req.session.complaint_queue_count = complaint_queue_count;
 						req.session.general_queue_count = general_queue_count;
-						res.redirect('.' + agentRoute);
+						res.redirect('./agent');
 					});
 				} else {
 					res.render('pages/agent_account_pending', {
@@ -2874,25 +2686,21 @@ app.get('/updatelightconfigs', function (req, res) {
  * @param {function} function(req, res)
  */
 app.get('/getVideomail', function (req, res) {
-	logger.debug("/getVideomail");
+	console.log("/getVideomail");
 	var videoId = req.query.id;
-	logger.debug("id: " + videoId);
+	console.log("id: " + videoId);
 	var agentExt = req.query.ext;
 	//Wrap in mysql query
 	dbConnection.query('SELECT video_filepath AS filepath, video_filename AS filename FROM videomail WHERE id = ?', videoId, function (err, result) {
 		if (err) {
-			logger.error('GET VIDEOMAIL ERROR: '+ err.code);
+			console.log('GET VIDEOMAIL ERROR: ', err.code);
 		} else {
 			var videoFile = result[0].filepath + result[0].filename;
-			
-			//var videoFile = '/home/ekosinski2/acedirect/upload_204d2a03f4b6f14368d85e4162cb8369.webm'
-			console.log("Using", videoFile)
 			try {
 				var stat = fs.statSync(videoFile);
 				res.writeHead(200, {
 					'Content-Type': 'video/webm',
-					'Content-Length': stat.size,
-					'Accept-Ranges': 'bytes'
+					'Content-Length': stat.size
 				});
 				var readStream = fs.createReadStream(videoFile);
 				readStream.pipe(res);

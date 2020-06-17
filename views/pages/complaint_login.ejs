@@ -3,9 +3,9 @@
 <head>
 	<meta charset="utf-8" />
 	<title>FCC ASL Consumer Support</title>
-	<link rel="stylesheet" href="/assets/css/adminlte.min.css">
+	<link rel="stylesheet" href="/assets/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/assets/css/bootstrap-toggle.css">
-	<link rel="stylesheet" href="/assets/css/all.min.css">
+	<link rel="stylesheet" href="/assets/css/font-awesome.min.css">
 	<link rel="stylesheet" href="/assets/css/inputmask.css">
 
 	<link rel="stylesheet" href="/css/fcc.css">
@@ -13,10 +13,10 @@
 </head>
 
 <body>
-	<div class="container-fluid">
-		<div class="row pt-3">
-			<div class="col align-self-center">
-				<h3>FCC ASL Consumer Support </h3>
+	<div class="container-fluid header">
+		<div class="row">
+			<div class="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1">
+				<h3> Consumer Help Center - Access for People with Disabilities </h3>
 			</div>
 		</div>
 	</div>
@@ -50,25 +50,24 @@
 
 
 	<div class="container" id="vrslogincontainer">
-		<div class="row mt-4 mb-2">
-			<div class="col-xl-6 offset-xl-3 col-lg-4 offset-lg-4 col-md-6 offset-md-3 col-sm-8 offset-sm-2 text-center">
+		<div class="row">
+			<div class="col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
 				<div class="account-wall">
 					<form class="form-login" id="form-login">
 						<div class="alert alert-danger" id="message" hidden></div>
-						<label>Please Enter your Videophone Number: </label>
-						<div id="input-group" class="input-group mx-auto">
-							<div class="input-group-prepend">
-								<span class="input-group-text">
-									<i class="fas fa-phone-alt"></i>
-								</span>
+						<div class = "row margin" style="margin-left: 0;">
+							<label>Please Enter your Videophone Number: </label>
+						</div>
+						<div id="input-group" class="input-group">
+							<div class="input-group-addon">
+								<i class="fa fa-phone"></i>
 							</div>
 							<input type="text" class="form-control input-lg" id="vrs_number" placeholder="Videophone Number" data-inputmask="'mask': '(999) 999-9999'" data-mask required>
 						</div>
 				</div>
-				<!-- <div align="center" class = "margin">
-				</div> -->
-				<div class="row">
-					<div class="col align-self-center">
+				<div align="center" class = "margin">
+					<div class="row">
+						<button class = "btn btn-lg btn-gray" id = "backtostage" onclick="choosecontactmethod()"> Back </button>
 						<button class="btn btn-lg btn-primary" type="submit"> Continue </button>
 					</div>
 				</div>
@@ -76,7 +75,7 @@
 			</div>
 		</div>
 		<div class="row" style=" margin-top: 30px; font-style: italic;">
-			<div class = "col-md-8 offset-md-2 col-sm-10 offset-sm-1">
+			<div class = "col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2">
     			<p>You are entering an Official United States Government System, which may be used only for authorized purposes. The Government may monitor and audit usage of this system, and all persons are hereby notified that use of this system constitutes consent to such monitoring and auditing. Unauthorized attempts to upload or change information on this web site is prohibited.</p>
     		</div>
     	</div>
@@ -101,8 +100,8 @@
 
 	<!-- jQuery v2.1.4 -->
 	<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
-	<script type="text/javascript" src="/assets/js/popper.min.js"></script>
-	<script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+	<!-- Bootstrap 3.3.5 -->
+	<script type="text/javascript" src="/assets/js/bootstrap.js"></script>
 
 	<script type="text/javascript" src="/assets/js/inputmask.min.js"></script>
 	<script type="text/javascript" src="/assets/js/jquery.inputmask.min.js"></script>
@@ -116,7 +115,7 @@
 				var vrsnumber = $('#vrs_number').val().replace(/^1|[^\d]/g, '');
 				$('#message').hide();
 				$('#message').text('');
-				$('#vrs_number').removeClass('is-invalid');
+				$('#input-group').removeClass('has-error');
 				if (vrsnumber.length === 10) {
 					$.ajax({
 						url: './consumer_login',
@@ -133,7 +132,6 @@
 								window.location.reload();
 							} else {
 								$('#message').text(data.message + ' ' + $('#vrs_number').val());
-								$('#message').removeAttr('hidden');
 								$('#message').show();
 								$('#vrs_number').val('');
 							}
@@ -141,14 +139,12 @@
 						error: function (xhr, status, error) {
 							//alert('Error');
 							$('#message').text('An Error Occured.');
-							$('#message').removeAttr('hidden');
 							$('#message').show();
 						}
 					});
 				} else {
-					$('#vrs_number').addClass('is-invalid');
+					$('#input-group').addClass('has-error');
 					$('#message').text('Invalid phone number format');
-					$('#message').removeAttr('hidden');
 					$('#message').show();
 				}
 			});

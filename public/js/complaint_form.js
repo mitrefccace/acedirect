@@ -8,7 +8,6 @@ var isOpen = true;
 var startTimeUTC = "14:00"; //start time in UTC
 var endTimeUTC = "21:30"; //end time in UTC
 var skinny = false;
-var tz;
 
 $(document).ready(function () {
 	//formats the phone number.
@@ -17,7 +16,6 @@ $(document).ready(function () {
 	//JSSIP components
 	$('#login-full-background').hide();
 	$('#login-box').hide();
-	$('#webcam').removeAttr("hidden");
 	$('#webcam').show();
 
 	$('#complaint').keyup(function () {
@@ -50,45 +48,6 @@ $(document).ready(function () {
 	});
 });
 
-
-function clearScreen() {
-        $('#ticketNumber').text('');
-        $('#complaintcounter').text('2,000');
-        $('#complaint').val('');
-        $('#subject').val('');
-	$('#userform').find('input:text').val('');
-	$('#callerEmail').val('');
-
-	$('#callinfodiv').find('input:text').val('');
-
-	$('#inbounddhohlabel').hide();
-	$('#outbounddhohlabel').hide();
-
-	$('#outboundnumber').text('');
-	$('#inboundnumber').text('');
-
-	$('#duration').timer('reset');
-	$('#duration').timer('pause');
-
-	$('#caption-messages').html('');
-	$('#chat-messages').html('');
-	$('#rtt-typing').html('');
-	$('#newchatmessage').val('');
-
-	$('#ticketForm').find('input:text').val('');
-	$('#ticketForm').find('textarea').val('');
-
-	$('#complaintsInCall').hide();
-	$('#geninfoInCall').hide();
-
-	$('#ivrsnum').val('');
-	$('#ivrsmessage').hide();
-
-	$('#notickettxt').hide();
-	$('#ticketTab').removeClass("bg-pink");
-
-	$('#modalWrapup').modal('hide');
-}
 
 function connect_socket() {
 	console.log('connect_socket to ');
@@ -123,25 +82,20 @@ function connect_socket() {
 					$('#callerEmail').val(payload.email);
 					$('#displayname').val(payload.first_name + ' ' + payload.last_name);
 					isOpen = payload.isOpen;
-                                        if (typeof isOpen === 'undefined') {
-                                          //default to true if the user hit back; they won't be able to get into queue if closed
-                                          //this will prevent the after hours dialog if they hit back (per customer requirement)
-                                          isOpen = true;
-                                        }
-
 					if (!isOpen) { //after hours processing; if after hours, then show this modal
 						$("#afterHoursModal").modal({
 							backdrop: "static"
 						});
 						$("#afterHoursModal").modal("show");
-                                                //get the start/end time strings for the after hours dialog
-                                                tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
-                                                startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0, 8); //start time in UTC
-                                                endTimeUTC = convertUTCtoLocal(payload.endTimeUTC).substring(0, 8); //end time in UTC
-                                                $('#ah-start-time').text(startTimeUTC);
-												$('#ah-end-time').text(endTimeUTC + " " + tz);
-						//$('#videomailModal').modal('show');
 					}
+
+					//get the start/end time strings for the after hours dialog
+					var tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
+					startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0, 8); //start time in UTC
+					endTimeUTC = convertUTCtoLocal(payload.endTimeUTC).substring(0, 8); //end time in UTC
+					$('#ah-start-time').text(startTimeUTC);
+					$('#ah-end-time').text(endTimeUTC + " " + tz);
+
 
 					socket.emit('register-client', {
 						"hello": "hello"
@@ -333,13 +287,7 @@ function connect_socket() {
 						$("#agent-name").text(firstname[0]);
 						$("#agent-name-box").show();
 					}
-				}).on("agents", function (data) {
-                                  if (data.agents_logged_in) {
-	                            $("#agents-avail").text('');
-                                  } else {
-	                            $("#agents-avail").text('No representatives are available to take your call at this time.');
-                                  }
-                                }).on("chat-leave", function (error) {
+				}).on("chat-leave", function (error) {
 					//clear chat
 					$('#chatcounter').text('500');
 					$('#chat-messages').html('');
@@ -566,19 +514,6 @@ $('#fullscreen-element').mouseleave(function () {
 function exit_queue() {
 	$('#queueModal').modal('hide');
 	terminate_call();
-        clearScreen();
-}
-
-function afterHourVoicemail(){
-	$("#afterHoursModal").modal("hide");
-	$('#videomailModal').modal('show');
-}
-
-function afterHoursHideVoicemail(){
-	if(isOpen){
-		$("#afterHoursModal").modal("show");
-	}
-	$('#videomailModal').modal('hide');
 }
 
 function set_queue_text(position) {
@@ -593,7 +528,6 @@ function enable_chat_buttons() {
 	$("#newchatmessage").removeAttr("disabled");
 	$("#chat-send").removeAttr("disabled");
 	$("#newchatmessage").attr("placeholder", "Type Message ...");
-	$("#characters-left").removeAttr("hidden");
 	$("#characters-left").show();
 
 }
@@ -640,14 +574,4 @@ function convertUTCtoLocal(hhmmutc) {
 	if (newhh > 11) ampm = "PM";
 	if (newhh > 12) newhh -= 12;
 	return newhh + ":" + newmin + " " + ampm + " " + arr[6].replace('(', '').replace(')', '');
-}
-
-function logout(msg) {
-  //clear the token from session storage
-  sessionStorage.clear();
-  //disconnect socket.io connection
-  if (socket)
-    socket.disconnect();
-  //display the login screen to the user.
-  window.location.href = './logout';
 }

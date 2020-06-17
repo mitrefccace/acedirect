@@ -6,7 +6,6 @@ var ticketTabFade;
 var busylight = new Busylight();
 var agentStatus = 'OFF';
 var away_color;
-var sipUri;
 var ready_color;
 var in_call_color;
 var hold_color;
@@ -25,12 +24,9 @@ var wrap_up_blinking;
 var need_assistance_blinking;
 var missed_call_blinking;
 var videomail_status_buttons = document.getElementById("videomail-status-buttons");
-var videomail_buttons = document.getElementById("videomailButtons");
-console.log("Videomail buttons are " + videomail_buttons);
 var sortFlag = "id desc";
 var filter = "ALL";
 var telNumber;
-var playingVideomail = false;
 
 setInterval(function () {
 	busylight.light(this.agentStatus);
@@ -45,12 +41,12 @@ $(document).ready(function () {
 	$("[data-mask]").inputmask();
 
 	// chat-transcript toggle
-	$('#chat-tab').on('click', function () {
+	$('#chat-tab').on('click', function(){
 		$('#chat-body').css('display', 'block');
 		$('#chat-footer').css('display', 'block');
 		$('#trans-body').css('display', 'none');
 	});
-	$('#trans-tab').on('click', function () {
+	$('#trans-tab').on('click', function(){
 		$('#chat-body').css('display', 'none');
 		$('#chat-footer').css('display', 'none');
 		$('#trans-body').css('display', 'block');
@@ -60,11 +56,9 @@ $(document).ready(function () {
 
 	$.getJSON("./resources/licenses.json", function (data) {
 		$.each(data.license, function (i) {
-			$("#licModalBody").append("<h3>" + data.license[i].name + "</h3><pre>" + data.license[i].pre + "</pre>");
+			$("#licModalBody").append("<h3>" + data.license[i].name + "<h3><pre>" + data.license[i].pre + "</pre>");
 		});
 	});
-
-	enable_persist_view();
 });
 
 function connect_socket() {
@@ -78,7 +72,7 @@ function connect_socket() {
 			console.log(JSON.stringify(data));
 			if (data.message === "success") {
 				socket = io.connect('https://' + window.location.host, {
-					path: nginxPath + '/socket.io',
+					path: nginxPath+'/socket.io',
 					query: 'token=' + data.token,
 					forceNew: true
 				});
@@ -104,7 +98,6 @@ function connect_socket() {
 
 					//populate call agent information
 					$('#displayname').val("CSR " + payload.first_name);
-					console.log("The agent sidebar is " + $('#agentname-sidebar'));
 					$('#agentname-sidebar').html(payload.first_name + " " + payload.last_name);
 					$('#agentname-header').html(payload.first_name + " " + payload.last_name);
 					$('#agentname-headerdropdown').html(payload.first_name + " " + payload.last_name);
@@ -117,10 +110,10 @@ function connect_socket() {
 					$("#general-queue-num").text(payload.general_queue_count);
 
 					if (payload.queue_name === "ComplaintsQueue" || payload.queue2_name === "ComplaintsQueue") {
-						$('#sidebar-complaints').removeAttr('hidden');
+						$('#sidebar-complaints').show();
 					}
 					if (payload.queue_name === "GeneralQuestionsQueue" || payload.queue2_name === "GeneralQuestionsQueue") {
-						$('#sidebar-geninfo').removeAttr('hidden');
+						$('#sidebar-geninfo').show();
 					}
 
 					if (payload.layout || sessionStorage.layout) {
@@ -168,16 +161,9 @@ function connect_socket() {
 					debugtxt('error', reason);
 
 					if (reason.code === "invalid_token") {
-						//	logout("Session has expired");
-						location.reload();
+						logout("Session has expired");
 					} else {
 						logout("An Error Occurred: " + JSON.stringify(reason));
-					}
-				}).on("call-center-closed", function (data) {
-					if (data.closed) {
-						$("#closed-label").text('Call Center Closed');
-					} else {
-						$("#closed-label").text('');
 					}
 				}).on('typing', function (data) {
 					debugtxt('typing', data);
@@ -253,8 +239,6 @@ function connect_socket() {
 						if (data.data[i].id === 2)
 							$('#complaints_script_content').val(data.data[i].text);
 					}
-				}).on('sip-uri-info', function (data) {
-					sipUri = (data.message == "Success") ? data.sipUri : "Unknown";
 				}).on('ad-zendesk', function (data) {
 					debugtxt('ad-zendesk', data);
 					$('#ticketId').val(data.id);
@@ -357,10 +341,9 @@ function connect_socket() {
 								"queues": queues
 							});
 						}
+
 						$('#agenttable').dataTable().fnClearTable();
-						if (tabledata.data.length > 0) {
-							$('#agenttable').dataTable().fnAddData(tabledata.data);
-						}
+						$('#agenttable').dataTable().fnAddData(tabledata.data);
 					}
 				}).on('new-caller-ringing', function (data) {
 					debugtxt('new-caller-ringing', data);
@@ -381,20 +364,12 @@ function connect_socket() {
 					unpauseQueues();
 				}).on('request-assistance-response', function (data) {
 					debugtxt('request-assistance-response', data);
-					console.log(JSON.stringify(data));
-					window.setTimeout(function () {
-						$("#helpalert_placeholder").append('<div id="helpalert" class="alert alert-info" role="alert" >Request received.</div>');
-						$("#helpalert").show();
-						$("#helpalert").fadeTo(3000, 0).slideUp(500, function () {
-							$(this).remove();
-						});
-					}, 0);
 				}).on('lightcode-configs', function (data) {
 					debugtxt('lightcode-configs', data);
 					updateColors(data);
 					busylight.updateConfigs(data);
 				}).on('caption-config', function (data) {
-					if (data == 'false') {
+					if(data == 'false') {
 						console.log('captions off');
 						$('.config-hide').css('display', 'none');
 						$('#transcriptoverlay').css('display', 'none');
@@ -412,21 +387,12 @@ function connect_socket() {
 					updateVideomailTable(data);
 				}).on('got-unread-count', function (data) {
 					updateVideomailNotification(data);
-				}).on('new-peer', function (data) {
-					//new peer is required for out going videomail on purple and zrvs networks
-					// if this is done on a convo provider call it could cause black/green video issues.
-					console.log("New peer joined the call for purple and zvrs only");
-					toggleSelfview(200);
 				}).on('changed-status', function () {
 					getVideomailRecs();
 				}).on('videomail-retrieval-error', function (data) {
 					$('#videomailErrorBody').html('Unable to locate videomail with ID ' + data + '.');
 					$('#videomailErrorModal').modal('show');
 					stopVideomail();
-					document.getElementById("persistCameraCheck").disabled = false;
-					if (document.getElementById("persistCameraCheck").checked == true) {
-						enable_persist_view();
-					}
 				}).on('queue-caller-join', function (data) {
 					if (data.queue === "ComplaintsQueue") {
 						$("#complaints-queue-num").text(data.count);
@@ -439,6 +405,8 @@ function connect_socket() {
 					} else if (data.queue === "GeneralQuestionsQueue") {
 						$("#general-queue-num").text(data.count);
 					}
+				}).on('force-logout', function(){
+					logout('Forcefully logging out');
 				});
 
 			} else {
@@ -456,17 +424,17 @@ function connect_socket() {
 $('#agenttable').DataTable({
 	aaData: null,
 	aoColumns: [{
-		"mDataProp": "status"
-	},
-	{
-		"mDataProp": "name"
-	},
-	{
-		"mDataProp": "extension"
-	},
-	{
-		"mDataProp": "queues"
-	}
+			"mDataProp": "status"
+		},
+		{
+			"mDataProp": "name"
+		},
+		{
+			"mDataProp": "extension"
+		},
+		{
+			"mDataProp": "queues"
+		}
 	],
 	searching: false,
 	paging: false,
@@ -620,8 +588,6 @@ function inCallADComplaints(endpoint_type) {
 	socket.emit('pause-queues', null);
 	$('#myRingingModalPhoneNumber').html('');
 	$('#myRingingModal').modal('hide');
-	//Make sure dropdown is disabled while in call
-	document.getElementById("statusDropdownMenuButton").disabled = true;
 	$('#user-status').text('In Call');
 	$('#complaintsInCall').show();
 	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
@@ -636,6 +602,7 @@ function inCallADComplaints(endpoint_type) {
 		$('#remoteView').css('object-fit', ' cover');
 	}
 
+
 }
 
 function inCallADGeneral(endpoint_type) {
@@ -644,12 +611,10 @@ function inCallADGeneral(endpoint_type) {
 	$('#myRingingModal').modal('hide');
 	$('#user-status').text('In Call');
 	$('#geninfoInCall').show();
-	//Disable dropdown while in a call
-	document.getElementById("statusDropdownMenuButton").disabled = true;
 	changeStatusLight('IN_CALL');
 	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	socket.emit('incall', null);
-	if ( endpoint_type === "Provider_General_Questions" || endpoint_type === "General_Questions" ) {
+	if (endpoint_type === "Provider_General_Questions") {
 		disable_chat_buttons();
 		$("#newchatmessage").attr("placeholder", "Chat disabled for provider endpoints");
 		$('#remoteView').css('object-fit', ' contain');
@@ -673,13 +638,6 @@ function unpauseQueues() {
 	changeStatusLight('READY');
 	socket.emit('unpause-queues', null);
 	socket.emit('ready', null);
-	if (this.agentStatus == 'READY' && playingVideomail == true) {
-		stopVideomail();
-		document.getElementById("persistCameraCheck").disabled = false;
-		if (document.getElementById("persistCameraCheck").checked == true) {
-			enable_persist_view();
-		}
-	}
 }
 
 //i == 1: go to Ready; i == 0: go to Away
@@ -884,7 +842,7 @@ function changeStatusIcon(newColor, statusName, blinking) {
 
 
 function testLightConnection() {
-	console.log('\n\nChecking for BusyLight... Ignore this error if no BusyLight...');
+        console.log('\n\nChecking for BusyLight... Ignore this error if no BusyLight...');
 	$('#busylightModalBody').html(" ");
 	$('#busylightModalTestBtn').prop("disabled", true);
 	$('#busylightModalBody').html("Checking BusyLight server...");
@@ -894,7 +852,7 @@ function testLightConnection() {
 		timeout: 2000,
 		dataType: "jsonp xml",
 		success: function (data, text) {
-			busyLightEnabled = true;
+                  busyLightEnabled = true;
 		},
 		error: function (request, status, error) {
 			$('#busylightModalTestBtn').prop("disabled", false);
@@ -914,18 +872,17 @@ function testLightConnection() {
 				}
 			} else {
 				$('#busylightModalBody').html('Connected to busylight!!!!');
-				busyLightEnabled = true;
+                                busyLightEnabled = true;
 				setTimeout(function () {
 					$('#busylightModal').modal('hide');
 				}, 1500);
 			}
-			console.log('');
+                        console.log('');
 		}
 	});
 }
 
-if (busyLightEnabled)
-	testLightConnection();
+testLightConnection();
 
 //####################################################################
 //Videomail functionality: mostly sending socket.io events to adserver
@@ -949,10 +906,7 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
 	console.log('vidId: ' + tableData[5]);
 	$("#videomailId").attr("name", tableData[5]);
 	$("#callbacknum").attr("name", tableData[0]);
-	//Make sure you are not in a call
-	if (agentStatus != 'IN_CALL') {
-		playVideomail(tableData[5], tableData[2], tableData[3]); //vidId, vidDuration vidStatus);
-	}
+	playVideomail(tableData[5], tableData[2], tableData[3]); //vidId, vidDuration vidStatus);
 });
 
 //Sorting the videomail table
@@ -973,9 +927,9 @@ $('#vmail-vrs-number').on('click', function () {
 $('#vmail-date').on('click', function () {
 	var sort = sortButtonToggle($(this).children("i"));
 	if (sort === "asc") {
-		sortFlag = "received asc";
+		sortFlag = "unix_timestamp(received) asc";
 	} else if (sort === "desc") {
-		sortFlag = "received desc";
+		sortFlag = "unix_timestamp(received) desc";
 	}
 	socket.emit('get-videomail', {
 		"extension": extensionMe,
@@ -1042,7 +996,7 @@ function updateVideomailTable(data) {
 			if (vidNumber[0] === '1') vidNumber = vidNumber.slice(1, vidNumber.length);
 			vidNumber = '(' + vidNumber.substring(0, 3) + ') ' + vidNumber.substring(3, 6) + '-' + vidNumber.substring(6, vidNumber.length);
 		}
-		var vidReceived = moment.utc(data[i].received).local().format('ddd MM/DD/YYYY hh:mm A');
+		var vidReceived = data[i].received;
 		var vidDuration = data[i].video_duration;
 		var vidStatus = data[i].status;
 		var vidFilepath = data[i].video_filepath;
@@ -1119,25 +1073,15 @@ function showAgentsTab() {
 
 //Play the selected videomail
 function playVideomail(id, duration, vidStatus) {
-	//Start by removing the persist camera
-	disable_persist_view();
-	document.getElementById("persistCameraCheck").disabled = true;
-	playingVideomail = true;
-
-	//Set agent to away to avoid taking call
-	pauseQueues();
-
 	console.log('Playing video mail with id ' + id);
 	remoteView.removeAttribute("autoplay");
 	remoteView.removeAttribute("poster");
 	remoteView.setAttribute("src", './getVideomail?id=' + id + '&ext=' + extensionMe);
-	//New attribute for control
-	remoteView.setAttribute("controls", "controls");
-	//remoteView.setAttribute("onended", "change_play_button()");
-	//if (document.getElementById("play-video-icon").classList.contains("fa-pause")) {
-	//	document.getElementById("play-video-icon").classList.add("fa-play");
-	//	document.getElementById("play-video-icon").classList.remove("fa-pause");
-	//}
+	remoteView.setAttribute("onended", "change_play_button()");
+	if (document.getElementById("play-video-icon").classList.contains("fa-pause")) {
+		document.getElementById("play-video-icon").classList.add("fa-play");
+		document.getElementById("play-video-icon").classList.remove("fa-pause");
+	}
 	toggle_videomail_buttons(true);
 	updateVideoTime(duration, "vmail-total-time");
 	if (vidStatus === "UNREAD") {
@@ -1162,44 +1106,24 @@ function updateVideoTime(time, elementId) {
 
 //Display the videomail control buttons
 function toggle_videomail_buttons(make_visible) {
-	if (make_visible) {
-		videomail_status_buttons.style.display = "none";
-		videomail_buttons.style.display = "block";
-	}
-	else {
-		videomail_status_buttons.style.display = "none";
-		videomail_buttons.style.display = "none";
-	}
+	if (make_visible) videomail_status_buttons.style.display = "block";
+	else videomail_status_buttons.style.display = "none";
 }
 
 //Exit videomail view and return to call view
-function exitVideomail() {
-	stopVideomail()
-	document.getElementById("persistCameraCheck").disabled = false;
-	if (document.getElementById("persistCameraCheck").checked == true) {
-		enable_persist_view();
-	}
-}
-
 function stopVideomail() {
 	console.log("Videomail view has been stopped, back to call view");
 	remoteView.setAttribute("src", "");
 	remoteView.removeAttribute("src");
 	remoteView.removeAttribute("onended");
-	remoteView.removeAttribute("controls");
 	remoteView.setAttribute("autoplay", "autoplay");
 	remoteView.setAttribute("poster", "images/acedirect-logo.png");
 	toggle_videomail_buttons(false);
-	playingVideomail = false;
 }
 
 //Callback for videomail
 function videomailCallback(callbacknum) {
 	stopVideomail();
-	document.getElementById("persistCameraCheck").disabled = false;
-	if (document.getElementById("persistCameraCheck").checked == true) {
-		enable_persist_view();
-	}
 	var videophoneNumber = callbacknum.match(/\d/g);
 	videophoneNumber = videophoneNumber.join('');
 	start_call(videophoneNumber);
@@ -1247,7 +1171,7 @@ function play_video() {
 		document.getElementById("play-video-icon").classList.remove("fa-play");
 		document.getElementById("play-video-icon").classList.add("fa-pause");
 	} else { // pause the video
-		//remoteView.pause(); //not needed? was potentially causing an exception 
+		remoteView.pause();
 		document.getElementById("play-video-icon").classList.add("fa-play");
 		document.getElementById("play-video-icon").classList.remove("fa-pause");
 	}
@@ -1287,7 +1211,7 @@ remoteView.addEventListener("timeupdate", function () {
 function enterFullscreen() {
 	var webcam_container = document.getElementById("fullscreen-element");
 
-	if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+	if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement ) {
 
 		if (webcam_container.requestFullscreen) {
 			webcam_container.requestFullscreen();
@@ -1301,21 +1225,21 @@ function enterFullscreen() {
 	} else {
 
 		if (document.exitFullscreen) {
-			document.exitFullscreen();
+		  	document.exitFullscreen();
 		} else if (document.msExitFullscreen) {
-			document.msExitFullscreen();
+		  	document.msExitFullscreen();
 		} else if (document.mozCancelFullScreen) {
-			document.mozCancelFullScreen();
+		  	document.mozCancelFullScreen();
 		} else if (document.webkitExitFullscreen) {
-			document.webkitExitFullscreen();
+		  	document.webkitExitFullscreen();
 		}
 	}
 }
 
-function toggleDisplay() {
+function toggleDisplay(){
 	var video_display = $('#remoteView');
 
-	if (video_display.css('object-fit') == 'contain') {
+	if(video_display.css('object-fit') == 'contain') {
 		video_display.css('object-fit: cover');
 	} else {
 		video_display.css('object-fit: contain');
@@ -1323,32 +1247,32 @@ function toggleDisplay() {
 }
 
 var fade_timer = null;
-function clearFadeTimer() {
-	if (fade_timer) {
+function clearFadeTimer(){
+	if(fade_timer) {
 		clearTimeout(fade_timer);
 		fade_timer = 0;
 	}
 }
 
-function fade(type = 'out') {
-	$('#call-option-buttons button').each(function (i) {
-		$(this).css('animation', `fade-${type} 0.${i + 2}s ease-out forwards`);
+function fade(type='out'){
+	$('#call-option-buttons button').each(function(i){
+		$(this).css('animation', `fade-${type} 0.${i+2}s ease-out forwards`);
 	});
 
-	if (type == 'out') {
+	if(type == 'out') {
 		$('#transcriptoverlay').css('bottom', '10px');
 	} else {
 		$('#transcriptoverlay').css('bottom', '65px');
 	}
 }
 
-$('#fullscreen-element').mousemove(function () {
+$('#fullscreen-element').mousemove(function(){
 	clearFadeTimer();
 	fade('in');
 	fade_timer = setTimeout(fade, 3000);
 });
 
-$('#fullscreen-element').mouseleave(function () {
+$('#fullscreen-element').mouseleave(function(){
 	clearFadeTimer();
 	fade_timer = setTimeout(fade, 500);
 });
@@ -1374,15 +1298,6 @@ $("#decline-btn").click(function () {
 	$('#myRingingModal').modal('hide');
 });
 
-//Functionality for videomail hover while in call
-$("#videomailTbody").hover(function () {
-	if (agentStatus == 'IN_CALL') {
-		document.getElementById("videomailTbody").style.cursor = "not-allowed";
-	} else {
-		document.getElementById("videomailTbody").style.cursor = "pointer";
-	}
-});
-
 //Dialpad functionality
 $(".keypad-button").click(function (e) {
 	var etemp = $(e.currentTarget);
@@ -1394,7 +1309,6 @@ $(".keypad-button").click(function (e) {
 	var text = el.text().trim();
 	telNumber = $('#phone-number');
 	$(telNumber).val(telNumber.val() + text);
-	$("#phone-number").focus();
 });
 
 $('#phone-number-delete-btn').click(function (e) {
@@ -1402,26 +1316,14 @@ $('#phone-number-delete-btn').click(function (e) {
 		function (index, value) {
 			return value.substr(0, value.length - 1);
 		});
-	$("#phone-number").focus();
-});
-
-
-//pressing Enter in dialpad will dial
-$("#phone-number").keyup(function (event) {
-	if (event.keyCode === 13) {
-		$("#button-call").click();
-	}
 });
 
 $("#button-call").click(function () {
 	$('#modalDialpad').modal('hide');
 	telNumber = $('#phone-number');
 	start_call($(telNumber).val());
-	socket.emit('sipUriLookup', $('#phone-number').val())
 	$(telNumber).val('');
 	$('#duration').timer('reset');
-	//Disable dropdown while in a call
-	document.getElementById("statusDropdownMenuButton").disabled = true;
 	$('#user-status').text('In Call');
 	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	changeStatusLight('IN_CALL');
@@ -1429,15 +1331,6 @@ $("#button-call").click(function () {
 	toggle_incall_buttons(true);
 	$('#outboundCallAlert').show();
 });
-
-//Functionlaity for persist camera
-$("#persistCameraCheck").click(function () {
-	if (document.getElementById("persistCameraCheck").checked == true) {
-		enable_persist_view();
-	} else if (document.getElementById("persistCameraCheck").checked == false) {
-		disable_persist_view();
-	}
-})
 
 var options = {
 	cellHeight: 40,
@@ -1538,7 +1431,6 @@ function enable_chat_buttons() {
 	$("#newchatmessage").removeAttr("disabled");
 	$("#chat-send").removeAttr("disabled");
 	$("#newchatmessage").attr("placeholder", "Type Message ...");
-	$("#characters-left").removeAttr("hidden");
 	$("#characters-left").show();
 
 }
@@ -1552,6 +1444,4 @@ function disable_chat_buttons() {
 
 }
 
-function enable_initial_buttons() { }
-
-$("#helpalert").hide();
+function enable_initial_buttons() {}

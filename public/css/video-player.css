@@ -24,12 +24,6 @@
   background-color:#fff;
 } 
 
-.mirror-mode {
-    transform: rotateY(180deg);
-    -webkit-transform:rotateY(180deg); /* Safari and Chrome */
-    -moz-transform:rotateY(180deg); /* Firefox */
-}
-
 #call-option-buttons {
   display: none;
   width: 100%;

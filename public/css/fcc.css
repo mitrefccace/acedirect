@@ -2,7 +2,7 @@
 .container-fluid {
   color: white;
      text-align: center;
-     background-color: #2d8ece;
+     background-color: #2d8ece;   
 }
 .row h3 {
      color: white;
@@ -28,16 +28,5 @@
 .remoteView{
   background-color:#000000;
   object-fit:fill;
-}
-/* Set the width of the videophone number input group to be around the same length as the label text above it */
-#input-group {
-   width: 288px;
-}
-
-/* Override admin lte alert danger css */
-.alert-danger {
-   color: #721c24;
-   background-color: #f8d7da;
-   border-color: #f5c6cb;
 }
 

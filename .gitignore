@@ -6,4 +6,4 @@ bower_components
 /.vscode/
 *.swp
 .env
-public/assets/
+public/assets

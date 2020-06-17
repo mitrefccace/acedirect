@@ -1,45 +1,41 @@
-<div class="card card-outline card-outline-tabs">
-    <div class="direct-chat direct-chat-primary" id="userchat">
-        <div class="card-header p-0 border-bottom-0" id="chat-header">
-            <ul class="nav nav-tabs" role="tablist" id="custom-tabs-two-tab">
-                <li class="nav-item">
-                    <a href="#" class="nav-link active" id="chat-tab" data-toggle="pill" role="tab"
-                        aria-selected="true">
-                        <i class="fa fa-comments"></i>
-                        User Chat
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="#" class="nav-link" id="trans-tab" data-toggle="pill" role="tab" aria-selected="false">
-                        <i class="fas fa-file-alt"></i>
-                        Transcript
-                    </a>
-                </li>
-            </ul>
-        </div>
-        <div class="card-body">
-            <div class="tab-content">
-                <div class="tab-pane active" id="chat-body" role="tabpanel">
-                    <div class="direct-chat-messages" id="chat-messages"></div>
-                    <div class="direct-chat-timestamp text-bold" id="rtt-typing"
-                        style="margin-left: 10px; min-height: 20px"></div>
-                </div>
-                <div class="tab-pane" id="trans-body" role="tabpanel">
-                    <div class="direct-chat-messages" id="caption-messages"></div>
-                </div>
+<div class="direct-chat direct-chat-primary" id="userchat">
+    <div class="box-header with-border" id="chat-header">
+        <div class="tab-container">
+            <div id="chat-tab" class="tab active-tab">
+                <i class="fa fa-comments"></i>
+                <h3 class="box-title">User Chat</h3>
+            </div>
+            <div id="trans-tab" class="tab">
+                <h3 class="box-title">Transcript</h3>
             </div>
         </div>
-        <div class="card-footer" id="chat-footer">
-            <form name="chatsend" id="chatsend">
-                <div class="input-group">
-                    <input type="hidden" id="displayname">
-                    <input type="text" id="newchatmessage" placeholder="Chat disabled" class="form-control"
-                        autocomplete="off" required disabled>
-                    <span class="input-group-btn">
-                        <button class="btn btn-primary btn-flat" id="chat-send" type="submit" disabled>Send</button>
-                    </span>
-                </div>
-            </form>
+        <div class="box-tools pull-right">
+            <!--button type="button" class="btn btn-box-tool" data-widget="collapse">
+                <i class="fa fa-minus"></i>
+            </button-->
         </div>
+    </div>
+    <div class="box-body">
+        <!-- Conversations are loaded here -->
+        <div id="chat-body">
+            <div class="direct-chat-messages" id="chat-messages"></div>
+            <div class="direct-chat-timestamp text-bold" id="rtt-typing" style="margin-left: 10px; min-height: 20px">
+            </div>
+        </div>
+        <div id="trans-body">
+            <div class="direct-chat-messages" id="caption-messages"></div>
+        </div>
+    </div>
+    <div class="box-footer" id="chat-footer">
+        <form name="chatsend" id="chatsend">
+            <div class="input-group">
+                <input type="hidden" id="displayname">
+                <input type="text" id="newchatmessage" placeholder="Chat disabled" class="form-control"
+                    autocomplete="off" required disabled>
+                <span class="input-group-btn">
+                    <button class="btn btn-primary btn-flat" id="chat-send" type="submit" disabled>Send</button>
+                </span>
+            </div>
+        </form>
     </div>
 </div>
