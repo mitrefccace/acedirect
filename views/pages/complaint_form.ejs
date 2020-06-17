@@ -369,6 +369,34 @@
 										<input type="text" id="newchatmessage" placeholder="Chat disabled"
 											class="form-control" maxlength="500" autocomplete="off" required disabled>
 										<span class="input-group-btn">
+											<button id="chat-emoji" class="btn btn-primary btn-flat" type="button"
+												data-toggle="dropdown" animation="true" disabled>&#128512;</button>
+											<div class="dropdown-menu dropdown-multicol" id="emoji-selector"
+												aria-labelledby="dropdownMenuButton" style="height:150px; overflow-y: scroll;">
+												<li role="presentation" class="dropdown-header">Select an Emoji</li>
+												<li role="presentation" class="divider"></li>
+												<div class="dropdown-row">
+													<button class="dropdown-item" type="button" style="background-color:transparent; border:none" onclick="addEmoji(this.value)" value="&#128512;">&#128512;</button>
+													<button class="dropdown-item" type="button" style="background-color:transparent; border:none" onclick="addEmoji(this.value)" value="&#128513;">&#128513;</button>
+													<button class="dropdown-item" type="button" style="background-color:transparent; border:none" onclick="addEmoji(this.value)" value="&#128516;">&#128516;</button>
+												</div>
+												<div class="dropdown-row">
+													<button class="dropdown-item" type="button" style="background-color:transparent; border:none" onclick="addEmoji(this.value)" value="&#128547;">&#128547;</button>
+													<button class="dropdown-item" type="button" style="background-color:transparent; border:none" onclick="addEmoji(this.value)" value="&#128577;">&#128577;</button>
+													<button class="dropdown-item" type="button" style="background-color:transparent; border:none" onclick="addEmoji(this.value)" value="&#129320;">&#129320;</button>
+												</div>
+												<div class="dropdown-row">
+													<button class="dropdown-item" type="button" style="background-color:transparent; border:none" onclick="addEmoji(this.value)" value="&#128077;">&#128077;</button>
+													<button class="dropdown-item" type="button" style="background-color:transparent; border:none" onclick="addEmoji(this.value)" value="&#128078;">&#128078;</button>
+													<button class="dropdown-item" type="button" style="background-color:transparent; border:none" onclick="addEmoji(this.value)" value="&#128075;">&#128075;</button>
+												</div>
+												<div class="dropdown-row">
+													<button class="dropdown-item" type="button" style="background-color:transparent; border:none" onclick="addEmoji(this.value)" value="&#128263;">&#128263;</button>
+													<button class="dropdown-item" type="button" style="background-color:transparent; border:none" onclick="addEmoji(this.value)" value="&#128264;">&#128264;</button>
+													<button class="dropdown-item" type="button" style="background-color:transparent; border:none" onclick="addEmoji(this.value)" value="&#128266;">&#128266;</button>
+												</div>
+
+											</div>
 											<button id="chat-send" class="btn btn-primary btn-flat" type="submit"
 												disabled>Send</button>
 										</span>

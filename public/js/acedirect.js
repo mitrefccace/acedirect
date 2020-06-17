@@ -32,6 +32,10 @@ var playingVideomail = false;
 var acekurento;
 var privacy_video_url = null;
 var recipientNumber;
+//Used for tracking new videomail
+var storedData = document.getElementById("unread-mail-count").innerHTML;
+//Used for DTMFpad toggle
+var DTMFpad = false;
 
 setInterval(function () {
 	busylight.light(this.agentStatus);
@@ -104,8 +108,17 @@ function connect_socket() {
                                         if (!payload.signalingServerProto) {
                                            payload.signalingServerProto = 'wss';
                                         }
-				        var signaling_url  = payload.signalingServerProto + '://' + payload.signalingServerPublic + '/signaling';
-										console.log('signaling_url: ' + signaling_url);
+				        var signaling_url  = payload.signalingServerProto + '://' + payload.signalingServerPublic + ':' + payload.signalingServerPort + '/signaling';
+
+                                        //see if we should override with a full NGINX route (development only)
+                                        var dev_url = payload.signalingServerDevUrl;
+                                        dev_url = dev_url.trim();
+                                        if(dev_url !== null && dev_url !== '') {
+                                          console.log('FOR DEVELOPMENT ONLY! Using own signaling server: ' + dev_url);
+                                          signaling_url = dev_url;
+                                        }
+
+					console.log('signaling_url: ' + signaling_url);
 										
 				        acekurento = new ACEKurento({acekurentoSignalingUrl: signaling_url  });
 	
@@ -198,15 +211,17 @@ function connect_socket() {
                                   } else {
                                     $("#closed-label").text('');
                                   }
-                                }).on('typing', function (data) {
+                }).on('typing', function (data) {
 					debugtxt('typing', data);
 					if ($("#displayname").val() !== data.displayname) {
-						$('#rtt-typing').html(data.displayname + ": " + data.rttmsg);
+						$("#rtt-typing").html(data.displayname + ": " + data.rttmsg).addClass("direct-chat-text").addClass("direct-chat-timestamp text-bold");
+						$("#rtt-typing").appendTo($("#chat-messages"));
 					}
 				}).on('typing-clear', function (data) {
 					debugtxt('typing-clear', data);
 					if ($("#displayname").val() !== data.displayname) {
-						$('#rtt-typing').html('');
+						$("#chat-messages").remove($("#rtt-typing"));					
+						$('#rtt-typing').html('').removeClass("direct-chat-text");
 					}
 				}).on('new-caller-general', function (endpoint_type) { // a new general caller has connected
 					debugtxt('new-caller-general', data);
@@ -223,8 +238,9 @@ function connect_socket() {
 					$('#ticketTab').addClass("bg-pink");
 				}).on('chat-leave', function (data) {
 					console.log(acekurento.isMultiparty + " is multiparty");
-					console.log(acekurento.activeAgentList.length + " is number of agents.");
-					if(acekurento.activeAgentList.length < 2){
+                                        if (acekurento.activeAgentList)
+					  console.log(acekurento.activeAgentList.length + " is number of agents.");
+					if(acekurento.activeAgentList  && acekurento.activeAgentList.length < 2){
 						console.log("Entered if");
 					debugtxt('chat-leave', data);
 					$('#duration').timer('pause');
@@ -261,12 +277,15 @@ function connect_socket() {
 						$(msgtext).addClass("direct-chat-text").html(msg).appendTo(msgblock);
 						$(msgblock).addClass("direct-chat-msg right").appendTo($("#chat-messages"));
 					} else {
-						$('#rtt-typing').html('');
+						$('#chat-messages').remove($("#rtt-typing"));
+						$("#rtt-typing").html('').removeClass("direct-chat-text");
+
 						$(msgsender).addClass("direct-chat-name pull-left").html(displayname).appendTo(msginfo);
 						$(msgtime).addClass("direct-chat-timestamp pull-right").html(timestamp).appendTo(msginfo);
 						$(msginfo).addClass("direct-chat-info clearfix").appendTo(msgblock);
 						$(msgtext).addClass("direct-chat-text").html(msg).appendTo(msgblock);
 						$(msgblock).addClass("direct-chat-msg").appendTo($("#chat-messages"));
+
 					}
 					$("#chat-messages").scrollTop($("#chat-messages")[0].scrollHeight);
 				}).on('script-data', function (data) {
@@ -452,6 +471,14 @@ function connect_socket() {
 					debugtxt('outbound-answered', data);
 					$('#modalOutboundCall').modal('hide');
 					console.log("ANSWER -- Option 2: Added asterisk AMI event listener to catch outboud answers. Good: fires when asterisk detects the call has been answered. Bad: not sure what happens if call is never answered. Not sure about multiparty calls.")
+					//setTimeout(() => {
+					//	calibrateVideo(2000);
+					//}, 1000);
+				}).on('new-peer', function (data) {
+					//new peer is required for out going videomail on purple and zrvs networks
+					// if this is done on a convo provider call it could cause black/green video issues.
+					//console.log("New peer joined the call for purple and zvrs only");
+					//toggleSelfview(200);
 				}).on('request-assistance-response', function (data) {
 					debugtxt('request-assistance-response', data);
                                         window.setTimeout(function() {
@@ -623,6 +650,22 @@ $('#ticketTabTitle').click(function () {
 	clearInterval(ticketTabFade);
 });
 
+function addEmoji(emoji) {
+	/*  character count is still wonky */
+	var value = $('#newchatmessage').val();
+	var displayname = $('#displayname').val();
+	var vrs = $('#callerPhone').val();
+
+	value = value+emoji;
+	$('#newchatmessage').val(value);	
+
+	socket.emit('chat-typing', {
+		"displayname": displayname,
+		"vrs": vrs,
+		rttmsg: value
+	});
+}
+
 function requestAssistance() {
 	socket.emit('request-assistance', null);
 }
@@ -785,8 +828,7 @@ function clearScreen() {
 	$('#duration').timer('pause');
 
 	$('#caption-messages').html('');
-	$('#chat-messages').html('');
-	$('#rtt-typing').html('');
+	$('#chat-messages').html('<div id="rtt-typing"></div>');
 	$('#newchatmessage').val('');
 
 	$('#ticketForm').find('input:text').val('');
@@ -961,49 +1003,10 @@ function changeStatusIcon(newColor, statusName, blinking) {
 
 
 function testLightConnection() {
-        console.log('\n\nChecking for BusyLight... Ignore this error if no BusyLight...');
-	$('#busylightModalBody').html(" ");
-	$('#busylightModalTestBtn').prop("disabled", true);
-	$('#busylightModalBody').html("Checking BusyLight server...");
-	$.ajax({
-		type: "get",
-		url: "https://localhost:6298/",
-		timeout: 2000,
-		dataType: "jsonp xml",
-		success: function (data, text) {
-                        busyLightEnabled = true;
-		},
-		error: function (request, status, error) {
-			$('#busylightModalTestBtn').prop("disabled", false);
-			if (status === 'timeout') {
-				$('#busylightModalBody').html("BusyLight app is not running.");
-				$('#busylightModal').modal('show');
-			} else if (status === 'error') {
-				var win = window.open('https://localhost:6298/', '_blank');
-				if (win) {
-					//browser allows popups
-					win.focus();
-				} else {
-					//no pop ups display modal
-					$('#busylightModalBody').html(
-						"<a href='https://localhost:6298/' target='_blank'>Please visit the Busylight Test Page</a>");
-					$('#busylightModal').modal('show');
-				}
-			} else {
-				$('#busylightModalBody').html('Connected to busylight!!!!');
-                                busyLightEnabled = true;
-
-				setTimeout(function () {
-					$('#busylightModal').modal('hide');
-				}, 1500);
-			}
-                        console.log('');
-		}
-	});
+   //no longer needed
+  ; 
 }
 
-if (busyLightEnabled)
-  testLightConnection();
 
 //####################################################################
 //Videomail functionality: mostly sending socket.io events to adserver
@@ -1028,7 +1031,8 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
 	$("#videomailId").attr("name", tableData[5]);
 	$("#callbacknum").attr("name", tableData[0]);
 	if(agentStatus != 'IN_CALL'){
-		playVideomail(tableData[5], tableData[2], tableData[3]); //vidId, vidDuration vidStatus);
+		console.log("Table is "+tableData[3]+" "+tableData[4]+" "+tableData[5]);
+		playVideomail(tableData[4], tableData[2], tableData[3]); //vidId, vidDuration vidStatus);
 	}
 });
 
@@ -1111,6 +1115,7 @@ function updateVideomailTable(data) {
 	var receivedCell;
 	var durationCell;
 	var statusCell;
+	var callbackCell;
 	for (var i = 0; i < data.length; i++) {
 		var vidId = data[i].id;
 		var vidNumber = data[i].callbacknumber;
@@ -1130,15 +1135,22 @@ function updateVideomailTable(data) {
 		receivedCell = row.insertCell(1);
 		durationCell = row.insertCell(2);
 		statusCell = row.insertCell(3);
-		filepathCell = row.insertCell(4);
-		filepathCell.setAttribute('hidden', true);
-		idCell = row.insertCell(5);
+		idCell = row.insertCell(4);
 		idCell.setAttribute('hidden', true);
-		filepathCell.innerHTML = vidFilepath + vidFilename;
+		callbackCell = row.insertCell(5);
+		//filepathCell = row.insertCell(5);
+		//filepathCell.setAttribute('hidden', true);
+		//filepathCell.innerHTML = vidFilepath + vidFilename;
 		idCell.innerHTML = vidId;
 		numberCell.innerHTML = vidNumber;
 		receivedCell.innerHTML = vidReceived;
 		durationCell.innerHTML = vidDuration;
+
+		if ($('#user-status').text() == 'Away'){
+			callbackCell.innerHTML = '<button class=\"demo-btn\" onclick="outbound_call(\'' + data[i].callbacknumber + '\')"><i class="fa fa-phone-square"></i></button>';
+		} else{
+			callbackCell.innerHTML = '<button><i class="fa fa-phone-square"></i></button>';
+		}
 
 		if (vidStatus === 'UNREAD')
 			statusCell.innerHTML = '<span style="font-weight:bold">' + vidStatus + '</span>';
@@ -1149,9 +1161,16 @@ function updateVideomailTable(data) {
 
 //Notification for unread videomail
 function updateVideomailNotification(data) {
+	if(data != storedData){
+		if(data > storedData){
+			showAlert('info', 'You have a new unread videomail');
+		}
+		storedData = data;
+	}
 	$("#unread-mail-count").html(data);
-	if (data === 0)
+	if (data === 0){
 		$("#unread-mail-count").html("");
+	}
 }
 
 //Filter videomail by status
@@ -1203,7 +1222,7 @@ function playVideomail(id, duration, vidStatus) {
 	pauseQueues();
 
 	console.log('Playing video mail with id ' + id);
-	remoteView.removeAttribute("autoplay");
+	//remoteView.removeAttribute("autoplay");
 	remoteView.removeAttribute("poster");
 	remoteView.setAttribute("src", './getVideomail?id=' + id + '&ext=' + extensionMe);
 	//New attribute for control
@@ -1596,6 +1615,7 @@ $("#disallowScreenshare").click(function(){
 	$('#screenshareButtons').hide();
 });
 
+//Functionality for fileshare
 function ShareFile(){
 	//console.log("Sending file " + document.getElementById("fileInput").files[0]);
 	var vrs = $('#callerPhone').val();
@@ -1618,6 +1638,63 @@ function ShareFile(){
 			console.log("ERROR");
 		}
 	});
+}
+
+$("#fullscreen-element").dblclick(function(){
+	enterFullscreen();
+})
+
+//Alert message function
+function showAlert(alertType, alertText){
+	$('#generalAlert').attr('class','alert alert-' + alertType + ' alert-dismissible');
+	$('#alertText').html(alertText);
+	$('#generalAlert').show();
+	setTimeout(function(){
+		$('#generalAlert').hide();
+	},2000)
+}
+
+//Keypress for DTMF toggle
+$(document).on('keypress', function(e){
+	if(e.which == 'k' && agentStatus == 'IN_CALL'){
+		if(DTMFpad){
+			$('#dtmfpad').hide();
+			DTMFpad = false;
+		}else{
+			$('#dtmfpad').show();
+			DTMFpad = true;
+		}
+	}
+})
+
+//Button press for DTMF toggle
+$("#toggleDTMF").click(function(){
+	if(DTMFpad){
+		$('#dtmfpad').hide();
+		DTMFpad = false;
+	}else{
+		$('#dtmfpad').show();
+		DTMFpad = true;
+	}
+})
+
+function DTMFpress(number){
+	acekurento.sendDTMF(number);
+}
+
+//Callback method
+function outbound_call(number){
+	$('#modalDialpad').modal('hide');
+	showOutboundRinging();
+	start_call(number);
+	$('#duration').timer('reset');
+	$('#user-status').text('In Call');
+	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
+	changeStatusLight('IN_CALL');
+	var vrs = $('#callerPhone').val();
+	socket.emit('incall', {'vrs' : vrs});
+	toggle_incall_buttons(true);
+	$('#outboundCallAlert').show();
 }
 
 var options = {
@@ -1718,6 +1795,7 @@ function resetLayout() {
 function enable_chat_buttons() {
 	$("#newchatmessage").removeAttr("disabled");
 	$("#chat-send").removeAttr("disabled");
+	$("#chat-emoji").removeAttr("disabled");
 	$("#newchatmessage").attr("placeholder", "Type Message ...");
 	$("#characters-left").show();
 
@@ -1727,6 +1805,7 @@ function enable_chat_buttons() {
 function disable_chat_buttons() {
 	$("#newchatmessage").attr("disabled", "disabled");
 	$("#chat-send").attr("disabled", "disabled");
+	$("#chat-emoji").attr("disabled", "disabled");
 	$("#newchatmessage").attr("placeholder", "Chat disabled");
 	$("#characters-left").hide();
 

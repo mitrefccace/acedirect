@@ -20,6 +20,13 @@
             <!-- Main content -->
             <div id="helpalert_placeholder"></div>
             <section class="content">
+
+                <!--Alert message-->
+                <div id="generalAlert" class="alert alert-success alert-dismissible" role="alert" hidden>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <div id="alertText">Alert</div>
+                </div>
+
                 <div class="grid-stack">
                     <!-- VideoBox -->
                     <div class="grid-stack-item" data-gs-x="0" data-gs-width="10" data-gs-max-width="10" data-gs-min-width="2" data-gs-height="14" data-gs-max-height="14" data-gs-id="gsvideobox" id='gsvideobox'>
@@ -169,6 +176,9 @@
                                                 <i id="video-id-sort" class="fa fa-sort"> </i>
                                             </th>
                                             <th id="vmail-status">Status
+                                                <i id="video-id-sort" class="fa fa-sort"> </i>
+                                            </th>
+                                            <th id="vmail-callback">Callback
                                                 <i id="video-id-sort" class="fa fa-sort"> </i>
                                             </th>
                                         </tr>

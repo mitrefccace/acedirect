@@ -157,7 +157,7 @@ if (nginxPath.length === 0) {
   nginxPath = "/ACEDirect";
 }
 
-//busylight paramete
+//busylight parameter
 var busyLightEnabled = getConfigVal('busylight:enabled');
 if (busyLightEnabled.length === 0) {
   //default for backwards compatibility
@@ -166,6 +166,16 @@ if (busyLightEnabled.length === 0) {
   busyLightEnabled = (busyLightEnabled === 'true');
 }
 logger.debug('busyLightEnabled: ' + busyLightEnabled);
+
+//busylight awayBlink parameter (blink while Away, if callers are in queue)
+var awayBlink= getConfigVal('busylight:awayBlink');
+if (awayBlink.length === 0) {
+  //default to on 
+  awayBlink = true;
+} else {
+  awayBlink = (awayBlink === 'true');
+}
+logger.debug('awayBlink: ' + awayBlink);
 
 //graceful shutdown, especially with node restarts
 process.on('exit', function() {
@@ -190,6 +200,7 @@ if (consumerPath.length === 0) {
 var signalingServerPublic = getConfigVal('signaling_server:public');
 var signalingServerPort = getConfigVal('signaling_server:port');
 var signalingServerProto = getConfigVal('signaling_server:proto');
+var signalingServerDevUrl = getConfigVal('signaling_server:dev_url');
 
 var queuesVideomailNumber = getConfigVal('asterisk:queues:videomail:number');
 
@@ -1243,6 +1254,19 @@ function handle_manager_event(evt) {
   //console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>The event is " + evt.event);
   switch (evt.event) {
 
+	case ('VarSet'):
+		//let channel = evt.channel.split(/[\/,-]/);
+		//console.log(JSON.stringify(evt))
+		//if(channel[1]  && (channel[1].startsWith("ProviderPurple") || channel[1].startsWith("ProviderZVRS")) && 
+		if (evt.variable && evt.variable.bridgepeer == ''){
+			let agentExt = evt.value.split(/[\/,-]/);
+			console.log("sending new-peer to", agentExt[1])
+			if(agentExt[1])
+				io.to(agentExt[1]).emit('new-peer',{});
+		}		
+		break;
+
+
     // Sent by Asterisk when the call is answered
     case ('DialEnd'):
       // Make sure this is an ANSWER event only
@@ -1848,6 +1872,7 @@ function init_ami() {
       //add only the manager ami events we care about
       //ami.on('managerevent', handle_manager_event);
       ami.on('dialend', handle_manager_event);
+      ami.on('varset', handle_manager_event);
       ami.on('hangup', handle_manager_event);
       ami.on('attendedtransfer', handle_manager_event);
       ami.on('newstate', handle_manager_event);
@@ -2263,6 +2288,7 @@ function processExtension(data) {
 						"signaling_server_public": signalingServerPublic,
 						"signaling_server_port": signalingServerPort,
 						"signaling_server_proto": signalingServerProto,
+						"signaling_server_dev_url": signalingServerDevUrl,
 					        "privacy_video_url": privacy_video_url,
 						"queues_complaint_number": queuesComplaintNumber,
 						"queues_videomail_number": queuesVideomailNumber,
@@ -2668,7 +2694,8 @@ app.post('/consumer_login', function (req, res) {
 app.use(function (req, res, next) {
         res.locals = {
                 "nginxPath":nginxPath,
-                "busyLightEnabled":busyLightEnabled
+                "busyLightEnabled":busyLightEnabled,
+                "awayBlink":awayBlink
         }
         next();
 });
@@ -2814,6 +2841,7 @@ app.get('/token', function (req, res) {
 		payload.signalingServerPublic = req.session.signalingServerPublic;
 		payload.signalingServerPort = req.session.signalingServerPort;
 		payload.signalingServerProto= req.session.signalingServerProto;
+		payload.signalingServerDevUrl = req.session.signalingServerDevUrl;
                 payload.privacy_video_url = privacy_video_url;
 		payload.queuesComplaintNumber = req.session.queuesComplaintNumber;
 		payload.extensionPassword = req.session.extensionPassword;
@@ -3000,6 +3028,7 @@ app.get('/login', agent.shield(cookieShield), function (req, res) {
 						req.session.signalingServerPublic = signalingServerPublic;
 						req.session.signalingServerPort = signalingServerPort;
 						req.session.signalingServerProto= signalingServerProto;
+						req.session.signalingServerDevUrl= signalingServerDevUrl;
 						req.session.privacy_video_url = privacy_video_url;
 						req.session.queuesComplaintNumber = queuesComplaintNumber;
 						req.session.extensionPassword = extensionPassword;

@@ -23,55 +23,6 @@
   //     };
   //   }
   // }
-  var MEDIA_CONSTRAINTS = {
-    audio: true,
-    video: {
-      minWidth: 640,
-      minHeight: 480,
-      maxWidth: 1280,
-      maxHeight: 720,
-      minFrameRate: 12,
-      maxFrameRate: 30
-    }
-  };
-
-  //Resolution for multiparty adjustment
-  var lowres_media = {
-    audio: true,
-    video: {
-      width: 320,
-      height: 240,
-      frameRate: {
-        min: 10,
-        max: 20
-      }
-    },
-  };
-
-  var medres_media = {
-    audio: true,
-    video: {
-      width: 640,
-      height: 480,
-      frameRate: {
-        min: 10,
-        max: 20
-      }
-    },
-  };
-
-  var highres_media = {
-    audio: true,
-    video: {
-      width: 1280,
-      height: 720,
-      frameRate: {
-        min: 10,
-        max: 25
-      }
-    },
-  };
-
   var ua = window && window.navigator ? window.navigator.userAgent : '';
   var parser = new UAParser(ua);
   var browser = parser.getBrowser();
@@ -257,7 +208,8 @@
       var candidate = event.candidate;
       if (EventEmitter.listenerCount(self, 'icecandidate') || EventEmitter.listenerCount(self, 'candidategatheringdone')) {
         if (candidate) {
-          var cand;
+        setTimeout(function() {
+	  var cand;
           if (multistream && usePlanB) {
             cand = interop.candidateToUnifiedPlan(candidate);
           } else {
@@ -265,7 +217,9 @@
           }
           self.emit('icecandidate', cand);
           candidategatheringdone = false;
-        } else if (!candidategatheringdone) {
+        }, 2000);
+	logger.debug('ICE Candidate TIMEOUT', candidate); 
+	} else if (!candidategatheringdone) {
           self.emit('candidategatheringdone');
           candidategatheringdone = true;
         }
@@ -442,68 +396,64 @@
     if (mode !== 'recvonly' && !videoStream && !audioStream) {
       function getMedia(constraints) {
         if (constraints === undefined) {
-          if(acekurento.isMultiparty){
-            //constraints = lowres_media;
-            constraints = MEDIA_CONSTRAINTS;
-          } else {
-            //constraints = highres_media;
-            constraints = MEDIA_CONSTRAINTS;
-          }
-          //constraints = MEDIA_CONSTRAINTS;
+          constraints = MEDIA_CONSTRAINTS;
         }
         navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
           videoStream = stream;
           start();
         }).catch(callback);
       }
-      console.log("Setting constraints " + acekurento.isMultiparty);
       if (sendSource === 'webcam') {
-        logger.debug('Media Constraints from source: WEBCAM', highres_media);
-        getMedia(highres_media);
+        getMedia(mediaConstraints);
+	logger.debug('Media Constraints for source:  WEBCAM', mediaConstraints);
       } else {
         if (navigator.getDisplayMedia) {
-          if(acekurento.isMultiparty){
-            navigator.getDisplayMedia(MEDIA_CONSTRAINTS).then(function (stream) {
-              videoStream = stream;
-              navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(function (aStream) {
-                audioStream = aStream;
-                start();
-              }).catch(callback);
+          navigator.getDisplayMedia({video: true, audio: true}).then(function (stream) {
+            videoStream = stream;
+            navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(function (aStream) {
+              audioStream = aStream;
+              start();
             }).catch(callback);
-          }
-          else {
-            navigator.getDisplayMedia(MEDIA_CONSTRAINTS).then(function (stream) {
-              videoStream = stream;
-              navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(function (aStream) {
-                audioStream = aStream;
-                start();
-              }).catch(callback);
-            }).catch(callback);
-          }
+          }).catch(callback);
         } else if (navigator.mediaDevices.getDisplayMedia) {
-          if(acekurento.isMultiparty){
-            navigator.mediaDevices.getDisplayMedia(MEDIA_CONSTRAINTS).then(function (stream) {
-              videoStream = stream;
-              navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(function (aStream) {
-                audioStream = aStream;
-                start();
-              }).catch(callback);
+          navigator.mediaDevices.getDisplayMedia({video: true, audio: true}).then(function (stream) {
+            videoStream = stream;
+            navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(function (aStream) {
+              audioStream = aStream;
+              start();
             }).catch(callback);
-          } else {
-            navigator.mediaDevices.getDisplayMedia(MEDIA_CONSTRAINTS).then(function (stream) {
-              videoStream = stream;
-              navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(function (aStream) {
-                audioStream = aStream;
-                start();
-              }).catch(callback);
-            }).catch(callback);
-          }
+          }).catch(callback);
         } else {
           logger.warn('This browser does not support getDisplayMedia, screen share might fail');
           mediaConstraints.video = {mediaSource: 'screen'};
           getMedia(mediaConstraints);
         }
-        // No plugin
+/*      if (sendSource === 'webcam') {
+        getMedia(mediaConstraints);
+      } else {
+        if (navigator.getDisplayMedia) {
+          navigator.getDisplayMedia({video: true, audio: true}).then(function (stream) {
+            videoStream = stream;
+            navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(function (aStream) {
+              audioStream = aStream;
+              start();
+            }).catch(callback);
+          }).catch(callback);
+        } else if (navigator.mediaDevices.getDisplayMedia) {
+          navigator.mediaDevices.getDisplayMedia({video: true, audio: true}).then(function (stream) {
+            videoStream = stream;
+            navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(function (aStream) {
+              audioStream = aStream;
+              start();
+            }).catch(callback);
+          }).catch(callback);
+        } else {
+          logger.warn('This browser does not support getDisplayMedia, screen share might fail');
+          mediaConstraints.video = {mediaSource: 'screen'};
+          getMedia(mediaConstraints);
+        }
+  */
+         // No plugin
         // getScreenConstraints(sendSource, function (error, constraints_) {
         //   if (error)
         //     return callback(error);
@@ -1055,14 +1005,11 @@
   module.exports = freeice;
 },{"./stun.json":6,"./turn.json":7,"normalice":12}],6:[function(require,module,exports){
   module.exports=[
-    //"stun.l.google.com:19302",
-    //"stun1.l.google.com:19302",
-    //"stun2.l.google.com:19302"
     "stun.task3acrdemo.com:3478"
   ]
 
 },{}],7:[function(require,module,exports){
-  module.exports=[{"url":"turn:coturn.task3acrdemo.com","username":"turn","credential":"turn123"}]
+module.exports=[{"url":"turn:coturn.task3acrdemo.com","username":"turn","credential":"turn123"}]
 
 },{}],8:[function(require,module,exports){
   var WildEmitter = require('wildemitter');
@@ -4495,7 +4442,10 @@ function ACEKurento(config) {
     ws = new WebSocket(config.acekurentoSignalingUrl);
   } else {
     ws = new WebSocket('wss://' + window.location.host + '/signaling');
-  }
+    }
+//ws = new WebSocket('wss://dev3demo.task3acrdemo.com/swilkins/acedirect/signaling');
+
+
   var selfStream;
   var remoteStream;
   var webRtcPeer;
@@ -4594,14 +4544,6 @@ function ACEKurento(config) {
      * Call IsScreensharing boolean
      */
     isScreensharing: this.isScreensharing || false,
-    /**
-     * custom variable to check for multi party
-     */
-    isMultiparty: false,
-    /**
-     * Custom list of involved agents
-     */
-    activeAgentList: [],
     /**
      * Configuration object use to hold authentication data as well as other config call parameters.
      * You can find the available config options in {@link ACEKurento}
@@ -4740,8 +4682,8 @@ function ACEKurento(config) {
         remoteVideo: this.remoteStream,
         onicecandidate: onIceCandidate,
         mediaConstraints: {
-          audio: this.enableVideo,
-          video: this.enableAudio
+          audio: this.enableAudio,
+          video: this.enableVideo
         }
       }
       console.log('create webRtcPeer ...');
@@ -4812,8 +4754,8 @@ function ACEKurento(config) {
         remoteVideo: this.remoteStream,
         onicecandidate: onIceCandidate,
         mediaConstraints: {
-          audio: this.enableVideo,
-          video: this.enableAudio
+          audio: this.enableAudio,
+          video: this.enableVideo
         }
       };
       console.log('create webRtcPeer ...');
@@ -4946,6 +4888,20 @@ function ACEKurento(config) {
       sendMessage({ id: 'privacy', enabled: enabled, url: enabled ? url : undefined });
     },
     /**
+     * Sends calibration video image to peer instead of local video stream
+     * @param {Boolean} enabled - If "true" enables video calibrate mode
+     * @param {String} url - The video calibrate mode url
+     */
+    calibrateMode: function (enabled, url) {
+      sendMessage({ id: 'privacy', enabled: enabled, url: enabled ? "file://tmp/media/calibrate5.webm" : undefined });
+    },
+    /**
+     * @param {Number} number - Number value for DTMF input
+     */
+    sendDTMF: function (number) {
+      sendMessage({ id: 'senddtmf', number : number});
+    },
+    /**
      * ICE Restart
      */
     iceRestart: function () {
@@ -4973,8 +4929,8 @@ function ACEKurento(config) {
         remoteVideo: this.remoteStream,
         onicecandidate: onIceCandidate,
         mediaConstraints: {
-          audio: this.enableVideo,
-          video: this.enableAudio
+          audio: this.enableAudio,
+          video: this.enableVideo
         }
       }
       console.log('create webRtcPeer ...');
@@ -5009,8 +4965,8 @@ function ACEKurento(config) {
         remoteVideo: this.remoteStream,
         onicecandidate: onIceCandidate,
         mediaConstraints: {
-          audio: this.enableVideo,
-          video: this.enableAudio
+          audio: this.enableAudio,
+          video: this.enableVideo
         }
       }
       console.log('create webRtcPeer ...');
@@ -5143,8 +5099,8 @@ function ACEKurento(config) {
         sendSource: enable ? 'screen' : 'webcam',
         onicecandidate: onIceCandidate,
         mediaConstraints: {
-          audio: this.enableVideo,
-          video: this.enableAudio
+          audio: this.enableAudio,
+          video: this.enableVideo
         }
       }
       console.log('create webRtcPeer ...');
@@ -5219,20 +5175,7 @@ function ACEKurento(config) {
     console.info('Received message data: ' + JSON.stringify(message));
 
     if(message.id === 'participantList'){
-      acekurento.activeAgentList = message.participants;
-      if(message.participants.length >= 3){
-        acekurento.isMultiparty = true;
-        if($('#user-status').text() === 'Incoming Call'){
-          $('#user-status').text('In Call');
-	        changeStatusIcon(in_call_color, "in-call", in_call_blinking);
-	        changeStatusLight('IN_CALL');
-        }
-        //Hide self view
-        $('#selfView').hide();
-      } else{
-        acekurento.isMultiparty = false;
-        $('#selfView').show();
-      }
+      console.log("Participant size is " + message.participants.length);
     }
 
     switch (message.id) {

@@ -30,7 +30,8 @@ $(document).ready(function () {
 	});
 
 	$('#newchatmessage').keyup(function () {
-		var left = 500 - $(this).val().length;
+		var message_count = Array.from($(this).val()).length; // counts emojis as a single character
+		var left = 500 - message_count;
 		if (left < 0) {
 			left = 0;
 		}
@@ -82,8 +83,7 @@ function clearScreen() {
 	$('#duration').timer('pause');
 
 	$('#caption-messages').html('');
-	$('#chat-messages').html('');
-	$('#rtt-typing').html('');
+	$('#chat-messages').html('<div id="rtt-typing" ></div>');
 	$('#newchatmessage').val('');
 
 	$('#ticketForm').find('input:text').val('');
@@ -237,10 +237,20 @@ function connect_socket() {
                                                      globalData.signaling_server_proto = 'wss';
                                                   }
 
-                                                  signaling_url = globalData.signaling_server_proto+ '://' + globalData.signaling_server_public + '/signaling';
-												  console.log('signaling_url: ' + signaling_url);
+                                                  signaling_url = globalData.signaling_server_proto+ '://' + globalData.signaling_server_public + ':' + globalData.signaling_server_port + '/signaling';
+
+                                                  //see if we should override with a full NGINX route (development only)
+                                                  var dev_url = globalData.signaling_server_dev_url;
+                                                  dev_url = dev_url.trim();
+                                                  if(dev_url !== null && dev_url !== '') {
+                                                    // do something
+                                                    console.log('FOR DEVELOPMENT ONLY! Using own signaling server: ' + dev_url);
+                                                    signaling_url = dev_url;
+                                                  }
+
+						  console.log('signaling_url: ' + signaling_url);
 												  
-												  acekurento = new ACEKurento({acekurentoSignalingUrl: signaling_url });
+						  acekurento = new ACEKurento({acekurentoSignalingUrl: signaling_url });
 
                                                   acekurento.remoteStream = document.getElementById('remoteView');
                                                   acekurento.selfStream = document.getElementById('selfView');
@@ -329,7 +339,8 @@ function connect_socket() {
 						$(msgtext).addClass("direct-chat-text").html(msg).appendTo(msgblock);
 						$(msgblock).addClass("direct-chat-msg right").appendTo($("#chat-messages"));
 					} else {
-						$('#rtt-typing').html('');
+						$('#chat-messages').remove($("#rtt-typing"));
+						$("#rtt-typing").html('').removeClass("direct-chat-text");
 
 						$(msgsender).addClass("direct-chat-name pull-left").html(displayname).appendTo(msginfo);
 						$(msgtime).addClass("direct-chat-timestamp pull-right").html(timestamp).appendTo(msginfo);
@@ -342,11 +353,15 @@ function connect_socket() {
 
 				}).on('typing', function (data) {
 					if ($("#displayname").val() !== data.displayname) {
-						$('#rtt-typing').html(data.displayname + ": " + data.rttmsg);
+						/* there's still some weird spacing between agent messages on the first call */
+						$("#rtt-typing").html(data.displayname + ": " + data.rttmsg).addClass("direct-chat-text").addClass("direct-chat-timestamp text-bold");
+						$("#rtt-typing").appendTo($("#chat-messages")); 
+						
 					}
 				}).on('typing-clear', function (data) {
 					if ($("#displayname").val() !== data.displayname) {
-						$('#rtt-typing').html('');
+						$("#chat-messages").remove($("#rtt-typing"));					
+						$("#rtt-typing").html('').removeClass("direct-chat-text");
 					}
 				}).on('disconnect', function () {
 					console.log('disconnected');
@@ -392,6 +407,7 @@ function connect_socket() {
 						$("#callbutton").attr("disabled", "disabled");
 						$("#newchatmessage").attr("disabled", "disabled");
 						$("#chat-send").attr("disabled", "disabled");
+						$("#chat-emoji").attr("disabled", "disabled");
 						$("#caption-settings").removeAttr("hidden");
 						$("#trans-tab").removeAttr("hidden");
 						skinny = false;
@@ -438,9 +454,8 @@ function connect_socket() {
                                 }).on("chat-leave", function (error) {
 					//clear chat
 					$('#chatcounter').text('500');
-					$('#chat-messages').html('');
+					$('#chat-messages').html('<div id="rtt-typing" ></div>');
 					$('#caption-messages').html('');
-					$('#rtt-typing').html('');
 					$('#newchatmessage').val('');
 
 					//reset buttons and ticket form
@@ -614,6 +629,31 @@ $('#chatsend').submit(function (evt) {
 	});
 });
 
+function addEmoji(emoji) {
+
+	var value = $('#newchatmessage').val();
+	var displayname = $('#displayname').val();
+
+	value = value+emoji;
+	$('#newchatmessage').val(value);	
+
+	//update rtt
+	socket.emit('chat-typing', {
+		"displayname": displayname,
+		rttmsg: value
+	});
+
+	// update the character count
+	var message_count = Array.from($('#newchatmessage').val()).length; // reads the emoji as one character
+	var left = 500 - message_count;
+
+	if (left < 0) {
+		left - 0;
+	}
+
+	$('#chatcounter').text(left);
+}
+
 // Event listener for the full-screen button
 function enterFullscreen() {
 	var webcam_container = document.getElementById("fullscreen-element");
@@ -728,6 +768,7 @@ function set_queue_text(position) {
 function enable_chat_buttons() {
 	$("#newchatmessage").removeAttr("disabled");
 	$("#chat-send").removeAttr("disabled");
+	$("#chat-emoji").removeAttr("disabled");
 	$("#newchatmessage").attr("placeholder", "Type Message ...");
 	$("#characters-left").show();
 
@@ -737,6 +778,7 @@ function enable_chat_buttons() {
 function disable_chat_buttons() {
 	$("#newchatmessage").attr("disabled", "disabled");
 	$("#chat-send").attr("disabled", "disabled");
+	$("#chat-emoji").attr("disabled", "disabled");
 	$("#newchatmessage").attr("placeholder", "Chat disabled");
 	$("#characters-left").hide();
 
