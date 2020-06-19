@@ -2260,6 +2260,12 @@ function processExtension(data) {
 		wsPort = parseInt(wsPort);
 	}
 
+        //get SIP proxy config vars
+        var ps_proto = getConfigVal('proxy_server:proto');
+        var ps_public = getConfigVal('proxy_server:public');
+        var ps_port = getConfigVal('proxy_server:port');
+        var ps_path = getConfigVal('proxy_server:path');
+
 	var queuesComplaintNumber = getConfigVal('asterisk:queues:complaint:number');
 	var queuesVideomailNumber = getConfigVal('asterisk:queues:videomail:number');
 	var queuesVideomailMaxrecordsecs = getConfigVal('videomail:max_record_secs');
@@ -2281,6 +2287,10 @@ function processExtension(data) {
 						"message":"success",
 						"vrs": data.vrs,
 						"extension": nextExtension,
+                                                "ps_proto": ps_proto,
+                                                "ps_public": ps_public,
+                                                "ps_port": ps_port,
+                                                "ps_path": ps_path,
 						"asterisk_public_hostname": asteriskPublicHostname,
 						"stun_server": stunServer,
 						"ws_port": wsPort,

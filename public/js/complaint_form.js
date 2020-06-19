@@ -176,13 +176,14 @@ function connect_socket() {
 						var extension = data.extension; //returned extension to use for WebRTC
 						exten = data.extension;
 						$('#display_name').val(data.extension);
+                                                var sip_proxy = "";
 						if (data.ws_port !== "") {
-							//$('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + ":" + data.ws_port + "/ws");
-                                                        $('#ws_servers').attr("name", "wss://" + "ace40sip.task3acrdemo.com" + ":" + data.ws_port + "/ws");
+                                                   sip_proxy = data.ps_proto + "://" + data.ps_public + ":" + data.ps_port + data.ps_path; 
 						} else {
-							//$('#ws_servers').attr("name", "wss://" + data.asterisk_public_hostname + "/ws");
-                                                        $('#ws_servers').attr("name", "wss://" + "ace40sip.task3acrdemo.com" + "/ws");
+                                                   sip_proxy = data.ps_proto + "://" + data.ps_public + data.ps_path; 
                                                 }
+                                                console.log('sip_proxy: ' + sip_proxy);
+                                                $('#ws_servers').attr("name", sip_proxy);
 
 
                                                 //is this a videomail call or complaint call?
@@ -194,8 +195,7 @@ function connect_socket() {
 						    asterisk_sip_uri = "sip:" + data.queues_videomail_number + "@" + data.asterisk_public_hostname;
                                                 }
                                                 else{
-                                                    //$('#my_sip_uri').attr("name", "sip:" + data.extension + "@" + data.asterisk_public_hostname);
-                                                    $('#my_sip_uri').attr("name", "sip:" + data.extension + "@" + "ace40sip.task3acrdemo.com"); 
+                                                    $('#my_sip_uri').attr("name", "sip:" + data.extension + "@" + data.ps_public); 
                                                     asterisk_sip_uri = "sip:" + data.queues_complaint_number + "@" + data.asterisk_public_hostname;
                                                     asterisk_sip_uri = data.queues_complaint_number; //TODO: what is this doing?
                                                 }
