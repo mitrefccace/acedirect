@@ -4442,9 +4442,7 @@ function ACEKurento(config) {
     ws = new WebSocket(config.acekurentoSignalingUrl);
   } else {
     ws = new WebSocket('wss://' + window.location.host + '/signaling');
-    }
-//ws = new WebSocket('wss://dev3demo.task3acrdemo.com/swilkins/acedirect/signaling');
-
+  }
 
   var selfStream;
   var remoteStream;
