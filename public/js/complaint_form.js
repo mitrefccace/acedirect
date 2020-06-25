@@ -340,7 +340,7 @@ function connect_socket() {
 						$(msgblock).addClass("direct-chat-msg right").appendTo($("#chat-messages"));
 					} else {
 						$('#chat-messages').remove($("#rtt-typing"));
-						$("#rtt-typing").html('').removeClass("direct-chat-text");
+						$("#rtt-typing").html('').removeClass("direct-chat-text").removeClass("direct-chat-timestamp text-bold");
 
 						$(msgsender).addClass("direct-chat-name pull-left").html(displayname).appendTo(msginfo);
 						$(msgtime).addClass("direct-chat-timestamp pull-right").html(timestamp).appendTo(msginfo);
@@ -361,7 +361,7 @@ function connect_socket() {
 				}).on('typing-clear', function (data) {
 					if ($("#displayname").val() !== data.displayname) {
 						$("#chat-messages").remove($("#rtt-typing"));					
-						$("#rtt-typing").html('').removeClass("direct-chat-text");
+						$("#rtt-typing").html('').removeClass("direct-chat-text").removeClass("direct-chat-timestamp text-bold");
 					}
 				}).on('disconnect', function () {
 					console.log('disconnected');
@@ -648,7 +648,7 @@ function addEmoji(emoji) {
 	var left = 500 - message_count;
 
 	if (left < 0) {
-		left - 0;
+		left = 0;
 	}
 
 	$('#chatcounter').text(left);

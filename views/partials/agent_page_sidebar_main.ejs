@@ -12,7 +12,7 @@
                         <span>
                             <i id="status-icon" class="fa fa-circle text-yellow currently-away"></i>
                         </span>&nbsp;&nbsp;&nbsp;
-                        <span id="user-status">Away</span>
+                        <span id="user-status" name="User_Status" accesskey="U">Away</span>
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu">
@@ -66,8 +66,8 @@
 
             <li class="header">TOOLS</li>
 
-            <li id="sidebar-dialpad">
-                <a href="#" onclick="showDialpad()">
+            <li id="sidebar-dialpad" name="Dialpad" accesskey="1">
+                <a href="#" onclick="showDialpad()" accesskey="1">
                     <i class="fa fa-video-camera"></i>
                     <span>Dial Pad</span>
                 </a>
@@ -77,7 +77,7 @@
             <li class="header config-hide">CAPTION SETTINGS</li>
             <li id="cap-font-size" class="cap-setting config-hide">
                 <span>Font size</span>
-                <select id="font-select" class="font-select" type="select" name="font-select" onchange="changeCaption(this.value)">
+                <select id="font-select" class="font-select" type="select" name="Font_Size" onchange="changeCaption(this.value)" value="Font Size" accesskey="F">
                     <option value="2">Default</option>
                     <option value="1.5">Small</option>
                     <option value="2.8">Large</option>
@@ -87,9 +87,9 @@
             <li id="cap-font-color" class="cap-setting config-hide">
                 <span>Font color</span>
                 <div class="color-select-container">
-                    <div id="font-grey" class="color-select" onclick="changeCaption(this.id)"></div>
-                    <div id="font-black" class="color-select" onclick="changeCaption(this.id)"></div>
-                    <div id="font-white" class="color-select" onclick="changeCaption(this.id)"></div>
+                    <div id="font-grey" class="color-select" onclick="changeCaption(this.id)" name="Grey_Font" accesskey="G"></div>
+                    <div id="font-black" class="color-select" onclick="changeCaption(this.id)" name="Black_Font" accesskey="B"></div>
+                    <div id="font-white" class="color-select" onclick="changeCaption(this.id)" name="White_Font" accesskey="W"></div>
                 </div>
             </li>
 
@@ -97,22 +97,22 @@
                 <span>Background color</span>
                 <div class="color-select-container">
                     <i id="bg-transparent" class="far fa-times-circle"></i>
-                    <div id="bg-grey" class="color-select" onclick="changeCaption(this.id)"></div>
-                    <div id="bg-black" class="color-select" onclick="changeCaption(this.id)"></div>
-                    <div id="bg-white" class="color-select" onclick="changeCaption(this.id)"></div>
+                    <div id="bg-grey" class="color-select" onclick="changeCaption(this.id)" name="Grey_Background" accesskey="0"></div>
+                    <div id="bg-black" class="color-select" onclick="changeCaption(this.id)" name="Black_Background" accesskey="9"></div>
+                    <div id="bg-white" class="color-select" onclick="changeCaption(this.id)" name="White_Background" accesskey="8"></div>
                 </div>
-                <input type = "range" min = "0" max = "1" step = .01 value = "1" id = "opacity-slider-agent">
+                <input type = "range" min = "0" max = "1" step = .01 value="1" id = "opacity-slider-agent"  name="Opacity_Slider" accesskey="O">
             </li>
             <li>
               <div class="demo-btn-container config-hide">
-                <a class="demo-btn" href="#" onclick="testCaptions()">Preview</a>
+                <a id="preview-caption-btn" class="demo-btn" href="#" onclick="testCaptions()" name="Preview_Button" accesskey="Z" disabled>Preview</a>
                 <p>&nbsp;</p>
               </div>
             </li>
 
             <li class="header config-hide">CAMERA OPTIONS</li>
             <li id="cap-font-size" class="cap-setting config-hide nav-item">
-                <span>Enable / Disable Self-View</span><input id="persistCameraCheck" type="checkbox" checked>
+                <span>Enable / Disable Self-View</span><input id="persistCameraCheck" type="checkbox" name="Self-View" accesskey="C"checked>
             </li>
 
             <!--<li id="sidebar-multiparty" class="cap-setting config-hide nav-item">

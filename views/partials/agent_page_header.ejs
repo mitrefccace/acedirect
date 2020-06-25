@@ -14,7 +14,7 @@
 <!-- Header Navbar: style can be found in header.less -->
 <nav class="navbar navbar-static-top" role="navigation">
     <!-- Sidebar toggle button-->
-    <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+    <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button" name="Sidebar" id="sidebar-toggle" accesskey="N">
         <span class="sr-only">Toggle navigation</span>
     </a>
     <div id="agentStatusInfo" class="col-lg-2 col-md-2 col-sm-2 col-lg-offset-2 col-md-offset-2" style="white-space:nowrap;">
@@ -27,14 +27,14 @@
         </span>
     </div>
     <div class="pull-right">
-        <button id="assistanceBtn" type="button" class="btn btn-danger" onclick="requestAssistance()">Get Help</button>
+        <button id="assistanceBtn" type="button" class="btn btn-danger" onclick="requestAssistance()" name="Help" accesskey="H">Get Help</button>
     </div>
     <!-- Navbar Right Menu -->
     <div class="navbar-custom-menu">
         <ul class="nav navbar-nav">
             <!-- User Account: style can be found in dropdown.less -->
             <li class="dropdown user user-menu">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"  id="user-menu" name="User_Menu" accesskey="P">
                     <img src="/images/anon.png" class="user-image" alt="User Image">
                     <span class="hidden-xs" id="agentname-header"></span>
                 </a>
@@ -61,18 +61,18 @@
             </li>
             <!-- Control Sidebar Toggle Button -->
             <li>
-                <a href="#" id="mail-btn" data-toggle="control-sidebar" onClick="showVideoMailTab()">
+                <a href="#" id="mail-btn" data-toggle="control-sidebar" onClick="showVideoMailTab()" name="Video_Mail"accesskey="V">
                     <i class="fa fa-envelope-o"></i>
                     <span class="label label-danger" id="unread-mail-count"></span>
                 </a>
             </li>
             <li>
-                <a href="#" data-toggle="modal" data-target="#licModal">
+                <a href="#" id="license" data-toggle="modal" data-target="#licModal" name="License" accesskey="L">
                     <i class="fa fa-info-circle"></i>
                 </a>
             </li>
             <li>
-                <a href="#" id="agents-btn" data-toggle="control-sidebar" onClick="showAgentsTab()">
+                <a href="#" id="agents-btn" data-toggle="control-sidebar" onClick="showAgentsTab()" name="Settings" accesskey="S">
                     <i class="fa fa-gears"></i>
                 </a>
             </li>

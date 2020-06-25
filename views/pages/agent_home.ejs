@@ -79,13 +79,17 @@
             <aside id="ctrl-sidebar" class="control-sidebar control-sidebar-dark" style="width: 500px; right:-500px">
                 <!-- Create the tabs -->
                 <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
-                    <li id="agents-tab" class="active">
+                    <li id="agents-tab" class="active" name="Agent_Tab">
                         <a href="#control-sidebar-agents-tab" data-toggle="tab">
                             <i class="fa fa-users"></i>&nbsp;&nbsp;Agents</a>
                     </li>
-                    <li id="videomail-tab">
+                    <li id="videomail-tab" name="Videomail_Tab">
                         <a href="#control-sidebar-videomail-tab" data-toggle="tab">
                             <i class="fa fa-envelope-o"></i>&nbsp;&nbsp;Video Mail</a>
+                    </li>
+                    <li id="shortcuts-tab" name="Shortcuts_Tab">
+                        <a href="#control-sidebar-shortcuts-tab" data-toggle="tab">
+                            <i class="fa fa-keyboard-o"></i>&nbsp;&nbsp;Shortcuts</a>
                     </li>
                     <li id="debugtab">
                         <a href="#control-sidebar-debug-tab" data-toggle="tab">
@@ -126,12 +130,12 @@
                         <div class="form-group" style='height: 90vh; max-height:90vh; overflow-y:scroll;'>
                             <label>Mailbox Messages</label>
                             <button type="button" class="btn btn-default" onclick="getVideomailRecs();">
-                                <i id="refresh-icon" class="fa fa-refresh"></i>
+                                <i id="refresh-icon" class="fa fa-refresh" name="Refresh_Messages" accesskey="R"></i>
                             </button>
                             <span id="videomail-filter-dropdown" class="dropdown dropdown-menu-left" style='float:right'>
                                 <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
                                     <!--span><i id="status-icon" class="call-btn-icon fa fa-envelope"></i></span-->&nbsp;&nbsp;&nbsp;
-                                    <span id="videomail-filter">Filter Messages
+                                    <span id="videomail-filter" name="Videomaiil_Filter" accesskey="Q">Filter Messages
                                         <span>
                                             <span class="caret"></span>
                                 </button>
@@ -166,19 +170,19 @@
                                 <table class="table table-hover" id="Videomail_Table">
                                     <thead>
                                         <tr>
-                                            <th id="vmail-vrs-number">Videophone No.
+                                            <th id="vmail-vrs-number" name="VRS_Number" accesskey="">Videophone No.
+                                                <i id="video-id-sort" class="fa fa-sort" > </i>
+                                            </th>
+                                            <th id="vmail-date" name="Videomail_Date" accesskey="">Date
                                                 <i id="video-id-sort" class="fa fa-sort"> </i>
                                             </th>
-                                            <th id="vmail-date">Date
+                                            <th id="vmail-duration" name="Videomail_Duration" accesskey="">Duration (sec)
+                                                <i id="video-id-sort" class="fa fa-sort" > </i>
+                                            </th>
+                                            <th id="vmail-status" name="Videomail_Status" accesskey="">Status
                                                 <i id="video-id-sort" class="fa fa-sort"> </i>
                                             </th>
-                                            <th id="vmail-duration">Duration (sec)
-                                                <i id="video-id-sort" class="fa fa-sort"> </i>
-                                            </th>
-                                            <th id="vmail-status">Status
-                                                <i id="video-id-sort" class="fa fa-sort"> </i>
-                                            </th>
-                                            <th id="vmail-callback">Callback
+                                            <th id="vmail-callback" name="Videomail_Callback" accesskey="">Callback
                                                 <i id="video-id-sort" class="fa fa-sort"> </i>
                                             </th>
                                         </tr>
@@ -189,18 +193,66 @@
                         </div>
                     </div>
                     <!-- /.Mail tab content -->
+
+                    <!-- Keyboard Shortcuts tab content -->
+                    <div class="tab-pane" id="control-sidebar-shortcuts-tab">
+                        <div class="form-group" style='height: 90vh; max-height:90vh; overflow-y:scroll;'>
+                            <table id='shortcutsTable' class="table table-hover dataTable">
+                                <thead>
+                                    <div>PC: alt+shortrcut</div>
+                                    <div>Mac: ctrl+option+shortcut</div>
+                                    <div><b>Click row to change shortcut</b></div>
+                                    <tr>
+                                        <th>Action&nbsp;&nbsp;&nbsp;</th>
+                                        <th>Shortcut</th>
+                                        <th><button id="clear-shortcuts" class="btn btn-default" onclick="clearShortcuts()" name="Clear_Shortcuts" accesskey="`">Clear</button> </th> 
+                                    </tr>
+                                </thead>
+                                <tbody id="shortcutsBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- /.Keyboard Shortcuts tab content -->
                 </div>
                 <!-- /.Tab panes -->
             </aside>
             <!-- /.control-sidebar -->
             <!-- Add the sidebar's background. This div must be placed immediately after the control sidebar -->
-            <div class="control-sidebar-bg" style="width:400px; right:-400px"></div>
+            <div class="control-sidebar-bg" style="width:500px; right:-500px"></div>
 
     </div>
     <!-- ./wrapper -->
 
     <!-- Glass Panel -->
     <div id='divGlassPanel' class='glass-panel' style='visibility:hidden'></div>
+
+    <!--Keyboard Shortcuts Modal-->
+    <div id="modalChangeShortcut" class="modal fade">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 text-align="center" class="modal-title">Change Shortcut</h2>
+                </div>
+                <div class="modal-body text-center">
+                    <h4 class="modal-title" id="changeShortcutBody">
+                        <div id="current-action"></div>
+                        <input id="new-shortcut" type="text" class="form-control input-md" placeholder="Enter new shortcut" maxlength="1" autofocus />
+
+                    </h4>
+
+                </div>  
+                <div class="modal-footer">
+                    <div class="btn-group" style="width: 100%;">
+                        <button id="update-shortcut-btn" type="button" onclick="setShortcut( ($('#current-action').attr('value')), ($('#new-shortcut').val()) )" data-dismiss="modal" class="btn btn-success" style="width: 50%; height: 50px;">
+                            Accept </button>
+                        <button id="close-shortcut-btn" type="button" data-dismiss="modal" class="btn btn-default" style="width: 50%; height: 50px;">
+                            Close </button>
+                    </div>
+                </div>     
+            </div>
+        </div>
+    </div>
 
     <!-- License Modal -->
     <div class="modal fade" id="licModal" tabindex="-1" role="dialog">
@@ -397,7 +449,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button id="dismiss-dialpad-btn" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
                 <!-- /.modal-content -->
