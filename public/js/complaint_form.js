@@ -176,15 +176,6 @@ function connect_socket() {
 						var extension = data.extension; //returned extension to use for WebRTC
 						exten = data.extension;
 						$('#display_name').val(data.extension);
-                                                var sip_proxy = "";
-						if (data.ws_port !== "") {
-                                                   sip_proxy = data.ps_proto + "://" + data.ps_public + ":" + data.ps_port + data.ps_path; 
-						} else {
-                                                   sip_proxy = data.ps_proto + "://" + data.ps_public + data.ps_path; 
-                                                }
-                                                console.log('sip_proxy: ' + sip_proxy);
-                                                $('#ws_servers').attr("name", sip_proxy);
-
 
                                                 //is this a videomail call or complaint call?
                                                 if (videomailflag){

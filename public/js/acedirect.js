@@ -135,7 +135,6 @@ function connect_socket() {
 					$('#agentname-header').html(payload.first_name + " " + payload.last_name);
 					$('#agentname-headerdropdown').html(payload.first_name + " " + payload.last_name);
 					$('#agentrole-headerdropdown').html("<small>" + payload.role + "</small>");
-					$('#ws_servers').attr("name", "wss://" + payload.asteriskPublicHostname + ":" + payload.wsPort + "/ws");
 					$('#my_sip_uri').attr("name", "sip:" + payload.extension + "@" + payload.asteriskPublicHostname);
 					$('#signaling_server_public').attr("name", payload.signalingServerPublic);
 					$('#signaling_server_port').attr("name", payload.signalingServerPort);
