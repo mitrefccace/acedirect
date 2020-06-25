@@ -1,6 +1,5 @@
 var ua;
 var my_sip_uri = document.getElementById("my_sip_uri");
-var ws_servers = document.getElementById("ws_servers");
 var pc_config = document.getElementById("pc_config");
 var sip_password = document.getElementById("sip_password");
 var currentSession = null;
