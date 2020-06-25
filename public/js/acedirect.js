@@ -69,6 +69,7 @@ $(document).ready(function () {
 		});
 	});
 
+	updateShortcutTable();
 	enable_persist_view();
 });
 
@@ -651,7 +652,6 @@ $('#ticketTabTitle').click(function () {
 });
 
 function addEmoji(emoji) {
-	/*  character count is still wonky */
 	var value = $('#newchatmessage').val();
 	var displayname = $('#displayname').val();
 	var vrs = $('#callerPhone').val();
@@ -1472,6 +1472,11 @@ function showDialpad() {
 		backdrop: 'static',
 		keyboard: false
 	});
+
+	$('#modalDialpad').on('shown.bs.modal', function() {
+		$('#phone-number').focus();
+	});
+
 }
 
 function showOutboundRinging() {
@@ -1554,10 +1559,13 @@ $('#phone-number-delete-btn').click(function (e) {
 });
 
 //pressing Enter in dialpad will dial
+// pressing ESC will close
 $("#phone-number").keyup(function(event) {
     if (event.keyCode === 13) {
         $("#button-call").click();
-    }
+    } else if (event.keyCode == 27) {
+		$('#dismiss-dialpad-btn').click();
+	}
 });
 
 $("#button-call").click(function () {
@@ -1813,3 +1821,145 @@ function disable_chat_buttons() {
 
 function enable_initial_buttons() {}
 $("#helpalert").hide();
+
+/* use Enter or ESC keys in change shortcut modal */
+$("#modalChangeShortcut").keyup(function(event) {
+	if (event.keyCode === 13) {
+		$("#update-shortcut-btn").click();
+	} else if (event.keyCode == 27) {
+		$('#close-shortcut-btn').click();
+	}
+});
+
+/* click on a row in the shortcuts table to customize shortcut */
+$('#shortcutsBody').on('click','tr',function() {
+	var clickedValue = $(this).find("th").text();
+	console.log("clicked value: " + clickedValue);
+
+	var currentShortcut = $(this).find("td").text();
+	console.log("current shortcut: " + currentShortcut);
+
+	var clickedID = $("[name="+clickedValue+"]").attr("id");
+
+	$('#modalChangeShortcut').modal({
+		backdrop: 'static',
+		keyboard: true
+	});
+	//cursor is automatically in textbox
+	$('#modalChangeShortcut').on('shown.bs.modal', function() {
+		$('#new-shortcut').focus();
+	});
+
+	$('#current-action').html(clickedValue);
+	$('#current-action').attr("value", clickedID);
+	$('#new-shortcut').val(currentShortcut);
+
+});
+
+/**
+ * @param {string} task task id
+ * @param {string} shortcut not case sensitive
+ */
+function setShortcut(task, shortcut) {
+	//multiple tasks can have no shortcut
+	if (shortcut == undefined || shortcut == "") {
+		shortcut = "";
+		console.log("task: " + task.toString());
+		console.log('shortcut: ' + shortcut);
+		$('#'+task).attr("accesskey", shortcut);
+		updateShortcutTable();
+	} else {
+		//TODO: check if the shortcut is already in use
+		var isShortcutUsed = checkValidShortcut(shortcut);
+
+		if (isShortcutUsed) {
+			//error modal
+
+		} else {
+			//good to go
+			console.log("task: " + task.toString());
+			console.log('shortcut: ' + shortcut);
+			$('#'+task).attr("accesskey", shortcut);
+			updateShortcutTable();
+		}
+	}
+}
+/**
+ * 
+ * @param {string} task task id
+ */
+function getShortcut(task) {
+	return ($('#'+task).attr("accesskey"))
+}
+
+function updateShortcutTable() {
+	console.log("UPDATE!");
+	clearShortcutsTable();
+
+	var taskArray = $("[accesskey]").map(function(){
+		return $(this).attr('id');
+	}).get();
+
+	 var tableLength = taskArray.length;
+
+	 for (var i = 0; i < tableLength; i++) {
+
+		 if (taskArray[i] != undefined) {
+
+			var taskValue = $('#' + taskArray[i]).attr('name');
+
+			$('#shortcutsBody').append(
+					"<tr><th>" +taskValue+ "</th>" +
+					"<td>" + getShortcut(taskArray[i]).toUpperCase() + "</td>"
+			)				
+			
+			$('#shortcutsBody').append("<br>"); //spaces the elements out a little		
+		 }
+	 }
+	 $('#shortcutsTable').append($('#shortcutsBody'));
+
+}
+
+/**
+ * check if the shortcut is already in use before assigning it to an element
+ * @param {string} shortcut not case sensitive
+ */
+function checkValidShortcut(shortcut) {
+	var isUsed = false;
+	shortcut = shortcut.toUpperCase();
+
+	var accesskeyArray = $("[accesskey]").map(function(){
+		return $(this).attr('id');
+	}).get();
+
+	var arrayLength = accesskeyArray.length;
+	for (var i = 0; i <= arrayLength; i++) {
+		if (accesskeyArray[i] != undefined) {
+			//console.log('shortcut: ' + shortcut+ ' vs: ' + (getShortcut(accesskeyArray[i])));
+			if (getShortcut(accesskeyArray[i]).toUpperCase() == shortcut) {
+				isUsed = true;
+				console.log('shortcut in use');
+				return isUsed;
+			}
+		}
+	}
+
+	return isUsed;
+}
+
+function clearShortcutsTable() {
+	$('#shortcutsTable tbody').html("");
+}
+
+function clearShortcuts() {
+	var taskArray = $("[accesskey]").map(function () {
+		return $(this).attr('id');
+	}).get();
+	var arrayLength = taskArray.length;
+
+	for (var i = 0; i <= arrayLength; i++) {
+		if (taskArray[i] != undefined) {
+			setShortcut(taskArray[i], "");
+		}
+	}
+}

@@ -965,7 +965,6 @@ io.sockets.on('connection', function (socket) {
 
 	//Retrieval of videomail records from the database
 	socket.on("get-videomail", function (data) {
-		logger.debug('entered get-videomail');
 		let filterFlag = (data.filter === "ALL"||typeof data.filter === 'undefined')?false:true;
 		let sort = (typeof data.sortBy === 'undefined')?[]:data.sortBy.split(" ");
 
@@ -1001,7 +1000,6 @@ io.sockets.on('connection', function (socket) {
 			if (err) {
 				logger.error("COUNT-UNREAD-MAIL ERROR: "+ err.code);
 			} else {
-				logger.debug(result);
 				io.to(token.extension).emit('got-unread-count', result[0].unreadMail);
 			}
 		});
@@ -1013,7 +1011,7 @@ io.sockets.on('connection', function (socket) {
 			if (err) {
 				logger.error('DELETE-OLD-VIDEOMAIL ERROR: '+ err.code);
 			} else {
-				logger.debug('Deleted old videomail');
+				;
 			}
 		});
 	});
@@ -1248,7 +1246,7 @@ function insertCallDataRecord (eventType) {
  */
 function handle_manager_event(evt) {
 
-  logger.info('\n######################################');
+  logger.info('\n\n######################################');
   logger.info('Received an AMI event: ' + evt.event);
   logger.info(util.inspect(evt, false, null));
   //console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>The event is " + evt.event);
@@ -1928,7 +1926,6 @@ setInterval(function () {
 
 setInterval(function () {
   //query for after hours
-  logger.debug('GET operatinghours...');
   var ohurl = 'https://' + getConfigVal('common:private_ip') + ":" + parseInt(getConfigVal('agent_service:port')) + '/operatinghours';
   request({
     method: 'GET',
@@ -1941,10 +1938,7 @@ setInterval(function () {
     if (error) {
       logger.error("GET operatinghours: " + error);
     } else {
-      logger.debug("GET operatinghours success:");
-      logger.debug(JSON.stringify(data));
       isOpen = data.isOpen;
-      logger.debug("isOpen is: " + isOpen);
 
       //operating hours
       startTimeUTC = data.start; //hh:mm in UTC
