@@ -136,9 +136,13 @@
 							}
 						},
 						error: function (xhr, status, error) {
-							//alert('Error');
-							$('#message').text('An Error Occured.');
-							$('#message').show();
+							if (xhr.responseJSON && xhr.responseJSON.message === 'Number blocked') {
+								window.location = xhr.responseJSON.redirectUrl;
+							}
+							else {
+								$('#message').text('An Error Occured.');
+								$('#message').show();
+							}
 						}
 					});
 				} else {

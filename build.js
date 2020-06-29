@@ -108,7 +108,7 @@ function buildAssets() {
 //cmd is the shell command
 //wdir is the working dir
 //return a Promise
-function execCommand(cmd,wdir) {
+function execCommand(cmd,wdir,expected,hint) {
   console.log('  executing  ' + cmd + '  ...');
   const exec = require('child_process').exec;
   return new Promise((resolve, reject) => {
@@ -118,6 +118,13 @@ function execCommand(cmd,wdir) {
         console.error('  FAILED! Please resolve: ' + error.cmd);
         console.log();
         process.exit(99);
+      } else if (expected) {
+        expected = expected.trim();
+        stdout = stdout.trim();
+        if (stdout !== expected) {
+          console.log('  FAILED! Incorrect version: ' + stdout + '. expected: ' + expected);
+          process.exit(99);
+        } 
       }
       resolve(stdout? stdout : stderr);
     });
@@ -125,39 +132,45 @@ function execCommand(cmd,wdir) {
 }
 
 async function go() {
-  console.log('\n*** NOTE: make sure gulp is already installed (as root, npm install -g gulp-cli). ***\n');
+  console.log('\nBuilding acedirect...\n');
+
+  console.log('checking required versions...');
+  s = await execCommand('node -v ','.','v10.16.0',null); //required node version
+  s = await execCommand('npm -v ','.','6.9.0',null); //required npm version
+  s = await execCommand('pm2 -v ','.','4.4.0','Try... sudo npm install -g pm2@4.4.0 ; pm2 update ; pm2 save --force'); //required pm2 version
 
   console.log('checking for required tools...');
-  s = await execCommand('which gulp >/dev/null  ','.');
-  s = await execCommand('which npm >/dev/null  ','.');
-  s = await execCommand('which bower >/dev/null  ','.');
-  s = await execCommand('which node >/dev/null  ','.');
-  s = await execCommand('which pm2 >/dev/null  ','.');
+  s = await execCommand('which gulp >/dev/null  ','.',null,'Try... sudo npm install -g gulp-cli');
+  s = await execCommand('which npm >/dev/null  ','.',null,null);
+  s = await execCommand('which bower >/dev/null  ','.',null,null);
+  s = await execCommand('which node >/dev/null  ','.',null,null);
+  s = await execCommand('which pm2 >/dev/null  ','.',null,null);
 
 
   console.log('checking for dat/ configuration files...');
-  s = await execCommand('ls config.json','../dat');
-  s = await execCommand('ls default_color_config.json','../dat');
-  s = await execCommand('ls color_config.json','../dat');
+  s = await execCommand('ls config.json','../dat',null,null);
+  s = await execCommand('ls default_color_config.json','../dat',null,null);
+  s = await execCommand('ls color_config.json','../dat',null,null);
 
   console.log('building...');
-  s = await execCommand('rm -rf node_modules >/dev/null  # removing node_modules','.');
-  s = await execCommand('npm install >/dev/null  # main install','.');
-  s = await execCommand('npm install >/dev/null  # jssip install','./node_modules/jssip');
-  s = await execCommand('gulp dist >/dev/null  # jssip build','./node_modules/jssip');
-  s = await execCommand('rm -f public/assets/css/* public/assets/fonts/* public/assets/js/* public/assets/webfonts/* || true > /dev/null 2>&1 ','.');
-  s = await execCommand('mkdir -p ../scripts  # init scripts','.');
-  s = await execCommand('cp scripts/itrslookup.sh ../scripts/.','.');
-  s = await execCommand('chmod 755 ../scripts/itrslookup.sh','.');
+  s = await execCommand('rm -rf node_modules >/dev/null  # removing node_modules','.',null,null);
+  s = await execCommand('npm install >/dev/null  # main install','.',null,null);
+  s = await execCommand('npm install >/dev/null  # jssip install','./node_modules/jssip',null,null);
+  s = await execCommand('gulp dist >/dev/null  # jssip build','./node_modules/jssip',null,null);
+  s = await execCommand('rm -f public/assets/css/* public/assets/fonts/* public/assets/js/* public/assets/webfonts/* || true > /dev/null 2>&1 ','.',null,null);
+  s = await execCommand('mkdir -p ../scripts  # init scripts','.',null,null);
+  s = await execCommand('cp scripts/itrslookup.sh ../scripts/.','.',null,null);
+  s = await execCommand('chmod 755 ../scripts/itrslookup.sh','.',null,null);
 
   //PATCH jssip.js per our findings, rename to jssip.min.js, let build proceed from there
   tempFile = '/tmp/ed' + secondsSinceEpoch + '.txt';
-  s = await execCommand('head -n 18197 node_modules/jssip/dist/jssip.js > ' + tempFile + '  # modifying jssip','.');
-  s = await execCommand('cat patches/jssip_patch.txt >> ' + tempFile ,'.');
-  s = await execCommand('tail -n 8168 node_modules/jssip/dist/jssip.js >> ' + tempFile,'.');
-  s = await execCommand('mv ' + tempFile + ' node_modules/jssip/dist/jssip.min.js  ','.');
+  s = await execCommand('head -n 18197 node_modules/jssip/dist/jssip.js > ' + tempFile + '  # modifying jssip','.',null,null);
+  s = await execCommand('cat patches/jssip_patch.txt >> ' + tempFile ,'.',null,null);
+  s = await execCommand('tail -n 8168 node_modules/jssip/dist/jssip.js >> ' + tempFile,'.',null,null);
+  s = await execCommand('mv ' + tempFile + ' node_modules/jssip/dist/jssip.min.js  ','.',null,null);
 
   buildAssets();
+  console.log();
   console.log('SUCCESS!');
   console.log();
 
