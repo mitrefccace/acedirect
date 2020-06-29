@@ -2054,6 +2054,25 @@ function getCallerInfo(phoneNumber, callback) {
 }
 
 /**
+ * Looks in the call_block table of the mysql db to see if VRS number is blocked.  Reason is irrelevant here.
+ * 
+ * @param {type} phoneNumber
+ * @param {type} callback
+ * @returns {boolean}
+ */
+function checkIfBlocked(phoneNumber, callback) {
+	dbConnection.query('SELECT reason FROM call_block WHERE vrs = ?', phoneNumber, function (err, result) {
+		if (err) {
+			logger.error('Call block lookup error: '+ err.code);
+			callback(true); // default to blocked if there is a DB error
+		} else {
+			callback(result.length > 0); // true if at least one row with that number, false otherwise
+		}
+	});
+	
+}
+
+/**
  * Makes a REST call to retrieve the script associated with the specified
  * queueName (e.g. InboundQueue) and queueType (e.g. General).
  *
@@ -2666,27 +2685,36 @@ app.post('/forcelogout', function (req, res) {
 });
 
 /**
- * Calls the RESTful service to verify the VRS number.
+ * Checks to see if the number is blocked and, if it is not blocked, calls the RESTful service to verify the VRS number.
+ * If it is blocked, return 401 and send the FCC URL for the front end to redirect to.
  */
 app.post('/consumer_login', function (req, res) {
 	// All responses will be JSON sets response header.
 	res.setHeader('Content-Type', 'application/json');
 	var vrsnum = req.body.vrsnumber;
 	if (/^\d+$/.test(vrsnum)) {
-		getCallerInfo(vrsnum, function (vrs) {
-			if (vrs.message === 'success') {
-				req.session.role = "VRS";
-				req.session.vrs = vrs.data[0].vrs;
-				req.session.first_name = vrs.data[0].first_name;
-				req.session.last_name = vrs.data[0].last_name;
-				req.session.email = vrs.data[0].email;
-				res.status(200).json({
-					"message": "success"
-				});
-			} else {
-				res.status(200).json(vrs);
+		checkIfBlocked(vrsnum, function(isBlocked) {
+			if (isBlocked) {
+				res.status(401).json({'message': 'Number blocked', 'redirectUrl': 'http://www.fcc.gov'});
 			}
-		});
+			else {
+				getCallerInfo(vrsnum, function (vrs) {
+					if (vrs.message === 'success') {
+						req.session.role = "VRS";
+						req.session.vrs = vrs.data[0].vrs;
+						req.session.first_name = vrs.data[0].first_name;
+						req.session.last_name = vrs.data[0].last_name;
+						req.session.email = vrs.data[0].email;
+						res.status(200).json({
+							"message": "success"
+						});
+					} else {
+						res.status(200).json(vrs);
+					}
+				
+				});
+			}
+		})
 	} else {
 		res.status(200).json({
 			"message": "Error: Phone number format incorrect"
