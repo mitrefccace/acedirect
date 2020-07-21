@@ -174,7 +174,7 @@
 
 				console.log("--- WV: partCount: " + partCount);
 
-				if (partCount >=2 ) {
+				if (partCount >=2 || videomailflag) {
 					console.log("--- WV: CONNECTED");
 					$("#queueModal").modal("hide");
 

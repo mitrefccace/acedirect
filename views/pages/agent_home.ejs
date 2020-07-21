@@ -79,16 +79,16 @@
             <aside id="ctrl-sidebar" class="control-sidebar control-sidebar-dark" style="width: 500px; right:-500px">
                 <!-- Create the tabs -->
                 <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
-                    <li id="agents-tab" class="active" name="Agent_Tab">
-                        <a href="#control-sidebar-agents-tab" data-toggle="tab">
+                    <li class="active">
+                        <a href="#control-sidebar-agents-tab" data-toggle="tab"id="agents-tab" name="Agent_Tab">
                             <i class="fa fa-users"></i>&nbsp;&nbsp;Agents</a>
                     </li>
-                    <li id="videomail-tab" name="Videomail_Tab">
-                        <a href="#control-sidebar-videomail-tab" data-toggle="tab">
+                    <li>
+                        <a href="#control-sidebar-videomail-tab" data-toggle="tab" id="videomail-tab" name="Videomail_Tab">
                             <i class="fa fa-envelope-o"></i>&nbsp;&nbsp;Video Mail</a>
                     </li>
-                    <li id="shortcuts-tab" name="Shortcuts_Tab">
-                        <a href="#control-sidebar-shortcuts-tab" data-toggle="tab">
+                    <li>
+                        <a href="#control-sidebar-shortcuts-tab" data-toggle="tab" id="shortcuts-tab" name="Shortcuts_Tab">
                             <i class="fa fa-keyboard-o"></i>&nbsp;&nbsp;Shortcuts</a>
                     </li>
                     <li id="debugtab">
@@ -135,7 +135,7 @@
                             <span id="videomail-filter-dropdown" class="dropdown dropdown-menu-left" style='float:right'>
                                 <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
                                     <!--span><i id="status-icon" class="call-btn-icon fa fa-envelope"></i></span-->&nbsp;&nbsp;&nbsp;
-                                    <span id="videomail-filter" name="Videomaiil_Filter" accesskey="Q">Filter Messages
+                                    <span id="videomail-filter" name="Videomail_Filter" accesskey="Q">Filter Messages
                                         <span>
                                             <span class="caret"></span>
                                 </button>
@@ -170,19 +170,19 @@
                                 <table class="table table-hover" id="Videomail_Table">
                                     <thead>
                                         <tr>
-                                            <th id="vmail-vrs-number" name="VRS_Number" accesskey="">Videophone No.
+                                            <th id="vmail-vrs-number" name="Sort_VRS_Number" accesskey="">Videophone No.
                                                 <i id="video-id-sort" class="fa fa-sort" > </i>
                                             </th>
-                                            <th id="vmail-date" name="Videomail_Date" accesskey="">Date
+                                            <th id="vmail-date" name="Sort_Videomail_Date" accesskey="">Date
                                                 <i id="video-id-sort" class="fa fa-sort"> </i>
                                             </th>
-                                            <th id="vmail-duration" name="Videomail_Duration" accesskey="">Duration (sec)
+                                            <th id="vmail-duration" name="Sort_Videomail_Duration" accesskey="">Duration (sec)
                                                 <i id="video-id-sort" class="fa fa-sort" > </i>
                                             </th>
-                                            <th id="vmail-status" name="Videomail_Status" accesskey="">Status
+                                            <th id="vmail-status" name="Sort_Videomail_Status" accesskey="">Status
                                                 <i id="video-id-sort" class="fa fa-sort"> </i>
                                             </th>
-                                            <th id="vmail-callback" name="Videomail_Callback" accesskey="">Callback
+                                            <th id="vmail-callback" name="Sort_Videomail_Callback" accesskey="">Callback
                                                 <i id="video-id-sort" class="fa fa-sort"> </i>
                                             </th>
                                         </tr>
@@ -202,6 +202,10 @@
                                     <div>PC: alt+shortrcut</div>
                                     <div>Mac: ctrl+option+shortcut</div>
                                     <div><b>Click row to change shortcut</b></div>
+                                    <!-- 
+                                    <button id="shortcut-up-btn" class="btn" href="javascript:void()" style="background-color: transparent; size: 0px;" name="UP_BTN" onclick="console.log(goUpTable())" accesskey="="></button>
+                                    <button id="shortcut-down-btn" class="btn" href="javascript:void()" style="background-color: transparent; size: 0px;" name="DWN_BTN" onclick="console.log(goDownTable())" accesskey="-"></button>
+                                    -->
                                     <tr>
                                         <th>Action&nbsp;&nbsp;&nbsp;</th>
                                         <th>Shortcut</th>
@@ -218,8 +222,8 @@
                 <!-- /.Tab panes -->
             </aside>
             <!-- /.control-sidebar -->
-            <!-- Add the sidebar's background. This div must be placed immediately after the control sidebar -->
-            <div class="control-sidebar-bg" style="width:500px; right:-500px"></div>
+            <!-- Add the sidebar's background. This div must be placed immediately after the control sidebar 
+            <div class="control-sidebar-bg" style="width:500px; right:-500px"></div>-->
 
     </div>
     <!-- ./wrapper -->
@@ -237,7 +241,7 @@
                 <div class="modal-body text-center">
                     <h4 class="modal-title" id="changeShortcutBody">
                         <div id="current-action"></div>
-                        <input id="new-shortcut" type="text" class="form-control input-md" placeholder="Enter new shortcut" maxlength="1" autofocus />
+                        <input id="new-shortcut" type="text" class="form-control input-md" placeholder="Enter new shortcut" maxlength="1" autofocus autocomplete="off" />
 
                     </h4>
 
@@ -252,6 +256,24 @@
                 </div>     
             </div>
         </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Error -->
+    <div class="modal fade" id="shortcutsErrorModal" tabindex="-1" role="dialog" aria-labelledby="shortcutsErrorModal" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Error</h4>
+                </div>
+                <div class="modal-body" id='shortcutsErrorModalBody'></div>
+                <div class="modal-footer">
+                    <button type="button" id="shortcuts-error-btn" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
     </div>
 
     <!-- License Modal -->

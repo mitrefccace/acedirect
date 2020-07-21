@@ -134,11 +134,6 @@ function execCommand(cmd,wdir,expected,hint) {
 async function go() {
   console.log('\nBuilding acedirect...\n');
 
-  console.log('checking required versions...');
-  s = await execCommand('node -v ','.','v10.16.0',null); //required node version
-  s = await execCommand('npm -v ','.','6.9.0',null); //required npm version
-  s = await execCommand('pm2 -v ','.','4.4.0','Try... sudo npm install -g pm2@4.4.0 ; pm2 update ; pm2 save --force'); //required pm2 version
-
   console.log('checking for required tools...');
   s = await execCommand('which gulp >/dev/null  ','.',null,'Try... sudo npm install -g gulp-cli');
   s = await execCommand('which npm >/dev/null  ','.',null,null);
@@ -146,11 +141,11 @@ async function go() {
   s = await execCommand('which node >/dev/null  ','.',null,null);
   s = await execCommand('which pm2 >/dev/null  ','.',null,null);
 
-
   console.log('checking for dat/ configuration files...');
-  s = await execCommand('ls config.json','../dat',null,null);
-  s = await execCommand('ls default_color_config.json','../dat',null,null);
-  s = await execCommand('ls color_config.json','../dat',null,null);
+  s = await execCommand('ls config.json','../dat',null,'ERROR: ../dat/config.json is missing!');
+  s = await execCommand('ls default_color_config.json','../dat',null,'ERROR: ../dat/default_color_config.json is missing!');
+  s = await execCommand('ls color_config.json','../dat',null,'ERROR: ../dat/color_config.json is missing!');
+  s = await execCommand('cp process.json_TEMPLATE ../process.json','../dat',null,null);
 
   console.log('building...');
   s = await execCommand('rm -rf node_modules >/dev/null  # removing node_modules','.',null,null);

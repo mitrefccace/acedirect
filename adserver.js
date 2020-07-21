@@ -2695,7 +2695,7 @@ app.post('/consumer_login', function (req, res) {
 	if (/^\d+$/.test(vrsnum)) {
 		checkIfBlocked(vrsnum, function(isBlocked) {
 			if (isBlocked) {
-				res.status(401).json({'message': 'Number blocked', 'redirectUrl': 'http://www.fcc.gov'});
+				res.status(401).json({'message': 'Number blocked', 'redirectUrl': complaintRedirectUrl});
 			}
 			else {
 				getCallerInfo(vrsnum, function (vrs) {
