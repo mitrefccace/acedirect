@@ -257,6 +257,9 @@ function connect_socket() {
                                                        if(!error) {
                                                        }
                                                     },
+						    'accepted' : function (e) {
+							$('#remoteView').removeClass("mirror-mode"); 
+							},
                                                     'pausedQueue': function (e) {
                                                        console.log('--- WV: Paused Agent Member in Queue ---\n');
                                                     },
@@ -287,7 +290,7 @@ function connect_socket() {
                                                     },
                                                     'ended': function(e) {
                                                       console.log('--- WV: Call ended ---\n');
-                                                      terminate_call();
+                                                      //terminate_call();
                                                     }
                                                   };
                                                   acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, eventHandlers);
@@ -530,8 +533,8 @@ function startRecordingVideomail(switchQueueFlag) {
 		transfer_to_videomail();
 	} else {
 		$('#videomailModal').modal('hide');
-		$('#vmwait').show();
-		swap_video();
+//		$('#vmwait').show();
+//		swap_video();
 		$('#vmsent').hide();
 		videomailflag = true;
 		$('#record-progress-bar').show();
@@ -543,6 +546,7 @@ function startRecordingVideomail(switchQueueFlag) {
 		socket.emit('call-initiated', {
 			"vrs": vrs
 		}); //sends vrs number to adserver
+		
 		console.log('call-initiated event for videomail');
 	}
 	switchQueueFlag = false;
@@ -735,7 +739,8 @@ function exit_queue() {
 }
 
 function afterHourVoicemail(){
-	$('#afterHoursModal').modal('hide');
+	exit_queue();
+ 	$('#afterHoursModal').modal('hide');
 	$('#videomailModal').modal('show');
 }
 

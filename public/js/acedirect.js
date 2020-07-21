@@ -37,6 +37,11 @@ var storedData = document.getElementById("unread-mail-count").innerHTML;
 //Used for DTMFpad toggle
 var DTMFpad = false;
 
+//shortcut table variables
+var shortcutTableLength;
+var currentShortcutRow=0;
+var isSidebarOpen = false;
+
 setInterval(function () {
 	busylight.light(this.agentStatus);
 }, 2000);
@@ -1192,24 +1197,79 @@ function processFilter(filter) {
 
 //Show videomail sidebar tab
 function showVideoMailTab() {
-	if ($('#agents-tab').hasClass('active')) {
-		if (document.getElementById("ctrl-sidebar").hasAttribute('control-sidebar-open')) {
-			$('.nav-tabs a[href="#control-sidebar-agents-tab"]').removeClass('active');
+	if ($('#videomail-tab').hasClass('active') || $('#agents-tab').hasClass('active') ) {
+		// if the sidebar is closing, remove the shortcuts of the tabs
+		$('#videomail-tab').attr("accesskey", '');
+		$('#agents-tab').attr("accesskey", '');
+		$('#shortcuts-tab').attr("accesskey", '');
+		updateShortcutTable();
+		
+		$('#agents-tab').removeClass('active');
+		$('#videomail-tab').removeClass('active');
+		
+		isSidebarOpen = false;
+		
+	} else {
+		// sidebar is opening, re-add the tab shortcuts
+		$('#videomail-tab').attr("accesskey", 'm');
+		$('#agents-tab').attr("accesskey", 'a');
+		$('#shortcuts-tab').attr("accesskey", 'k');
+		updateShortcutTable();
+
+		if ($('#agents-tab').hasClass('active')) {
+			if (document.getElementById("ctrl-sidebar").hasAttribute('control-sidebar-open')) {
+				$('.nav-tabs a[href="#control-sidebar-agents-tab"]').removeClass('active');
+
+				$('#agents-tab').removeClass('active');
+
+				isSidebarOpen = true;
+				
+			}
 		}
+		isSidebarOpen = true;
+		$('.nav-tabs a[href="#control-sidebar-videomail-tab"]').tab('show');
+		$('.nav-tabs a[href="#control-sidebar-videomail-tab"]').addClass('active');
+		$('#videomail-tab').addClass('active');
 	}
-	$('.nav-tabs a[href="#control-sidebar-videomail-tab"]').tab('show');
-	$('.nav-tabs a[href="#control-sidebar-videomail-tab"]').addClass('active');
+
 }
 
 //Show agent info sidebar tab
 function showAgentsTab() {
-	if ($('#videomail-tab').hasClass('active')) {
-		if (document.getElementById("ctrl-sidebar").hasAttribute('control-sidebar-open')) {
-			$('.nav-tabs a[href="#control-sidebar-agents-tab"]').removeClass('active');
+	if ( $('#agents-tab').hasClass('active') || $('#videomail-tab').hasClass('active') ) {
+		// if the sidebar is closing, remove the tab shortcuts
+		$('#videomail-tab').attr("accesskey", '');
+		$('#agents-tab').attr("accesskey", '');
+		$('#shortcuts-tab').attr("accesskey", '');
+		updateShortcutTable();
+
+		$('#agents-tab').removeClass('active');
+		$('#videomail-tab').removeClass('active');
+		isSidebarOpen = false;
+		
+	} else {
+		// sidebar is opening, re-add the tab shortcuts
+		$('#videomail-tab').attr("accesskey", 'm');
+		$('#agents-tab').attr("accesskey", 'a');
+		$('#shortcuts-tab').attr("accesskey", 'k');
+		updateShortcutTable();
+
+		if ($('#videomail-tab').hasClass('active')) {
+			if (document.getElementById("ctrl-sidebar").hasAttribute('control-sidebar-open')) {
+				$('.nav-tabs a[href="#control-sidebar-agents-tab"]').removeClass('active');
+				$('#videomail-tab').removeClass('active')
+
+				isSidebarOpen = true;
+
+			}
 		}
+		isSidebarOpen = true;
+		$('.nav-tabs a[href="#control-sidebar-videomail-tab"]').removeClass('active')
+		$('.nav-tabs a[href="#control-sidebar-agents-tab"]').tab('show');
+		$('.nav-tabs a[href="#control-sidebar-agents-tab"]').addClass('active');
+		$('#agents-tab').addClass('active');
 	}
-	$('.nav-tabs a[href="#control-sidebar-agents-tab"]').tab('show');
-	$('.nav-tabs a[href="#control-sidebar-agents-tab"]').addClass('active');
+
 }
 
 //Play the selected videomail
@@ -1830,8 +1890,12 @@ $("#modalChangeShortcut").keyup(function(event) {
 	}
 });
 
-/* click on a row in the shortcuts table to customize shortcut */
+/* click on a row in the shortcuts table to customize shortcut 
+*	CANNOT CUSTOMIZE SIDEBAR TAB SHORTCUTS
+*/
 $('#shortcutsBody').on('click','tr',function() {
+	//console.log("CLICK: " +($(this).index()));
+	//$('shortcutsBody tbody').removeClass('table table-hover');
 	var clickedValue = $(this).find("th").text();
 	console.log("clicked value: " + clickedValue);
 
@@ -1840,19 +1904,38 @@ $('#shortcutsBody').on('click','tr',function() {
 
 	var clickedID = $("[name="+clickedValue+"]").attr("id");
 
-	$('#modalChangeShortcut').modal({
-		backdrop: 'static',
-		keyboard: true
-	});
-	//cursor is automatically in textbox
-	$('#modalChangeShortcut').on('shown.bs.modal', function() {
-		$('#new-shortcut').focus();
-	});
+	if (clickedID == "agents-tab" || clickedID == "videomail-tab" || clickedID == "shortcuts-tab") {
 
-	$('#current-action').html(clickedValue);
-	$('#current-action').attr("value", clickedID);
-	$('#new-shortcut').val(currentShortcut);
+		//error modal
+		console.log("cannot customize tab shortcuts")
+		$('#shortcutsErrorModal').modal({
+			backdrop: 'static',
+			keyboard: true
+		});
 
+		$('#shortcutsErrorModalBody').html("Cannot customize sidebar tab shortcuts");
+
+		//pressing Enter will close modal
+		$("#shortcutsErrorModal").keyup(function(event) {
+			if (event.keyCode === 13) {
+				$("#shortcuts-error-btn").click();
+			}
+		});
+	} else {
+
+		$('#modalChangeShortcut').modal({
+			backdrop: 'static',
+			keyboard: true
+		});
+		//cursor is automatically in textbox
+		$('#modalChangeShortcut').on('shown.bs.modal', function() {
+			$('#new-shortcut').focus();
+		});
+	
+		$('#current-action').html(clickedValue);
+		$('#current-action').attr("value", clickedID);
+		$('#new-shortcut').val(currentShortcut);
+	}
 });
 
 /**
@@ -1863,21 +1946,29 @@ function setShortcut(task, shortcut) {
 	//multiple tasks can have no shortcut
 	if (shortcut == undefined || shortcut == "") {
 		shortcut = "";
-		console.log("task: " + task.toString());
-		console.log('shortcut: ' + shortcut);
 		$('#'+task).attr("accesskey", shortcut);
 		updateShortcutTable();
 	} else {
-		//TODO: check if the shortcut is already in use
-		var isShortcutUsed = checkValidShortcut(shortcut);
+		//check if the shortcut is already being used
+		var isShortcutUsed = checkShortcutUse(shortcut);
 
 		if (isShortcutUsed) {
 			//error modal
+			$('#shortcutsErrorModal').modal({
+				backdrop: 'static',
+				keyboard: true
+			});
 
+			$('#shortcutsErrorModalBody').html("Shortcut in use");
+
+			//pressing Enter will close modal
+			$("#shortcutsErrorModal").keyup(function(event) {
+				if (event.keyCode === 13) {
+					$("#shortcuts-error-btn").click();
+				}
+			});
 		} else {
 			//good to go
-			console.log("task: " + task.toString());
-			console.log('shortcut: ' + shortcut);
 			$('#'+task).attr("accesskey", shortcut);
 			updateShortcutTable();
 		}
@@ -1892,9 +1983,10 @@ function getShortcut(task) {
 }
 
 function updateShortcutTable() {
-	console.log("UPDATE!");
+	console.log("UPDATE SHORTCUTS");
 	clearShortcutsTable();
-
+	
+	//array of all elements with an accesskey
 	var taskArray = $("[accesskey]").map(function(){
 		return $(this).attr('id');
 	}).get();
@@ -1914,16 +2006,19 @@ function updateShortcutTable() {
 			
 			$('#shortcutsBody').append("<br>"); //spaces the elements out a little		
 		 }
+		// shortcutTableLength++;
 	 }
 	 $('#shortcutsTable').append($('#shortcutsBody'));
-
+	 //console.log("STL:" + shortcutTableLength);
 }
 
 /**
- * check if the shortcut is already in use before assigning it to an element
+ * Check if the shortcut is already in use.
+ * 
+ * Returns true if shortcut is in use, false if not 
  * @param {string} shortcut not case sensitive
  */
-function checkValidShortcut(shortcut) {
+function checkShortcutUse(shortcut) {
 	var isUsed = false;
 	shortcut = shortcut.toUpperCase();
 
@@ -1948,6 +2043,7 @@ function checkValidShortcut(shortcut) {
 
 function clearShortcutsTable() {
 	$('#shortcutsTable tbody').html("");
+	//shortcutTableLength=0;
 }
 
 function clearShortcuts() {
@@ -1958,7 +2054,144 @@ function clearShortcuts() {
 
 	for (var i = 0; i <= arrayLength; i++) {
 		if (taskArray[i] != undefined) {
-			setShortcut(taskArray[i], "");
+			if (taskArray[i] == 'agents-tab' || taskArray[i] == "videomail-tab" || taskArray[i] == "shortcuts-tab") {
+				//do nothing
+			} else {
+				setShortcut(taskArray[i], "");
+			}
 		}
 	}
 }
+
+
+/**
+ * Note from Jackie: Customizing keyboard shortcuts using the keyboard isn't working yet.
+ * 
+ * I added two transparent buttons (commented out in agent_home.ejs)-- one to go up the table and one to go down.
+ * Ideally hitting the enter key should act the same as clicking on a row.
+ * 
+ * I set the accesskeys as = and - to go up and down the table respectively.
+ * hitting enter clicks the buttons again instead of clicking on the selected row
+ * 
+ * There is probably a much better way to do this
+ * 
+*/
+
+ 
+
+// function goDownTable() {
+// 	/* hitting enter allows the user to change the shortcut */
+	
+
+// 	//TODO: only work if shortcuts tab is active
+// 	//$('#shortcutsBody tr').index() = $(this).index()+1;
+// 	console.log('test 3');
+// 	var previousRow = currentShortcutRow-1;
+
+// 	if (currentShortcutRow == 0) {
+// 		console.log('test 4');
+// 		console.log('index: ' + $('#shortcutsBody tr:eq('+currentShortcutRow+')').addClass('table table-active').focus());
+// 		currentShortcutRow++;
+// 	} else if (currentShortcutRow == shortcutTableLength) {
+// 		console.log('test 5');
+// 		// end of the table
+// 		console.log('bottom');
+// 		currentShortcutRow = shortcutTableLength;
+// 	} else{
+// 		console.log('test 6');
+// 		console.log('index: ' + $('#shortcutsBody tr:eq('+previousRow+')').removeClass('table table-active').focus());
+// 		console.log('index: ' + $('#shortcutsBody tr:eq('+currentShortcutRow+')').addClass('table table-active').focus());
+// 		currentShortcutRow++;
+// 	}
+// 	console.log("previous row: " +previousRow);
+// 	console.log("current row: " +currentShortcutRow);
+// 	console.log("total length: " +shortcutTableLength);
+
+
+// 	$('#shortcut-down-btn').on('keyup', function(event) {
+// 		console.log('currentShortcutRow: '+currentShortcutRow);
+// 		console.log("test 1");
+// 		if (event.keyCode === 13 || event.which === 13) {
+// 			event.preventDefault();
+// 			console.log("ENTER");
+// 			$('#shortcutsBody tr').removeClass('table table-hover');
+
+// 			console.log('test 2');
+// 			console.log('CURRENT ROW: ' +currentShortcutRow);
+			
+// 			//pull up the modal to change the shortcut
+// 			$('#shortcutsBody tr').removeClass('table table-hover')
+
+// 			var clickedValue = $('#shortcutsBody tr:eq('+currentShortcutRow+')').find("th").text();
+// 			console.log('CURRENT ROW: ' +currentShortcutRow);
+// 			console.log("clicked value: " + clickedValue);
+		
+// 			var currentShortcut = $(this).find("td").text();
+// 			console.log("current shortcut: " + currentShortcut);
+		
+// 			var clickedID = $("[name="+clickedValue+"]").attr("id");
+		
+// 			$('#modalChangeShortcut').modal({
+// 				backdrop: 'static',
+// 				keyboard: true
+// 			});
+// 			//cursor is automatically in textbox
+// 			$('#modalChangeShortcut').on('shown.bs.modal', function() {
+// 				$('#new-shortcut').focus();
+// 			});
+		
+// 			$('#current-action').html(clickedValue);
+// 			$('#current-action').attr("value", clickedID);
+// 			$('#new-shortcut').val(currentShortcut);
+
+
+// 			//restart table at top
+// 			//currentShortcutRow = 0;
+			
+// 		}
+// 	});
+// 	return "down";
+
+// }
+
+// function goUpTable() {
+// 	/* hitting enter allows the user to change the shortcut */
+// 	$('#shortcut-down-btn').on('keyup', function(event) {
+// 		if (event.keyCode === 13 || event.which === 13) {
+// 			//pull up the modal to change the shortcut
+// 			$('#shortcutsBody tr').removeClass('table table-hover')
+			
+
+
+			
+// 			//restart table at top
+// 			//currentShortcutRow = 0;
+// 		}
+// 	});
+// 	//TODO: only work if shortcuts tab is active
+
+// 	console.log(currentShortcutRow);
+// 	var previousRow = currentShortcutRow+1;
+// 	if (currentShortcutRow == shortcutTableLength) {
+// 		console.log('bottom');
+// 		console.log('index: ' + $('#shortcutsBody tr:eq('+previousRow+')').removeClass('table table-hover'));
+// 		console.log('index: ' + $('#shortcutsBody tr:eq('+currentShortcutRow+')').addClass('table table-hover'));
+// 		currentShortcutRow--;
+// 	} else if (currentShortcutRow == 0) {
+// 		//top of the table
+// 		console.log('top');
+// 		console.log('index: ' + $('#shortcutsBody tr:eq('+currentShortcutRow+')').addClass('table table-hover'));
+
+// 		console.log('index: ' + $('#shortcutsBody tr:eq('+previousRow+')').removeClass('table table-hover'));
+// 		console.log('index: ' + $('#shortcutsBody tr:eq('+currentShortcutRow+')').addClass('table table-hover'));
+// 		currentShortcutRow = 0;
+// 	} else {
+// 		console.log('index: ' + $('#shortcutsBody tr:eq('+previousRow+')').removeClass('table table-hover'));
+// 		console.log('index: ' + $('#shortcutsBody tr:eq('+currentShortcutRow+')').addClass('table table-hover'));
+// 		currentShortcutRow--;
+// 	}
+// 	console.log("previous row: " +previousRow);
+// 	console.log("current row: " +currentShortcutRow);
+// 	console.log("total length: " + shortcutTableLength);
+// 	return "up";
+// }
