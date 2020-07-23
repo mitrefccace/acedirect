@@ -92,7 +92,11 @@
 			},
 			'newMessage': function (e) {
 				console.log('--- WV: New Message ---\n');
-		 		try {
+				try {
+					if (e.msg == 'STARTRECORDING') {
+						enable_video_privacy()
+						setTimeout(function(){disable_video_privacy()},1000);
+					} else {
 					var transcripts = JSON.parse(e.msg);
 					//var transcripts = JSON.parse(e.msg._request.body)
 					//var transcripts = JSON.parse(e.message._request.body)
@@ -116,7 +120,8 @@
 								$("#caption-messages").scrollTop($("#caption-messages")[0].scrollHeight);
 		 					}
 		 				}
-		 			}
+					 }
+					}
 		 		} catch (err) {
 		 			console.log(err);
 		 		}
