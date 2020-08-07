@@ -36,6 +36,13 @@ var recipientNumber;
 var storedData = document.getElementById("unread-mail-count").innerHTML;
 //Used for DTMFpad toggle
 var DTMFpad = false;
+//Call history values
+var callerName = "";
+var callerNumber;
+var direction;
+var duration;
+var callDate;
+var endpoint;
 
 //shortcut table variables
 var shortcutTableLength;
@@ -94,6 +101,9 @@ function connect_socket() {
 					forceNew: true
 				});
 
+				console.log("Function load call history");
+				loadCallHistory();
+
 				//update the version and year in the footer
 				socket.on('adversion', function (data) {
 					$('#ad-version').text(data.version);
@@ -120,7 +130,7 @@ function connect_socket() {
                                         var dev_url = payload.signalingServerDevUrl;
                                         dev_url = dev_url.trim();
                                         if(dev_url !== null && dev_url !== '') {
-                                          console.log('FOR DEVELOPMENT ONLY! Using own signaling server: ' + dev_url);
+                                          console.log('Using signaling server: ' + dev_url);
                                           signaling_url = dev_url;
                                         }
 
@@ -199,6 +209,7 @@ function connect_socket() {
 				}).on("unauthorized", function (error) {
 					debugtxt('unauthorized', error);
 					if (error.data.type === "UnauthorizedError" || error.data.code === "invalid_token") {
+						console.log("EXPIRED session");
 						logout("Session has expired");
 					}
 				}).on('error', function (reason) {
@@ -246,20 +257,19 @@ function connect_socket() {
                                         if (acekurento.activeAgentList)
 					  console.log(acekurento.activeAgentList.length + " is number of agents.");
 					if(acekurento.activeAgentList  && acekurento.activeAgentList.length < 2){
-						console.log("Entered if");
-					debugtxt('chat-leave', data);
-					$('#duration').timer('pause');
-					$('#user-status').text('Wrap Up');
-					$('#complaintsInCall').hide();
-					$('#geninfoInCall').hide();
-					socket.emit('wrapup', null);
-					changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
-					changeStatusLight('WRAP_UP');
-					socket.emit('chat-leave-ack', data);
-					$('#modalWrapup').modal({
-						backdrop: 'static',
-						keyboard: false
-					});
+						debugtxt('chat-leave', data);
+						$('#duration').timer('pause');
+						$('#user-status').text('Wrap Up');
+						$('#complaintsInCall').hide();
+						$('#geninfoInCall').hide();
+						socket.emit('wrapup', null);
+						changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
+						changeStatusLight('WRAP_UP');
+						socket.emit('chat-leave-ack', data);
+						$('#modalWrapup').modal({
+							backdrop: 'static',
+							keyboard: false
+						});
 					}
 				}).on('chat-message-new', function (data) {
 					debugtxt('chat-message-new', data);
@@ -458,6 +468,7 @@ function connect_socket() {
 					if(data.phoneNumber){
 						$('#myRingingModalPhoneNumber').html(data.phoneNumber);
 						recipientNumber = data.phoneNumber;
+						callerNumber = data.phoneNumber;
 					} else{
 						$('#myRingingModalPhoneNumber').html(data.callerNumber);
 					}
@@ -535,15 +546,18 @@ function connect_socket() {
 						$("#general-queue-num").text(data.count);
 					}
 				}).on('force-logout', function(){
+					console.log("FORCED logout");
 					logout('Forcefully logging out');
 				}).on('agent-resp', function(data) { //Load the agent table in the multi party modal
 					console.log("The agents are " + JSON.stringify(data));
 				}).on('fileList', function(data){
 					console.log("Got fileList event");
 					$('#fileSent').show();
+					document.getElementById("downloadButton").className = "demo-btn"
+					document.getElementById("downloadButton").disabled = false;
 					$('#downloadButton').html('');
 					for(var i = 0; i < data.result.length; i++){
-						$('#downloadButton').append('<a class="demo-btn mb-3" href="./downloadFile?id=' + data.result[i].id + '">' + data.result[i].original_filename +'</a><br>');
+						$('#downloadButton').append('<a class="demo-btn mb-3" target="_blank" href="./downloadFile?id=' + data.result[i].id + '">' + data.result[i].original_filename +'</a><br>');
 					}
 				}).on('screenshareRequest', function(data){
 					$('#screenshareButtons').show()
@@ -755,10 +769,12 @@ function inCallADComplaints(endpoint_type) {
 	var vrs = $('#callerPhone').val();
 	socket.emit('incall', {'vrs' : vrs});
 	if (endpoint_type === "Provider_Complaints") {
+		endpoint = "provider";
 		disable_chat_buttons();
 		$("#newchatmessage").attr("placeholder", "Chat disabled for Provider endpoints");
 		$('#remoteView').css('object-fit', ' contain');
 	} else { //should be webrtc
+		endpoint = "webrtc";
 		enable_chat_buttons();
 		$('#remoteView').css('object-fit', ' cover');
 	}
@@ -777,10 +793,12 @@ function inCallADGeneral(endpoint_type) {
 	var vrs = $('#callerPhone').val();
 	socket.emit('incall', {'vrs' : vrs});
 	if ( endpoint_type === "Provider_General_Questions" || endpoint_type === "General_Questions" ) {
+		endpoint = "provider";
 		disable_chat_buttons();
 		$("#newchatmessage").attr("placeholder", "Chat disabled for provider endpoints");
 		$('#remoteView').css('object-fit', ' contain');
 	} else { //should be webrtc
+		endpoint = "webrtc";
 		enable_chat_buttons();
 		$('#remoteView').css('object-fit', ' cover');
 	}
@@ -832,6 +850,7 @@ function clearScreen() {
 	$('#duration').timer('pause');
 
 	$('#caption-messages').html('');
+        $('#transcriptoverlay').html('');
 	$('#chat-messages').html('<div id="rtt-typing"></div>');
 	$('#newchatmessage').val('');
 
@@ -1348,6 +1367,7 @@ function videomailCallback(callbacknum) {
 	stopVideomail();
 	var videophoneNumber = callbacknum.match(/\d/g);
 	videophoneNumber = videophoneNumber.join('');
+	direction = 'outgoing';
 	start_call(videophoneNumber);
 	$('#duration').timer('reset');
 	$('#outboundCallAlert').show();
@@ -1532,10 +1552,20 @@ function showDialpad() {
 		keyboard: false
 	});
 
+	$("#dialpad-tab").trigger("click");
+
 	$('#modalDialpad').on('shown.bs.modal', function() {
 		$('#phone-number').focus();
 	});
+}
 
+function showCallHistory() {
+	$('#modalDialpad').modal({
+		backdrop: 'static',
+		keyboard: false
+	});
+
+	$("#callhistory-tab").trigger("click");
 }
 
 function showOutboundRinging() {
@@ -1628,19 +1658,27 @@ $("#phone-number").keyup(function(event) {
 });
 
 $("#button-call").click(function () {
-	$('#modalDialpad').modal('hide');
-	showOutboundRinging();
-	telNumber = $('#phone-number');
-	start_call($(telNumber).val());
-	$(telNumber).val('');
-	$('#duration').timer('reset');
-	$('#user-status').text('In Call');
-	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
-	changeStatusLight('IN_CALL');
-	var vrs = $('#callerPhone').val();
-	socket.emit('incall', {'vrs' : vrs});
-	toggle_incall_buttons(true);
-	$('#outboundCallAlert').show();
+	if($('#phone-number').val() < 10){
+		//Phone number is not valid
+		$('#invalidNumber').show();
+	}else {
+		direction = 'outgoing';
+		$('#modalDialpad').modal('hide');
+		$('#invalidNumber').hide();
+		showOutboundRinging();
+		telNumber = $('#phone-number');
+		callerNumber = $('#phone-number').val();
+		start_call($(telNumber).val());
+		$(telNumber).val('');
+		$('#duration').timer('reset');
+		$('#user-status').text('In Call');
+		changeStatusIcon(in_call_color, "in-call", in_call_blinking);
+		changeStatusLight('IN_CALL');
+		var vrs = $('#callerPhone').val();
+		socket.emit('incall', {'vrs' : vrs});
+		toggle_incall_buttons(true);
+		$('#outboundCallAlert').show();
+	}
 });
 
 //Functionality for videomail hover while in call
@@ -1746,13 +1784,70 @@ $("#toggleDTMF").click(function(){
 })
 
 function DTMFpress(number){
+	showAlert('info', 'You pressed key number ' + number);
 	acekurento.sendDTMF(number);
+}
+
+function changeTabs(id){
+	if(id == "callhistory-tab"){
+		$('#callCard').hide();
+		$('#callhistory').show();
+		$('#contact-tab').hide();
+		$('#callHistoryBody').show();
+	}else if(id == "dialpad-tab"){
+		$('#callCard').show();
+		$('#callhistory').hide();
+		$('#contact-tab').hide();
+		$('#callHistoryBody').hide();
+	}else if(id == "contact-tab"){
+		$('#callCard').hide();
+		$('#callhistory').hide();
+		$('#contact-tab').show();
+		$('#callHistoryBody').hide();
+	}
+}
+
+function loadCallHistory(){
+
+	var endpointType;
+	socket.emit('getCallHistory');
+	socket.on('returnCallHistory', function(result){
+
+                $("#callHistoryBody").html("");
+  
+                var show_records = 20; //num call history records to show
+                var count_recs = 0;
+		for(var i = result.length - 1; i >= 0; i--){
+                        count_recs++;
+			if(result[i].endpoint == "webrtc"){
+				endpointType = '<i class="fa fa-globe"></i>';
+			} else{
+				endpointType = '<i class="fa fa-phone"></i>';
+			}
+			$("#callHistoryBody").append(
+				'<tr>' +
+					'<th>' + result[i].callerName + '</th>' +
+					'<th>' + result[i].callerNumber + '</th>' +
+					'<th>' + result[i].direction + '</th>' +
+					'<th>' + result[i].duration + '</th>' +
+					'<th>' + endpointType + '</th>' + 
+					'<th>' + result[i].callDate + '</th>' +
+					'<th><button class=\"demo-btn\" onclick="outbound_call(\'' + result[i].callerNumber + '\')"><i class="fa fa-phone-square"></i></button></th>' +
+				"</tr>"
+			)
+                        if (count_recs >= show_records)
+                          break;
+		}
+	});
 }
 
 //Callback method
 function outbound_call(number){
 	$('#modalDialpad').modal('hide');
 	showOutboundRinging();
+	direction = 'outgoing';
+	callerNumber = number;
+	endpoint = 'provider';
 	start_call(number);
 	$('#duration').timer('reset');
 	$('#user-status').text('In Call');
@@ -1822,6 +1917,7 @@ function resizeVideo() {
 	var contentHeight = $("#gsvideobox").height() - 50;
 	$('#VideoBox').css("height", contentHeight + "px");
 	$('#remoteView').css("height", contentHeight - 125 + "px");
+	$('#VideoBox').attr('style', "background-color:white;"); //doesn't open box if it's collapsed
 }
 
 function resizeChat() {
@@ -1837,6 +1933,7 @@ function resizeChat() {
 	// userchat is overall chat box content, chatmessages is only the messages area
 	$('#userchat').css("height", contentHeight - padding + "px");
 	$('#chat-messages').css("height", contentHeight - parts - padding + "px");
+	$('#userchat').attr('style', "background-color:white;"); //doesn't open box if it's collapsed
 }
 
 function resetLayout() {
@@ -2063,6 +2160,15 @@ function clearShortcuts() {
 	}
 }
 
+function collapseVideoBox() {
+    console.log('collapse video box');
+    $('#VideoBox').attr('style', "background-color:white;"); //removes the background when collapsing the box
+}
+
+function collapseChatBox() {
+    console.log('collapse chat box');
+    $('#userchat').attr('style', "background-color:white;"); //removes the background when collapsing the box
+}
 
 /**
  * Note from Jackie: Customizing keyboard shortcuts using the keyboard isn't working yet.

@@ -32,9 +32,9 @@
                     <div class="grid-stack-item" data-gs-x="0" data-gs-width="10" data-gs-max-width="10" data-gs-min-width="2" data-gs-height="14" data-gs-max-height="14" data-gs-id="gsvideobox" id='gsvideobox'>
                         <div class="grid-stack-item-content">
                             <!--div class="col-xs-12 col-sm-12 col-md-12 col-lg-9"-->
-                            <div class="box">
+                            <!--<div class="box"> added the box class in the included file for collapse to work-->
                                 <% include ../partials/agent_box_video %>
-                            </div>
+                            <!--</div>-->
                             <!--/div-->
                         </div>
                     </div>
@@ -42,9 +42,9 @@
                     <div class="grid-stack-item" data-gs-x="9" data-gs-width="4" data-gs-height="10" id='gschatbox'>
                         <div class="grid-stack-item-content">
                             <!--div class="col-xs-12 col-sm-12 col-md-12 col-lg-3"-->
-                            <div class="box">
+                            <!--<div class="box"> added the box class in the included file for collapse to work-->
                                 <% include ../partials/agent_box_chat %>
-                            </div>
+                            <!--</div>-->
                             <!--/div-->
                         </div>
                     </div>
@@ -411,65 +411,111 @@
         <div class="modal fade" id="modalDialpad">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Dialpad</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div id="callCard" class="card">
-                            <div class="container-fluid ">
+                    <ul class="nav nav-tabs" id="myTab" role="tablist">
+                        <li class="nav-item active">
+                          <a class="nav-link" id="dialpad-tab" onclick="changeTabs('dialpad-tab')" data-toggle="tab" href="#dialpad" role="tab" aria-controls="dialpad" aria-selected="true">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Dialpad</h4>
+                            </div>
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" id="callhistory-tab" onclick="changeTabs('callhistory-tab')" data-toggle="tab" href="#callhistory" role="tab" aria-controls="callhistory" aria-selected="false">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Call History</h4>
+                            </div>
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" id="contact-tab" onclick="changeTabs('contact-tab')" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Contacts</h4>
+                            </div>
+                          </a>
+                        </li>
+                      </ul>
+                      
 
-                                <div id="call-controls">
-
-                                    <div id="button_menu_panel" class="center bottomspace" style="display: none">
-                                        <button class="button_menu" id="dial">
-                                            <img class="button-icon" src="/images/dial.png">
-                                        </button>
-                                    </div>
-
-                                    <div class="phone" id="keypad">
-                                        <div class="input-group">
-                                            <input id="phone-number" type="text" class="form-control input-lg" placeholder="Enter a phone #" autofocus />
-                                            <span class="input-group-addon">
-                                                <img id="phone-number-delete-btn" src="/images/backspace.png" height=25 />
-                                            </span>
-                                        </div>
-                                        <div>
-                                            <div class="num-pad">
-                                                <% var key=[ 1, 2, 3 , 4 ,5 ,6, 7, 8, 9, "*", 0, "#"]; var label=[ "", "ABC", "DEF", "GHI", "JKL", "MNO", "PQRS", "TUV", "WXYZ", "", "", "" ] ; if (key.length === label.length) label.forEach( (x,i)=>{ %>
-                                                    <div class="span4">
-                                                        <div class="txt keypad-button">
-                                                            <div class="big">
-                                                                <%=key[i] %>
-                                                            </div>
-                                                            <div class="small">
-                                                                <%= label[i] %>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <% }); else {%>
-                                                        <div>INTERNAL ERROR: mismatched arrays</div>
-                                                        <% } %>
-                                                            <div class="clearfix"></div>
-                                                            <div class="row">
-                                                                <div class="col-md-12">
-                                                                    <div></div>
+                        <div class="tab-pane fade show active in" id="dialpad" role="tabpanel" aria-labelledby="dialpad-tab">
+                            <div class="modal-body">
+                                <div id="callCard" class="card">
+                                    <div class="container-fluid ">
+        
+                                        <div id="call-controls">
+        
+                                            <div id="button_menu_panel" class="center bottomspace" style="display: none">
+                                                <button class="button_menu" id="dial">
+                                                    <img class="button-icon" src="/images/dial.png">
+                                                </button>
+                                            </div>
+        
+                                            <div class="phone" id="keypad">
+                                                <div class="input-group">
+                                                    <input id="phone-number" type="text" class="form-control input-lg" placeholder="Enter a phone #" autofocus />
+                                                    <span class="input-group-addon">
+                                                        <img id="phone-number-delete-btn" src="/images/backspace.png" height=25 />
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <div class="num-pad">
+                                                        <% var key=[ 1, 2, 3 , 4 ,5 ,6, 7, 8, 9, "*", 0, "#"]; var label=[ "", "ABC", "DEF", "GHI", "JKL", "MNO", "PQRS", "TUV", "WXYZ", "", "", "" ] ; if (key.length === label.length) label.forEach( (x,i)=>{ %>
+                                                            <div class="span4">
+                                                                <div class="txt keypad-button">
+                                                                    <div class="big">
+                                                                        <%=key[i] %>
+                                                                    </div>
+                                                                    <div class="small">
+                                                                        <%= label[i] %>
+                                                                    </div>
                                                                 </div>
                                                             </div>
+                                                            <% }); else {%>
+                                                                <div>INTERNAL ERROR: mismatched arrays</div>
+                                                                <% } %>
+                                                                    <div class="clearfix"></div>
+                                                                    <div class="row">
+                                                                        <div class="col-md-12">
+                                                                            <div></div>
+                                                                        </div>
+                                                                    </div>
+                                                    </div>
+                                                    <div id="log"></div>
+                                                </div>
                                             </div>
-                                            <div id="log"></div>
+        
+                                            <div class="center">
+                                                <button id="button-call">
+                                                    <img class="button-icon" src="/images/call.png">
+                                                </button>
+                                            </div>
+                                            <div id="invalidNumber" hidden><span style="color:red"><br>The number you have inputed is invalid.  Please check the number and try again.</span></div>
                                         </div>
-                                    </div>
-
-                                    <div class="center">
-                                        <button id="button-call">
-                                            <img class="button-icon" src="/images/call.png">
-                                        </button>
+        
                                     </div>
                                 </div>
-
                             </div>
                         </div>
+                        <div class="tab-pane fade show active" id="callhistory" role="tabpanel" aria-labelledby="callhistory-tab">
+                            <table class="table no-margin" style="widows: 100%">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Number</th>
+                                        <th>Direction</th>
+                                        <th>Duration (s)</th>
+                                        <th>Provider/Web Call</th>
+                                        <th>Date</th>
+                                        <th>Callback</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="callHistoryBody">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div>
                     </div>
+
+                    
                     <div class="modal-footer">
                         <button id="dismiss-dialpad-btn" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     </div>

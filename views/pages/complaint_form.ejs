@@ -23,6 +23,12 @@
 	<link rel="stylesheet" href="/css/video-player.css">
 	<script>
 		var nginxPath = '<%= nginxPath %>';
+                var stunFQDN = '<%= stunFQDN %>';
+                var stunPort = '<%= stunPort %>';
+                var turnFQDN = '<%= turnFQDN %>';
+                var turnPort = '<%= turnPort %>';
+                var turnUser = '<%= turnUser %>';
+                var turnCred = '<%= turnCred %>';
 	</script>
 	<style>
 		.blink {
@@ -418,11 +424,17 @@
 										<a class="btn btn-primary" id="startScreenshare">Start Screenshare</a>
 										<a class="btn btn-primary" id="stopScreenshare">Stop Screenshare</a>
 									</div>
-									<input type="file" id="fileInput" name="fileInput" class="form-control-file" disabled>
-									<a class="btn btn-primary" id="shareFileConsumer" href="#" onclick="shareFileConsumer()" disabled>Send File</a>
+
+
+                                                                        <!-- disable file-sharing for now -->
+									<input style="display:none"  type="file" id="fileInput" name="fileInput" class="form-control-file" disabled>
+									<a class="btn btn-primary" id="shareFileConsumer" href="#" onclick="shareFileConsumer()" style="display:none"  disabled>Send File</a>
 									<div class="demo-btn-container config-hide mb-2">
-										<a class="btn btn-primary" id="downloadButton" href="./downloadFile" disabled>Download File</a><br>
+										<a class="btn btn-primary" id="downloadButton" target="_blank"  href="./downloadFile" style="display:none"  disabled>Download File</a><br>
 									</div>
+
+
+
 								</div>
 							</div>
 						</div>

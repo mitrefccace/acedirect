@@ -235,7 +235,7 @@ function connect_socket() {
                                                   dev_url = dev_url.trim();
                                                   if(dev_url !== null && dev_url !== '') {
                                                     // do something
-                                                    console.log('FOR DEVELOPMENT ONLY! Using own signaling server: ' + dev_url);
+                                                    console.log('Using signaling server: ' + dev_url);
                                                     signaling_url = dev_url;
                                                   }
 
@@ -473,9 +473,10 @@ function connect_socket() {
 				}).on('fileList', function(data){
 					console.log("Got file list");
 					console.log('data length is ' + data.result.length + ' and data is ' + JSON.stringify(data));
+					$("#downloadButton").removeAttr('disabled');
 					$('#downloadButton').html('');
 					for(var i = 0; i < data.result.length; i++){
-						$('#downloadButton').append('<a class="btn btn-primary" href="./downloadFile?id=' + data.result[i].id + '">' + data.result[i].original_filename +'</a><br>');
+						$('#downloadButton').append('<a class="btn btn-primary" target="_blank"  href="./downloadFile?id=' + data.result[i].id + '">' + data.result[i].original_filename +'</a><br>');
 					}
 				}).on('screenshareResponse', function(data){
 					console.log("screen request received " + data.permission);
