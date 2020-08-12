@@ -37,34 +37,49 @@
         </div>
         <!-- sidebar menu: : style can be found in sidebar.less -->
         <ul class="sidebar-menu">
+
+            <!-- QUEUES BLOCK-->
+            
             <li id="sidebar-queues" class="header">
                 <span id="nav-desktop">QUEUES</span>
             </li>
 
-            <li id="sidebar-geninfo" class="cap-setting" onclick="" hidden>
-                <span><i class="fa fa-question-circle nav-icon"></i>&nbsp;&nbsp;General Info</span>
-                <span id="general-queue-num" style="color:black" class="badge bg-md-gray right">0</span>
-                <p id="geninfoInCall" hidden>
-                  <span class="badge right btn-red" style="margin-top: 3px;">in call</span>
-                </p>
+            <li>
+                <a id="sidebar-geninfo" class="cap-setting" onclick="" hidden>
+                    <i class="fa fa-question-circle nav-icon"></i>
+                    <span>General Info</span>
+                    <span id="general-queue-num" style="color:black" class="badge bg-md-gray pull-right">0</span>
+                    <p id="geninfoInCall" hidden>
+                        <span class="badge right btn-red pull-right" style="margin-top: 3px;">in call</span>
+                    </p>
+                </a>
+
             </li>
 
-            <li id="sidebar-complaints" class="cap-setting" onclick="" hidden>
-                <span><i class="fa fa-thumbs-down nav-icon"></i>&nbsp;&nbsp;Complaints</span>
-                <span id="complaints-queue-num" style="color:black" class="badge bg-md-gray right">0</span>
-                <p id="complaintsInCall" hidden>
-                  <span class="badge right btn-red" style='margin-top: 3px;'>in call</span>
-                </p>
+            <li>
+                <a id="sidebar-complaints" class="cap-setting" onclick="" hidden>
+                    <i class="fa fa-thumbs-down nav-icon"></i>
+                    <span>Complaints</span>
+                    <span id="complaints-queue-num" style="color:black" class="badge bg-md-gray pull-right">0</span>
+                    <span id="complaintsInCall" hidden>
+                        <span class="badge right btn-red" style='margin-top: 3px;'>in call</span>
+                    </span>
+                </a>
             </li>
+
+            <!--END QUEUES BLOCK-->
+
+            <!--START TOOLS BLOCK-->
 
             <li class="header">TOOLS</li>
 
-            <li >
+            <li>
                 <a href="#" onclick="showDialpad()" id="sidebar-dialpad" name="Dialpad" accesskey="1">
                     <i class="fa fa-video-camera"></i>
                     <span>Dial Pad</span>
                 </a>
             </li>
+
             <li>
                 <a href="#" onclick="showCallHistory()" id="sidebar-callHistory" name="CallHistory" accesskey="2">
                     <i class="fa fa-list"></i>
@@ -72,46 +87,92 @@
                 </a>
             </li>
 
+            <!--END TOOLS BLOCK-->
+
+            <!--START CAPTION SETTINGS BLOCK-->
+
             <li class="header config-hide">CAPTION SETTINGS</li>
-            <li id="cap-font-size" class="cap-setting config-hide">
-                <span>Font size</span>
-                <select id="font-select" class="font-select" type="select" name="Font_Size" onchange="changeCaption(this.value)" value="Font Size" accesskey="F">
-                    <option value="2">Default</option>
-                    <option value="1.5">Small</option>
-                    <option value="2.8">Large</option>
-                </select>
-            </li>
 
-            <li id="cap-font-color" class="cap-setting config-hide">
-                <span>Font color</span>
-                <div class="color-select-container">
-                    <div id="font-grey" class="color-select" onclick="changeCaption(this.id)" name="Grey_Font" accesskey="G"></div>
-                    <div id="font-black" class="color-select" onclick="changeCaption(this.id)" name="Black_Font" accesskey="B"></div>
-                    <div id="font-white" class="color-select" onclick="changeCaption(this.id)" name="White_Font" accesskey="W"></div>
-                </div>
-            </li>
-
-            <li id="cap-bg-color" class="cap-setting config-hide">
-                <span>Background color</span>
-                <div class="color-select-container">
-                    <i id="bg-transparent" class="far fa-times-circle"></i>
-                    <div id="bg-grey" class="color-select" onclick="changeCaption(this.id)" name="Grey_Background" accesskey="0"></div>
-                    <div id="bg-black" class="color-select" onclick="changeCaption(this.id)" name="Black_Background" accesskey="9"></div>
-                    <div id="bg-white" class="color-select" onclick="changeCaption(this.id)" name="White_Background" accesskey="8"></div>
-                </div>
-                <input type = "range" min = "0" max = "1" step = .01 value="1" id = "opacity-slider-agent"  name="Opacity_Slider" accesskey="O">
-            </li>
             <li>
-              <div class="demo-btn-container config-hide">
-                <a id="preview-caption-btn" class="demo-btn" href="#" onclick="testCaptions()" name="Preview_Button" accesskey="Z" disabled>Preview</a>
-                <p>&nbsp;</p>
-              </div>
+                <a id="cap-font-size" class="cap-setting config-hide ">
+                    <i class="fa fa-text-height"></i>
+                    <span>Font size</span>
+                    <select id="font-select" class="font-select pull-right" type="select" name="Font_Size" style="color: black;"
+                        onchange="changeCaption(this.value)" value="Font Size" accesskey="F">
+                        <option value="2">Default</option>
+                        <option value="1.5">Small</option>
+                        <option value="2.8">Large</option>
+                    </select>
+                </a>
             </li>
+
+            <li>
+                <a id="cap-font-color" class="cap-setting config-hide">
+                    <i class="fa fa-font"></i>
+                    <span style="position: absolute;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Font color</span>
+    
+                    <div class="color-select-container pull-right">
+                        <div id="font-grey" class="color-select" onclick="changeCaption(this.id)" name="Grey_Font"
+                            accesskey="G"></div>
+                        <div id="font-black" class="color-select" onclick="changeCaption(this.id)" name="Black_Font"
+                            accesskey="B"></div>
+                        <div id="font-white" class="color-select" onclick="changeCaption(this.id)" name="White_Font"
+                            accesskey="W"></div>
+                    </div> 
+                </a>
+            </li>
+
+            <li> 
+                <a id="cap-bg-color" class="cap-setting config-hide">
+                    <i class="fa fa-file-text"></i>
+                    <span>&nbsp;Background color&nbsp;</span>
+    
+                    <div class="color-select-container pull-right">
+                        <i id="bg-transparent" class="fa fa-circle-o"></i>
+                        <div id="bg-grey" class="color-select" onclick="changeCaption(this.id)" name="Grey_Background"
+                            accesskey="0"></div>
+                        <div id="bg-black" class="color-select" onclick="changeCaption(this.id)" name="Black_Background"
+                            accesskey="9"></div>
+                        <div id="bg-white" class="color-select" onclick="changeCaption(this.id)" name="White_Background"
+                            accesskey="8"></div>
+                    </div>
+                    
+                    <input class="pull-right" type="range" min="0" max="1" step=.01 value="1" id="opacity-slider-agent" name="Opacity_Slider"
+                        accesskey="O">
+                </a>
+            </li>
+
+            <li>
+            <a href="#" class="demo-btn-container config-hide" onclick="testCaptions()" name="Preview_Button" accesskey="Z">
+                <span class="demo-btn">Preview</span>
+
+            </a>
+              <!--   <div class="demo-btn-container config-hide">
+                    <i class="fa fa-square" style="color:darkslateblue; size: 50px;"></i>
+                    <a id="preview-caption-btn" class="demo-btn" href="#" onclick="testCaptions()" name="Preview_Button"
+                        accesskey="Z" disabled>Preview</a>
+                    <p>&nbsp;</p>
+                </div> -->
+            
+            </li>
+
+            <!--END CAPTION SETTINGS BLOCK-->
+
+            <!--START CAMERA OPTIONS BLOCK-->
 
             <li class="header config-hide">CAMERA OPTIONS</li>
-            <li id="cap-font-size" class="cap-setting config-hide nav-item">
-                <span>Enable / Disable Self-View</span><input id="persistCameraCheck" type="checkbox" name="Self-View" accesskey="C"checked>
+
+            <li>
+                <a id="cap-font-size" class="cap-setting config-hide nav-item">
+                    <span>Enable / Disable Self-View&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <input id="persistCameraCheck" type="checkbox" name="Self-View"
+                        accesskey="C" checked>
+                </a>
             </li>
+            
+            <!--END CAMERA OPTIONS BLOCK-->
+
+            <!--START IN CALL FEATURES BLOCK-->
 
             <!--<li id="sidebar-multiparty" class="cap-setting config-hide nav-item">
                 <a href="#" onclick=multipartyModal()>
@@ -120,9 +181,15 @@
                 </a>
             </li>-->
             <li class="header config-hide">IN CALL FEATURES</li>
-            <div class="demo-btn-container config-hide mb-2">
-                <a class="btn btn-primary" id="screenShareButton" href="#" onclick="shareScreen()" disabled>Enable Screenshare</a>
-            </div>
+
+            <li>
+                <a href="#" class="demo-btn-container config-hide mb-2"disabled> 
+                    <span class="btn btn-primary" id="screenShareButton" onclick="shareScreen()"  
+                        disabled>Enable Screenshare</span>
+                    
+                </a>
+
+            </li>
 
 
             <!-- disable file-sharing for now -->
@@ -147,7 +214,7 @@
                 <a class="demo-btn" id="retreiveFileButton" href="#" onclick="retreiveFiles()">Get Files</a>
             </div>-->
 
-
+            <!--END IN CALL FEATURES BLOCK-->
 
         </ul>
 
