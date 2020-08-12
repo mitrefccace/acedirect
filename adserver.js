@@ -64,6 +64,9 @@ var complaint_queue_count = 0;
 //keeps track of number of consumers in general queue, send to agent on login
 var general_queue_count = 0;
 
+//Keep track of specific user for specific databases
+var usernameTracker;
+
 // Initialize log4js
 var logname = 'ad-server';
 log4js.configure({
@@ -156,6 +159,55 @@ if (nginxPath.length === 0) {
   //default for backwards compatibility
   nginxPath = "/ACEDirect";
 }
+
+//outbound videomail timeout parameter
+var outVidTimeout = getConfigVal('videomail:outbound_timeout_secs');
+if (!outVidTimeout) {
+  //default if not there
+  outVidTimeout = 45 * 1000; //ms
+} else {
+  outVidTimeout = outVidTimeout * 1000; //ms
+}
+logger.debug('outVidTimeout: ' + outVidTimeout);
+
+
+//stun & turn params
+var stunFQDN = getConfigVal('asterisk:sip:stun');
+var stunPort = getConfigVal('asterisk:sip:stun_port');
+var turnFQDN = getConfigVal('asterisk:sip:turn');
+var turnPort = getConfigVal('asterisk:sip:turn_port');
+var turnUser = getConfigVal('asterisk:sip:turn_user');
+var turnCred = getConfigVal('asterisk:sip:turn_cred');
+if (!stunFQDN) {
+  console.log('ERROR: dat/config.json is missing asterisk:sip:stun');
+  process.exit(0);
+}
+if (!stunPort) {
+  console.log('ERROR: dat/config.json is missing asterisk:sip:stun_port');
+  process.exit(0);
+}
+if (!turnFQDN) {
+  console.log('ERROR: dat/config.json is missing asterisk:sip:turn');
+  process.exit(0);
+}
+if (!turnPort) {
+  turnPort = ""; //blank is valid for this one
+}
+if (!turnUser) {
+  console.log('ERROR: dat/config.json is missing asterisk:sip:turn_user');
+  process.exit(0);
+}
+if (!turnCred) {
+  console.log('ERROR: dat/config.json is missing turn_cred');
+  process.exit(0);
+}
+
+
+
+
+
+
+
 
 //busylight parameter
 var busyLightEnabled = getConfigVal('busylight:enabled');
@@ -376,7 +428,7 @@ if (typeof mongodbUriEncoded !== 'undefined' && mongodbUriEncoded) {
 	});
 } else {
 	console.log('Missing MongoDB Connection URI in config');
-
+	logger.error('Missing MongoDB Connection URI in config');
 	//httpsServer.listen(port);
 	//console.log('https web server listening on ' + port);
 }
@@ -563,6 +615,65 @@ io.sockets.on('connection', function (socket) {
 		console.log('Received agent screenshare reply');
 		io.to(Number(data.number)).emit('screenshareResponse', {
 			'permission' : data.permission
+		});
+	});
+
+	socket.on('callHistory', function(data){
+		// first check if collection "events" already exist, if not create one
+		mongodb.listCollections({name: usernameTracker + 'callHistory'}).toArray((err, collections) => {
+			if (collections.length == 0) {	// "stats" collection does not exist
+				console.log("Creating new callHistory colleciton in MongoDB");
+				mongodb.createCollection(usernameTracker + "callHistory",{capped: true, size:1000000, max:5000}, function(err, result) {
+					if (err) throw err;
+						console.log("Collection " + usernameTracker + "callHistory is created capped size 100000, max 5000 entries");
+					colCallHistory = mongodb.collection(usernameTracker + 'callHistory');
+				});
+			}
+			else {
+				// events collection exist already
+				console.log("Collection callHistory exists");
+				colCallHistory = mongodb.collection(usernameTracker + 'callHistory');
+				//colCallHistory.remove({});
+				// insert an entry to record the start of ace direct
+				colCallHistory.insertOne(data, function(err, result) {
+					if(err){
+						console.log("Insert a record into callHistory collection of MongoDB, error: " + err);
+						logger.debug("Insert a record into callHistory collection of MongoDB, error: " + err);
+						throw err;
+					}
+				});
+			}
+
+		});
+	});
+
+	socket.on('getCallHistory', function(){
+		console.log("COLLECTION IS " + usernameTracker);
+		mongodb.listCollections({name: usernameTracker + 'callHistory'}).toArray((err, collections) => {
+			if (collections.length == 0) {	// "stats" collection does not exist
+				console.log("Creating new callHistory colleciton in MongoDB");
+				mongodb.createCollection(usernameTracker + "callHistory",{capped: true, size:1000000, max:5000}, function(err, result) {
+					if (err) throw err;
+						console.log("Collection callHistory is created capped size 100000, max 5000 entries");
+					colCallHistory = mongodb.collection(usernameTracker + 'callHistory');
+				});
+			}
+			else {
+				// events collection exist already
+				console.log("Collection callHistory exists");
+				colCallHistory = mongodb.collection(usernameTracker + 'callHistory');
+				// insert an entry to record the start of ace direct
+				colCallHistory.find({}).toArray(function(err, result) {
+					if(err){
+						console.log("Insert a record into callHistory collection of MongoDB, error: " + err);
+						logger.debug("Insert a record into callHistory collection of MongoDB, error: " + err);
+						throw err;
+					}else{
+						socket.emit('returnCallHistory', result);
+					}
+				});
+			}
+
 		});
 	});
 
@@ -1313,7 +1424,7 @@ function handle_manager_event(evt) {
 		  insertCallDataRecord("Web");
 
           var destExtString = evt.destchannel;
-          var destExtension = destExtString.split(/[\/,-]/);
+		  var destExtension = destExtString.split(/[\/,-]/);
           redisClient.hset(rConsumerToCsr, Number(extension[1]), Number(destExtension[1]));
           logger.info('Populating consumerToCsr: ' + extension[1] + ' => ' + destExtension[1]);
           logger.info('Extension number: ' + extension[1]);
@@ -1487,7 +1598,7 @@ function handle_manager_event(evt) {
       // Sent by Asterisk when the caller hangs up
     case ('Hangup'):
       var extString = evt.channel;
-      var extension = extString.split(/[\/,-]/);
+	  var extension = extString.split(/[\/,-]/);
 
       logger.info('HANGUP RECEIVED: evt.context:' + evt.context + ' , evt.channel:' + evt.channel);
 
@@ -1960,6 +2071,7 @@ setInterval(function () {
  */
 function getUserInfo(username, callback) {
 	var url = 'https://' + getConfigVal('common:private_ip') + ":" + parseInt(getConfigVal('agent_service:port')) + '/getagentrec/' + username;
+	usernameTracker = username;
 	request({
 		url: url,
 		json: true
@@ -2035,7 +2147,6 @@ function getCallerInfo(phoneNumber, callback) {
 	while (phoneNumber.length > 10) {
 		phoneNumber = phoneNumber.substring(1);
 	}
-
 	url += "/vrsverify/?vrsnum=" + phoneNumber;
 
 	request({
@@ -2263,6 +2374,7 @@ function processExtension(data) {
 	var resultJson = {};
 
 	logger.info('processExtension - incoming ' + JSON.stringify(data));
+	console.log('processExtension - incoming ' + JSON.stringify(data));
 
 	var asteriskPublicHostname = getConfigVal('asterisk:sip:public');
 	var stunServer = getConfigVal('asterisk:sip:stun') + ":" + getConfigVal('asterisk:sip:stun_port');
@@ -2480,6 +2592,7 @@ function findExtensionPassword(extension, callback) {
 function vrsAndZenLookup(vrsNum, destAgentExtension) {
 
 	logger.info('Performing VRS lookup for number: ' + vrsNum + ' to agent ' + destAgentExtension);
+	console.log('Performing VRS lookup for number: ' + vrsNum + ' to agent ' + destAgentExtension);
 
 	if (vrsNum) {
 		logger.info('Performing VRS lookup for number: ' + vrsNum + ' to agent ' + destAgentExtension);
@@ -2727,7 +2840,14 @@ app.use(function (req, res, next) {
         res.locals = {
                 "nginxPath":nginxPath,
                 "busyLightEnabled":busyLightEnabled,
-                "awayBlink":awayBlink
+                "awayBlink":awayBlink,
+                "outVidTimeout":outVidTimeout,
+                "stunFQDN":stunFQDN,
+                "stunPort":stunPort,
+                "turnFQDN":turnFQDN,
+                "turnPort":turnPort,
+                "turnUser":turnUser,
+                "turnCred":turnCred
         }
         next();
 });

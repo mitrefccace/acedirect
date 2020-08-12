@@ -23,6 +23,19 @@
   //     };
   //   }
   // }
+
+  var webcam_media = {
+    audio: true,
+    video: {
+      width: 640,
+      height: 480,
+      frameRate: {
+        min: 10,
+        max: 20
+      }
+    },
+  };
+
   var ua = window && window.navigator ? window.navigator.userAgent : '';
   var parser = new UAParser(ua);
   var browser = parser.getBrowser();
@@ -404,11 +417,11 @@
         }).catch(callback);
       }
       if (sendSource === 'webcam') {
-        getMedia(mediaConstraints);
-	logger.debug('Media Constraints for source:  WEBCAM', mediaConstraints);
+        getMedia(webcam_media);
+        logger.debug('Media Constraints for source:  WEBCAM', webcam_media);
       } else {
         if (navigator.getDisplayMedia) {
-          navigator.getDisplayMedia({video: true, audio: true}).then(function (stream) {
+            navigator.getDisplayMedia({video:true, audio: true}).then(function (stream) {
             videoStream = stream;
             navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(function (aStream) {
               audioStream = aStream;
@@ -416,7 +429,7 @@
             }).catch(callback);
           }).catch(callback);
         } else if (navigator.mediaDevices.getDisplayMedia) {
-          navigator.mediaDevices.getDisplayMedia({video: true, audio: true}).then(function (stream) {
+            navigator.mediaDevices.getDisplayMedia({video:true, audio:true}).then(function (stream) {
             videoStream = stream;
             navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(function (aStream) {
               audioStream = aStream;
@@ -1004,13 +1017,19 @@
 
   module.exports = freeice;
 },{"./stun.json":6,"./turn.json":7,"normalice":12}],6:[function(require,module,exports){
+  var stun_fqdn_1 = stunFQDN;
+  stunPort = stunPort.trim();
+  if (stunPort.length > 0)
+    stun_fqdn_1 = stun_fqdn_1 + ':' + stunPort;
   module.exports=[
-    "stun.task3acrdemo.com:3478"
-  ]
-
+    stun_fqdn_1
+  ];
 },{}],7:[function(require,module,exports){
-module.exports=[{"url":"turn:coturn.task3acrdemo.com","username":"turn","credential":"turn123"}]
-
+  var url1 = turnUser + ':' + turnFQDN;
+  turnPort = turnPort.trim();
+  if (turnPort.length > 0)
+    url1 = url1 + ':' + turnPort;
+  module.exports=[{"url":url1,"username":turnUser,"credential":turnCred}];
 },{}],8:[function(require,module,exports){
   var WildEmitter = require('wildemitter');
 
@@ -4543,6 +4562,14 @@ function ACEKurento(config) {
      */
     isScreensharing: this.isScreensharing || false,
     /**
+     * custom variable to check for multiparty
+     */
+    isMultiparty: false,
+    /**
+     * Custom list of involved agents
+     */
+    activeAgentList: [],
+    /**
      * Configuration object use to hold authentication data as well as other config call parameters.
      * You can find the available config options in {@link ACEKurento}
      */
@@ -5172,8 +5199,22 @@ function ACEKurento(config) {
     //Where the multi party call participant list is
     console.info('Received message data: ' + JSON.stringify(message));
 
+    //Where the multi party call participant list is
+    console.info('Received message data: ' + JSON.stringify(message));
+
     if(message.id === 'participantList'){
       console.log("Participant size is " + message.participants.length);
+      if(message.participants.length >= 3){
+        console.log("Call is multiparty");
+        acekurento.isMultiparty = true;
+        if($('#user-status').text() === 'Incoming Call'){
+          $('#user-status').text('In Call');
+	        changeStatusIcon(in_call_color, "in-call", in_call_blinking);
+	        changeStatusLight('IN_CALL');
+        }
+      } else{
+        acekurento.isMultiparty = false;
+      }
     }
 
     switch (message.id) {

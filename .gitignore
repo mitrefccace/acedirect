@@ -7,3 +7,4 @@ bower_components
 *.swp
 .env
 public/assets/
+uploads/

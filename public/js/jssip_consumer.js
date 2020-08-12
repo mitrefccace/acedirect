@@ -159,8 +159,30 @@
 			'failed': function(e) {
 				console.log('--- WV: Failed ---\n' + e);
 			},
+                        'restartCallResponse': function (e) {
+                                console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e) );
+                                if (selfStream && selfStream.srcObject) {
+                                  selfStream.srcObject.getVideoTracks()[0].onended = function () {
+                                    console.log('screensharing ended self');
+				    $("#startScreenshare").hide();
+                                    if (acekurento) acekurento.screenshare(false);
+                                  };
+                                }
+                                if (remoteStream && remoteStream.srcObject) {
+                                  remoteStream.srcObject.getVideoTracks()[0].onended = function () {
+                                    console.log('screensharing ended remote');
+				    $("#startScreenshare").hide();
+                                    if (acekurento) acekurento.screenshare(false);
+                                  };
+                                }
+                        },
 			'ended': function(e) {
 				console.log('--- WV: Call ended ---\n');
+
+                                //stop screen sharing at end
+				$("#startScreenshare").hide();
+                                if (acekurento)
+                                  acekurento.screenshare(false);
 
                                 terminate_call();
                                 clearScreen();
@@ -205,7 +227,7 @@
 		  $("#screenshareButton").removeAttr('disabled');
 		  $("#fileInput").removeAttr('disabled');
 		  $("#shareFileConsumer").removeAttr('disabled');
-		  $("#downloadButton").removeAttr('disabled');
+		  //$("#downloadButton").removeAttr('disabled');
           //acekurento.call(globalData.queues_complaint_number, false);
           acekurento.call(other_sip_uri, false);
 	}

@@ -15,11 +15,12 @@ var mute_captions_icon = document.getElementById("mute-captions-off-icon");
 var transcript_overlay = document.getElementById("transcriptoverlay");
 var hide_video_icon = document.getElementById("mute-camera-off-icon");
 var hold_button = document.getElementById("hold-call");
-var screenShareEnabled = false; //Used to check if it needs to be enabled or disabled.
+var screenShareEnabled = false; 
 var debug = true; //console logs event info if true
 var jssip_debug = true; //enables debugging logs from jssip library if true NOTE: may have to refresh a lot to update change
 var incomingCall = null;
 var recording = false;
+var outbound_timer = null;
 
 
 //setup for the call. creates and starts the User Agent (UA) and registers event handlers
@@ -96,6 +97,7 @@ function register_jssip() {
 		'incomingCall': function (call) {
 			console.log('--- WV: Incoming call ---\n');
 			incomingCall = call;
+			direction = 'incoming';
 			//accept_call()
 			console.log("Agent status is " + $('#user-status').text());
 			//if(agentStatus.toString() === 'READY' || agentStatus.toString() === 'INCOMING_CALL'){
@@ -131,12 +133,46 @@ function register_jssip() {
 		'failed': function (e) {
 			console.log('--- WV: Failed ---\n' + e);
 		},
+                'restartCallResponse': function (e) {
+                        console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e) );
+                        selfStream.srcObject.getVideoTracks()[0].onended = function () {
+                          console.log('screensharing ended self');
+                          screenShareEnabled = false;
+ 		          acekurento.screenshare(false);
+                        };
+                        remoteStream.srcObject.getVideoTracks()[0].onended = function () {
+                          console.log('screensharing ended remote');
+                          screenShareEnabled = false;
+ 		          acekurento.screenshare(false);
+                        };
+                },
 		'ended': function (e) {
+                        screenShareEnabled = false;
+                        acekurento.screenshare(false);
 			if (acekurento.isMultiparty == false) {
 				console.log("Wont enter wrap up");
 			}
 			console.log('--- WV: Call ended ---\n');
 			terminate_call();
+
+                        duration = $('#duration').html();
+                        var currentTime = new Date();
+                        callDate = (currentTime.getHours() + ":"
+                                + (currentTime.getMinutes() < 10 ? '0' + currentTime.getMinutes() : currentTime.getMinutes()) + " "
+                                + (currentTime.getMonth() + 1) + "/"
+                                + (currentTime.getDate()) + "/"
+                                + (currentTime.getFullYear()));
+                        socket.emit('callHistory', {
+                                "callerName": callerName,
+                                "callerNumber": callerNumber,
+                                "direction" : direction,
+                                "duration" : duration,
+                                "endpoint" : endpoint,
+                                "callDate" : callDate
+                        });
+                        console.log("Table vars are " + callerName + " " + callerNumber + " " + direction + " " + duration + " " + callDate);
+                        loadCallHistory();
+
 			console.log("REASON: " + e.reason);
 			clearScreen();
 			if (e.reason != undefined && e.reason.includes("failed")) {
@@ -162,6 +198,7 @@ function register_jssip() {
 			socket.emit('wrapup', null);
 			changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
 			changeStatusLight('WRAP_UP');
+                        $('#modalWrapup').modal('show');
 			$('#modalWrapup').modal({
 				backdrop: 'static',
 				keyboard: false
@@ -173,10 +210,46 @@ function register_jssip() {
 	acekurento.ua.onopen = function () { acekurento.register(extensionMe + '', extensionMePassword, true); };
 }
 
+$("#modalOutboundFailed").on("hidden.bs.modal", function () {
+  console.log('wrapping up...');
+  $('#duration').timer('pause');
+  $('#user-status').text('Wrap Up');
+  $('#complaintsInCall').hide();
+  $('#geninfoInCall').hide();
+  socket.emit('wrapup', null);
+  changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
+  changeStatusLight('WRAP_UP');
+  $('#modalWrapup').modal({
+    backdrop: 'static',
+    keyboard: false
+  }); 
+});
+function callTimedOut() {
+  console.log('*** ACE Direct TIME OUT ('+outVidTimeout+' seconds) waiting for videomail server response ***');
+  terminate_call();
+  clearScreen();
+  $('#outboundFailedBody').html('Could not leave videomail. Please try again later.');
+  $('#modalOutboundFailed').modal({
+    backdrop: 'static',
+    keyboard: false
+  }); 
+}
+
 //makes a call
 //@param other_sip_uri: is the sip uri of the person to call
 function start_call(other_sip_uri) {
+
+        outbound_timer = setTimeout(callTimedOut, outVidTimeout); //config var
+
+	//Used for call history
+	callerNumber = other_sip_uri;
 	disable_persist_view();
+	$("#sidebar-dialpad").off('click');
+	$("#sidebar-callHistory").off('click');
+	document.getElementById("sidebar-dialpad").removeAttribute("onclick");
+	document.getElementById("sidebar-callHistory").removeAttribute("onclick");
+	document.getElementById("status-dropdown-button").disabled = true;
+	document.getElementById("persistCameraCheck").disabled = true;
 	console.log("Call is started");
 	var options = {
 		'mediaConstraints': {
@@ -202,6 +275,7 @@ function start_call(other_sip_uri) {
 	$("#remoteView")[0].onplay = function () {
 		$('#modalOutboundCall').modal('hide');
 		console.log("ANSWER -- Option 1: add onplay event to the remoteVideo after acekurento.call. Good: fires after video stream starts. Bad: in the case of 1 way video this may not fire.")
+                clearTimeout(outbound_timer);
 		setTimeout(() => {
 			calibrateVideo(2000);
 		}, 1000);
@@ -235,13 +309,16 @@ function calibrateVideo(duration) {
 function accept_call() {
 	stopVideomail();
 	disable_persist_view();
+	document.getElementById("sidebar-dialpad").removeAttribute("onclick");
+	document.getElementById("sidebar-callHistory").removeAttribute("onclick");
+	document.getElementById("status-dropdown-button").disabled = true;
 	document.getElementById("persistCameraCheck").disabled = true;
 	//Enable in call buttons
 	document.getElementById("fileInput").disabled = false;
 	document.getElementById("sendFileButton").className = "demo-btn"
 	document.getElementById("sendFileButton").disabled = false;
-	document.getElementById("downloadButton").className = "demo-btn"
-	document.getElementById("downloadButton").disabled = false;
+	//document.getElementById("downloadButton").className = "demo-btn"
+	//document.getElementById("downloadButton").disabled = false;
 	document.getElementById("screenShareButton").className = "demo-btn"
 	document.getElementById("screenShareButton").disabled = false;
 	if (incomingCall) {
@@ -401,6 +478,8 @@ function toggle_incall_buttons(make_visible) {
 }
 
 function terminate_call() {
+        clearTimeout(outbound_timer);
+        $('#outboundCallAlert').hide();
 	mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
 	mute_audio_icon.classList.add("fa-microphone");
 	mute_audio_icon.classList.remove("fa-microphone-slash");
@@ -410,6 +489,10 @@ function terminate_call() {
 	enable_initial_buttons();
 	$("#start-call-buttons").show();
 	exitFullscreen();
+	$("#sidebar-dialpad").on('click', showDialpad);
+	$("#sidebar-callHistory").on('click', showCallHistory);
+	document.getElementById("status-dropdown-button").disabled = false;
+	$('#dtmfpad').hide();
 	//RemoteView is not currently set to value so line gives an error
 	//remoteView.srcObject.getTracks().forEach(track => track.stop());
 	if (document.getElementById("persistCameraCheck").checked == true) {
@@ -754,8 +837,8 @@ function shareScreen() {
 				acekurento.selfStream = document.getElementById('selfView');
 			}
 		}
-		screenShareEnabled = !screenShareEnabled;
-		acekurento.screenshare(screenShareEnabled);
+ 		acekurento.screenshare(false);
+ 		acekurento.screenshare(true);
 	}
 }
 
