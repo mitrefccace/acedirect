@@ -266,10 +266,6 @@ function connect_socket() {
 						changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
 						changeStatusLight('WRAP_UP');
 						socket.emit('chat-leave-ack', data);
-						$('#modalWrapup').modal({
-							backdrop: 'static',
-							keyboard: false
-						});
 					}
 				}).on('chat-message-new', function (data) {
 					debugtxt('chat-message-new', data);
@@ -1147,7 +1143,12 @@ function updateVideomailTable(data) {
 			if (vidNumber[0] === '1') vidNumber = vidNumber.slice(1, vidNumber.length);
 			vidNumber = '(' + vidNumber.substring(0, 3) + ') ' + vidNumber.substring(3, 6) + '-' + vidNumber.substring(6, vidNumber.length);
 		}
+
+                //convert videomail received time to client browser timezone
 		var vidReceived = data[i].received;
+                const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                vidReceived = new Date(vidReceived).toLocaleString('en-US', { timeZone: tz }); 
+
 		var vidDuration = data[i].video_duration;
 		var vidStatus = data[i].status;
 		var vidFilepath = data[i].video_filepath;
@@ -1917,6 +1918,10 @@ function resizeVideo() {
 	var contentHeight = $("#gsvideobox").height() - 50;
 	$('#VideoBox').css("height", contentHeight + "px");
 	$('#remoteView').css("height", contentHeight - 125 + "px");
+	$('#fullscreen-element').css("height", contentHeight+ "px");
+
+	$('#persistView').css({"height": '100%', "width": '100%', 'object-fit':'cover'});
+
 	$('#VideoBox').attr('style', "background-color:white;"); //doesn't open box if it's collapsed
 }
 

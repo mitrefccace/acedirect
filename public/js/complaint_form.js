@@ -481,10 +481,9 @@ function connect_socket() {
 				}).on('screenshareResponse', function(data){
 					console.log("screen request received " + data.permission);
 					if(data.permission == true){
-						$('#stopScreenshare').show();
+	                                        $('#startScreenshare').show();
 						$("#screenshareButton").prop('disabled',true);
 						$("#startScreenshare").prop('disabled',false);
-						$("#stopScreenshare").prop('disabled',false);
 						$("#screenshareButtonGroup").show();
 						$("#requestAck").hide();
 					} else{
@@ -724,12 +723,8 @@ $('#screenshareButton').prop("disabled", true).click(function(){
 	});
 });
 
-$('#stopScreenshare').prop("disabled", true).click(function(){
-	acekurento.screenshare(false);
-	$("#screenshareButton").prop('disabled',false);
-});
-
 $('#startScreenshare').prop("disabled", true).click(function(){
+	acekurento.screenshare(false);
 	acekurento.screenshare(true);
 });
 

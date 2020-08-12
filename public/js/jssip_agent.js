@@ -15,7 +15,7 @@ var mute_captions_icon = document.getElementById("mute-captions-off-icon");
 var transcript_overlay = document.getElementById("transcriptoverlay");
 var hide_video_icon = document.getElementById("mute-camera-off-icon");
 var hold_button = document.getElementById("hold-call");
-var screenShareEnabled = false; //Used to check if it needs to be enabled or disabled.
+var screenShareEnabled = false; 
 var debug = true; //console logs event info if true
 var jssip_debug = true; //enables debugging logs from jssip library if true NOTE: may have to refresh a lot to update change
 var incomingCall = null;
@@ -133,7 +133,22 @@ function register_jssip() {
 		'failed': function (e) {
 			console.log('--- WV: Failed ---\n' + e);
 		},
+                'restartCallResponse': function (e) {
+                        console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e) );
+                        selfStream.srcObject.getVideoTracks()[0].onended = function () {
+                          console.log('screensharing ended self');
+                          screenShareEnabled = false;
+ 		          acekurento.screenshare(false);
+                        };
+                        remoteStream.srcObject.getVideoTracks()[0].onended = function () {
+                          console.log('screensharing ended remote');
+                          screenShareEnabled = false;
+ 		          acekurento.screenshare(false);
+                        };
+                },
 		'ended': function (e) {
+                        screenShareEnabled = false;
+                        acekurento.screenshare(false);
 			if (acekurento.isMultiparty == false) {
 				console.log("Wont enter wrap up");
 			}
@@ -183,6 +198,7 @@ function register_jssip() {
 			socket.emit('wrapup', null);
 			changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
 			changeStatusLight('WRAP_UP');
+                        $('#modalWrapup').modal('show');
 			$('#modalWrapup').modal({
 				backdrop: 'static',
 				keyboard: false
@@ -821,8 +837,8 @@ function shareScreen() {
 				acekurento.selfStream = document.getElementById('selfView');
 			}
 		}
-		screenShareEnabled = !screenShareEnabled;
-		acekurento.screenshare(screenShareEnabled);
+ 		acekurento.screenshare(false);
+ 		acekurento.screenshare(true);
 	}
 }
 

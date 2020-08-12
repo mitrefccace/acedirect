@@ -1041,6 +1041,3 @@ div#call-controls button#button-hangup {
   background: rgba(255, 255, 255, 0.5);
 }
 
-#videomail-status-buttons {
-  pointer-events: none;
-}

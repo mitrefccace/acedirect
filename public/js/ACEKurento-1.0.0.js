@@ -421,7 +421,7 @@
         logger.debug('Media Constraints for source:  WEBCAM', webcam_media);
       } else {
         if (navigator.getDisplayMedia) {
-            navigator.getDisplayMedia(webcam_media).then(function (stream) {
+            navigator.getDisplayMedia({video:true, audio: true}).then(function (stream) {
             videoStream = stream;
             navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(function (aStream) {
               audioStream = aStream;
@@ -429,7 +429,7 @@
             }).catch(callback);
           }).catch(callback);
         } else if (navigator.mediaDevices.getDisplayMedia) {
-          navigator.mediaDevices.getDisplayMedia(webcam_media).then(function (stream) {
+            navigator.mediaDevices.getDisplayMedia({video:true, audio:true}).then(function (stream) {
             videoStream = stream;
             navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(function (aStream) {
               audioStream = aStream;
