@@ -94,6 +94,7 @@
 				console.log('--- WV: New Message ---\n');
 				try {
 					if (e.msg == 'STARTRECORDING') {
+						startRecordProgress();
 						enable_video_privacy()
 						setTimeout(function(){disable_video_privacy()},1000);
 					} else {
@@ -292,6 +293,11 @@
 		$("#agent-name").text("");
 		exitFullscreen();
 		$('#transcriptoverlay').html('');
+
+		//remove file sharing
+		socket.emit('call-ended');
+
+		stopRecordProgress();
 	}
 
 	//terminates the call (if present) and unregisters the ua
@@ -403,7 +409,7 @@
 	//unmutes self audio so remote can hear you
 	function unmute_audio() {
                 if (acekurento !== null) {
-                  acekurento.enableDisableTrack(false, true); //unmute audio
+                  acekurento.enableDisableTrack(true, true); //unmute audio
                   mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
                   mute_audio_icon.classList.add("fa-microphone");
                   mute_audio_icon.classList.remove("fa-microphone-slash");

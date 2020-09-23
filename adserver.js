@@ -21,8 +21,36 @@ var csrf = require('csurf');
 var cors = require('cors');
 var mysql = require('mysql');
 var MongoClient = require('mongodb').MongoClient;
+var dbConnection = null;
+var dbconn = null;
 //For fileshare
 //var upload = multer();
+
+
+//CLEAN UP function; must be at the top!
+//for exits, abnormal ends, signals, uncaught exceptions
+var cleanup = require('./cleanup').Cleanup(myCleanup);
+function myCleanup() {
+  //clean up code on exit, exception, SIGINT, etc.
+  console.log('');
+  console.log('***Exiting***');
+
+  //MySQL DB cleanup
+  if (dbConnection) {
+    console.log('Cleaning up MySQL DB connection...');
+    dbConnection.destroy();
+  }
+
+  //MongoDB cleanup
+  if (dbconn) {
+    console.log('Cleaning up MongoDB connection...');
+    dbconn.close();
+  }
+
+  console.log('byeee.');
+  console.log('');
+};
+
 
 //after hours vars
 var isOpen = true;
@@ -66,6 +94,12 @@ var general_queue_count = 0;
 
 //Keep track of specific user for specific databases
 var usernameTracker;
+
+//file share test
+let sharingAgent= [];
+let sharingConsumer = [];
+let fileToken = [];
+var incomingVRS;
 
 // Initialize log4js
 var logname = 'ad-server';
@@ -229,14 +263,6 @@ if (awayBlink.length === 0) {
 }
 logger.debug('awayBlink: ' + awayBlink);
 
-//graceful shutdown, especially with node restarts
-process.on('exit', function() {
-  console.log('exit caught');
-  console.log('DESTROYING DB CONNECTION');
-  dbConnection.destroy(); //destroy db connection
-  process.exit(0);
-});
-
 var agentPath = getConfigVal('nginx:agent_route');
 if (agentPath.length === 0) {
   agentPath = "/agent";
@@ -335,7 +361,7 @@ var dbPort = parseInt(getConfigVal('database_servers:mysql:port'));
 var vmTable = "videomail";
 
 // Create MySQL connection and connect to the database
-var dbConnection = mysql.createConnection({
+dbConnection = mysql.createConnection({
 	host: dbHost,
 	user: dbUser,
 	password: dbPassword,
@@ -562,8 +588,74 @@ io.sockets.on('connection', function (socket) {
 		socket.join('my room');
 	});
 
+	socket.on('begin-file-share', function(data) {
+	
+		if (sharingAgent.length == 0) {
+			//first element
+			sharingAgent[0] = token.extension;
+			sharingConsumer[0] = incomingVRS;
+			fileToken[0] = '';
+		} else {
+			for (let i = 0; i <= sharingAgent.length; i++) {
+				if (i == sharingAgent.length) {
+					//end of the list
+					sharingAgent[i] = token.extension;
+					sharingConsumer[i] = incomingVRS;
+					fileToken[i] = '';
+					break; 
+				} else if (sharingAgent[i] == '') {
+					//fil any gaps
+					sharingAgent[i] = token.extension;
+					sharingConsumer[i] = incomingVRS;
+					fileToken[i] = '';
+					break;
+				} 
+			}
+		}
+		
+		//these should always be in sync
+		//but is that guarunteed?
+		console.log(sharingAgent);
+		console.log(sharingConsumer);
+		console.log(fileToken);
+
+		for (let i = 0; i < sharingAgent.length; i++){
+			console.log(sharingAgent[i] + ' and ' + sharingConsumer[i] + " can share files");
+		}
+	})
+
+	socket.on('call-ended', function(data) {
+		console.log('call ended');
+
+		for (let i = 0; i < sharingAgent.length; i++) {
+			if (token.extension == sharingAgent[i] || token.vrs == sharingConsumer[i]) {
+				//empty
+				sharingAgent[i] = '';
+				sharingConsumer[i] = '';
+				fileToken[i]='';
+			}
+		}
+		//check if the whole array is ''
+		let isEmpty=true;
+		for (let i = 0; i < sharingAgent.length; i++) {
+			if (sharingAgent[i] !== '' ){
+				isEmpty=false;
+				break;
+			}
+		}
+		if (isEmpty){
+			sharingAgent = [];
+			sharingConsumer = [];
+			fileToken = [];
+		}
+		//console.log(sharingAgent);
+		//console.log(sharingConsumer);
+		//console.log(fileToken);
+	});
+
 	//Handle multiple files
-	socket.on('get-file-list', function(data){
+	socket.on('get-file-list-agent', function(data){
+		console.log('AGENT HAS UPLOADED FILE');
 		let vrsNum =  (token.vrs) ? token.vrs : data.vrs;
 		let  url = 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port');
 		url += '/fileListByVRS?vrs=' + vrsNum;
@@ -575,9 +667,38 @@ io.sockets.on('connection', function (socket) {
 					console.log("Error");
 				} else {
 					if(results.message == "Success"){
+						let latestResult = results.result[results.result.length-1];
+
+						console.log('last 5 results: ');
+						console.log( results.result.slice(Math.max(results.result.length - 5, 0)) );
+
 						redisClient.hget(rConsumerToCsr, Number(data.vrs), function (err, agentExtension) {
 							var vrs = null;
 							console.log("Token is " + JSON.stringify(token) + "\n and data is " + JSON.stringify(data));
+
+							// populate fileToken in the same spot as the uploader
+							let uploader;
+							if (token.vrs == undefined) {
+								uploader = token.extension;
+							} else {
+								uploader = token.vrs;
+							} 
+							
+							for (let i = 0; i < sharingAgent.length; i++) {
+								//console.log('comparing ' + sharingAgent[i] + ' to ' +uploader);
+								//console.log('and ' +sharingConsumer[i]+ ' to ' +uploader);
+								if (sharingAgent[i] == uploader) {
+									fileToken[i] = latestResult.id;
+									console.log(sharingAgent[i] + ' shared file');
+									console.log('with id: ');
+									console.log(fileToken[i]);
+									break;
+								}
+							}
+							console.log('agents: ' +sharingAgent);
+							console.log('consumers: ' +sharingConsumer);
+							console.log('file ID: ' +fileToken);
+
 							//if (token.vrs) {
 								//vrs = token.vrs;
 							if(token.phone){
@@ -585,9 +706,72 @@ io.sockets.on('connection', function (socket) {
 							} else {
 								vrs = data.vrs;
 							}
-							console.log("Sending file list message to " + vrs + " with " + JSON.stringify(results));
+							console.log("Sending file list message to " + vrsNum + " with " + JSON.stringify(latestResult));
 							
-							io.to(Number(vrsNum)).emit('fileList', results);
+							io.to(Number(vrsNum)).emit('fileListConsumer', (latestResult) );
+						});
+					}else{
+						console.log("ANother error");
+					}
+				}
+			});
+	});
+
+	socket.on('get-file-list-consumer', function(data){
+		console.log('CONSUMER HAS UPLOADED FILE');
+		let vrsNum =  (token.vrs) ? token.vrs : data.vrs;
+		let  url = 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port');
+		url += '/fileListByVRS?vrs=' + vrsNum;
+			request({
+				url: url,
+				json: true
+			}, function (error, response, results) {
+				if (error) {
+					console.log("Error");
+				} else {
+					if(results.message == "Success"){
+						let latestResult = results.result[results.result.length-1];
+
+						console.log('last 5 results: ');
+						console.log( results.result.slice(Math.max(results.result.length - 5, 0)) );
+
+						redisClient.hget(rConsumerToCsr, Number(data.vrs), function (err, agentExtension) {
+							var vrs = null;
+							console.log("Token is " + JSON.stringify(token) + "\n and data is " + JSON.stringify(data));
+
+							// populate fileToken in the same spot as the uploader
+							let uploader;
+							if (token.vrs == undefined) {
+								uploader = token.extension;
+							} else {
+								uploader = token.vrs;
+							} 
+							
+							for (let i = 0; i < sharingAgent.length; i++) {
+								//console.log('comparing ' + sharingAgent[i] + ' to ' +uploader);
+								//console.log('and ' +sharingConsumer[i]+ ' to ' +uploader);
+								if (sharingConsumer[i] == uploader) {
+									fileToken[i] = latestResult.id;
+									console.log(sharingConsumer[i]+ ' shared file');
+									console.log('with id: ');
+									console.log(fileToken[i]);
+									break;
+								}
+							}
+							console.log('agents: ' +sharingAgent);
+							console.log('consumers: ' +sharingConsumer);
+							console.log('file ID: ' +fileToken);
+
+							//if (token.vrs) {
+								//vrs = token.vrs;
+							if(token.phone){
+								vrs = token.phone.replace(/-/g,"");
+							} else {
+								vrs = data.vrs;
+							}
+							console.log("Sending file list message to " + vrsNum + " with " + JSON.stringify(latestResult));
+							
+							io.to(Number(vrsNum)).emit('fileListAgent', (latestResult) );
 						});
 					}else{
 						console.log("ANother error");
@@ -1130,7 +1314,6 @@ io.sockets.on('connection', function (socket) {
 	//updates videomail records when the agent changes the status
 	socket.on("videomail-status-change", function (data) {
 		logger.debug('updating MySQL entry');
-
 		let vm_sql_query = `UPDATE ${vmTable} SET status = ?, processed = CURRENT_TIMESTAMP,
 			processing_agent = ? WHERE id = ?;`;
 		let vm_sql_params = [data.status, token.extension, data.id];
@@ -1735,7 +1918,7 @@ function handle_manager_event(evt) {
           logger.info('**********************************');
 
           //this agent(agentExtension) must now go to away status
-          io.to(Number(agentExtension)).emit('new-missed-call', {}); //should send missed call number
+          io.to(Number(agentExtension)).emit('new-missed-call', {"max_missed":getConfigVal('missed_calls:max_missed_calls')}); //should send missed call number
           redisClient.hget(rTokenMap, agentExtension, function (err, tokenMap) {
             if (err) {
               logger.error("Redis Error: " + err);
@@ -2596,7 +2779,7 @@ function vrsAndZenLookup(vrsNum, destAgentExtension) {
 
 	if (vrsNum) {
 		logger.info('Performing VRS lookup for number: ' + vrsNum + ' to agent ' + destAgentExtension);
-
+		incomingVRS=vrsNum; //for file share
 		// Do the VRS lookup
 		getCallerInfo(vrsNum, function (vrsinfo) {
 
@@ -3246,14 +3429,38 @@ app.get('/getVideomail', agent.shield(cookieShield),function (req, res) {
 var multer = require('multer');
 var upload = multer({dest: 'uploads/'});
 app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
-	//console.log("File posted " + req.session.vrs);
-	let uploadedBy = req.session.vrs || ((req.session.role == 'AD Agent') ? req.body.vrs : false);
-	console.log("Valid agent " + uploadedBy);
+	
+	let uploadedBy = req.session.vrs || ((req.session.role == 'AD Agent') ? req.body.vrs : false); 
+
+	//sometimes the consumer doesn't have it's vrs number in req.session
+	//also sometimes the req.session doesn't update?? **** This is the issue
+	//this is rare and hard to reproduce, but this will catch it when/if it does
+	if (uploadedBy == undefined) {
+		uploadedBy = req.session.data.valid;
+	}
+	
+	console.log("Uploaded by " + uploadedBy);
 	console.log("SESSION " + JSON.stringify(req.session));
 	if(uploadedBy){
 		console.log("Valid agent " + uploadedBy);
 		let uploadMetadata = {};
-		uploadMetadata.vrs = uploadedBy;
+
+		if (uploadedBy === true) {
+			//this means vrs isn't in the req.session
+			//this is a weird workaround that finds the vrs
+			//by looking at the agent extension and finding the vrs associated with it
+
+			let uploadAgentExt = req.session.extension;
+			
+			for (let i = 0; i < sharingAgent.length; i++){
+				if (sharingAgent[i] == uploadAgentExt) {
+					uploadMetadata.vrs = sharingConsumer[i];
+					break;
+				}
+			}
+		} else {
+			uploadMetadata.vrs = uploadedBy;
+		}
 		uploadMetadata.filepath = __dirname + '/' + req.file.path;
 		uploadMetadata.originalFilename = req.file.originalname;
 		uploadMetadata.filename = req.file.filename;
@@ -3282,28 +3489,55 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 });
 
 //Download
-app.get('/downloadFile', function(req, res) {
-	let documentID = req.query.id;
-	let  url = 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port');
-	url += '/storeFileInfo?documentID=' + documentID;
-		request({
-			url: url,
-			json: true
-		}, function (error, response, data) {
-			if (error) {
-				res.status(500).send("Error");
-			} else {
-				if(data.message == "Success"){
-					let filepath = data.filepath;
-					let filename = data.filename;
-					var readStream = fs.createReadStream(filepath);
-					res.attachment(filename);
-					readStream.pipe(res);
-				}else{
-					res.status(500).send("Error");
+app.get('/downloadFile',/*agent.shield(cookieShield) ,*/function(req, res) {
+
+	if (sharingAgent !== undefined && sharingConsumer !== undefined) {
+		for (let i = 0; i < sharingAgent.length; i++) {
+
+				//make sure the agent is in a call with the consumer who sent the file
+				if (req.session.extension == sharingAgent[i] || req.session.vrs == sharingConsumer[i]){
+					
+					console.log('In valid session');
+
+					console.log('Comparing file IDs');
+					//console.log(fileToken[i] + " vs " +req.query.id.split('"')[0]);
+					if (fileToken[i] == (req.query.id).split('"')[0]) { //remove the filename from the ID if it's there
+						console.log('allowed to download');
+					
+						let documentID = req.query.id;
+						let  url = 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port');
+						url += '/storeFileInfo?documentID=' + documentID;
+
+						request({
+							url: url,
+							json: true
+						}, function (error, response, data) {
+							if (error) {
+								res.status(500).send("Error");
+							} else {
+								if(data.message == "Success"){
+									let filepath = data.filepath;
+									let filename = data.filename;
+									var readStream = fs.createReadStream(filepath);
+									res.attachment(filename);
+									readStream.pipe(res);
+								}else{
+									res.status(500).send("Error");
+								}
+							}
+						});
+						break;
+					} else{
+						console.log('Not authorized to download this file');
+						break;
+					}
+				} else {
+					console.log('Not authorized to download');
 				}
-			}
-		});
+		}
+	} else {
+		console.log('Not authorized to download');
+	}
 });
 
 

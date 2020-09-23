@@ -135,16 +135,20 @@ function register_jssip() {
 		},
                 'restartCallResponse': function (e) {
                         console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e) );
-                        selfStream.srcObject.getVideoTracks()[0].onended = function () {
-                          console.log('screensharing ended self');
-                          screenShareEnabled = false;
- 		          acekurento.screenshare(false);
-                        };
-                        remoteStream.srcObject.getVideoTracks()[0].onended = function () {
-                          console.log('screensharing ended remote');
-                          screenShareEnabled = false;
- 		          acekurento.screenshare(false);
-                        };
+                        if (selfStream.srcObject) {
+                          selfStream.srcObject.getVideoTracks()[0].onended = function () {
+                            console.log('screensharing ended self');
+                            screenShareEnabled = false;
+                            acekurento.screenshare(false);
+                          };
+                        }
+                        if (remoteStream.srcObject) {
+                          remoteStream.srcObject.getVideoTracks()[0].onended = function () {
+                            console.log('screensharing ended remote');
+                            screenShareEnabled = false;
+                            acekurento.screenshare(false);
+                          };
+                        }
                 },
 		'ended': function (e) {
                         screenShareEnabled = false;
@@ -155,23 +159,23 @@ function register_jssip() {
 			console.log('--- WV: Call ended ---\n');
 			terminate_call();
 
-                        duration = $('#duration').html();
-                        var currentTime = new Date();
-                        callDate = (currentTime.getHours() + ":"
-                                + (currentTime.getMinutes() < 10 ? '0' + currentTime.getMinutes() : currentTime.getMinutes()) + " "
-                                + (currentTime.getMonth() + 1) + "/"
-                                + (currentTime.getDate()) + "/"
-                                + (currentTime.getFullYear()));
-                        socket.emit('callHistory', {
-                                "callerName": callerName,
-                                "callerNumber": callerNumber,
-                                "direction" : direction,
-                                "duration" : duration,
-                                "endpoint" : endpoint,
-                                "callDate" : callDate
-                        });
-                        console.log("Table vars are " + callerName + " " + callerNumber + " " + direction + " " + duration + " " + callDate);
-                        loadCallHistory();
+			duration = $('#duration').html();
+			var currentTime = new Date();
+			callDate = (currentTime.getHours() + ":"
+					+ (currentTime.getMinutes() < 10 ? '0' + currentTime.getMinutes() : currentTime.getMinutes()) + " "
+					+ (currentTime.getMonth() + 1) + "/"
+					+ (currentTime.getDate()) + "/"
+					+ (currentTime.getFullYear()));
+			socket.emit('callHistory', {
+					"callerName": callerName,
+					"callerNumber": callerNumber,
+					"direction" : direction,
+					"duration" : duration,
+					"endpoint" : endpoint,
+					"callDate" : callDate
+			});
+			console.log("Table vars are " + callerName + " " + callerNumber + " " + direction + " " + duration + " " + callDate);
+			loadCallHistory();
 
 			console.log("REASON: " + e.reason);
 			clearScreen();
@@ -240,7 +244,7 @@ function callTimedOut() {
 function start_call(other_sip_uri) {
 
         outbound_timer = setTimeout(callTimedOut, outVidTimeout); //config var
-
+	exitVideomail();
 	//Used for call history
 	callerNumber = other_sip_uri;
 	disable_persist_view();
@@ -317,18 +321,21 @@ function accept_call() {
 	document.getElementById("fileInput").disabled = false;
 	document.getElementById("sendFileButton").className = "demo-btn"
 	document.getElementById("sendFileButton").disabled = false;
-	//document.getElementById("downloadButton").className = "demo-btn"
+	document.getElementById("sendFileButton").style = 'cursor: pointer';
+	document.getElementById("downloadButton").className = "demo-btn";
+	document.getElementById("downloadButton").style = 'cursor: not-allowed';
 	//document.getElementById("downloadButton").disabled = false;
 	document.getElementById("screenShareButton").className = "demo-btn"
 	document.getElementById("screenShareButton").disabled = false;
+	document.getElementById("screenShareButton").style = 'cursor: pointer';
 	if (incomingCall) {
 		console.log("Accepting a call");
-		incomingCall.accept();
 		selfStream.removeAttribute("hidden");
 		//Test to assign remoteView
 		//remoteView.srcObject = pc.getRemoteStreams()[0];
 		toggle_incall_buttons(true);
 		start_self_video();
+		incomingCall.accept();
 		$("#start-call-buttons").hide();
 		$('#outboundCallAlert').hide();// Does Not Exist - ybao: recover this to remove the Calling screen
 		setTimeout(() => {
@@ -504,10 +511,19 @@ function terminate_call() {
 	document.getElementById("fileInput").disabled = true;
 	document.getElementById("sendFileButton").className = "btn btn-primary"
 	document.getElementById("sendFileButton").disabled = true;
+	document.getElementById("sendFileButton").removeAttribute('style');
 	document.getElementById("downloadButton").className = "btn btn-primary"
 	document.getElementById("downloadButton").disabled = true;
+	document.getElementById("downloadButton").removeAttribute('style');
 	document.getElementById("screenShareButton").className = "btn btn-primary"
 	document.getElementById("screenShareButton").disabled = true;
+	document.getElementById("screenShareButton").removeAttribute('style');
+
+	// doesn't reset the agent and consumer who can share files if an agent leaves a multiparty call
+	if (!(acekurento.isMultiparty)){
+		//resets the agent and consumer who can share files
+		socket.emit('call-ended');
+	}
 }
 
 function unregister_jssip() {
@@ -610,7 +626,7 @@ function mute_audio() {
 function unmute_audio() {
 	if (acekurento !== null) {
 		console.log('UNMUTING AUDIO');
-		acekurento.enableDisableTrack(false, true); //unmute audio
+		acekurento.enableDisableTrack(true, true); //unmute audio
 		mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
 		mute_audio_icon.classList.add("fa-microphone");
 		mute_audio_icon.classList.remove("fa-microphone-slash");

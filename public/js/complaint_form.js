@@ -11,6 +11,8 @@ var skinny = false;
 var acekurento = null;
 var globalData;
 var agentExtension;
+//Used for DTMFpad toggle
+var DTMFpad = false;
 
 $(document).ready(function () {
 	//formats the phone number.
@@ -99,6 +101,13 @@ function clearScreen() {
 	$('#ticketTab').removeClass("bg-pink");
 
 	$('#modalWrapup').modal('hide');
+
+	// clear file share elements
+	$('#downloadButton').attr('disabled', true);
+	$('#downloadButton').html('Download File');
+	$('#downloadButton').attr('href', './downloadFile');
+	$('#fileInput').val('');
+	$('#fileSent').hide();
 }
 
 function connect_socket() {
@@ -135,10 +144,9 @@ function connect_socket() {
 					$('#displayname').val(payload.first_name + ' ' + payload.last_name);
 					isOpen = payload.isOpen;
 					if (!isOpen) { //after hours processing; if after hours, then show this modal
-						$("#afterHoursModal").modal({
-							backdrop: "static"
-						});
-						$("#afterHoursModal").modal("show");
+                                          //$("#afterHoursModal").modal({ backdrop: "static" });
+                                          //$("#afterHoursModal").modal("show");
+                                          console.log('after hours modal suppressed. isOpen: ' + isOpen); 
 					}
 
 					//get the start/end time strings for the after hours dialog
@@ -470,14 +478,22 @@ function connect_socket() {
 					} else {
 						logout("An Error Occurred: " + JSON.stringify(reason));
 					}
-				}).on('fileList', function(data){
-					console.log("Got file list");
-					console.log('data length is ' + data.result.length + ' and data is ' + JSON.stringify(data));
+				}).on('fileListConsumer', function(data){
+					console.log("Consumer got file list");
+					console.log(data);
+					$('#fileSent').hide();
 					$("#downloadButton").removeAttr('disabled');
-					$('#downloadButton').html('');
-					for(var i = 0; i < data.result.length; i++){
-						$('#downloadButton').append('<a class="btn btn-primary" target="_blank"  href="./downloadFile?id=' + data.result[i].id + '">' + data.result[i].original_filename +'</a><br>');
-					}
+					$('#downloadButton').html(data.original_filename);
+					$('#downloadButton').attr({'class': 'btn btn-primary', 'target':'_blank', 'href': './downloadFile?id=' + data.id + '">' + data.original_filename });
+					console.log( $('#downloadButton').attr('href') );					
+				}).on('fileListAgent', function(data) {
+					//file sent confirmation
+					console.log('file successfully sent');
+					$('#fileSent').show();
+					$('#fileInput').val('');
+					$('#downloadButton').html('Download File');
+					$('#downloadButton').attr('href', './downloadFile');
+					$('#downloadButton').attr('disabled', 'true');
 				}).on('screenshareResponse', function(data){
 					console.log("screen request received " + data.permission);
 					if(data.permission == true){
@@ -742,7 +758,8 @@ function afterHourVoicemail(){
 
 function afterHoursHideVoicemail(){
 	if(isOpen){
-		$('afterHoursModal').modal('show');
+          //$('afterHoursModal').modal('show');
+          console.log('afterHoursHideVoicemail(): after hours modal suppressed. isOpen: ' + isOpen); 
 	}
 	$('#videomailModal').modal('hide');
         $("#videomailbutton").removeAttr("disabled");
@@ -791,27 +808,56 @@ function enable_initial_buttons() {
 
 //Fileshare for consumer portal
 function shareFileConsumer() {
-	var formData = new FormData();
-	formData.append('uploadfile', $("#fileInput")[0].files[0]);
-	//formData.append('vrs', '1111111111');
-	$.ajax({
-		url: './fileUpload',
-		type: "POST",
-		data: formData,
-		contentType: false,
-		processData: false,
-		success: function (data) {
-			console.log(JSON.stringify(data, null, 2))
-			$("#downloadButton").show();
-			socket.emit('get-file-list', {vrs : $('#callerPhone').val().replace(/^1|[^\d]/g, '')});
-		},
-		error: function (jXHR, textStatus, errorThrown) {
-			console.log("ERROR");
-		}
-	});
+	if ($("#fileInput")[0].files[0]) {
+		var formData = new FormData();
+		console.log('uploading:');
+		console.log($("#fileInput")[0].files[0]);
+		formData.append('uploadfile', $("#fileInput")[0].files[0]);
+		$.ajax({
+			url: './fileUpload',
+			type: "POST",
+			data: formData,
+			contentType: false,
+			processData: false,
+			success: function (data) {
+				console.log(JSON.stringify(data, null, 2))
+				socket.emit('get-file-list-consumer', {vrs : $('#callerPhone').val().replace(/^1|[^\d]/g, '')});
+			},
+			error: function (jXHR, textStatus, errorThrown) {
+				console.log("ERROR");
+			}
+		});
+	}
 }
 
+//Keypress for DTMF toggle
+$(document).on('keypress', function(e){
+	if(e.which == 'k' && agentStatus == 'IN_CALL'){
+		if(DTMFpad){
+			$('#dtmfpad').hide();
+			DTMFpad = false;
+		}else{
+			$('#dtmfpad').show();
+			DTMFpad = true;
+		}
+	}
+})
 
+//Button press for DTMF toggle
+$("#toggleDTMF").click(function(){
+	if(DTMFpad){
+		$('#dtmfpad').hide();
+		DTMFpad = false;
+	}else{
+		$('#dtmfpad').show();
+		DTMFpad = true;
+	}
+})
+
+function DTMFpress(number){
+	showAlert('info', 'You pressed key number ' + number);
+	acekurento.sendDTMF(number);
+}
 
 //convert UTC hh:mm to current time in browser's timezone, e.g., 01:00 PM EST
 //accepts UTC hh:mm, e.g., 14:00
