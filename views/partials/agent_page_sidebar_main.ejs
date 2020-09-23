@@ -143,17 +143,9 @@
             </li>
 
             <li>
-            <a href="#" class="demo-btn-container config-hide" onclick="testCaptions()" name="Preview_Button" accesskey="Z">
-                <span class="demo-btn">Preview</span>
-
-            </a>
-              <!--   <div class="demo-btn-container config-hide">
-                    <i class="fa fa-square" style="color:darkslateblue; size: 50px;"></i>
-                    <a id="preview-caption-btn" class="demo-btn" href="#" onclick="testCaptions()" name="Preview_Button"
-                        accesskey="Z" disabled>Preview</a>
-                    <p>&nbsp;</p>
-                </div> -->
-            
+                <a class="demo-btn-container config-hide" >
+                    <span class="demo-btn" onclick="testCaptions()" name="Preview_Button" style="cursor: pointer;" accesskey="Z">Preview</span>
+                </a>
             </li>
 
             <!--END CAPTION SETTINGS BLOCK-->
@@ -183,36 +175,41 @@
             <li class="header config-hide">IN CALL FEATURES</li>
 
             <li>
-                <a href="#" class="demo-btn-container config-hide mb-2"disabled> 
+                <a class="demo-btn-container config-hide mb-2"disabled> 
                     <span class="btn btn-primary" id="screenShareButton" onclick="shareScreen()"  
                         disabled>Enable Screenshare</span>
-                    
                 </a>
-
             </li>
 
-
-            <!-- disable file-sharing for now -->
-            <li id="sidebar-fileShare" class="cap-setting config-hide nav-item">
-                <input type="file" id="fileInput" name="fileInput" class="form-control-file" style="display:none"  disabled>
+            <br>
+            
+            <!-- file sharing-->
+            <li>
+                <a id="sidebar-fileShare" class="cap-setting config-hide nav-item">
+                    <span>
+                        <input type="file" id="fileInput" name="fileInput" class="form-control-file"  disabled>
+                    </span>
+                </a>
             </li>
 
-            <div class="demo-btn-container config-hide mb-2">
-                <a class="btn btn-primary" href="#" onclick="ShareFile()" id="sendFileButton" style="display:none"  disabled>Send File</a>
-            </div>
+            <li>
+                <a class="demo-btn-container config-hide mb-2" disabled>
+                    <span class="btn btn-primary" onclick="ShareFile()" id="sendFileButton" disabled>Send File</span>
+                </a>
+            </li>
 
-            <div class="demo-btn-container config-hide mb-2">
-                <a class="btn btn-primary" target="_blank"  href="./downloadFile" id="downloadButton"  style="display:none"  disabled>Download File</a><br>
-            </div>
+            <li>
+                <a class="demo-btn-container config-hide mb-2">
+                    <span class="btn btn-primary" target="_blank"  href="./downloadFile" id="downloadButton"  disabled>Download File</span>
+                </a>
+            </li> 
 
-            <div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
-                <a class="close" onclick="$('#fileSent').hide();" style="text-decoration:none">×</a>
-                <strong>Success!</strong> File Sent
-              </div>
-
-            <!--<div class="demo-btn-container config-hide mb-2" id="retriveFiles">
-                <a class="demo-btn" id="retreiveFileButton" href="#" onclick="retreiveFiles()">Get Files</a>
-            </div>-->
+            <li>
+                <div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
+                    <span class="close" onclick="$('#fileSent').hide();" style="text-decoration:none">×</span>
+                    <strong>Success!</strong>  File Sent
+                </div>
+            </li>
 
             <!--END IN CALL FEATURES BLOCK-->
 

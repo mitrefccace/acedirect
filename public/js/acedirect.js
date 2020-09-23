@@ -24,7 +24,8 @@ var transferred_call_blinking;
 var wrap_up_blinking;
 var need_assistance_blinking;
 var missed_call_blinking;
-var videomail_status_buttons = document.getElementById("videomail-status-buttons");
+//var videomail_status_buttons = document.getElementById("videomail-status-buttons");
+var videomail_status_buttons = document.getElementById("videomail-status-buttons-footer");
 var sortFlag = "id desc";
 var filter = "ALL";
 var telNumber;
@@ -48,6 +49,11 @@ var endpoint;
 var shortcutTableLength;
 var currentShortcutRow=0;
 var isSidebarOpen = false;
+var originalShortcuts = [];
+
+//missed call variables
+var maxMissedCalls;
+var totalMissedCalls = 0;
 
 setInterval(function () {
 	busylight.light(this.agentStatus);
@@ -82,6 +88,15 @@ $(document).ready(function () {
 	});
 
 	updateShortcutTable();
+	//storing the original shortcut values
+	var taskArray = $("[accesskey]").map(function(){
+		return $(this).attr('id');
+	}).get();
+
+	for (var i = 0; i < taskArray.length; i++) {
+		originalShortcuts[i] = getShortcut(taskArray[i]);
+	}
+
 	enable_persist_view();
 });
 
@@ -101,7 +116,7 @@ function connect_socket() {
 					forceNew: true
 				});
 
-				console.log("Function load call history");
+
 				loadCallHistory();
 
 				//update the version and year in the footer
@@ -476,9 +491,21 @@ function connect_socket() {
 					//Did come with null
 					socket.emit('incomingcall', null);
 				}).on('new-missed-call', function (data) {
+					maxMissedCalls = data.max_missed;
+					if (maxMissedCalls == '') {
+						//the config file doesn't have the param
+						maxMissedCalls = 3;
+					}
+					totalMissedCalls++;
+					if (totalMissedCalls >= maxMissedCalls) {
+						//set agent status to away
+						pauseQueues();
+						totalMissedCalls = 0;
+					} else {
+						unpauseQueues();
+					}
 					debugtxt('new-missed-call', data);
 					$('#myRingingModal').modal('hide');
-					unpauseQueues();
 				}).on('outbound-answered', function (data) {
 					debugtxt('outbound-answered', data);
 					$('#modalOutboundCall').modal('hide');
@@ -546,15 +573,24 @@ function connect_socket() {
 					logout('Forcefully logging out');
 				}).on('agent-resp', function(data) { //Load the agent table in the multi party modal
 					console.log("The agents are " + JSON.stringify(data));
-				}).on('fileList', function(data){
-					console.log("Got fileList event");
-					$('#fileSent').show();
+				}).on('fileListAgent', function(data){
+					console.log("Agent got file list");
+					$('#fileSent').hide();
 					document.getElementById("downloadButton").className = "demo-btn"
 					document.getElementById("downloadButton").disabled = false;
 					$('#downloadButton').html('');
-					for(var i = 0; i < data.result.length; i++){
-						$('#downloadButton').append('<a class="demo-btn mb-3" target="_blank" href="./downloadFile?id=' + data.result[i].id + '">' + data.result[i].original_filename +'</a><br>');
-					}
+					$('#downloadButton').css('cursor', 'pointer');
+					$('#downloadButton').append('<a id="downloadFileID" class="demo-btn mb-3" target="_blank" href="./downloadFile?id=' + data.id + '">' + data.original_filename +'</a><br>');
+					console.log($('#downloadFileID').attr('href'));
+				}).on('fileListConsumer', function(data) {
+					//file confirmation
+					console.log('file successfully sent');
+					$('#fileSent').show();
+					$('#fileInput').val('');
+					$('#downloadFileID').remove();
+					$('#downloadButton').html('Download File');
+					$('#downloadButton').attr('disabled', 'true');
+					$('#downloadButton').css('cursor', 'not-allowed');
 				}).on('screenshareRequest', function(data){
 					$('#screenshareButtons').show()
 					console.log('Screenshare buttons enabled');
@@ -769,10 +805,23 @@ function inCallADComplaints(endpoint_type) {
 		disable_chat_buttons();
 		$("#newchatmessage").attr("placeholder", "Chat disabled for Provider endpoints");
 		$('#remoteView').css('object-fit', ' contain');
+		
+		//disable filesharing buttons
+		document.getElementById("fileInput").disabled = true;
+		document.getElementById("sendFileButton").className = "btn btn-primary"
+		document.getElementById("sendFileButton").disabled = true;
+		document.getElementById("sendFileButton").removeAttribute('style');
+		document.getElementById("downloadButton").className = "btn btn-primary"
+		document.getElementById("downloadButton").disabled = true;
+		document.getElementById("downloadButton").removeAttribute('style');
+
 	} else { //should be webrtc
 		endpoint = "webrtc";
 		enable_chat_buttons();
 		$('#remoteView').css('object-fit', ' cover');
+
+		//allow file sharing
+		socket.emit('begin-file-share', {'vrs': vrs});
 	}
 
 
@@ -793,10 +842,23 @@ function inCallADGeneral(endpoint_type) {
 		disable_chat_buttons();
 		$("#newchatmessage").attr("placeholder", "Chat disabled for provider endpoints");
 		$('#remoteView').css('object-fit', ' contain');
+
+		//disable file sharing buttons
+		document.getElementById("fileInput").disabled = true;
+		document.getElementById("sendFileButton").className = "btn btn-primary"
+		document.getElementById("sendFileButton").disabled = true;
+		document.getElementById("sendFileButton").removeAttribute('style');
+		document.getElementById("downloadButton").className = "btn btn-primary"
+		document.getElementById("downloadButton").disabled = true;
+		document.getElementById("downloadButton").removeAttribute('style');
+
 	} else { //should be webrtc
 		endpoint = "webrtc";
 		enable_chat_buttons();
 		$('#remoteView').css('object-fit', ' cover');
+
+		//allow file sharing
+		socket.emit('begin-file-share', {'vrs': vrs});
 	}
 }
 
@@ -815,7 +877,7 @@ function unpauseQueues() {
 	socket.emit('unpause-queues', null);
 	socket.emit('ready', null);
 	if(this.agentStatus == 'READY'){
-		stopVideomail();
+		exitVideomail();
 	}
 }
 
@@ -865,6 +927,12 @@ function clearScreen() {
 
 	$('#modalWrapup').modal('hide');
 	$('#modalOutboundCall').modal('hide');
+
+	// clear file share elements
+	$('#downloadFileID').remove();
+	$('#downloadButton').html('Download File');
+	$('#fileInput').val('');
+	$('#fileSent').hide();
 }
 
 function changeStatusLight(state) {
@@ -1046,11 +1114,11 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
 	}).get();
 
 	console.log('Click event for playing video');
-	console.log('vidId: ' + tableData[5]);
-	$("#videomailId").attr("name", tableData[5]);
+	console.log('vidId: ' + tableData[4]);
+	$("#videomailId").attr("name", tableData[4]);
 	$("#callbacknum").attr("name", tableData[0]);
 	if(agentStatus != 'IN_CALL'){
-		console.log("Table is "+tableData[3]+" "+tableData[4]+" "+tableData[5]);
+		console.log("Table is "+tableData[4]+" "+tableData[2]+" "+tableData[3]);
 		playVideomail(tableData[4], tableData[2], tableData[3]); //vidId, vidDuration vidStatus);
 	}
 });
@@ -1222,6 +1290,8 @@ function showVideoMailTab() {
 		$('#videomail-tab').attr("accesskey", '');
 		$('#agents-tab').attr("accesskey", '');
 		$('#shortcuts-tab').attr("accesskey", '');
+		$('#clear-shortcuts').attr("accesskey", '');
+		$('#reset-shortcuts').attr("accesskey", '');
 		updateShortcutTable();
 		
 		$('#agents-tab').removeClass('active');
@@ -1250,6 +1320,24 @@ function showVideoMailTab() {
 		$('.nav-tabs a[href="#control-sidebar-videomail-tab"]').tab('show');
 		$('.nav-tabs a[href="#control-sidebar-videomail-tab"]').addClass('active');
 		$('#videomail-tab').addClass('active');
+
+		$('#shortcuts-tab').on('click', function() {
+			//give clear and reset buttons their shortcuts
+			console.log('here');
+			$('#clear-shortcuts').attr("accesskey", '`');
+			$('#reset-shortcuts').attr("accesskey", '-');
+			updateShortcutTable();
+		});
+		$('#videomail-tab').on('click', function() {
+			//remove shortcuts
+			$('#clear-shortcuts').attr("accesskey", '');
+			$('#reset-shortcuts').attr("accesskey", '');
+		});
+		$('#agents-tab').on('click', function() {
+			//remove shortcuts
+			$('#clear-shortcuts').attr("accesskey", '');
+			$('#reset-shortcuts').attr("accesskey", '');
+		});
 	}
 
 }
@@ -1261,6 +1349,8 @@ function showAgentsTab() {
 		$('#videomail-tab').attr("accesskey", '');
 		$('#agents-tab').attr("accesskey", '');
 		$('#shortcuts-tab').attr("accesskey", '');
+		$('#clear-shortcuts').attr("accesskey", '');
+		$('#reset-shortcuts').attr("accesskey", '');
 		updateShortcutTable();
 
 		$('#agents-tab').removeClass('active');
@@ -1288,6 +1378,23 @@ function showAgentsTab() {
 		$('.nav-tabs a[href="#control-sidebar-agents-tab"]').tab('show');
 		$('.nav-tabs a[href="#control-sidebar-agents-tab"]').addClass('active');
 		$('#agents-tab').addClass('active');
+
+		$('#shortcuts-tab').on('click', function() {
+			//give clear and reset buttons their shortcuts
+			$('#clear-shortcuts').attr("accesskey", '`');
+			$('#reset-shortcuts').attr("accesskey", '-');
+			updateShortcutTable();
+		});
+		$('#videomail-tab').on('click', function() {
+			//remove shortcuts
+			$('#clear-shortcuts').attr("accesskey", '');
+			$('#reset-shortcuts').attr("accesskey", '');
+		});
+		$('#agents-tab').on('click', function() {
+			//remove shortcuts
+			$('#clear-shortcuts').attr("accesskey", '');
+			$('#reset-shortcuts').attr("accesskey", '');
+		});
 	}
 
 }
@@ -1386,7 +1493,7 @@ function videomail_status_change(id, videoStatus) {
 		"extension": extensionMe,
 		"status": videoStatus
 	});
-	console.log('Emitted a socket videomail-status-change');
+	console.log('Emitted a socket videomail-status-change ');
 }
 
 //Marks the videomail read when the agent clicks it and doesn't close the videomail view
@@ -1597,6 +1704,7 @@ $('#accept-btn').click(function () {
 	$('#user-status').text('In Call');
 	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	changeStatusLight('IN_CALL');
+	totalMissedCalls = 0; // reset missed calls count
 	//Added for multiparty status
 	var vrs = $('#callerPhone').val();
 	socket.emit('incall', {'vrs' : vrs});
@@ -1659,7 +1767,7 @@ $("#phone-number").keyup(function(event) {
 });
 
 $("#button-call").click(function () {
-	if($('#phone-number').val() < 10){
+	if($('#phone-number').val().length < 10){
 		//Phone number is not valid
 		$('#invalidNumber').show();
 	}else {
@@ -1723,27 +1831,28 @@ $("#disallowScreenshare").click(function(){
 
 //Functionality for fileshare
 function ShareFile(){
-	//console.log("Sending file " + document.getElementById("fileInput").files[0]);
-	var vrs = $('#callerPhone').val();
-	var formData = new FormData();
-	formData.append('uploadfile', $("#fileInput")[0].files[0]);
-	//TODO get vrs number
-	formData.append("vrs", vrs);
-	$.ajax({
-		url: './fileUpload',
-		type: "POST",
-		data: formData,
-		contentType: false,
-		processData: false,
-		success: function (data) {
-			console.log(JSON.stringify(data, null, 2))
-			//TODO Get unique call identifier
-			socket.emit('get-file-list', {"vrs" : vrs});
-		},
-		error: function (jXHR, textStatus, errorThrown) {
-			console.log("ERROR");
-		}
-	});
+	if (agentStatus == 'IN_CALL' && document.getElementById("fileInput").files[0]) { 
+		//good to go
+		console.log("Sending file " + document.getElementById("fileInput").files[0]);
+		var vrs = $('#callerPhone').val();
+		var formData = new FormData();
+		formData.append('uploadfile', $("#fileInput")[0].files[0]);
+		formData.append("vrs", vrs);
+		$.ajax({
+			url: './fileUpload',
+			type: "POST",
+			data: formData,
+			contentType: false,
+			processData: false,
+			success: function (data) {
+				console.log(JSON.stringify(data, null, 2))
+				socket.emit('get-file-list-agent', {"vrs" : vrs});
+			},
+			error: function (jXHR, textStatus, errorThrown) {
+				console.log("ERROR");
+			}
+		});
+	}
 }
 
 $("#fullscreen-element").dblclick(function(){
@@ -1757,7 +1866,7 @@ function showAlert(alertType, alertText){
 	$('#generalAlert').show();
 	setTimeout(function(){
 		$('#generalAlert').hide();
-	},2000)
+	},4000)
 }
 
 //Keypress for DTMF toggle
@@ -1795,19 +1904,81 @@ function changeTabs(id){
 		$('#callhistory').show();
 		$('#contact-tab').hide();
 		$('#callHistoryBody').show();
-	}else if(id == "dialpad-tab"){
+		
+		//pressing esc closes the modal
+		$(document).on('keyup.close-dialpad',function (evt) {
+			if (evt.keyCode == 27) {
+				$('#dismiss-dialpad-btn').click();
+			}
+		});
+
+		//pressing the up and down arrows scrolls through callback buttons
+		//pressing enter calls the selected number
+		let buttonPosition=1;
+		let buttonTestID = 'callback-btn' + buttonPosition;
+		$('#'+buttonTestID).css('border', '5px solid black');
+		
+		$(document).on('keydown.scroll',function (evt) {
+			let scrollPosition= ( $('#modalDialpad').scrollTop() ); //current height of modal
+
+			//hitting enter calls
+			if (evt.keyCode == 13) {
+				$('#'+buttonTestID).trigger('click');
+			}
+
+			if (evt.keyCode == 40) {
+				//scroll down
+				scrollPosition += 40;
+				$('#modalDialpad').scrollTop(scrollPosition);
+
+				if (buttonPosition >= show_records) {
+					//do nothing
+				} else {
+					$('#'+buttonTestID).css('border', 'none');
+					
+					buttonPosition++; 
+					buttonTestID = 'callback-btn' + buttonPosition;
+					$('#'+buttonTestID).css('border', '5px solid black');
+				}
+
+			} else if (evt.keyCode == 38) {
+				//scroll up
+				scrollPosition -= 40;
+				$('#modalDialpad').scrollTop(scrollPosition);
+
+				if (buttonPosition <= 1) {
+					//do nothing
+				} else {
+					$('#'+buttonTestID).css('border', 'none');
+					
+					buttonPosition--; 
+					buttonTestID = 'callback-btn' + buttonPosition;
+					$('#'+buttonTestID).css('border', '5px solid black');					
+				}
+			}
+		});
+	} else if (id == "dialpad-tab") {
 		$('#callCard').show();
 		$('#callhistory').hide();
 		$('#contact-tab').hide();
 		$('#callHistoryBody').hide();
-	}else if(id == "contact-tab"){
+
+		//remove key bindings
+		closeDialpadModal();
+
+		//focus on the input box
+		$('#phone-number').focus();
+	} else if (id == "contact-tab") {
 		$('#callCard').hide();
 		$('#callhistory').hide();
 		$('#contact-tab').show();
 		$('#callHistoryBody').hide();
+
+		//remove key bindings
+		closeDialpadModal();
 	}
 }
-
+var show_records = 20; //num call history records to show
 function loadCallHistory(){
 
 	var endpointType;
@@ -1816,7 +1987,6 @@ function loadCallHistory(){
 
                 $("#callHistoryBody").html("");
   
-                var show_records = 20; //num call history records to show
                 var count_recs = 0;
 		for(var i = result.length - 1; i >= 0; i--){
                         count_recs++;
@@ -1825,21 +1995,27 @@ function loadCallHistory(){
 			} else{
 				endpointType = '<i class="fa fa-phone"></i>';
 			}
-			$("#callHistoryBody").append(
-				'<tr>' +
-					'<th>' + result[i].callerName + '</th>' +
-					'<th>' + result[i].callerNumber + '</th>' +
-					'<th>' + result[i].direction + '</th>' +
-					'<th>' + result[i].duration + '</th>' +
-					'<th>' + endpointType + '</th>' + 
-					'<th>' + result[i].callDate + '</th>' +
-					'<th><button class=\"demo-btn\" onclick="outbound_call(\'' + result[i].callerNumber + '\')"><i class="fa fa-phone-square"></i></button></th>' +
-				"</tr>"
-			)
-                        if (count_recs >= show_records)
-                          break;
+				$("#callHistoryBody").append(
+					'<tr>' +
+						'<th>' + result[i].callerName + '</th>' +
+						'<th>' + result[i].callerNumber + '</th>' +
+						'<th>' + result[i].direction + '</th>' +
+						'<th>' + result[i].duration + '</th>' +
+						'<th>' + endpointType + '</th>' + 
+						'<th>' + result[i].callDate + '</th>' +
+						'<th><button class=\"demo-btn\" onclick="outbound_call(\'' + result[i].callerNumber + '\')" id=\'callback-btn' + count_recs + '\'><i class="fa fa-phone-square"></i></button></th>' +
+					"</tr>"
+				)
+				if (count_recs >= show_records)
+					break;
 		}
 	});
+}
+
+function closeDialpadModal() {
+	//remove esc and arrow key binding events
+	$(document).off("keydown.scroll");
+	$(document).off("keyup.close-dialpad");
 }
 
 //Callback method
@@ -1858,6 +2034,7 @@ function outbound_call(number){
 	socket.emit('incall', {'vrs' : vrs});
 	toggle_incall_buttons(true);
 	$('#outboundCallAlert').show();
+	closeDialpadModal(); //remove key bindings
 }
 
 var options = {
@@ -1918,8 +2095,9 @@ function resizeVideo() {
 	var contentHeight = $("#gsvideobox").height() - 50;
 	$('#VideoBox').css("height", contentHeight + "px");
 	$('#remoteView').css("height", contentHeight - 125 + "px");
-	$('#fullscreen-element').css("height", contentHeight+ "px");
+	$('#fullscreen-element').css("height", contentHeight-100+ "px");
 
+	//$('#persistView').css({"height": '100%', "width": '100%', 'object-fit':'cover'});
 	$('#persistView').css({"height": '100%', "width": '100%', 'object-fit':'cover'});
 
 	$('#VideoBox').attr('style', "background-color:white;"); //doesn't open box if it's collapsed
@@ -2006,20 +2184,22 @@ $('#shortcutsBody').on('click','tr',function() {
 
 	var clickedID = $("[name="+clickedValue+"]").attr("id");
 
-	if (clickedID == "agents-tab" || clickedID == "videomail-tab" || clickedID == "shortcuts-tab") {
+	if (clickedID == "agents-tab" || clickedID == "videomail-tab" || clickedID == "shortcuts-tab" || clickedID == "clear-shortcuts" || clickedID == "reset-shortcuts") {
 
 		//error modal
-		console.log("cannot customize tab shortcuts")
+		console.log("cannot customize tab shortcuts or shortcut buttons")
 		$('#shortcutsErrorModal').modal({
 			backdrop: 'static',
 			keyboard: true
 		});
 
-		$('#shortcutsErrorModalBody').html("Cannot customize sidebar tab shortcuts");
+		$('#shortcutsErrorModalBody').html("Cannot customize sidebar tab shortcuts or shortcut buttons");
 
-		//pressing Enter will close modal
+		//pressing Enter or ESC will close modal
 		$("#shortcutsErrorModal").keyup(function(event) {
 			if (event.keyCode === 13) {
+				$("#shortcuts-error-btn").click();
+			} else if (event.keyCode == 27) {
 				$("#shortcuts-error-btn").click();
 			}
 		});
@@ -2052,7 +2232,7 @@ function setShortcut(task, shortcut) {
 		updateShortcutTable();
 	} else {
 		//check if the shortcut is already being used
-		var isShortcutUsed = checkShortcutUse(shortcut);
+		var isShortcutUsed = checkShortcutUse(task, shortcut);
 
 		if (isShortcutUsed) {
 			//error modal
@@ -2063,9 +2243,11 @@ function setShortcut(task, shortcut) {
 
 			$('#shortcutsErrorModalBody').html("Shortcut in use");
 
-			//pressing Enter will close modal
+			//pressing Enter or ESC will close modal
 			$("#shortcutsErrorModal").keyup(function(event) {
 				if (event.keyCode === 13) {
+					$("#shortcuts-error-btn").click();
+				}  else if (event.keyCode == 27) {
 					$("#shortcuts-error-btn").click();
 				}
 			});
@@ -2103,9 +2285,8 @@ function updateShortcutTable() {
 
 			$('#shortcutsBody').append(
 					"<tr><th>" +taskValue+ "</th>" +
-					"<td>" + getShortcut(taskArray[i]).toUpperCase() + "</td>"
-			)				
-			
+					"<td>" + getShortcut(taskArray[i]).toUpperCase() + "</td>"		
+				);			
 			$('#shortcutsBody').append("<br>"); //spaces the elements out a little		
 		 }
 		// shortcutTableLength++;
@@ -2118,9 +2299,10 @@ function updateShortcutTable() {
  * Check if the shortcut is already in use.
  * 
  * Returns true if shortcut is in use, false if not 
+ * @param {string} task	element's shortcut we are changing
  * @param {string} shortcut not case sensitive
  */
-function checkShortcutUse(shortcut) {
+function checkShortcutUse(task, shortcut) {
 	var isUsed = false;
 	shortcut = shortcut.toUpperCase();
 
@@ -2133,9 +2315,16 @@ function checkShortcutUse(shortcut) {
 		if (accesskeyArray[i] != undefined) {
 			//console.log('shortcut: ' + shortcut+ ' vs: ' + (getShortcut(accesskeyArray[i])));
 			if (getShortcut(accesskeyArray[i]).toUpperCase() == shortcut) {
-				isUsed = true;
-				console.log('shortcut in use');
-				return isUsed;
+				if (accesskeyArray[i] == task) {
+					//shortcut being used by itself
+					isUsed = false;
+					return isUsed;
+				} else {
+					isUsed = true;
+					console.log('shortcut being used by ' +accesskeyArray[i]);
+					console.log(task);
+					return isUsed;
+				}
 			}
 		}
 	}
@@ -2149,6 +2338,7 @@ function clearShortcutsTable() {
 }
 
 function clearShortcuts() {
+	console.log('clearing');
 	var taskArray = $("[accesskey]").map(function () {
 		return $(this).attr('id');
 	}).get();
@@ -2158,8 +2348,42 @@ function clearShortcuts() {
 		if (taskArray[i] != undefined) {
 			if (taskArray[i] == 'agents-tab' || taskArray[i] == "videomail-tab" || taskArray[i] == "shortcuts-tab") {
 				//do nothing
+			} else if (taskArray[i] == 'clear-shortcuts' || taskArray[i] == "reset-shortcuts"){
+				//do nothing
 			} else {
 				setShortcut(taskArray[i], "");
+			}
+		}
+	}
+}
+
+function resetShortcuts() {	
+	console.log('reseting shortcuts');
+	var taskArray = $("[accesskey]").map(function(){
+		return $(this).attr('id');
+	}).get();
+
+	var reachedTabs = false;
+	reachedButtons = false;
+	
+	for (var i = 0; i < taskArray.length; i++) {
+		if (taskArray[i] == 'agents-tab' || taskArray[i] == "videomail-tab" || taskArray[i] == "shortcuts-tab") {
+			//do nothing
+			reachedTabs = true;
+		} else if (taskArray[i] == 'clear-shortcuts' || taskArray[i] == "reset-shortcuts") {
+			//do nothing
+			reachedButtons = true;
+		} else {
+			if (reachedTabs) {
+				//originalShortcuts doesn't store the sidebar tabs' shortcuts
+				//so we skip over them
+				setShortcut(taskArray[i], originalShortcuts[i-3]);
+			} else if (reachedButtons) {
+				// originalShortcuts doesn't store the shortcuts buttons
+				// we will only need this if we add more accesskeys to elements in the future
+				setShortcut(taskArray[i], originalShortcuts[i-5]);
+			} else {
+				setShortcut(taskArray[i], originalShortcuts[i]);
 			}
 		}
 	}

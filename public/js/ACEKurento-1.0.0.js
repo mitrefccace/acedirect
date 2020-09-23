@@ -5131,8 +5131,10 @@ function ACEKurento(config) {
       console.log('create webRtcPeer ...');
       webRtcPeer = kurentoUtils.WebRtcPeer.WebRtcPeerSendrecv(options, function (error) {
         if (error) {
-          console.error(error);
+          //screen sharing soft errors
+          //console.log(JSON.stringify(error));
           setCallState(NO_CALL);
+          return;
         }
         console.log('created webRtcPeer');
         acekurento.isScreensharing = enable;
@@ -5207,6 +5209,7 @@ function ACEKurento(config) {
       if(message.participants.length >= 3){
         console.log("Call is multiparty");
         acekurento.isMultiparty = true;
+        $('#selfView').hide();
         if($('#user-status').text() === 'Incoming Call'){
           $('#user-status').text('In Call');
 	        changeStatusIcon(in_call_color, "in-call", in_call_blinking);
@@ -5214,6 +5217,7 @@ function ACEKurento(config) {
         }
       } else{
         acekurento.isMultiparty = false;
+        $('#selfView').show(); 
       }
     }
 

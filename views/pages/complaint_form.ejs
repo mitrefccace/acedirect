@@ -51,7 +51,7 @@
 		<div class="content-wrapper">
 			<!-- Content Header (Page header) -->
 			<section class="content-header">
-				<h1>FCC ASL Consumer Support</h1>
+				<h1>FCC ASL Consumer Support</h1><small><a href="/logout" id="notMyInfoLink">Back</a></small>
 
 			</section>
 			<!-- Main content -->
@@ -61,8 +61,7 @@
 					<section class="col-lg-12">
 						<div id="vrs-info-box" class="box" hidden>
 							<div class="box-header with-border">
-								<h3 class="box-title">VRS Information</h3>&nbsp;<small>(<a href="/logout"
-										id="notMyInfoLink">not my info</a>)</small>
+								<h3 class="box-title">VRS Information</h3>
 								<div class="box-tools pull-right">
 									<button class="btn btn-box-tool" data-widget="collapse"><i
 											class="fa fa-minus"></i></button>
@@ -122,7 +121,6 @@
 							<div class="box-header with-border">
 								<h3 class="box-title">
 									<i class="fa fa-exclamation-triangle"></i>
-									Complaint Ticket
 									Complaint Ticket&nbsp;<span id="ticketNumber"></span>
 								</h3>
 								<div class="box-tools pull-right">
@@ -182,6 +180,7 @@
 							<div class="box-body" id="fullscreen-element">
 								<div id="webcam" hidden>
 
+
 									<video id="remoteView" autoplay poster="images/acedirect-logo.png"></video>
 									<video id="selfView" autoplay muted="true" class="mirror-mode" hidden></video>
 									<div id="transcriptoverlay" class="transcriptoverlay"></div> <!-- Caption code -->
@@ -213,7 +212,10 @@
 												</span>
 											</button>
 											<!-- hack for hide video button since there's no fa-icon for it. we overlay an x and hide and show it when needed-->
-
+											
+											<button id="toggleDTMF" type="button" class="btn btn-gray">
+												<i class="fa fa-phone-square"></i>
+											</button>
 											<button type="button" class="btn btn-gray" onclick="enterFullscreen()"><i
 													id="fullscreen-icon" class="call-btn-icon fa fa-expand"></i>
 											</button>
@@ -417,22 +419,32 @@
 
 							</div>
 							<div class = "row">
-								<div class = "col-xs-12 " style="margin-top: 10px; margin-bottom: 10px;">
-									<a class="btn btn-primary" id="screenshareButton" disabled>Request Screenshare</a>
-									<p id="requestAck" hidden>Screenshare Request Sent</p>
-									<div id="screenshareButtonGroup" hidden>
-										<a class="btn btn-primary" id="startScreenshare">Start Screenshare</a>
+                                <div class = "col-xs-12 btn-group-vertical" style="margin-top: 10px; margin-bottom: 10px; margin-left:10px; width:45%">
+
+                                    <button class="btn btn-primary" id="screenshareButton" disabled>Request Screenshare</button><br>
+
+                                    <p id="requestAck" hidden>Screenshare Request Sent</p>
+
+                                    <div id="screenshareButtonGroup" hidden>
+                                        <a class="btn btn-primary" id="startScreenshare">Start Screenshare</a><br>
+                                    </div>
+                                    <br>
+                                    <br>                                
+
+                                    <div class="btn-group">
+                                    <input type="file" id="fileInput" name="fileInput" class="form-control-file btn btn-default" style="background-color:transparent; border: transparent;" disabled>
+                                    </div><br>
+
+                                    <button class="btn btn-primary" id="shareFileConsumer" onclick="shareFileConsumer()" disabled>Send File</button><br>
+
+                                    <div class="btn-group">
+                                        <a class="btn btn-primary" id="downloadButton" target="_blank" href="./downloadFile" disabled>Download File</a><br>
 									</div>
-
-
-                                                                        <!-- disable file-sharing for now -->
-									<input style="display:none"  type="file" id="fileInput" name="fileInput" class="form-control-file" disabled>
-									<a class="btn btn-primary" id="shareFileConsumer" href="#" onclick="shareFileConsumer()" style="display:none"  disabled>Send File</a>
-									<div class="demo-btn-container config-hide mb-2">
-										<a class="btn btn-primary" id="downloadButton" target="_blank"  href="./downloadFile" style="display:none"  disabled>Download File</a><br>
+									
+									<div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
+										<span class="close" onclick="$('#fileSent').hide();" style="text-decoration:none">×</span>
+										<strong>Success!</strong>  File Sent
 									</div>
-
-
 
 								</div>
 							</div>

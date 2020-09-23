@@ -2,6 +2,12 @@
 <html>
 
 <head>
+    <style>
+        /* prevents white bar from appearing */
+        body:not(.modal-open){
+            padding-right: 0px !important;
+        }       
+    </style>
     <% include ../partials/agent_page_head %>
 </head>
 
@@ -170,19 +176,19 @@
                                 <table class="table table-hover" id="Videomail_Table">
                                     <thead>
                                         <tr>
-                                            <th id="vmail-vrs-number" name="Sort_VRS_Number" accesskey="">Videophone No.
+                                            <th id="vmail-vrs-number" name="Sort_VRS_Number" accesskey="3">Videophone No.
                                                 <i id="video-id-sort" class="fa fa-sort" > </i>
                                             </th>
-                                            <th id="vmail-date" name="Sort_Videomail_Date" accesskey="">Date
+                                            <th id="vmail-date" name="Sort_Videomail_Date" accesskey="4">Date
                                                 <i id="video-id-sort" class="fa fa-sort"> </i>
                                             </th>
-                                            <th id="vmail-duration" name="Sort_Videomail_Duration" accesskey="">Duration (sec)
+                                            <th id="vmail-duration" name="Sort_Videomail_Duration" accesskey="5">Duration (sec)
                                                 <i id="video-id-sort" class="fa fa-sort" > </i>
                                             </th>
-                                            <th id="vmail-status" name="Sort_Videomail_Status" accesskey="">Status
+                                            <th id="vmail-status" name="Sort_Videomail_Status" accesskey="6">Status
                                                 <i id="video-id-sort" class="fa fa-sort"> </i>
                                             </th>
-                                            <th id="vmail-callback" name="Sort_Videomail_Callback" accesskey="">Callback
+                                            <th id="vmail-callback" name="Sort_Videomail_Callback" accesskey="7">Callback
                                                 <i id="video-id-sort" class="fa fa-sort"> </i>
                                             </th>
                                         </tr>
@@ -209,7 +215,8 @@
                                     <tr>
                                         <th>Action&nbsp;&nbsp;&nbsp;</th>
                                         <th>Shortcut</th>
-                                        <th><button id="clear-shortcuts" class="btn btn-default" onclick="clearShortcuts()" name="Clear_Shortcuts" accesskey="`">Clear</button> </th> 
+                                        <th><button id="clear-shortcuts" class="btn btn-default" onclick="clearShortcuts()" name="Clear_Shortcuts">Clear</button> </th> 
+                                        <th><button id="reset-shortcuts" class="btn btn-default" onclick="resetShortcuts()" name="Reset_Shortcuts" >Reset</button> </th> 
                                     </tr>
                                 </thead>
                                 <tbody id="shortcutsBody">
@@ -410,7 +417,7 @@
         <!-- Dialpad Modal -->
         <div class="modal fade" id="modalDialpad">
             <div class="modal-dialog">
-                <div class="modal-content">
+                <div class="modal-content" style="width: fit-content;">
                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                         <li class="nav-item active">
                           <a class="nav-link" id="dialpad-tab" onclick="changeTabs('dialpad-tab')" data-toggle="tab" href="#dialpad" role="tab" aria-controls="dialpad" aria-selected="true">
@@ -488,7 +495,7 @@
                                                     <img class="button-icon" src="/images/call.png">
                                                 </button>
                                             </div>
-                                            <div id="invalidNumber" hidden><span style="color:red"><br>The number you have inputed is invalid.  Please check the number and try again.</span></div>
+                                            <div id="invalidNumber" hidden><span style="color:red"><br>The number you have entered is invalid.  Please check the number and try again.</span></div>
                                         </div>
         
                                     </div>
@@ -517,7 +524,7 @@
 
                     
                     <div class="modal-footer">
-                        <button id="dismiss-dialpad-btn" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button id="dismiss-dialpad-btn" type="button" class="btn btn-default" onclick="closeDialpadModal()" data-dismiss="modal">Cancel</button>
                     </div>
                 </div>
                 <!-- /.modal-content -->
