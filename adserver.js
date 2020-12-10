@@ -399,7 +399,7 @@ var colCallData = null;
 if (typeof mongodbUriEncoded !== 'undefined' && mongodbUriEncoded) {
 	var mongodbUri = getConfigVal('database_servers:mongodb:connection_uri');
 	// Initialize connection once
-	MongoClient.connect(mongodbUri, {forceServerObjectId:true, useNewUrlParser: true}, function (err, database) {
+	MongoClient.connect(mongodbUri, {forceServerObjectId:true, useNewUrlParser: true, useUnifiedTopology: true}, function (err, database) {
 		if (err) {
 			logger.error('*** ERROR: Could not connect to MongoDB. Please make sure it is running.');
 			console.error('*** ERROR: Could not connect to MongoDB. Please make sure it is running.');
@@ -568,8 +568,8 @@ io.sockets.on('connection', function (socket) {
 
     //emit AD version and year to clients
 	socket.emit('adversion', {"version":version,"year":year});
-	
-	// emit 
+
+	// emit
 	if (getConfigVal('translation_server:enabled') === 'true') {
 		socket.emit('enable-translation');
 	}
@@ -879,9 +879,9 @@ io.sockets.on('connection', function (socket) {
 				//collection exist already
 				//console.log("Collection shortcuts exists");
 				colShortcuts = mongodb.collection(token.username + 'shortcuts');
-	
+
 				//updates the shortcut if it exists. create a new document if not
-				colShortcuts.updateOne( 
+				colShortcuts.updateOne(
 					{_id: data._id},
 					{$set: {task:data.task, shortcut:data.shortcut}},
 					{upsert: true}
@@ -907,7 +907,7 @@ io.sockets.on('connection', function (socket) {
 			else {
 				//console.log("Collection shortcuts exists");
 				colShortcuts = mongodb.collection(token.username + 'shortcuts');
-				
+
 				colShortcuts.find({}).toArray(function(err, result) {
 					if(err){
 						console.log("error getting shortcuts: " + err);
@@ -1151,7 +1151,7 @@ io.sockets.on('connection', function (socket) {
 			'Action':'Command',
 			'command':'database show global/dialin'
 		}
-		
+
 		ami.action(obj, function(err, res) {
 			if (err) {
 				console.log('error getting dial-in number');
@@ -1172,7 +1172,7 @@ io.sockets.on('connection', function (socket) {
 				} else {
 					dialInNumber = 'UNKNOWN';
 				}
-				
+
 				io.to(data.extension).emit('dialin-number', {'number': dialInNumber});
 			};
 		})
@@ -1263,7 +1263,7 @@ io.sockets.on('connection', function (socket) {
 			//if collection with data participants exists, send collection
 			//if not, create collection
 			var chatMembers = [data.destext, data.senderext];
-		
+
 			if (chatMembers.length < 2) {
 				console.log("ERROR");
 			} else {
@@ -1276,7 +1276,7 @@ io.sockets.on('connection', function (socket) {
 						console.log("Creating new chatHistory colleciton in MongoDB");
 
 						if (err) throw err;
-					
+
 						colChatHistory = mongodb.collection(extensionsChat + 'chatHistory');
 						console.log("Collection "+extensionsChat+"chatHistory is created ");
 
@@ -1335,7 +1335,7 @@ io.sockets.on('connection', function (socket) {
 
 	//for testing only-- drop all chatHistory collections
 	socket.on('clear-chat-messages', function() {
-		
+
 		mongodb.listCollections().toArray(function(err, results) {
 			if(err) throw err;
 
@@ -1355,7 +1355,7 @@ io.sockets.on('connection', function (socket) {
 	socket.on('get-my-chats', function(data) {
 		if (saveChatHistory == 'true'){
 			var chats = [];
-	
+
 			mongodb.listCollections().toArray((err, results) =>{
 				if(err) throw err;
 
@@ -1369,9 +1369,9 @@ io.sockets.on('connection', function (socket) {
 				var totalChats=chats.length;
 				for (var i = 0; i < chats.length; i++) {
 					colChatHistory = mongodb.collection(chats[i]);
-				
+
 					colChatHistory.find().sort({$natural: -1}).limit(1).next().then(
-						function(doc) {		
+						function(doc) {
 							socket.emit('my-chats', {'doc':doc, "total": totalChats});
 						},
 						function(err) {
@@ -1400,7 +1400,7 @@ io.sockets.on('connection', function (socket) {
 	//RTT for agent to agent chat
 	socket.on('agent-chat-typing-clear', function (data) {
 		var ext = data.ext;
-	
+
 		io.to(Number(ext)).emit('agent-typing-clear', {
 			"displayname": data.displayname
 		});
@@ -1413,7 +1413,7 @@ io.sockets.on('connection', function (socket) {
 			var extensionsChat = chatMembers.toString();
 
 			mongodb.listCollections({name: extensionsChat + 'chatHistory'}).toArray((err, collections) => {
-		
+
 				colChatHistory = mongodb.collection(extensionsChat + 'chatHistory');
 				//console.log('recipient opened message');
 				colChatHistory.updateMany(
@@ -1428,7 +1428,7 @@ io.sockets.on('connection', function (socket) {
 	socket.on('broadcast-agent-chat', function(data) {
 		var broadcastExtensions = [];
 
-		var clients_in_the_room = io.sockets.adapter.rooms['my room']; 
+		var clients_in_the_room = io.sockets.adapter.rooms['my room'];
 		var clients = (clients_in_the_room.sockets);
 		var roomKeys = Object.keys(clients)
 
@@ -1444,7 +1444,7 @@ io.sockets.on('connection', function (socket) {
 			for (var i = 0; i < broadcastExtensions.length; i++) {
 				data.destname = '';
 				var currentExt = broadcastExtensions[i][0];
-			
+
 				data.destext=broadcastExtensions[i][0];
 
 				var chatMembers = [currentExt, data.senderext];
@@ -1474,7 +1474,7 @@ io.sockets.on('connection', function (socket) {
 			var extensionsChat = chatMembers.toString();
 
 			mongodb.listCollections({name: extensionsChat + 'chatHistory'}).toArray((err, collections) => {
-		
+
 				colChatHistory = mongodb.collection(extensionsChat + 'chatHistory');
 
 				colChatHistory.updateOne(
@@ -1482,7 +1482,7 @@ io.sockets.on('connection', function (socket) {
 					{$set: {destname:data.name}},
 					{upsert:false}
 				);
-		
+
 			});
 		}
 	});
@@ -1771,7 +1771,7 @@ io.sockets.on('connection', function (socket) {
 	});
 
 	socket.on('translate-caption', function(data) {
-		
+
 		// fixme do we have to test this to avoid hacks or bugs?
 		let callerNumber = data.callerNumber.toString();
 		let msgid = data.transcripts.msgid;
@@ -1783,7 +1783,7 @@ io.sockets.on('connection', function (socket) {
 		var toNumber;
 		var languageFrom;
 		var languageTo;
-		
+
 		redisClient.hgetall(rConsumerToCsr, function (err, tuples) {
 			if (err) {
 				logger.error("Redis Error" + err);
@@ -1791,7 +1791,7 @@ io.sockets.on('connection', function (socket) {
 			} else {
 				console.log('csr', callerNumber, tuples)
 				for (let clientNumber in tuples) {
-					agentNumber = tuples[clientNumber] 
+					agentNumber = tuples[clientNumber]
 					console.log(callerNumber, clientNumber + ' => ' + agentNumber, typeof(callerNumber), typeof(agentNumber), callerNumber === agentNumber);
 					if (callerNumber === agentNumber) {
 						fromNumber = clientNumber;
@@ -1809,14 +1809,14 @@ io.sockets.on('connection', function (socket) {
 							if (err) {
 								logger.error("Redis Error" + err);
 								reject(err);
-							} 
+							}
 							else {
 								languageFrom = language;
 								console.log('language from for user', fromNumber, languageFrom)
 								if (!languageFrom) {
 									languageFrom = 'en'; // default English
 								}
-								
+
 								resolve();
 							}
 						})
@@ -1826,7 +1826,7 @@ io.sockets.on('connection', function (socket) {
 							if (err) {
 							  logger.error("Redis Error" + err);
 							  reject(err);
-							} 
+							}
 							else {
 								languageTo = language;
 								if (!languageTo) {
@@ -1837,7 +1837,7 @@ io.sockets.on('connection', function (socket) {
 						})
 					})
 				];
-				
+
 				Promise.all(promises).then( function(values) {
 					console.log('language',fromNumber,toNumber,languageFrom,languageTo);
 					console.log('translating', data.transcripts.transcript, 'from', languageFrom, 'to', languageTo);
@@ -1891,13 +1891,13 @@ io.sockets.on('connection', function (socket) {
 				}).catch(function(err) {
 					console.log('Error in translate-caption', err.message); // some coding error in handling happened
 				});
-				
-				
+
+
 
 			}
 		});
 
-		
+
 	});
 });
 
@@ -2064,9 +2064,9 @@ function handle_manager_event(evt) {
 
         logger.info('DialEnd / ANSWER: evt.context is: >' + evt.context + '< , evt.channel is: >' + evt.channel + '<');
 		logger.info("Event is " + JSON.stringify(evt, null, 2));
-		
+
 		if (evt.context === 'from-internal' && evt.destchannel.includes(PROVIDER_STR)) {
-			
+
 			let channel = evt.channel;
 			let channelExt = channel.split(/[\/,-]/);
 			io.to(Number(channelExt[1])).emit('outbound-answered', {});
@@ -3120,7 +3120,7 @@ function processExtension(data) {
 					else {
 						logger.error("Language has not been specified for extension", Number(nextExtension));
 					}
-					
+
 				}
 
 				logger.info('EMIT: extension-created: ' + JSON.stringify(resultJson));

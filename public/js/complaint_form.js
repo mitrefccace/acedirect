@@ -541,7 +541,8 @@ $("#callbutton").click(function () {
 });
 
 $("#videomailbutton").click(function () {
-	$('#videomailModal').modal('show');
+	//$('#videomailModal').modal('show');
+	startRecordingVideomail(false)
 });
 
 function initiateCall() {
@@ -800,7 +801,8 @@ function exit_queue() {
 function afterHourVoicemail(){
 	exit_queue();
  	$('#afterHoursModal').modal('hide');
-	$('#videomailModal').modal('show');
+	//$('#videomailModal').modal('show');
+	startRecordingVideomail(false) 
 }
 
 function afterHoursHideVoicemail(){
