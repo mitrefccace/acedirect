@@ -7,6 +7,18 @@
         body:not(.modal-open){
             padding-right: 0px !important;
         }       
+
+        .modal-content.ui-resizable {
+            overflow-y: scroll;
+            position: static;
+        }
+
+        .ui-resizable { position: absolute;}
+        .ui-resizable-handle { position: absolute; font-size: 0.1px; display: block; }
+        .ui-resizable-s { cursor: s-resize; height: 7px; width: 100%; bottom: 0px; left: 0;}
+        .ui-resizable-e { cursor: e-resize; width: 7px; right: 0px; top: 0; height: 100%;}
+        .ui-resizable-se { cursor: se-resize; width: 20px; height: 20px; right: 0px; bottom: 0px;}
+
     </style>
     <% include ../partials/agent_page_head %>
 </head>
@@ -116,6 +128,7 @@
                                         <th>Ext</th>
                                         <th>Queues</th>
                                         <th>Multi-Party Invite</th>
+                                        <th>Chat</th>
                                     </tr>
                                 </thead>
                             </table>
@@ -347,6 +360,22 @@
                         </div>
                     </div>
 
+                </div>
+            </div>
+        </div>
+
+        <div id="screenshareRequest" class="modal fade">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 class="modal-title">Consumer is requesting screenshare</h2>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="allowScreenshare" type="button" onclick="allowScreenShare()" class="btn btn-success btn-style" style="width: 50%; height: 50px;">
+                            Accept </button>
+                        <button id="disallowScreenshare" type="button" onclick="disallowScreenShare()" class="btn btn-danger btn-style" style="width: 50%; height: 50px;">
+                            Decline </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -609,6 +638,113 @@
             <!-- /.modal-dialog -->
         </div>
 
+        <!--Begin agent chat-->
+        <div class="modal fade" id="agentchat" tabindex="-1" role="dialog" aria-labelledby="agentchat" aria-hidden="true" data-backdrop="static" style="width:0px; height:0px; object-fit: contain;">
+            <div class="modal-dialog modal-md direct-chat direct-chat-primary" id="agent-chat-dialog" role="document" style="position: fixed;  margin:0;padding: 10px;">
+                <div class="modal-content" id="agent-chat-content" style="position: static; object-fit: cover; border: 1px solid #404040; box-shadow:2px 2px grey">
+                    <div class="modal-header" id="agent-chat-header" style="position: sticky; top:0; background-color: white; z-index: 99;">
+                        <div id="agent-ext" hidden></div>
+                        <button type="button" onclick="clearChat()" hidden>DROP ALL CHAT TABLES</button>
+                        <button type="button" class="close" data-dismiss="modal" onclick="closeAgentChat()" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="chatHeader"></h4>
+                    </div>
+                    <div class="modal-body" id="agent-modal-body">
+                        <div id="agent-chat-body">
+                            <div class="direct-chat-messages" id="agent-chat-messages"></div>
+                            <div class="direct-chat-timestamp text-bold" id="agent-rtt-typing" style="margin-left: 10px; min-height: 20px"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" id="agent-chat-footer" style="position: sticky; bottom:0; background-color: white; z-index: 99;">
+                        <form name="chatsend" id="agent-chatsend">
+                            <div class="input-group">
+                                <input type="hidden" id="agentdisplayname">
+                                <input type="text" id="agentnewchatmessage" placeholder="Type Message..." class="form-control" autocomplete="off" required>
+                                <span class="input-group-btn">
+                                    <div class="dropup">
+                                        <div class="btn-group">
+                                            <button id="agent-chat-emoji" class="btn btn-primary btn-flat" type="button" data-toggle="dropdown"
+                                                animation="true" >&#128512;</button>
+                                            <div class="dropdown-menu dropdown-multicol" id="emoji-selector"
+                                                aria-labelledby="dropdownMenuButton" style="height:150px; min-width:120px; overflow-y: scroll;">
+                                                <li role="presentation" class="dropdown-header">Select an Emoji</li>
+                                                <li role="presentation" class="divider"></li>
+                                                <div class="dropdown-row">
+                                                    <button class="dropdown-item" type="button"
+                                                        style="background-color:transparent; border:none" onclick="addEmojiAgentChat(this.value)"
+                                                        value="&#128512;">&#128512;</button>
+                                                    <button class="dropdown-item" type="button"
+                                                        style="background-color:transparent; border:none" onclick="addEmojiAgentChat(this.value)"
+                                                        value="&#128513;">&#128513;</button>
+                                                    <button class="dropdown-item" type="button"
+                                                        style="background-color:transparent; border:none" onclick="addEmojiAgentChat(this.value)"
+                                                        value="&#128516;">&#128516;</button>
+                                                </div>
+                                                <div class="dropdown-row">
+                                                    <button class="dropdown-item" type="button"
+                                                        style="background-color:transparent; border:none" onclick="addEmojiAgentChat(this.value)"
+                                                        value="&#128547;">&#128547;</button>
+                                                    <button class="dropdown-item" type="button"
+                                                        style="background-color:transparent; border:none" onclick="addEmojiAgentChat(this.value)"
+                                                        value="&#128577;">&#128577;</button>
+                                                    <button class="dropdown-item" type="button"
+                                                        style="background-color:transparent; border:none" onclick="addEmojiAgentChat(this.value)"
+                                                        value="&#129320;">&#129320;</button>
+                                                </div>
+                                                <div class="dropdown-row">
+                                                    <button class="dropdown-item" type="button"
+                                                        style="background-color:transparent; border:none" onclick="addEmojiAgentChat(this.value)"
+                                                        value="&#128077;">&#128077;</button>
+                                                    <button class="dropdown-item" type="button"
+                                                        style="background-color:transparent; border:none" onclick="addEmojiAgentChat(this.value)"
+                                                        value="&#128078;">&#128078;</button>
+                                                    <button class="dropdown-item" type="button"
+                                                        style="background-color:transparent; border:none" onclick="addEmojiAgentChat(this.value)"
+                                                        value="&#128075;">&#128075;</button>
+                                                </div>
+                                                <div class="dropdown-row">
+                                                    <button class="dropdown-item" type="button"
+                                                        style="background-color:transparent; border:none" onclick="addEmojiAgentChat(this.value)"
+                                                        value="&#128263;">&#128263;</button>
+                                                    <button class="dropdown-item" type="button"
+                                                        style="background-color:transparent; border:none" onclick="addEmojiAgentChat(this.value)"
+                                                        value="&#128264;">&#128264;</button>
+                                                    <button class="dropdown-item" type="button"
+                                                        style="background-color:transparent; border:none" onclick="addEmojiAgentChat(this.value)"
+                                                        value="&#128266;">&#128266;</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <button class="btn btn-primary btn-flat" id="agent-chat-send" type="submit">Send</button>
+                                    <div class='btn-group'>
+                                        <button class="btn btn-primary btn-flat" id="agent-chat-broadcast" data-toggle="dropdown"
+                                        animation="true">Broadcast</button>
+                                        
+                                        <div class="dropdown-menu dropdown-multicol dropdown-menu-right" id="confirm-broadcast"
+                                            aria-labelledby="dropdownMenuButton" style="height:fit-content;width:fit-content;">
+                                            <li role="presentation" class="dropdown-header">Confirm Broadcast</li>
+                                        <li role="presentation" class="divider"></li>
+         
+                                            <div class="dropdown-row" style="text-align: center; display: block;">
+                                                <button class="dropdown-item btn btn-success" type="button"
+                                                    style="text-align: center;" onclick="sendBroadcast()">Confirm</button>
+                                                <button class="dropdown-item btn btn-danger" type="button"
+                                                    style="text-align: center;">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                        
+                                    </div>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!--End agent chat-->
+
         <!-- Jssip hidden data -->
         <div hidden>
             <div id="my_sip_uri"> </div>
@@ -671,7 +807,7 @@ function start_video(video) {
 			audio: true,
 			video: true
 		})
-		//navigator.mediaDevices.getUserMedia({ audio: false, video: true }) 
+        //navigator.mediaDevices.getUserMedia({ audio: false, video: true }) 
 		.then(function (stream) {
 			video.removeAttribute("hidden");
 			// Older browsers may not have srcObject

@@ -74,6 +74,9 @@ var rConsumerExtensions = 'consumerExtensions';
 // key:value nnnnn:mmmmmmmmmm and mmmmmmmmmm:nnnnn
 var rExtensionToVrs = 'extensionToVrs';
 
+// Contains the consumer extension(nnnnn) mapped to the preferred language
+var rExtensionToLanguage = 'extensionToLanguage';
+
 // Maps Linphone caller extension to agent extension
 var rLinphoneToAgentMap = 'linphoneToAgentMap';
 
@@ -92,10 +95,7 @@ var complaint_queue_count = 0;
 //keeps track of number of consumers in general queue, send to agent on login
 var general_queue_count = 0;
 
-//Keep track of specific user for specific databases
-var usernameTracker;
-
-//file share test
+//file share
 let sharingAgent= [];
 let sharingConsumer = [];
 let fileToken = [];
@@ -168,6 +168,7 @@ rStatusMap = pfx + rStatusMap;
 rVrsToZenId = pfx + rVrsToZenId;
 rConsumerExtensions = pfx + rConsumerExtensions;
 rExtensionToVrs = pfx + rExtensionToVrs;
+rExtensionToLanguage = pfx + rExtensionToLanguage;
 rLinphoneToAgentMap = pfx + rLinphoneToAgentMap;
 rConsumerToCsr = pfx + rConsumerToCsr;
 rAgentInfoMap = pfx + rAgentInfoMap;
@@ -182,6 +183,8 @@ logger.warn('WARN messages enabled.');
 logger.error('ERROR messages enabled.');
 logger.fatal('FATAL messages enabled.');
 logger.info('Using config file: ' + cfile);
+
+var queuesComplaintNumber = getConfigVal('asterisk:queues:complaint:number');
 
 //global vars that don't need to be read every time
 var jwtKey = getConfigVal('web_security:json_web_token:secret_key');
@@ -203,7 +206,6 @@ if (!outVidTimeout) {
   outVidTimeout = outVidTimeout * 1000; //ms
 }
 logger.debug('outVidTimeout: ' + outVidTimeout);
-
 
 //stun & turn params
 var stunFQDN = getConfigVal('asterisk:sip:stun');
@@ -236,13 +238,6 @@ if (!turnCred) {
   process.exit(0);
 }
 
-
-
-
-
-
-
-
 //busylight parameter
 var busyLightEnabled = getConfigVal('busylight:enabled');
 if (busyLightEnabled.length === 0) {
@@ -256,7 +251,7 @@ logger.debug('busyLightEnabled: ' + busyLightEnabled);
 //busylight awayBlink parameter (blink while Away, if callers are in queue)
 var awayBlink= getConfigVal('busylight:awayBlink');
 if (awayBlink.length === 0) {
-  //default to on 
+  //default to on
   awayBlink = true;
 } else {
   awayBlink = (awayBlink === 'true');
@@ -286,6 +281,9 @@ var queuesVideomailNumber = getConfigVal('asterisk:queues:videomail:number');
 var complaintRedirectActive = (getConfigVal('complaint_redirect:active') === 'true');
 var complaintRedirectDesc = getConfigVal('complaint_redirect:desc');
 var complaintRedirectUrl = getConfigVal('complaint_redirect:url');
+
+// translation server
+var translationServerUrl = getConfigVal('translation_server:protocol') + '://' + getConfigVal('translation_server:private_ip') + ':' + getConfigVal('translation_server:port');
 
 //get the ACE Direct version and year
 var version = getConfigVal('common:version');
@@ -327,6 +325,7 @@ redisClient.on('connect', function () {
 	redisClient.del(rVrsToZenId);
 	redisClient.del(rConsumerExtensions);
 	redisClient.del(rExtensionToVrs);
+	redisClient.del(rExtensionToLanguage);
 	redisClient.del(rLinphoneToAgentMap);
 	redisClient.del(rConsumerToCsr);
 	redisClient.del(rAgentInfoMap);
@@ -334,7 +333,6 @@ redisClient.on('connect', function () {
 	// Populate the consumerExtensions map
 	prepareExtensions();
 });
-
 
 // Load the Zendesk login parameters
 var zenUrl = getConfigVal('zendesk:protocol') + '://' + getConfigVal('zendesk:private_ip') + ':' + getConfigVal('zendesk:port') + '/api/v2';
@@ -506,7 +504,6 @@ app.use(csrf({
 	cookie: true
 }));
 
-
 var fqdn = '';
 if (nconf.get('nginx:fqdn')) {
 	fqdn = getConfigVal('nginx:fqdn');
@@ -562,8 +559,6 @@ io.use(socketioJwt.authorize({
 	handshake: getConfigVal('web_security:json_web_token:handshake')
 }));
 
-
-
 // Note - socket only valid in this block
 io.sockets.on('connection', function (socket) {
 
@@ -572,7 +567,12 @@ io.sockets.on('connection', function (socket) {
 	logger.info(socket.request.connection._peername);
 
     //emit AD version and year to clients
-    socket.emit('adversion', {"version":version,"year":year});
+	socket.emit('adversion', {"version":version,"year":year});
+	
+	// emit 
+	if (getConfigVal('translation_server:enabled') === 'true') {
+		socket.emit('enable-translation');
+	}
 
 	var token = socket.decoded_token;
 	logger.info('connected & authenticated: ' + token.username + " - " + token.first_name + " " + token.last_name);
@@ -589,7 +589,7 @@ io.sockets.on('connection', function (socket) {
 	});
 
 	socket.on('begin-file-share', function(data) {
-	
+
 		if (sharingAgent.length == 0) {
 			//first element
 			sharingAgent[0] = token.extension;
@@ -602,17 +602,17 @@ io.sockets.on('connection', function (socket) {
 					sharingAgent[i] = token.extension;
 					sharingConsumer[i] = incomingVRS;
 					fileToken[i] = '';
-					break; 
+					break;
 				} else if (sharingAgent[i] == '') {
 					//fil any gaps
 					sharingAgent[i] = token.extension;
 					sharingConsumer[i] = incomingVRS;
 					fileToken[i] = '';
 					break;
-				} 
+				}
 			}
 		}
-		
+
 		//these should always be in sync
 		//but is that guarunteed?
 		console.log(sharingAgent);
@@ -682,8 +682,8 @@ io.sockets.on('connection', function (socket) {
 								uploader = token.extension;
 							} else {
 								uploader = token.vrs;
-							} 
-							
+							}
+
 							for (let i = 0; i < sharingAgent.length; i++) {
 								//console.log('comparing ' + sharingAgent[i] + ' to ' +uploader);
 								//console.log('and ' +sharingConsumer[i]+ ' to ' +uploader);
@@ -707,7 +707,7 @@ io.sockets.on('connection', function (socket) {
 								vrs = data.vrs;
 							}
 							console.log("Sending file list message to " + vrsNum + " with " + JSON.stringify(latestResult));
-							
+
 							io.to(Number(vrsNum)).emit('fileListConsumer', (latestResult) );
 						});
 					}else{
@@ -745,8 +745,8 @@ io.sockets.on('connection', function (socket) {
 								uploader = token.extension;
 							} else {
 								uploader = token.vrs;
-							} 
-							
+							}
+
 							for (let i = 0; i < sharingAgent.length; i++) {
 								//console.log('comparing ' + sharingAgent[i] + ' to ' +uploader);
 								//console.log('and ' +sharingConsumer[i]+ ' to ' +uploader);
@@ -770,7 +770,7 @@ io.sockets.on('connection', function (socket) {
 								vrs = data.vrs;
 							}
 							console.log("Sending file list message to " + vrsNum + " with " + JSON.stringify(latestResult));
-							
+
 							io.to(Number(vrsNum)).emit('fileListAgent', (latestResult) );
 						});
 					}else{
@@ -802,27 +802,27 @@ io.sockets.on('connection', function (socket) {
 		});
 	});
 
+	//Fired at end of call when new call history is added
 	socket.on('callHistory', function(data){
-		// first check if collection "events" already exist, if not create one
-		mongodb.listCollections({name: usernameTracker + 'callHistory'}).toArray((err, collections) => {
+		console.log('callhistory for ' + token.username);
+		mongodb.listCollections({name: token.username + 'callHistory'}).toArray((err, collections) => {
 			if (collections.length == 0) {	// "stats" collection does not exist
-				console.log("Creating new callHistory colleciton in MongoDB");
-				mongodb.createCollection(usernameTracker + "callHistory",{capped: true, size:1000000, max:5000}, function(err, result) {
+				console.log("Creating new " + token.username + "callHistory colleciton in MongoDB");
+				mongodb.createCollection(token.username + "callHistory",{capped: true, size:1000000, max:5000}, function(err, result) {
 					if (err) throw err;
-						console.log("Collection " + usernameTracker + "callHistory is created capped size 100000, max 5000 entries");
-					colCallHistory = mongodb.collection(usernameTracker + 'callHistory');
+						console.log("Collection " + token.username + "callHistory is created capped size 100000, max 5000 entries");
+					colCallHistory = mongodb.collection(token.username + 'callHistory');
 				});
 			}
 			else {
 				// events collection exist already
-				console.log("Collection callHistory exists");
-				colCallHistory = mongodb.collection(usernameTracker + 'callHistory');
+				colCallHistory = mongodb.collection(token.username + 'callHistory');
 				//colCallHistory.remove({});
 				// insert an entry to record the start of ace direct
 				colCallHistory.insertOne(data, function(err, result) {
 					if(err){
-						console.log("Insert a record into callHistory collection of MongoDB, error: " + err);
-						logger.debug("Insert a record into callHistory collection of MongoDB, error: " + err);
+						console.log("Insert a record into " + token.username + "callHistory collection of MongoDB, error: " + err);
+						logger.debug("Insert a record into " + token.username + "callHistory collection of MongoDB, error: " + err);
 						throw err;
 					}
 				});
@@ -832,25 +832,25 @@ io.sockets.on('connection', function (socket) {
 	});
 
 	socket.on('getCallHistory', function(){
-		console.log("COLLECTION IS " + usernameTracker);
-		mongodb.listCollections({name: usernameTracker + 'callHistory'}).toArray((err, collections) => {
-			if (collections.length == 0) {	// "stats" collection does not exist
-				console.log("Creating new callHistory colleciton in MongoDB");
-				mongodb.createCollection(usernameTracker + "callHistory",{capped: true, size:1000000, max:5000}, function(err, result) {
+		console.log('callhistory for ' + token.username);
+		mongodb.listCollections({name: token.username + 'callHistory'}).toArray((err, collections) => {
+			if (collections.length == 0) {
+				console.log("Creating new " + token.username + "callHistory colleciton in MongoDB");
+				mongodb.createCollection(token.username + "callHistory",{capped: true, size:1000000, max:5000}, function(err, result) {
 					if (err) throw err;
 						console.log("Collection callHistory is created capped size 100000, max 5000 entries");
-					colCallHistory = mongodb.collection(usernameTracker + 'callHistory');
+					colCallHistory = mongodb.collection(token.username + 'callHistory');
 				});
 			}
 			else {
 				// events collection exist already
-				console.log("Collection callHistory exists");
-				colCallHistory = mongodb.collection(usernameTracker + 'callHistory');
+				console.log("Collection " + token.username + "callHistory exists");
+				colCallHistory = mongodb.collection(token.username + 'callHistory');
 				// insert an entry to record the start of ace direct
 				colCallHistory.find({}).toArray(function(err, result) {
 					if(err){
-						console.log("Insert a record into callHistory collection of MongoDB, error: " + err);
-						logger.debug("Insert a record into callHistory collection of MongoDB, error: " + err);
+						console.log("Insert a record into " + token.username + "callHistory collection of MongoDB, error: " + err);
+						logger.debug("Insert a record into " + token.username + "callHistory collection of MongoDB, error: " + err);
 						throw err;
 					}else{
 						socket.emit('returnCallHistory', result);
@@ -860,6 +860,72 @@ io.sockets.on('connection', function (socket) {
 
 		});
 	});
+
+	socket.on('set-shortcuts', function(data){
+		// first check if collection already exist, if not create one
+		mongodb.listCollections({name: token.username + 'shortcuts'}).toArray((err, collections) => {
+			if (collections.length == 0) {	// "stats" collection does not exist
+				console.log("Creating new shortcuts colleciton in MongoDB");
+				mongodb.createCollection(token.username + "shortcuts", function(err, result) {
+					if (err) {
+						console.log('error creating collection: ' +err);
+						throw err;
+					}
+					console.log("Collection " + token.username + "shortcuts is created");
+					colShortcuts = mongodb.collection(token.username + 'shortcuts');
+				});
+			}
+			else {
+				//collection exist already
+				//console.log("Collection shortcuts exists");
+				colShortcuts = mongodb.collection(token.username + 'shortcuts');
+	
+				//updates the shortcut if it exists. create a new document if not
+				colShortcuts.updateOne( 
+					{_id: data._id},
+					{$set: {task:data.task, shortcut:data.shortcut}},
+					{upsert: true}
+				);
+			}
+
+		});
+	});
+
+	socket.on('get-shortcuts', function(){
+		mongodb.listCollections({name: token.username + 'shortcuts'}).toArray((err, collections) => {
+			if (collections.length == 0) {	// collection does not exist
+				console.log("Creating new shortcuts colleciton in MongoDB");
+				mongodb.createCollection(token.username + "shortcuts", function(err, result) {
+					if (err) {
+						console.log('error creating collection: ' +err);
+						throw err;
+					}
+					console.log("Collection shortcuts is created");
+					colShortcuts = mongodb.collection(token.username + 'shortcuts');
+				});
+			}
+			else {
+				//console.log("Collection shortcuts exists");
+				colShortcuts = mongodb.collection(token.username + 'shortcuts');
+				
+				colShortcuts.find({}).toArray(function(err, result) {
+					if(err){
+						console.log("error getting shortcuts: " + err);
+						throw err;
+					}else{
+						socket.emit('receive-shortcuts', result);
+					}
+				});
+			}
+
+		});
+	});
+
+	socket.on('reset-shortcuts', function() {
+		console.log('resetting shortcuts');
+		colShortcuts = mongodb.collection(token.username + 'shortcuts');
+		colShortcuts.deleteMany({});
+	})
 
 	//Get all agents statuses and extensions.  Used for multi party option dropdown.
 	/*socket.on('ami-req', function(message){
@@ -1079,6 +1145,39 @@ io.sockets.on('connection', function (socket) {
 		});
 	});
 
+	socket.on('get-dial-in-number', function(data) {
+		var dialInNumber;
+		var obj = {
+			'Action':'Command',
+			'command':'database show global/dialin'
+		}
+		
+		ami.action(obj, function(err, res) {
+			if (err) {
+				console.log('error getting dial-in number');
+				console.log(JSON.stringify(err));
+			} else {
+				console.log('success getting dial-in number');
+				var outputValues = Object.values(res.output[0]);
+				var num = '';
+
+				for (var i = 0; i < outputValues.length; i++) {
+					if (!isNaN(outputValues[i]) && outputValues[i] !==' ') {
+						num = num+outputValues[i];
+					}
+				}
+
+				if (num.length == 10) {
+					dialInNumber = num.slice(0,3)+"-"+num.slice(3,6)+"-"+num.slice(6);
+				} else {
+					dialInNumber = 'UNKNOWN';
+				}
+				
+				io.to(data.extension).emit('dialin-number', {'number': dialInNumber});
+			};
+		})
+	});
+
 	// Handler catches a Socket.IO disconnect
 	socket.on('disconnect', function () {
 		logger.info('DISCONNECTED');
@@ -1116,7 +1215,8 @@ io.sockets.on('connection', function (socket) {
 						redisClient.hset(rConsumerExtensions, Number(ext), JSON.stringify(val));
 						redisClient.hset(rTokenMap, token.lightcode, "OFFLINE");
                                                 redisClient.hdel(rExtensionToVrs, Number(ext));
-                                                redisClient.hdel(rExtensionToVrs, Number(token.vrs));
+												redisClient.hdel(rExtensionToVrs, Number(token.vrs));
+												redisClient.hdel(rExtensionToLanguage, Number(ext));
 					}
 				});
 			});
@@ -1148,6 +1248,243 @@ io.sockets.on('connection', function (socket) {
 		logger.info('Session Token: ' + JSON.stringify(token));
 
 		updateZendeskTicket(data);
+	});
+
+	//defaults to false
+	var isMuted = getConfigVal('agent_incall_audio:mute_all_audio');
+    socket.emit('mute-options', {'isMuted':isMuted});
+
+    var saveChatHistory = getConfigVal('agent_chat:save_agent_chats');
+    socket.emit('save-chat-value', {'isSaved':saveChatHistory});
+
+	// direct messaging between agents
+	socket.on('check-agent-chat-status', function(data) {
+		if (saveChatHistory == 'true'){
+			//if collection with data participants exists, send collection
+			//if not, create collection
+			var chatMembers = [data.destext, data.senderext];
+		
+			if (chatMembers.length < 2) {
+				console.log("ERROR");
+			} else {
+				chatMembers = chatMembers.sort();
+				var extensionsChat = chatMembers.toString();
+
+				mongodb.listCollections({name: extensionsChat + 'chatHistory'}).toArray((err, collections) => {
+					if (collections.length == 0) {
+						// collection does not exist
+						console.log("Creating new chatHistory colleciton in MongoDB");
+
+						if (err) throw err;
+					
+						colChatHistory = mongodb.collection(extensionsChat + 'chatHistory');
+						console.log("Collection "+extensionsChat+"chatHistory is created ");
+
+						socket.emit('begin-agent-chat');
+					}
+					else {
+						// collection exist already
+						colChatHistory = mongodb.collection(extensionsChat + 'chatHistory');
+
+						socket.emit('continue-agent-chat', {'destExt': data.destext});
+					}
+				});
+			}
+		}
+	});
+
+	socket.on('get-agent-chat', function(data) {
+		if (saveChatHistory == 'true'){
+			var chatMembers = [data.destext, data.senderext];
+			chatMembers = chatMembers.sort();
+			var extensionsChat = chatMembers.toString();
+
+			colChatHistory = mongodb.collection(extensionsChat + 'chatHistory');
+
+			colChatHistory.find({}).sort({$natural:-1}).limit(100).toArray(function(err, result) {
+				//only load the last 100 chats to prevent lagging
+				if(err) {
+					console.log("Get agent chat error: " + err);
+					logger.debug("Get agent chat error: " + err);
+					throw err;
+				} else {
+					socket.emit('load-agent-chat-messages', result);
+				}
+			});
+		}
+	});
+
+	socket.on('upload-agent-message', function(data) {
+		io.to(Number(data.destext)).emit('new-agent-chat', data);
+
+		if (saveChatHistory == 'true'){
+			var chatMembers = [data.destext, data.senderext];
+			chatMembers = chatMembers.sort();
+			var extensionsChat = chatMembers.toString();
+
+			colChatHistory = mongodb.collection(extensionsChat + 'chatHistory');
+			colChatHistory.insertOne(data, function(err, result) {
+				if(err){
+					console.log("Insert a record into chatHistory collection of MongoDB, error: " + err);
+					logger.debug("Insert a record into chatHistory collection of MongoDB, error: " + err);
+					throw err;
+				}
+			});
+		}
+	});
+
+	//for testing only-- drop all chatHistory collections
+	socket.on('clear-chat-messages', function() {
+		
+		mongodb.listCollections().toArray(function(err, results) {
+			if(err) throw err;
+
+			for (var i = 0; i < results.length; i++) {
+				if (results[i].name.includes('chatHistory')) {
+					colChatHistory = mongodb.collection(results[i].name);
+					console.log(results[i].name);
+					colChatHistory.drop(function (err, success) {
+						if (err) throw err;
+						if (success) console.log('collection dropped');
+					})
+				}
+			}
+		});
+	});
+
+	socket.on('get-my-chats', function(data) {
+		if (saveChatHistory == 'true'){
+			var chats = [];
+	
+			mongodb.listCollections().toArray((err, results) =>{
+				if(err) throw err;
+
+				for (var i = 0; i < results.length; i++) {
+					if (results[i].name.includes(data.ext) && results[i].name.includes('chatHistory')) {
+						chats.push(results[i].name);
+					}
+				}
+
+				//get the last document from those chats
+				var totalChats=chats.length;
+				for (var i = 0; i < chats.length; i++) {
+					colChatHistory = mongodb.collection(chats[i]);
+				
+					colChatHistory.find().sort({$natural: -1}).limit(1).next().then(
+						function(doc) {		
+							socket.emit('my-chats', {'doc':doc, "total": totalChats});
+						},
+						function(err) {
+							console.log('Error:', err);
+						}
+					);
+				}
+			});
+		}
+	});
+
+	//RTT for agent to agent chat
+	socket.on('agent-chat-typing', function (data) {
+		var ext = data.ext;
+		var msg = data.rttmsg;
+		//Replace html tags with character entity code
+		msg = msg.replace(/</g, "&lt;");
+		msg = msg.replace(/>/g, "&gt;");
+		io.to(Number(ext)).emit('agent-typing', {
+			"typingmessage": data.displayname + ' is typing...',
+			"displayname": data.displayname,
+			"rttmsg": msg
+		});
+	});
+
+	//RTT for agent to agent chat
+	socket.on('agent-chat-typing-clear', function (data) {
+		var ext = data.ext;
+	
+		io.to(Number(ext)).emit('agent-typing-clear', {
+			"displayname": data.displayname
+		});
+	});
+
+	socket.on('chat-read', function(data) {
+		if (saveChatHistory == 'true'){
+			var chatMembers = [data.ext, data.destext];
+			chatMembers = chatMembers.sort();
+			var extensionsChat = chatMembers.toString();
+
+			mongodb.listCollections({name: extensionsChat + 'chatHistory'}).toArray((err, collections) => {
+		
+				colChatHistory = mongodb.collection(extensionsChat + 'chatHistory');
+				//console.log('recipient opened message');
+				colChatHistory.updateMany(
+					{},
+					{$set: {hasBeenOpened:true}},
+					{}
+				);
+			});
+		}
+	});
+
+	socket.on('broadcast-agent-chat', function(data) {
+		var broadcastExtensions = [];
+
+		var clients_in_the_room = io.sockets.adapter.rooms['my room']; 
+		var clients = (clients_in_the_room.sockets);
+		var roomKeys = Object.keys(clients)
+
+		//if the socketID matches, add to convo
+		for (var i = 0; i < roomKeys.length; i++) {
+			var currentRooms = (io.sockets.sockets[roomKeys[i]].rooms);
+			broadcastExtensions.push((Object.keys(currentRooms)))
+		}
+
+		io.emit('broadcast', data);
+		if (saveChatHistory == 'true'){
+			//insert the broadcast into each conversation's db
+			for (var i = 0; i < broadcastExtensions.length; i++) {
+				data.destname = '';
+				var currentExt = broadcastExtensions[i][0];
+			
+				data.destext=broadcastExtensions[i][0];
+
+				var chatMembers = [currentExt, data.senderext];
+				chatMembers = chatMembers.sort();
+				var extensionsChat = chatMembers.toString();
+
+				colChatHistory = mongodb.collection(extensionsChat+'chatHistory');
+				colChatHistory.insertOne(data, function(err, result) {
+					if(err){
+						console.log("Insert a record into chatHistory collection of MongoDB, error: " + err);
+						logger.debug("Insert a record into chatHistory collection of MongoDB, error: " + err);
+						throw err;
+					} else {
+						console.log('Successfully inserted broadcast message');
+					}
+				});
+			}
+		}
+	});
+
+	socket.on('update-broadcast-name', function(data) {
+		if (saveChatHistory == 'true'){
+			console.log('updating destname of broadcast');
+
+			var chatMembers = [data.destext, data.senderext];
+			chatMembers = chatMembers.sort();
+			var extensionsChat = chatMembers.toString();
+
+			mongodb.listCollections({name: extensionsChat + 'chatHistory'}).toArray((err, collections) => {
+		
+				colChatHistory = mongodb.collection(extensionsChat + 'chatHistory');
+
+				colChatHistory.updateOne(
+					{displayname: data.sendername, timeSent: data.time},
+					{$set: {destname:data.name}},
+					{upsert:false}
+				);
+		
+			});
+		}
 	});
 
 	// Handler catches a Socket.IO event (register-vrs) to create a new socket to the consumer portal.
@@ -1190,6 +1527,29 @@ io.sockets.on('connection', function (socket) {
 		data.message = msg;
 
 		io.to(Number(vrs)).emit('chat-message-new', data);
+	});
+
+	socket.on('translate', function (data){
+		console.log('Received data is ' + JSON.stringify(data));
+			request({
+				method: 'GET',
+				url: translationServerUrl + '/translate?languageFrom=' + data.fromLanguage + '&text=' + encodeURI(data.message) + '&languageTo=' + data.toLanguage,
+				headers: {
+					'Content-Type': 'application/json'
+				},
+			}, function (error, response, newData) {
+				if (error) {
+					logger.error("translate ERROR: " + error);
+					console.error("translate ERROR: " + error)
+					socket.emit('chat-message-new-translated', data);
+					socket.emit('translate-language-error', error);
+				} else {
+					let dataObj = JSON.parse(newData);
+					console.log('Translation is ' + dataObj.translation);
+					data.message = dataObj.translation
+					socket.emit('chat-message-new-translated', data);
+				}
+			});
 	});
 
 	// Handler catches a Socket.IO event (chat-typing) to send the user an 'is typing...' message in the chat window.
@@ -1405,8 +1765,141 @@ io.sockets.on('connection', function (socket) {
 		}
 	});
 
-});
+	socket.on('set-agent-language', function(data) {
+		console.log('setting language', Number(data.extension), data.language)
+		redisClient.hset(rExtensionToLanguage, Number(data.extension), data.language)
+	});
 
+	socket.on('translate-caption', function(data) {
+		
+		// fixme do we have to test this to avoid hacks or bugs?
+		let callerNumber = data.callerNumber.toString();
+		let msgid = data.transcripts.msgid;
+		let final = data.transcripts.final;
+
+		console.log('translating', data)
+
+		var fromNumber;
+		var toNumber;
+		var languageFrom;
+		var languageTo;
+		
+		redisClient.hgetall(rConsumerToCsr, function (err, tuples) {
+			if (err) {
+				logger.error("Redis Error" + err);
+				console.log("Redis Error" + err)
+			} else {
+				console.log('csr', callerNumber, tuples)
+				for (let clientNumber in tuples) {
+					agentNumber = tuples[clientNumber] 
+					console.log(callerNumber, clientNumber + ' => ' + agentNumber, typeof(callerNumber), typeof(agentNumber), callerNumber === agentNumber);
+					if (callerNumber === agentNumber) {
+						fromNumber = clientNumber;
+						toNumber = agentNumber;
+					}
+					else if (callerNumber === clientNumber) {
+						fromNumber = agentNumber;
+						toNumber = clientNumber;
+						console.log(agentNumber, clientNumber)
+					}
+				}
+				var promises = [
+					new Promise( function(resolve,reject) {
+						redisClient.hget(rExtensionToLanguage, Number(fromNumber), function (err, language) {
+							if (err) {
+								logger.error("Redis Error" + err);
+								reject(err);
+							} 
+							else {
+								languageFrom = language;
+								console.log('language from for user', fromNumber, languageFrom)
+								if (!languageFrom) {
+									languageFrom = 'en'; // default English
+								}
+								
+								resolve();
+							}
+						})
+					}),
+					new Promise( function(resolve,reject) {
+						redisClient.hget(rExtensionToLanguage, Number(toNumber), function (err, language) {
+							if (err) {
+							  logger.error("Redis Error" + err);
+							  reject(err);
+							} 
+							else {
+								languageTo = language;
+								if (!languageTo) {
+									languageTo = 'en'; // default English
+								}
+								resolve();
+							}
+						})
+					})
+				];
+				
+				Promise.all(promises).then( function(values) {
+					console.log('language',fromNumber,toNumber,languageFrom,languageTo);
+					console.log('translating', data.transcripts.transcript, 'from', languageFrom, 'to', languageTo);
+					let encodedText = encodeURI(data.transcripts.transcript.trim())
+					let translationUrl = translationServerUrl + '/translate?languageFrom=' + languageFrom + '&text=' + encodedText + '&languageTo=' + languageTo;
+					if (languageTo === languageFrom) {
+						console.log('same language!')
+						socket.emit('caption-translated', {
+							'transcript' : data.transcripts.transcript.trim(),
+							'msgid': msgid,
+							'final': final
+						});
+					}
+					else {
+						console.log('trying', translationUrl)
+						request({
+							method: 'GET',
+								url: translationUrl,
+								headers: {
+									'Content-Type': 'application/json'
+								},
+								json: true
+						}, function (error, response, data) {
+							if (error) {
+								logger.error("GET translation: " + error);
+								console.error("GET translation error: " + error);
+								socket.emit('caption-translated', {
+									'transcript' : 'Error using translation server: ' + translationUrl,
+									'msgid': msgid,
+									'final': final
+								});
+							} else {
+								console.log('received translation', data)
+								console.log(languageFrom, languageTo, translationUrl)
+								// fixme will this be wrong if multiple clients/agents?
+								socket.emit('caption-translated', {
+									'transcript' : data.translation,
+									'msgid': msgid,
+									'final': final
+									});
+								// io.to(Number(callerNumber)).emit('caption-translated', {
+								// 	'transcript' : data.translation,
+								// 	'msgid': msgid,
+								// 	'final': final
+								// 	});
+									// console.log(data.translation, 'sent to', callerNumber)
+
+							}
+						});
+					}
+				}).catch(function(err) {
+					console.log('Error in translate-caption', err.message); // some coding error in handling happened
+				});
+				
+				
+
+			}
+		});
+
+		
+	});
+});
 
 /**
  * updates and emits All Agents status to 'my room'
@@ -1449,7 +1942,6 @@ function sendAgentStatusList(agent, value) {
 		});
 	}
 }
-
 
 /**
  * Event handler to catch the incoming AMI action response. Note, this is
@@ -1515,13 +2007,18 @@ function popZendesk(callId,ani,agentid,agentphonenum,skillgrpnum,skillgrpnam,cal
 	});
 }
 
+/**
+ * Insert a call data record into calldata collection of MongoDB
+ *
+ * @param {string} eventType One of these event types: "Handled", "Web", "Videomail", "Abandoned"
+ */
 function insertCallDataRecord (eventType) {
 	if (logCallData) {
 		colCallData = mongodb.collection('calldata');
 		colCallData.insertOne({"Timestamp": new Date(), "Event": eventType}, function(err, result) {
 			if(err){
-				console.log("Insert a Web call record into calldata collection of MongoDB, error: " + err);
-				logger.debug("Insert a Web call record into calldata collection of MongoDB, error: " + err);
+				console.log("Insert a call data record into calldata collection of MongoDB, error: " + err);
+				logger.debug("Insert a call data record into calldata collection of MongoDB, error: " + err);
 			}
 		});
 	}
@@ -1547,15 +2044,13 @@ function handle_manager_event(evt) {
   switch (evt.event) {
 
 	case ('VarSet'):
-		//let channel = evt.channel.split(/[\/,-]/);
-		//console.log(JSON.stringify(evt))
-		//if(channel[1]  && (channel[1].startsWith("ProviderPurple") || channel[1].startsWith("ProviderZVRS")) && 
-		if (evt.variable && evt.variable.bridgepeer == ''){
+		let channel = evt.channel.split(/[\/,-]/);
+        if(channel[1]  && (channel[1].startsWith("ProviderPurple") || channel[1].startsWith("ProviderZVRS")) && evt.variable && evt.variable.bridgepeer == ''){
 			let agentExt = evt.value.split(/[\/,-]/);
 			console.log("sending new-peer to", agentExt[1])
 			if(agentExt[1])
 				io.to(agentExt[1]).emit('new-peer',{});
-		}		
+		}
 		break;
 
 
@@ -1565,11 +2060,12 @@ function handle_manager_event(evt) {
       if (evt.dialstatus === 'ANSWER') {
 
 		insertCallDataRecord("Handled");
+		console.log("EVT calleridnum" + evt.calleridnum);
 
         logger.info('DialEnd / ANSWER: evt.context is: >' + evt.context + '< , evt.channel is: >' + evt.channel + '<');
 		logger.info("Event is " + JSON.stringify(evt, null, 2));
 		
-		if (evt.context === 'from-internal' & evt.destchannel.includes(PROVIDER_STR)) {
+		if (evt.context === 'from-internal' && evt.destchannel.includes(PROVIDER_STR)) {
 			
 			let channel = evt.channel;
 			let channelExt = channel.split(/[\/,-]/);
@@ -1611,7 +2107,7 @@ function handle_manager_event(evt) {
           redisClient.hset(rConsumerToCsr, Number(extension[1]), Number(destExtension[1]));
           logger.info('Populating consumerToCsr: ' + extension[1] + ' => ' + destExtension[1]);
           logger.info('Extension number: ' + extension[1]);
-          logger.info('Dest extension number: ' + destExtension[1]);
+		  logger.info('Dest extension number: ' + destExtension[1]);
 
           if (extension[1].length >= 10) {
             //pop here, because we already have the consumer phone number
@@ -1634,8 +2130,8 @@ function handle_manager_event(evt) {
               // Trigger to agent to indicate that we don't have a valid VRS, agent will prompt user for VRS
               io.to(Number(destExtension[1])).emit('missing-vrs', {});
             }
+		  });
 
-          });
           //tell CSR portal that a complaints queue call has connected
           io.to(Number(destExtension[1])).emit('new-caller-complaints', evt.context);
         } else if (evt.context === 'Provider_General_Questions' || evt.context === 'General_Questions') {
@@ -1785,7 +2281,7 @@ function handle_manager_event(evt) {
 
       logger.info('HANGUP RECEIVED: evt.context:' + evt.context + ' , evt.channel:' + evt.channel);
 
-      if (evt.context === 'Complaints' && extension[1].indexOf(PROVIDER_STR) === -1) {
+      if ( evt.connectedlinenum == queuesComplaintNumber || evt.exten === queuesComplaintNumber ) {
         // Consumer portal ONLY! Zphone Complaint queue calls will go to the next if clause
         logger.info('Processing Hangup from a Complaints queue call');
 
@@ -1940,8 +2436,8 @@ function handle_manager_event(evt) {
           });
         }
       } else {
-          //SOFT ERROR- if we get here, then we didn't process the hangup. need to check evt string values with our if statements above
-          logger.error('ERROR!!! HANGUP NOT PROCESSED!!! VERIFY evt string values... evt.context:' + evt.context + ' , evt.channel:' + evt.channel);
+          //if we get here, it is a hangup that we are ignoring, probably because we don't need it
+          logger.info('Not processing hangup.  evt string values... evt.context:' + evt.context + ' , evt.channel:' + evt.channel);
       }
 
       break;
@@ -2121,6 +2617,7 @@ function handle_manager_event(evt) {
       	var data = {"position": evt.position, "extension": evt.calleridnum, "queue": evt.queue};
 		  sendEmit('queue-caller-abandon',data);
 
+		  //Console.log("ABANDONED: " +  evt.calleridnum);
 		  insertCallDataRecord("Abandoned");
       	break;
       //sent by asterisk when a caller joins the queue
@@ -2254,7 +2751,6 @@ setInterval(function () {
  */
 function getUserInfo(username, callback) {
 	var url = 'https://' + getConfigVal('common:private_ip') + ":" + parseInt(getConfigVal('agent_service:port')) + '/getagentrec/' + username;
-	usernameTracker = username;
 	request({
 		url: url,
 		json: true
@@ -2349,7 +2845,7 @@ function getCallerInfo(phoneNumber, callback) {
 
 /**
  * Looks in the call_block table of the mysql db to see if VRS number is blocked.  Reason is irrelevant here.
- * 
+ *
  * @param {type} phoneNumber
  * @param {type} callback
  * @returns {boolean}
@@ -2363,7 +2859,7 @@ function checkIfBlocked(phoneNumber, callback) {
 			callback(result.length > 0); // true if at least one row with that number, false otherwise
 		}
 	});
-	
+
 }
 
 /**
@@ -2418,7 +2914,6 @@ function processConsumerRequest(data) {
 		if (vrsinfo.message === 'success') {
 
 
-			var queuesComplaintNumber = getConfigVal('asterisk:queues:complaint:number');
 
 			logger.info('Config lookup:');
 			logger.info('queuesComplaintNumber: ' + queuesComplaintNumber);
@@ -2574,7 +3069,6 @@ function processExtension(data) {
         var ps_port = getConfigVal('proxy_server:port');
         var ps_path = getConfigVal('proxy_server:path');
 
-	var queuesComplaintNumber = getConfigVal('asterisk:queues:complaint:number');
 	var queuesVideomailNumber = getConfigVal('asterisk:queues:videomail:number');
 	var queuesVideomailMaxrecordsecs = getConfigVal('videomail:max_record_secs');
 
@@ -2620,6 +3114,13 @@ function processExtension(data) {
 
 					redisClient.hset(rExtensionToVrs, Number(nextExtension), Number(data.vrs));
 					redisClient.hset(rExtensionToVrs, Number(data.vrs), Number(nextExtension));
+					if (data.language) {
+						redisClient.hset(rExtensionToLanguage, Number(nextExtension), data.language);
+					}
+					else {
+						logger.error("Language has not been specified for extension", Number(nextExtension));
+					}
+					
 				}
 
 				logger.info('EMIT: extension-created: ' + JSON.stringify(resultJson));
@@ -2677,7 +3178,6 @@ function loadColorConfigs() {
 	}
 }
 
-
 /**
  * sends an emit message for all connections.
  *
@@ -2690,7 +3190,6 @@ function sendEmit(evt, message) {
 		logger.error('Socket io emit error ');
 	}
 }
-
 
 /**
  * Populates the consumerExtensions hash map with a range of valid extensions.
@@ -2763,7 +3262,6 @@ function findExtensionPassword(extension, callback) {
 		return callback(password);
 	});
 }
-
 
 /**
  * Perform VRS lookup and Zendesk ticket creation.
@@ -2941,7 +3439,6 @@ function createToken() {
 	});
 }
 
-
 var ctoken = jwt.sign({
 	tokenname: "servertoken"
 }, Buffer.alloc(jwtKey.length, jwtKey , jwtEnc  ));
@@ -3007,7 +3504,7 @@ app.post('/consumer_login', function (req, res) {
 					} else {
 						res.status(200).json(vrs);
 					}
-				
+
 				});
 			}
 		})
@@ -3017,7 +3514,6 @@ app.post('/consumer_login', function (req, res) {
 		});
 	}
 });
-
 
 app.use(function (req, res, next) {
         res.locals = {
@@ -3035,8 +3531,6 @@ app.use(function (req, res, next) {
         next();
 });
 
-
-
 /**
  * Handles all GET request to server
  * determines if user can procede or
@@ -3048,7 +3542,6 @@ app.use(function (req, res, next) {
 app.get('/', function (req, res, next) {
 	res.redirect('fcc');
 });
-
 
 //redirects to the fcc mockup page
 app.get('/fcc', function(req,res,next){
@@ -3074,8 +3567,6 @@ app.get(consumerPath, function (req, res, next) {
 		});
 	}
 });
-
-
 
 /**
  * Handles a GET request for /logout.
@@ -3115,7 +3606,6 @@ app.get('/logout', function (req, res) {
 		}
 	});
 });
-
 
 /**
  * Handles a GET request for token and returnes a valid JWT token
@@ -3222,8 +3712,6 @@ app.get('/token', function (req, res) {
 	}
 });
 
-
-
 /* NGINX location redirect for forcing
  * openam-agent to include NGINX path in parameters.
  *
@@ -3266,8 +3754,6 @@ app.get(agentPath, agent.shield(cookieShield), function (req, res) {
 		res.redirect('./login');
 	}
 });
-
-
 
 /**
  * Handles a GET request for /login prior to OpenAM Cookie Shield.
@@ -3336,7 +3822,6 @@ app.get('/login', agent.shield(cookieShield), function (req, res) {
 							wsPort = parseInt(wsPort);
 						}
 
-						var queuesComplaintNumber = getConfigVal('asterisk:queues:complaint:number');
 						var extensionPassword = getConfigVal('asterisk:extensions:secret');
 
 						redisClient.hset(rTokenMap, tokenMap.token, "AWAY");
@@ -3429,8 +3914,8 @@ app.get('/getVideomail', agent.shield(cookieShield),function (req, res) {
 var multer = require('multer');
 var upload = multer({dest: 'uploads/'});
 app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
-	
-	let uploadedBy = req.session.vrs || ((req.session.role == 'AD Agent') ? req.body.vrs : false); 
+
+	let uploadedBy = req.session.vrs || ((req.session.role == 'AD Agent') ? req.body.vrs : false);
 
 	//sometimes the consumer doesn't have it's vrs number in req.session
 	//also sometimes the req.session doesn't update?? **** This is the issue
@@ -3438,7 +3923,7 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 	if (uploadedBy == undefined) {
 		uploadedBy = req.session.data.valid;
 	}
-	
+
 	console.log("Uploaded by " + uploadedBy);
 	console.log("SESSION " + JSON.stringify(req.session));
 	if(uploadedBy){
@@ -3451,7 +3936,7 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 			//by looking at the agent extension and finding the vrs associated with it
 
 			let uploadAgentExt = req.session.extension;
-			
+
 			for (let i = 0; i < sharingAgent.length; i++){
 				if (sharingAgent[i] == uploadAgentExt) {
 					uploadMetadata.vrs = sharingConsumer[i];
@@ -3496,14 +3981,14 @@ app.get('/downloadFile',/*agent.shield(cookieShield) ,*/function(req, res) {
 
 				//make sure the agent is in a call with the consumer who sent the file
 				if (req.session.extension == sharingAgent[i] || req.session.vrs == sharingConsumer[i]){
-					
+
 					console.log('In valid session');
 
 					console.log('Comparing file IDs');
 					//console.log(fileToken[i] + " vs " +req.query.id.split('"')[0]);
 					if (fileToken[i] == (req.query.id).split('"')[0]) { //remove the filename from the ID if it's there
 						console.log('allowed to download');
-					
+
 						let documentID = req.query.id;
 						let  url = 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port');
 						url += '/storeFileInfo?documentID=' + documentID;
@@ -3539,7 +4024,6 @@ app.get('/downloadFile',/*agent.shield(cookieShield) ,*/function(req, res) {
 		console.log('Not authorized to download');
 	}
 });
-
 
 app.get('/getagentstatus/:token', function (req, res) {
 	var resObj = {

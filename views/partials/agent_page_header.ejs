@@ -59,6 +59,30 @@
                     </li>
                 </ul>
             </li>
+
+            <li class="dropdown messages-menu">
+                <a href="#" style="text-overflow:ellipsis;" id="chat-btn" data-toggle="dropdown" onclick="getMyChats()" name="Agent_Chats" accesskey="D">
+                    <i class="fa fa-comments"></i>
+                    <span class="label label-danger" id="unread-chat-count"></span>
+                </a>
+
+                <ul class="dropdown-menu" style="overflow-y: scroll;">
+                    <li role="presentation" class="dropdown-header"style="font-size:15px"><b>Direct Messages</b></li>
+                    <li role="presentation" class="divider"></li>
+                    <li>
+                        <ul id='agent-chat-list'class="menu">
+                            <li>
+                              <!-- start message -->
+                              <a href="#">
+                                <!-- The message -->
+                                <p>Your messages will appear here</p>
+                              </a>
+                            </li>
+                          </ul>
+                    </li>
+                  </ul>
+            </li>
+
             <!-- Control Sidebar Toggle Button -->
             <li>
                 <a href="#" id="mail-btn" data-toggle="control-sidebar" onClick="showVideoMailTab()" name="Video_Mail"accesskey="V">

@@ -47,32 +47,18 @@ function register_jssip() {
 			console.log('--- WV: after new calls ---\n');
 		},
 		'newMessage': function (e) {
-
-			//try captioning here
 			console.log('--- WV: New Message---\n');
 			try {
 				var transcripts = JSON.parse(e.msg);
-				//var transcripts = JSON.parse(e.msg._request.body)
-				//var transcripts = JSON.parse(e.message._request.body)
 				if (transcripts.transcript) {
-					console.log('--- WV: transcripts.transcript ---\n');
-					var tDiv = document.getElementById(transcripts.msgid);
-					if (!tDiv) {
-						var temp = document.createElement("div");
-						temp.id = transcripts.msgid;
-						temp.innerHTML = transcripts.transcript;
-						temp.classList.add("transcripttext");
-						document.getElementById("transcriptoverlay").appendChild(temp);
-					} else {
-						tDiv.innerHTML = transcripts.transcript;
-						if (transcripts.final) {
-							setTimeout(function () { tDiv.remove() }, 5000);
-
-							$('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>" + transcripts.transcript + "</div></div>");
-							$("#caption-messages").scrollTop($("#caption-messages")[0].scrollHeight);
-
-						}
-					}
+					// Acedirect will skip translation service if languages are the same
+					console.log('sending caption:', transcripts.transcript, extensionMe);
+					socket.emit('translate-caption', {
+						"transcripts": transcripts,
+						"callerNumber": extensionMe
+					});
+					// acedirect.js is listening for 'caption-translated' and will call updateCaptions directly with the translation
+					
 				}
 			} catch (err) {
 				console.log(err);
@@ -137,14 +123,12 @@ function register_jssip() {
                         console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e) );
                         if (selfStream.srcObject) {
                           selfStream.srcObject.getVideoTracks()[0].onended = function () {
-                            console.log('screensharing ended self');
                             screenShareEnabled = false;
                             acekurento.screenshare(false);
                           };
                         }
                         if (remoteStream.srcObject) {
                           remoteStream.srcObject.getVideoTracks()[0].onended = function () {
-                            console.log('screensharing ended remote');
                             screenShareEnabled = false;
                             acekurento.screenshare(false);
                           };
@@ -154,7 +138,7 @@ function register_jssip() {
                         screenShareEnabled = false;
                         acekurento.screenshare(false);
 			if (acekurento.isMultiparty == false) {
-				console.log("Wont enter wrap up");
+				//Wont enter wrap up
 			}
 			console.log('--- WV: Call ended ---\n');
 			terminate_call();
@@ -174,7 +158,7 @@ function register_jssip() {
 					"endpoint" : endpoint,
 					"callDate" : callDate
 			});
-			console.log("Table vars are " + callerName + " " + callerNumber + " " + direction + " " + duration + " " + callDate);
+			//console.log("Table vars are " + callerName + " " + callerNumber + " " + direction + " " + duration + " " + callDate);
 			loadCallHistory();
 
 			console.log("REASON: " + e.reason);
@@ -189,7 +173,6 @@ function register_jssip() {
 				})
 
 			}
-			console.log("Active list from agent is " + JSON.stringify(acekurento.activeAgentList));
 			/*for(var i = 0; i < acekurento.activeAgentList.length; i++){
 				if(acekurento.activeAgentList[i].ext == extensionMe){
 					console.log("Found extension");
@@ -254,7 +237,7 @@ function start_call(other_sip_uri) {
 	document.getElementById("sidebar-callHistory").removeAttribute("onclick");
 	document.getElementById("status-dropdown-button").disabled = true;
 	document.getElementById("persistCameraCheck").disabled = true;
-	console.log("Call is started");
+	document.getElementById("muteAudio").disabled = true;
 	var options = {
 		'mediaConstraints': {
 			'audio': true,
@@ -280,6 +263,9 @@ function start_call(other_sip_uri) {
 		$('#modalOutboundCall').modal('hide');
 		console.log("ANSWER -- Option 1: add onplay event to the remoteVideo after acekurento.call. Good: fires after video stream starts. Bad: in the case of 1 way video this may not fire.")
                 clearTimeout(outbound_timer);
+				if (document.getElementById("muteAudio").checked == true) {
+					mute_audio();
+				}
 		setTimeout(() => {
 			calibrateVideo(2000);
 		}, 1000);
@@ -295,15 +281,16 @@ function toggleSelfview(duration) {
 		console.log("TOGGLE END")
 	}, duration);
 }
-
+var calibrating = false;
 function calibrateVideo(duration) {
-	return;
 	console.log("Calibrate Video")
 	let mediaStream = acekurento.mediaStream()
 	
-	if (mediaStream.getVideoTracks()[0] && mediaStream.getVideoTracks()[0].enabled) {
+	if (!calibrating && mediaStream.getVideoTracks()[0] && mediaStream.getVideoTracks()[0].enabled) {
 		start_video_calibration()
+		calibrating = true;
 		setTimeout(function () {
+			calibrating = false;
 			end_video_calibration()
 		}, duration);
 	}
@@ -314,16 +301,21 @@ function accept_call() {
 	stopVideomail();
 	disable_persist_view();
 	document.getElementById("sidebar-dialpad").removeAttribute("onclick");
-	document.getElementById("sidebar-callHistory").removeAttribute("onclick");
+	// document.getElementById("sidebar-callHistory").removeAttribute("onclick");
 	document.getElementById("status-dropdown-button").disabled = true;
 	document.getElementById("persistCameraCheck").disabled = true;
+	document.getElementById("muteAudio").disabled = true;
+	// document.getElementById("language-select").disabled = true;
+	if ($('#language-select') && $('#language-select').data('dd')) {
+		$('#language-select').data('dd').set('disabled', true); // Disable the msdropdown
+	}
 	//Enable in call buttons
 	document.getElementById("fileInput").disabled = false;
 	document.getElementById("sendFileButton").className = "demo-btn"
 	document.getElementById("sendFileButton").disabled = false;
 	document.getElementById("sendFileButton").style = 'cursor: pointer';
-	document.getElementById("downloadButton").className = "demo-btn";
-	document.getElementById("downloadButton").style = 'cursor: not-allowed';
+	//document.getElementById("downloadButton").className = "demo-btn";
+	//document.getElementById("downloadButton").style = 'cursor: not-allowed';
 	//document.getElementById("downloadButton").disabled = false;
 	document.getElementById("screenShareButton").className = "demo-btn"
 	document.getElementById("screenShareButton").disabled = false;
@@ -339,6 +331,9 @@ function accept_call() {
 		$("#start-call-buttons").hide();
 		$('#outboundCallAlert').hide();// Does Not Exist - ybao: recover this to remove the Calling screen
 		setTimeout(() => {
+			if (document.getElementById("muteAudio").checked == true) {
+				mute_audio();
+			}
 			calibrateVideo(2000);
 		}, 1000);
 	}
@@ -347,6 +342,7 @@ function accept_call() {
 //Functions for enabling and disabling persist view
 function enable_persist_view() {
 	document.getElementById("persistCameraCheck").disabled = false;
+	document.getElementById("muteAudio").disabled = false;
 	document.getElementById("persistView").hidden = false;
 	document.getElementById("selfView").hidden = true;
 	document.getElementById("remoteView").hidden = true;
@@ -485,13 +481,14 @@ function toggle_incall_buttons(make_visible) {
 }
 
 function terminate_call() {
-        clearTimeout(outbound_timer);
-        $('#outboundCallAlert').hide();
+	clearTimeout(outbound_timer);
+	$('#outboundCallAlert').hide();
 	mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
 	mute_audio_icon.classList.add("fa-microphone");
 	mute_audio_icon.classList.remove("fa-microphone-slash");
 	acekurento.stop(false);
 	remove_video();
+	mute_captions();
 	disable_chat_buttons();
 	enable_initial_buttons();
 	$("#start-call-buttons").show();
@@ -505,17 +502,19 @@ function terminate_call() {
 	if (document.getElementById("persistCameraCheck").checked == true) {
 		enable_persist_view();
 	}
+	document.getElementById("muteAudio").disabled = false;
+	// document.getElementById("language-select").disabled = false;
+	if ($('#language-select') && $('#language-select').data('dd')) {
+		$('#language-select').data('dd').set('disabled', false); // Enable the msdropdown
+	}
 	document.getElementById("persistCameraCheck").disabled = false;
 	$('#screenshareButtons').hide();
 	//Disable in call buttons
 	document.getElementById("fileInput").disabled = true;
-	document.getElementById("sendFileButton").className = "btn btn-primary"
+	document.getElementById("sendFileButton").removeAttribute('class');
 	document.getElementById("sendFileButton").disabled = true;
 	document.getElementById("sendFileButton").removeAttribute('style');
-	document.getElementById("downloadButton").className = "btn btn-primary"
-	document.getElementById("downloadButton").disabled = true;
-	document.getElementById("downloadButton").removeAttribute('style');
-	document.getElementById("screenShareButton").className = "btn btn-primary"
+	document.getElementById("screenShareButton").removeAttribute('class');
 	document.getElementById("screenShareButton").disabled = true;
 	document.getElementById("screenShareButton").removeAttribute('style');
 
@@ -1003,3 +1002,34 @@ function testCaptions() {
 		}, 6000);
 	} else { console.log('demo running'); }
 }
+
+function updateCaptions(transcripts) {
+	console.log('transcripts in UC are ', transcripts)
+	var tDiv = document.getElementById(transcripts.msgid);
+	console.log(tDiv)
+	if (!tDiv) {
+		var temp = document.createElement("div");
+		temp.id = transcripts.msgid;
+		temp.innerHTML = transcripts.transcript;
+		temp.classList.add("transcripttext");
+		document.getElementById("transcriptoverlay").appendChild(temp);
+	} else {
+		tDiv.innerHTML = transcripts.transcript;
+		if (transcripts.final) {
+			setTimeout(function () { tDiv.remove() }, 5000);
+
+			$('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>" + transcripts.transcript + "</div></div>");
+			$("#caption-messages").scrollTop($("#caption-messages")[0].scrollHeight);
+
+		}
+	}
+}
+
+
+$('#language-select').on('change', function() {
+	console.log('Setting agent language', this.value, extensionMe)
+	socket.emit('set-agent-language', {
+		"language": this.value,
+		"extension": extensionMe
+	});
+});

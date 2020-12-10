@@ -42,21 +42,21 @@ $(document).ready(function () {
 	connect_socket();
 
 	// chat-transcript toggle
-	$('#chat-tab').on('click', function(){
+	$('#chat-tab').on('click', function () {
 		$('#chat-body').css('display', 'block');
 		$('#chat-footer').css('display', 'block');
 		$('#trans-body').css('display', 'none');
 		$('#caption-settings-body').css('display', 'none')
 		$('#caption-settings-footer').css('display', 'none')
 	});
-	$('#trans-tab').on('click', function(){
+	$('#trans-tab').on('click', function () {
 		$('#chat-body').css('display', 'none');
 		$('#chat-footer').css('display', 'none');
 		$('#caption-settings-body').css('display', 'none')
 		$('#caption-settings-footer').css('display', 'none')
 		$('#trans-body').css('display', 'block');
 	});
-	$('#caption-settings-tab').on('click', function(){
+	$('#caption-settings-tab').on('click', function () {
 		$('#chat-body').css('display', 'none')
 		$('#chat-footer').css('display', 'none')
 		$('#trans-body').css('display', 'none')
@@ -66,10 +66,10 @@ $(document).ready(function () {
 });
 
 function clearScreen() {
-        $('#ticketNumber').text('');
-        $('#complaintcounter').text('2,000');
-        $('#complaint').val('');
-        $('#subject').val('');
+	$('#ticketNumber').text('');
+	$('#complaintcounter').text('2,000');
+	$('#complaint').val('');
+	$('#subject').val('');
 	$('#userform').find('input:text').val('');
 	$('#callerEmail').val('');
 
@@ -179,27 +179,27 @@ function connect_socket() {
 				}).on('extension-created', function (data) {
 					console.log("got extension-created");
 					if (data.message === 'success') {
-                                                globalData = data;
+						globalData = data;
 						$('#outOfExtensionsModal').modal('hide');
 						var extension = data.extension; //returned extension to use for WebRTC
 						exten = data.extension;
 						$('#display_name').val(data.extension);
 
-                                                //is this a videomail call or complaint call?
-                                                if (videomailflag){
-						    //Videomail calls must come from videomail ext
-                                                    let ext = '99001';
-                                                    $('#my_sip_uri').attr("name", "sip:" + ext + "@" + data.asterisk_public_hostname);
+						//is this a videomail call or complaint call?
+						if (videomailflag) {
+							//Videomail calls must come from videomail ext
+							let ext = '99001';
+							$('#my_sip_uri').attr("name", "sip:" + ext + "@" + data.asterisk_public_hostname);
 
-						    asterisk_sip_uri = "sip:" + data.queues_videomail_number + "@" + data.asterisk_public_hostname;
-                                                }
-                                                else{
-                                                    $('#my_sip_uri').attr("name", "sip:" + data.extension + "@" + data.ps_public); 
-                                                    asterisk_sip_uri = "sip:" + data.queues_complaint_number + "@" + data.asterisk_public_hostname;
-                                                    asterisk_sip_uri = data.queues_complaint_number; //TODO: what is this doing?
-                                                }
+							asterisk_sip_uri = "sip:" + data.queues_videomail_number + "@" + data.asterisk_public_hostname;
+						}
+						else {
+							$('#my_sip_uri').attr("name", "sip:" + data.extension + "@" + data.ps_public);
+							asterisk_sip_uri = "sip:" + data.queues_complaint_number + "@" + data.asterisk_public_hostname;
+							asterisk_sip_uri = data.queues_complaint_number; //TODO: what is this doing?
+						}
 
-                                                console.log(`Asterisk sip URI = ${asterisk_sip_uri}`);
+						console.log(`Asterisk sip URI = ${asterisk_sip_uri}`);
 						//get the max videomail recording seconds
 						maxRecordingSeconds = data.queues_videomail_maxrecordsecs;
 
@@ -314,55 +314,40 @@ function connect_socket() {
 						let i = 10;
 						var newExtensionRetryCounter = setInterval(function () {
 
-								document.getElementById("newExtensionRetryCounter").innerHTML =  i;
-								i-- || (clearInterval(newExtensionRetryCounter), extensionRetry());
-							}, 1000);
+							document.getElementById("newExtensionRetryCounter").innerHTML = i;
+							i-- || (clearInterval(newExtensionRetryCounter), extensionRetry());
+						}, 1000);
 					} else {
 						console.log('Something went wrong when getting an extension');
 					}
 				}).on('chat-message-new', function (data) {
-					var msg = data.message;
-					var displayname = data.displayname;
-					var timestamp = data.timestamp;
-
-					msg = msg.replace(/:\)/, '<i class="fa fa-smile-o fa-2x"></i>');
-					msg = msg.replace(/:\(/, '<i class="fa fa-frown-o fa-2x"></i>');
-
-					var msgblock = document.createElement('div');
-					var msginfo = document.createElement('div');
-					var msgsender = document.createElement('span');
-					var msgtime = document.createElement('span');
-					var msgtext = document.createElement('div');
-
-					if ($("#displayname").val() === displayname) {
-						$(msgsender).addClass("direct-chat-name pull-right").html(displayname).appendTo(msginfo);
-						$(msgtime).addClass("direct-chat-timestamp pull-left").html(timestamp).appendTo(msginfo);
-						$(msginfo).addClass("direct-chat-info clearfix").appendTo(msgblock);
-						$(msgtext).addClass("direct-chat-text").html(msg).appendTo(msgblock);
-						$(msgblock).addClass("direct-chat-msg right").appendTo($("#chat-messages"));
-					} else {
-						$('#chat-messages').remove($("#rtt-typing"));
-						$("#rtt-typing").html('').removeClass("direct-chat-text").removeClass("direct-chat-timestamp text-bold");
-
-						$(msgsender).addClass("direct-chat-name pull-left").html(displayname).appendTo(msginfo);
-						$(msgtime).addClass("direct-chat-timestamp pull-right").html(timestamp).appendTo(msginfo);
-						$(msginfo).addClass("direct-chat-info clearfix").appendTo(msgblock);
-						$(msgtext).addClass("direct-chat-text").html(msg).appendTo(msgblock);
-						$(msgblock).addClass("direct-chat-msg").appendTo($("#chat-messages"));
+					//debugtxt('chat-message-new', data);
+					
+					//Translate incoming message
+					var localLanguage = sessionStorage.consumerLanguage;
+					console.log('Selected language is ' + localLanguage);
+					//var localLanguage = "es";
+					data["toLanguage"] = localLanguage;
+					if(localLanguage == data.fromLanguage){
+						newChatMessage(data);
+					}else{
+						socket.emit('translate', data);
 					}
-
-					$("#chat-messages").scrollTop($("#chat-messages")[0].scrollHeight);
-
+				}).on('chat-message-new-translated', function (data){
+					newChatMessage(data);
+					console.log('translated', data)
+				}).on('translate-language-error', function (error){
+					console.error('Translation error:', error)
 				}).on('typing', function (data) {
 					if ($("#displayname").val() !== data.displayname) {
 						/* there's still some weird spacing between agent messages on the first call */
 						$("#rtt-typing").html(data.displayname + ": " + data.rttmsg).addClass("direct-chat-text").addClass("direct-chat-timestamp text-bold");
-						$("#rtt-typing").appendTo($("#chat-messages")); 
-						
+						$("#rtt-typing").appendTo($("#chat-messages"));
+
 					}
 				}).on('typing-clear', function (data) {
 					if ($("#displayname").val() !== data.displayname) {
-						$("#chat-messages").remove($("#rtt-typing"));					
+						$("#chat-messages").remove($("#rtt-typing"));
 						$("#rtt-typing").html('').removeClass("direct-chat-text").removeClass("direct-chat-timestamp text-bold");
 					}
 				}).on('disconnect', function () {
@@ -373,7 +358,7 @@ function connect_socket() {
 						logout("Session has expired");
 					}
 				}).on("caption-config", function (data) {
-					if(data == 'false'){
+					if (data == 'false') {
 						$('#caption-settings').css('display', 'none');
 						$('#transcriptoverlay').css('display', 'none');
 						$('#mute-captions').css('display', 'none');
@@ -448,12 +433,12 @@ function connect_socket() {
 						agentExtension = data.vrs;
 					}
 				}).on("agents", function (data) {
-                                  if (data.agents_logged_in) {
-                                    $("#agents-avail").text('');
-                                  } else {
-                                    $("#agents-avail").text('No representatives are available to take your call at this time.');
-                                  }
-                                }).on("chat-leave", function (error) {
+					if (data.agents_logged_in) {
+						$("#agents-avail").text('');
+					} else {
+						$("#agents-avail").text('No representatives are available to take your call at this time.');
+					}
+				}).on("chat-leave", function (error) {
 					//clear chat
 					$('#chatcounter').text('500');
 					$('#chat-messages').html('<div id="rtt-typing" ></div>');
@@ -502,10 +487,28 @@ function connect_socket() {
 						$("#startScreenshare").prop('disabled',false);
 						$("#screenshareButtonGroup").show();
 						$("#requestAck").hide();
-					} else{
+					} else {
 						console.log("No permission");
 						$("#requestAck").html("Permission has been denied.");
 					}
+				}).on('caption-translated', function (transcripts) {
+					console.log('consumer received translation', transcripts);
+					updateConsumerCaptions(transcripts); // in jssip_consumer.js
+				}).on('enable-translation', function() {
+					// Activate flag/language dropdown
+					$("#language-select").msDropDown(
+						{
+							on: {
+								open:function(data, ui) {
+									// hack to make it work in bootstrap modal
+									$("#language-select_child").height('auto');
+								}
+							}
+						}
+					);
+					$("#languageSelectModal").modal('show');
+					// Align flags and labels to left
+					$('#language-select_msdd').css('text-align', 'left')
 				});
 
 			} else {
@@ -531,10 +534,8 @@ $("#callbutton").click(function () {
 	});
 	$("#queueModal").modal("show");
 	$("#dialboxcallbtn").click(); //may or may not be dead code
-	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
-	socket.emit('call-initiated', {
-		"vrs": vrs
-	}); //sends vrs number to adserver
+	
+	initiateCall();
 	console.log('call-initiated event for complaint');
 	enable_chat_buttons();
 });
@@ -542,6 +543,15 @@ $("#callbutton").click(function () {
 $("#videomailbutton").click(function () {
 	$('#videomailModal').modal('show');
 });
+
+function initiateCall() {
+	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
+	var language = sessionStorage.consumerLanguage;
+	socket.emit('call-initiated', {
+		"language": language,
+		"vrs": vrs
+	}); //sends vrs number to adserver
+}
 
 function startRecordingVideomail(switchQueueFlag) {
 	if (switchQueueFlag) {
@@ -559,7 +569,9 @@ function startRecordingVideomail(switchQueueFlag) {
 		//dial into the videomail queue
 		$("#videomailbutton").prop("disabled", true);
 		var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
+		var language = sessionStorage.consumerLanguage;
 		socket.emit('call-initiated', {
+			"language": language,
 			"vrs": vrs
 		}); //sends vrs number to adserver
 		
@@ -588,10 +600,43 @@ $('#userform').submit(function (evt) {
 function extensionRetry() {
 	//$('#newExtensionRetryCounter').timer('remove');
 	clearInterval(newExtensionRetryCounter);
-	var vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
-	socket.emit('call-initiated', {
-		"vrs": vrs
-	});
+	initiateCall();
+}
+
+function newChatMessage(data) {
+	console.log('Data is ' + JSON.stringify(data));
+
+	var msg = data.message;
+	var displayname = data.displayname;
+	var timestamp = data.timestamp;
+	console.log('Also ' + data.displayname + ' ' + data.timestamp);
+
+	msg = msg.replace(/:\)/, '<i class="fa fa-smile-o fa-2x"></i>');
+	msg = msg.replace(/:\(/, '<i class="fa fa-frown-o fa-2x"></i>');
+
+	var msgblock = document.createElement('div');
+	var msginfo = document.createElement('div');
+	var msgsender = document.createElement('span');
+	var msgtime = document.createElement('span');
+	var msgtext = document.createElement('div');
+	if ($("#displayname").val() === displayname) {
+		$(msgsender).addClass("direct-chat-name pull-right").html(displayname).appendTo(msginfo);
+		$(msgtime).addClass("direct-chat-timestamp pull-left").html(timestamp).appendTo(msginfo);
+		$(msginfo).addClass("direct-chat-info clearfix").appendTo(msgblock);
+		$(msgtext).addClass("direct-chat-text").html(msg).appendTo(msgblock);
+		$(msgblock).addClass("direct-chat-msg right").appendTo($("#chat-messages"));
+	} else {
+		$('#chat-messages').remove($("#rtt-typing"));
+		$("#rtt-typing").html('').removeClass("direct-chat-text");
+
+		$(msgsender).addClass("direct-chat-name pull-left").html(displayname).appendTo(msginfo);
+		$(msgtime).addClass("direct-chat-timestamp pull-right").html(timestamp).appendTo(msginfo);
+		$(msginfo).addClass("direct-chat-info clearfix").appendTo(msgblock);
+		$(msgtext).addClass("direct-chat-text").html(msg).appendTo(msgblock);
+		$(msgblock).addClass("direct-chat-msg").appendTo($("#chat-messages"));
+
+	}
+	$("#chat-messages").scrollTop($("#chat-messages")[0].scrollHeight); 
 }
 
 //Logout the user
@@ -629,14 +674,16 @@ $('#chatsend').submit(function (evt) {
 	var date = moment();
 	var timestamp = date.format("D MMM h:mm a");
 
+	var language = sessionStorage.consumerLanguage;
 	$('#newchatmessage').val('');
 	$('#chatcounter').text('500');
-	console.log("sent message");
+	console.log("sent message with language", language);
 	isTyping = false;
 	socket.emit('chat-message', {
 		"message": msg,
 		"timestamp": timestamp,
-		"displayname": displayname
+		"displayname": displayname,
+		"fromLanguage": language
 	});
 });
 
@@ -645,8 +692,8 @@ function addEmoji(emoji) {
 	var value = $('#newchatmessage').val();
 	var displayname = $('#displayname').val();
 
-	value = value+emoji;
-	$('#newchatmessage').val(value);	
+	value = value + emoji;
+	$('#newchatmessage').val(value);
 
 	//update rtt
 	socket.emit('chat-typing', {
@@ -709,10 +756,10 @@ function clearFadeTimer() {
 
 function fade(type = 'out') {
 	$('#call-option-buttons button').each(function (i) {
-		$(this).css('animation', `fade-${type} 0.${i+2}s ease-out forwards`);
+		$(this).css('animation', `fade-${type} 0.${i + 2}s ease-out forwards`);
 	});
 
-	if(type == 'out') {
+	if (type == 'out') {
 		$('#transcriptoverlay').css('bottom', '10px');
 	} else {
 		$('#transcriptoverlay').css('bottom', '65px');
@@ -731,7 +778,7 @@ $('#fullscreen-element').mouseleave(function () {
 });
 
 //Send screenshare request
-$('#screenshareButton').prop("disabled", true).click(function(){
+$('#screenshareButton').prop("disabled", true).click(function () {
 	console.log("Request screenshare button clicked");
 	$("#requestAck").show();
 	socket.emit('requestScreenshare', {
@@ -747,7 +794,7 @@ $('#startScreenshare').prop("disabled", true).click(function(){
 function exit_queue() {
 	$('#queueModal').modal('hide');
 	terminate_call();
-        clearScreen();
+	clearScreen();
 }
 
 function afterHourVoicemail(){
@@ -762,8 +809,8 @@ function afterHoursHideVoicemail(){
           console.log('afterHoursHideVoicemail(): after hours modal suppressed. isOpen: ' + isOpen); 
 	}
 	$('#videomailModal').modal('hide');
-        $("#videomailbutton").removeAttr("disabled");
-        $("#callbutton").removeAttr("disabled");
+	$("#videomailbutton").removeAttr("disabled");
+	$("#callbutton").removeAttr("disabled");
 }
 
 function set_queue_text(position) {
@@ -882,12 +929,18 @@ function convertUTCtoLocal(hhmmutc) {
 }
 
 function logout(msg) {
-        //clear the token from session storage
-        console.log('logout(): ' + msg);
-        sessionStorage.clear();
-        //disconnect socket.io connection
-        if (socket)
-          socket.disconnect();
-        //display the login screen to the user.
-        window.location.href = './logout';
+	//clear the token from session storage
+	console.log('logout(): ' + msg);
+	sessionStorage.clear();
+	//disconnect socket.io connection
+	if (socket)
+		socket.disconnect();
+	//display the login screen to the user.
+	window.location.href = './logout';
 }
+
+console.log('Consumer language for this session is ', sessionStorage.consumerLanguage);
+
+
+
+

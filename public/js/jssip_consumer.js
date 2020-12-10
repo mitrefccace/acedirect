@@ -18,6 +18,7 @@
 	var debug = true; //console logs event info if true
 	var jssip_debug = false; //enables debugging logs from jssip library if true NOTE: may have to refresh a lot to update change
 	var maxRecordingSeconds = 90;
+	var call_terminated = false;
 
 	//VIDEOMAIL recording progress bar
 	var recordId = null;
@@ -81,47 +82,38 @@
 	//setup for the call. creates and starts the User Agent (UA) and registers event handlers
 	// This uses the new ACE Kurento object rather than JsSIP
 	function register_jssip(myExtension, myPassword) {
-		console.log('Registering: ' + myExtension + ',' + myPassword);
+		console.log('Registering...');
 
 		var eventHandlers = {
 			'connected': function (e) {
 				console.log('--- WV: Connected ---\n');
+				call_terminated = false;
 			},
 			'accepted': function (e) {
 				console.log('--- WV: UA accepted ---\n');
 			},
 			'newMessage': function (e) {
 				console.log('--- WV: New Message ---\n');
+				let consumerLanguage = sessionStorage.consumerLanguage
+
+				console.log("Consumer's selected language is " + consumerLanguage);
+
 				try {
 					if (e.msg == 'STARTRECORDING') {
 						startRecordProgress();
 						enable_video_privacy()
 						setTimeout(function(){disable_video_privacy()},1000);
 					} else {
-					var transcripts = JSON.parse(e.msg);
-					//var transcripts = JSON.parse(e.msg._request.body)
-					//var transcripts = JSON.parse(e.message._request.body)
-		 			if(transcripts.transcript){
-						console.log('--- WV: transcripts.transcript ---\n');
-		 				var tDiv = document.getElementById(transcripts.msgid);
-		 				if(!tDiv) {
-		 					var temp = document.createElement("div");
-		 					temp.id = transcripts.msgid;
-		 					temp.innerHTML = transcripts.transcript;
-		 					temp.classList.add("transcripttext");
-		 					document.getElementById("transcriptoverlay").appendChild(temp);
-		 				} else {
-		 					tDiv.innerHTML = transcripts.transcript;
-		 					if(transcripts.final){
-								setTimeout(function(){tDiv.remove();},5000);
-
-								//var captionBubble = '<div><b>' +transcripts.timestamp + ':</b>&nbsp;'+transcripts.transcript+'<br/><div>';
-								//$(captionBubble).appendTo($("#caption-messages"));
-								$('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>"+transcripts.transcript+"</div></div>");
-								$("#caption-messages").scrollTop($("#caption-messages")[0].scrollHeight);
-		 					}
-		 				}
-					 }
+						var transcripts = JSON.parse(e.msg);
+						if(transcripts.transcript) {
+							// Acedirect will skip translation service if languages are the same
+							console.log('sending caption:', transcripts.transcript, myExtension);
+							socket.emit('translate-caption', {
+								"transcripts": transcripts,
+								"callerNumber": myExtension
+							});
+							// acedirect.js is listening for 'caption-translated' and will call updateConsumerCaptions directly with the translation
+						}
 					}
 		 		} catch (err) {
 		 			console.log(err);
@@ -225,7 +217,8 @@
 	function start_call(other_sip_uri, myExtension) {
           console.log("start_call: " + other_sip_uri);
 		  selfStream.removeAttribute("hidden");
-		  $("#screenshareButton").removeAttr('disabled');
+		
+		$("#screenshareButton").removeAttr('disabled');
 		  $("#fileInput").removeAttr('disabled');
 		  $("#shareFileConsumer").removeAttr('disabled');
 		  //$("#downloadButton").removeAttr('disabled');
@@ -278,6 +271,9 @@
 			acekurento.stop(false);
 			acekurento = null;
 		}
+		call_terminated = true;
+
+		
 		document.getElementById("screenshareButton").disabled = true;
 		$("#screenshareButton").prop('disabled',true);
 		$("#fileInput").prop('disabled',true);
@@ -293,6 +289,11 @@
 		$("#agent-name").text("");
 		exitFullscreen();
 		$('#transcriptoverlay').html('');
+
+		//reset the incall mute button
+		mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
+		mute_audio_icon.classList.add("fa-microphone");
+		mute_audio_icon.classList.remove("fa-microphone-slash");
 
 		//remove file sharing
 		socket.emit('call-ended');
@@ -398,11 +399,13 @@
 
 	//mutes self audio so remote cannot hear you
 	function mute_audio() {
+		console.log('here mute')
                 if (acekurento !== null) {
                   acekurento.enableDisableTrack(true, true); //mute audio
 				  mute_audio_button.setAttribute("onclick", "javascript: unmute_audio();");
                   mute_audio_icon.classList.add("fa-microphone-slash");
-                  mute_audio_icon.classList.remove("fa-microphone");
+				  mute_audio_icon.classList.remove("fa-microphone");
+				  console.log('here mute2')
                 }
 	}
 
@@ -546,6 +549,30 @@
 		document.documentElement.style.setProperty('--caption-bg-color', color);
 	});
 
+	function updateConsumerCaptions(transcripts) {
+		console.log('--- WV: transcripts.transcript ---\n');
+		console.log('consumer uc: ', transcripts)
+
+		var tDiv = document.getElementById(transcripts.msgid);
+		if(!tDiv) {
+			var temp = document.createElement("div");
+			temp.id = transcripts.msgid;
+			temp.innerHTML = transcripts.transcript;
+			temp.classList.add("transcripttext");
+			document.getElementById("transcriptoverlay").appendChild(temp);
+		} else {
+			tDiv.innerHTML = transcripts.transcript;
+			if(transcripts.final || call_terminated) {
+				setTimeout(function(){tDiv.remove();},5000);
+
+				//var captionBubble = '<div><b>' +transcripts.timestamp + ':</b>&nbsp;'+transcripts.transcript+'<br/><div>';
+				//$(captionBubble).appendTo($("#caption-messages"));
+				$('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>"+transcripts.transcript+"</div></div>");
+				$("#caption-messages").scrollTop($("#caption-messages")[0].scrollHeight);
+			}
+		}
+	}
+
 	// Run caption demo
 	var demo_running = false;
 	function testCaptions() {
@@ -587,4 +614,59 @@
 
 	}
 
-	// Clear caption text
+	
+	// Default to English
+	sessionStorage.consumerLanguage = 'en';
+	
+	function setPreferredLanguage() {
+		sessionStorage.consumerLanguage = $('#language-select').val();
+		let flag = 'us';
+		let language = 'English'
+
+		switch (sessionStorage.consumerLanguage) {
+			case 'ar':
+				flag = 'ae';
+				language = 'Arabic'
+				break;
+			case 'zh':
+				flag = 'cn';
+				language = 'Chinese (Mandarin)'
+				break;
+			case 'nl':
+				flag = 'nl';
+				language = 'Dutch'
+				break;
+			case 'fr':
+				flag = 'fr';
+				language = 'French'
+				break;
+			case 'de':
+				flag = 'de';
+				language = 'German'
+				break;
+			case 'it':
+				flag = 'in';
+				language = 'Italian'
+				break;
+			case 'ja':
+				flag = 'jp';
+				language = 'Japanese'
+				break;
+			case 'ko':
+				flag = 'kr';
+				language = 'Korean'
+				break;
+			case 'pt':
+				flag = 'pt';
+				language = 'Portuguese'
+				break;
+			case 'es':
+				flag = 'mx';
+				language = 'Spanish'
+				break;
+		}
+			
+		$('#preferred-language-span').html("").html("Preferred language is <img src='images/flags/" + flag + ".png'> " + language);
+	}
+
+

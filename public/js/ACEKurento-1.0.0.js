@@ -5106,7 +5106,15 @@ function ACEKurento(config) {
       console.log("Set " + (isAudio ? "AUDIO" : "VIDEO") + " " + (isActive ? "ON" : "OFF"));
 
       if(isAudio) {
+        // mediaStream.audioEnabled = false; // fixme
+        
+        // console.log('ats', mediaStream.getAudioTracks())
         mediaStream.getAudioTracks()[0].enabled = !(mediaStream.getAudioTracks()[0].enabled);
+        mediaStream.getAudioTracks()[0].muted = true; //fixme
+        console.log('enabled?', mediaStream.getAudioTracks()[0].enabled)
+        console.log('muted?', mediaStream.getAudioTracks()[0].muted)
+        console.log('ats', mediaStream.getAudioTracks())
+        console.log(this.mediaStream())
       } else {
         mediaStream.getVideoTracks()[0].enabled = !(mediaStream.getVideoTracks()[0].enabled);
       }
@@ -5350,7 +5358,7 @@ function ACEKurento(config) {
 
   function sendMessage(message) {
     var jsonMessage = JSON.stringify(message);
-    console.log('Sending message: ' + jsonMessage);
+    console.log('Sending message id: ' + message.id);
     ws.send(jsonMessage);
   }
 
