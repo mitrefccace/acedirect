@@ -49,7 +49,7 @@ function myCleanup() {
 
   console.log('byeee.');
   console.log('');
-};
+}
 
 
 //after hours vars
@@ -554,7 +554,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 // Validates the token, if valid go to connection.
 // If token is not valid, no connection will be established.
 io.use(socketioJwt.authorize({
-	secret: Buffer.alloc(jwtKey.length, jwtKey , jwtEnc ),
+	secret: ((jwtEnc == 'base64') ? Buffer.alloc(jwtKey.length, jwtKey , jwtEnc ): jwtKey),
 	timeout: parseInt(getConfigVal('web_security:json_web_token:timeout')), // seconds to send the authentication message
 	handshake: getConfigVal('web_security:json_web_token:handshake')
 }));
@@ -622,7 +622,7 @@ io.sockets.on('connection', function (socket) {
 		for (let i = 0; i < sharingAgent.length; i++){
 			console.log(sharingAgent[i] + ' and ' + sharingConsumer[i] + " can share files");
 		}
-	})
+	});
 
 	socket.on('call-ended', function(data) {
 		console.log('call ended');
@@ -925,7 +925,7 @@ io.sockets.on('connection', function (socket) {
 		console.log('resetting shortcuts');
 		colShortcuts = mongodb.collection(token.username + 'shortcuts');
 		colShortcuts.deleteMany({});
-	})
+	});
 
 	//Get all agents statuses and extensions.  Used for multi party option dropdown.
 	/*socket.on('ami-req', function(message){
@@ -1150,7 +1150,7 @@ io.sockets.on('connection', function (socket) {
 		var obj = {
 			'Action':'Command',
 			'command':'database show global/dialin'
-		}
+		};
 
 		ami.action(obj, function(err, res) {
 			if (err) {
@@ -1174,8 +1174,8 @@ io.sockets.on('connection', function (socket) {
 				}
 
 				io.to(data.extension).emit('dialin-number', {'number': dialInNumber});
-			};
-		})
+			}
+		});
 	});
 
 	// Handler catches a Socket.IO disconnect
@@ -1346,7 +1346,7 @@ io.sockets.on('connection', function (socket) {
 					colChatHistory.drop(function (err, success) {
 						if (err) throw err;
 						if (success) console.log('collection dropped');
-					})
+					});
 				}
 			}
 		});
@@ -1430,12 +1430,12 @@ io.sockets.on('connection', function (socket) {
 
 		var clients_in_the_room = io.sockets.adapter.rooms['my room'];
 		var clients = (clients_in_the_room.sockets);
-		var roomKeys = Object.keys(clients)
+		var roomKeys = Object.keys(clients);
 
 		//if the socketID matches, add to convo
 		for (var i = 0; i < roomKeys.length; i++) {
 			var currentRooms = (io.sockets.sockets[roomKeys[i]].rooms);
-			broadcastExtensions.push((Object.keys(currentRooms)))
+			broadcastExtensions.push((Object.keys(currentRooms)));
 		}
 
 		io.emit('broadcast', data);
@@ -1540,13 +1540,13 @@ io.sockets.on('connection', function (socket) {
 			}, function (error, response, newData) {
 				if (error) {
 					logger.error("translate ERROR: " + error);
-					console.error("translate ERROR: " + error)
+					console.error("translate ERROR: " + error);
 					socket.emit('chat-message-new-translated', data);
 					socket.emit('translate-language-error', error);
 				} else {
 					let dataObj = JSON.parse(newData);
 					console.log('Translation is ' + dataObj.translation);
-					data.message = dataObj.translation
+					data.message = dataObj.translation;
 					socket.emit('chat-message-new-translated', data);
 				}
 			});
@@ -1766,8 +1766,8 @@ io.sockets.on('connection', function (socket) {
 	});
 
 	socket.on('set-agent-language', function(data) {
-		console.log('setting language', Number(data.extension), data.language)
-		redisClient.hset(rExtensionToLanguage, Number(data.extension), data.language)
+		console.log('setting language', Number(data.extension), data.language);
+		redisClient.hset(rExtensionToLanguage, Number(data.extension), data.language);
 	});
 
 	socket.on('translate-caption', function(data) {
@@ -1777,7 +1777,7 @@ io.sockets.on('connection', function (socket) {
 		let msgid = data.transcripts.msgid;
 		let final = data.transcripts.final;
 
-		console.log('translating', data)
+		console.log('translating', data);
 
 		var fromNumber;
 		var toNumber;
@@ -1787,11 +1787,11 @@ io.sockets.on('connection', function (socket) {
 		redisClient.hgetall(rConsumerToCsr, function (err, tuples) {
 			if (err) {
 				logger.error("Redis Error" + err);
-				console.log("Redis Error" + err)
+				console.log("Redis Error" + err);
 			} else {
-				console.log('csr', callerNumber, tuples)
+				console.log('csr', callerNumber, tuples);
 				for (let clientNumber in tuples) {
-					agentNumber = tuples[clientNumber]
+					agentNumber = tuples[clientNumber];
 					console.log(callerNumber, clientNumber + ' => ' + agentNumber, typeof(callerNumber), typeof(agentNumber), callerNumber === agentNumber);
 					if (callerNumber === agentNumber) {
 						fromNumber = clientNumber;
@@ -1800,7 +1800,7 @@ io.sockets.on('connection', function (socket) {
 					else if (callerNumber === clientNumber) {
 						fromNumber = agentNumber;
 						toNumber = clientNumber;
-						console.log(agentNumber, clientNumber)
+						console.log(agentNumber, clientNumber);
 					}
 				}
 				var promises = [
@@ -1812,14 +1812,14 @@ io.sockets.on('connection', function (socket) {
 							}
 							else {
 								languageFrom = language;
-								console.log('language from for user', fromNumber, languageFrom)
+								console.log('language from for user', fromNumber, languageFrom);
 								if (!languageFrom) {
 									languageFrom = 'en'; // default English
 								}
 
 								resolve();
 							}
-						})
+						});
 					}),
 					new Promise( function(resolve,reject) {
 						redisClient.hget(rExtensionToLanguage, Number(toNumber), function (err, language) {
@@ -1834,17 +1834,17 @@ io.sockets.on('connection', function (socket) {
 								}
 								resolve();
 							}
-						})
+						});
 					})
 				];
 
 				Promise.all(promises).then( function(values) {
 					console.log('language',fromNumber,toNumber,languageFrom,languageTo);
 					console.log('translating', data.transcripts.transcript, 'from', languageFrom, 'to', languageTo);
-					let encodedText = encodeURI(data.transcripts.transcript.trim())
+					let encodedText = encodeURI(data.transcripts.transcript.trim());
 					let translationUrl = translationServerUrl + '/translate?languageFrom=' + languageFrom + '&text=' + encodedText + '&languageTo=' + languageTo;
 					if (languageTo === languageFrom) {
-						console.log('same language!')
+						console.log('same language!');
 						socket.emit('caption-translated', {
 							'transcript' : data.transcripts.transcript.trim(),
 							'msgid': msgid,
@@ -1852,7 +1852,7 @@ io.sockets.on('connection', function (socket) {
 						});
 					}
 					else {
-						console.log('trying', translationUrl)
+						console.log('trying', translationUrl);
 						request({
 							method: 'GET',
 								url: translationUrl,
@@ -1870,8 +1870,8 @@ io.sockets.on('connection', function (socket) {
 									'final': final
 								});
 							} else {
-								console.log('received translation', data)
-								console.log(languageFrom, languageTo, translationUrl)
+								console.log('received translation', data);
+								console.log(languageFrom, languageTo, translationUrl);
 								// fixme will this be wrong if multiple clients/agents?
 								socket.emit('caption-translated', {
 									'transcript' : data.translation,
@@ -2012,10 +2012,17 @@ function popZendesk(callId,ani,agentid,agentphonenum,skillgrpnum,skillgrpnam,cal
  *
  * @param {string} eventType One of these event types: "Handled", "Web", "Videomail", "Abandoned"
  */
-function insertCallDataRecord (eventType) {
+function insertCallDataRecord (eventType, vrs) {
 	if (logCallData) {
 		colCallData = mongodb.collection('calldata');
-		colCallData.insertOne({"Timestamp": new Date(), "Event": eventType}, function(err, result) {
+
+		var data = {"Timestamp": new Date(), "Event": eventType};
+		if (vrs != null) {
+			data.vrs = vrs;
+		}
+
+		console.log("INSERTING CALL DATA " + JSON.stringify(data, null, 2));
+		colCallData.insertOne(data, function(err, result) {
 			if(err){
 				console.log("Insert a call data record into calldata collection of MongoDB, error: " + err);
 				logger.debug("Insert a call data record into calldata collection of MongoDB, error: " + err);
@@ -2047,7 +2054,7 @@ function handle_manager_event(evt) {
 		let channel = evt.channel.split(/[\/,-]/);
         if(channel[1]  && (channel[1].startsWith("ProviderPurple") || channel[1].startsWith("ProviderZVRS")) && evt.variable && evt.variable.bridgepeer == ''){
 			let agentExt = evt.value.split(/[\/,-]/);
-			console.log("sending new-peer to", agentExt[1])
+			console.log("sending new-peer to", agentExt[1]);
 			if(agentExt[1])
 				io.to(agentExt[1]).emit('new-peer',{});
 		}
@@ -2060,7 +2067,7 @@ function handle_manager_event(evt) {
       if (evt.dialstatus === 'ANSWER') {
 
 		insertCallDataRecord("Handled");
-		console.log("EVT calleridnum" + evt.calleridnum);
+		console.log("HANDLED calleridnum " + evt.calleridnum);
 
         logger.info('DialEnd / ANSWER: evt.context is: >' + evt.context + '< , evt.channel is: >' + evt.channel + '<');
 		logger.info("Event is " + JSON.stringify(evt, null, 2));
@@ -2100,7 +2107,8 @@ function handle_manager_event(evt) {
 			logger.info("No phone match, but this could be a WebRTC extension: " + extension[1] + ". leaving extension[1] alone to continue processing...");
 		  }
 
-		  insertCallDataRecord("Web");
+		  //insertCallDataRecord("Web");
+		  //console.log("WEB EXTENSION[1] " + extension[1]);
 
           var destExtString = evt.destchannel;
 		  var destExtension = destExtString.split(/[\/,-]/);
@@ -2111,13 +2119,17 @@ function handle_manager_event(evt) {
 
           if (extension[1].length >= 10) {
             //pop here, because we already have the consumer phone number
-            popZendesk(evt.destuniqueid,extension[1],destExtension[1],destExtension[1],"","","","");
+			popZendesk(evt.destuniqueid,extension[1],destExtension[1],destExtension[1],"","","","");
+
+			console.log("CONSUMER VRS NUMBER " + extension[1]);
           }
 
           redisClient.hget(rExtensionToVrs, Number(extension[1]), function (err, vrsNum) {
             if (!err && vrsNum) {
               // Call new function
-              logger.info('Calling vrsAndZenLookup with ' + vrsNum + ' and ' + destExtension[1]);
+			  logger.info('Calling vrsAndZenLookup with ' + vrsNum + ' and ' + destExtension[1]);
+			  console.log("HAVE VRS NUMBER " + vrsNum);
+			  insertCallDataRecord("Web", vrsNum);
 
               //mapped consumer extension to a vrs num. so now we can finally pop
               popZendesk(evt.destuniqueid,vrsNum,destExtension[1],destExtension[1],"","","","");
@@ -2125,10 +2137,12 @@ function handle_manager_event(evt) {
               vrsAndZenLookup(Number(vrsNum), Number(destExtension[1]));
             } else if ( isOurPhone ) {
               vrsAndZenLookup(Number(extension[1]), Number(destExtension[1]));
-              io.to(Number(destExtension[1])).emit('no-ticket-info', {});
+			  io.to(Number(destExtension[1])).emit('no-ticket-info', {});
+			  console.log("OUR PHONE " + extension[1]);
             } else {
               // Trigger to agent to indicate that we don't have a valid VRS, agent will prompt user for VRS
-              io.to(Number(destExtension[1])).emit('missing-vrs', {});
+			  io.to(Number(destExtension[1])).emit('missing-vrs', {});
+			  console.log("MISSING VRS NUMBER ");
             }
 		  });
 
@@ -2356,7 +2370,7 @@ function handle_manager_event(evt) {
       } else if (evt.context === 'from-internal' && evt.connectedlinenum === queuesVideomailNumber) {
 		logger.info('Processing Hangup from a WebRTC Videomail call (Consumer hangup)');
 
-		insertCallDataRecord("Videomail");
+		//insertCallDataRecord("Videomail");
 
         logger.info('VIDEOMAIL Hangup extension number: ' + evt.calleridnum);
 
@@ -2387,6 +2401,10 @@ function handle_manager_event(evt) {
 
         redisClient.hget(rExtensionToVrs, Number(evt.calleridnum), function (err, vrsNum) {
           if (!err && vrsNum) {
+
+			console.log("VIDOEMAIL evt: " +  JSON.stringify(evt, null, 2));
+			insertCallDataRecord("Videomail", vrsNum);
+
             // Remove the extension when we're finished
             redisClient.hdel(rExtensionToVrs, Number(evt.calleridnum));
             redisClient.hdel(rExtensionToVrs, Number(vrsNum));
@@ -2617,8 +2635,20 @@ function handle_manager_event(evt) {
       	var data = {"position": evt.position, "extension": evt.calleridnum, "queue": evt.queue};
 		  sendEmit('queue-caller-abandon',data);
 
-		  //Console.log("ABANDONED: " +  evt.calleridnum);
-		  insertCallDataRecord("Abandoned");
+		  console.log("ABANDONED evt: " +  JSON.stringify(evt, null, 2));
+
+		  let ext = evt.calleridnum;
+		  let vrs;
+		  redisClient.hget(rExtensionToVrs, Number(ext), function (err, vrsNum) {
+            if (!err && vrsNum) {
+			  console.log("ABANDONED HAVE VRS NUMBER " + vrsNum);
+			  vrs = vrsNum;
+
+			  insertCallDataRecord("Abandoned", vrs);
+
+			}
+		  });
+
       	break;
       //sent by asterisk when a caller joins the queue
       case('QueueCallerJoin'):
@@ -3083,7 +3113,7 @@ function processExtension(data) {
 		findNextAvailableExtension(function (nextExtension) {
 			findExtensionPassword(nextExtension, function (extensionPassword) {
 				if(nextExtension == 0) {
-					resultJson = {'message':'OutOfExtensions'}
+					resultJson = {'message':'OutOfExtensions'};
 				} else {
 					resultJson = {
 						"message":"success",
@@ -3391,9 +3421,9 @@ function decodeBase64(encodedString) {
  */
 function getConfigVal(param_name) {
   var val = nconf.get(param_name);
+  var decodedString = null;
   if (typeof val !== 'undefined' && val !== null) {
     //found value for param_name
-    var decodedString = null;
     if (clearText) {
       decodedString = val;
     } else {
@@ -3473,7 +3503,7 @@ app.post('/forcelogout', function (req, res) {
 		agents.forEach(function(agent){
 			// Emit the forceful logout event to each agent by extension
 			io.to(Number(agent.extension)).emit('force-logout');
-		})
+		});
 	}
 });
 
@@ -3507,7 +3537,7 @@ app.post('/consumer_login', function (req, res) {
 
 				});
 			}
-		})
+		});
 	} else {
 		res.status(200).json({
 			"message": "Error: Phone number format incorrect"
@@ -3527,7 +3557,7 @@ app.use(function (req, res, next) {
                 "turnPort":turnPort,
                 "turnUser":turnUser,
                 "turnCred":turnCred
-        }
+        };
         next();
 });
 

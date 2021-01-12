@@ -582,6 +582,15 @@ However, delay the fade out process for 2.5 seconds */
   transform: rotate(135deg);
 }
 
+.fa-rotate-45
+{
+  -webkit-transform: rotate(45deg);
+  -moz-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  -o-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
 .fa-close-style
 {
  position:absolute;

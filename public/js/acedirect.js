@@ -1762,6 +1762,10 @@ function exitVideomail() {
 	if (document.getElementById("persistCameraCheck").checked == true) {
 		enable_persist_view();
 	}
+	//close right sidebar if it's open
+	if ($('#videomail-tab').hasClass('active') || $('#agents-tab').hasClass('active') || $('#shortcuts-tab').hasClass('active')) {
+		$('#mail-btn').trigger('click');
+	}
 }
 
 function stopVideomail() {
@@ -2616,7 +2620,7 @@ function changeTabs(id){
 		$('#'+buttonTestID).css('border', '5px solid black');
 		
 		$(document).on('keydown.scroll',function (evt) {
-			let scrollPosition= ( $('#modalDialpad').scrollTop() ); //current height of modal
+			let scrollPosition= ( $('#callhistory').scrollTop() ); //current height of modal
 
 			//hitting enter calls
 			if (evt.keyCode == 13) {
@@ -2626,7 +2630,7 @@ function changeTabs(id){
 			if (evt.keyCode == 40) {
 				//scroll down
 				scrollPosition += 40;
-				$('#modalDialpad').scrollTop(scrollPosition);
+				$('#callhistory').scrollTop(scrollPosition);
 
 				if (buttonPosition >= show_records) {
 					//do nothing
@@ -2641,7 +2645,7 @@ function changeTabs(id){
 			} else if (evt.keyCode == 38) {
 				//scroll up
 				scrollPosition -= 40;
-				$('#modalDialpad').scrollTop(scrollPosition);
+				$('#callhistory').scrollTop(scrollPosition);
 
 				if (buttonPosition <= 1) {
 					//do nothing
@@ -2714,6 +2718,12 @@ function closeDialpadModal() {
 	//remove esc and arrow key binding events
 	$(document).off("keydown.scroll");
 	$(document).off("keyup.close-dialpad");
+
+	//remove style from selected callback button
+	$('.demo-btn').css('border', '');
+
+	//reset scrollbar to top
+	$("#callhistory").scrollTop(0);
 }
 
 //Callback method
