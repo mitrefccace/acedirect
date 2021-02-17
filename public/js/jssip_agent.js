@@ -314,9 +314,6 @@ function accept_call() {
 	document.getElementById("sendFileButton").className = "demo-btn"
 	document.getElementById("sendFileButton").disabled = false;
 	document.getElementById("sendFileButton").style = 'cursor: pointer';
-	//document.getElementById("downloadButton").className = "demo-btn";
-	//document.getElementById("downloadButton").style = 'cursor: not-allowed';
-	//document.getElementById("downloadButton").disabled = false;
 	document.getElementById("screenShareButton").className = "demo-btn"
 	document.getElementById("screenShareButton").disabled = false;
 	document.getElementById("screenShareButton").style = 'cursor: pointer';

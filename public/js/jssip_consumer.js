@@ -221,7 +221,6 @@
 		$("#screenshareButton").removeAttr('disabled');
 		  $("#fileInput").removeAttr('disabled');
 		  $("#shareFileConsumer").removeAttr('disabled');
-		  //$("#downloadButton").removeAttr('disabled');
           //acekurento.call(globalData.queues_complaint_number, false);
           acekurento.call(other_sip_uri, false);
 	}
@@ -278,7 +277,6 @@
 		$("#screenshareButton").prop('disabled',true);
 		$("#fileInput").prop('disabled',true);
 		$("#shareFileConsumer").prop('disabled',true);
-		$("#downloadButton").prop('disabled',true);
 		$("#screenshareButtonGroup").hide();
 		clearScreen();
 		remove_video();

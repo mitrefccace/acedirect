@@ -14,7 +14,7 @@ var cio = require('socket.io-client');
 var redis = require("redis");
 var cookieParser = require('cookie-parser'); // the session is stored in a cookie, so we use this to parse it
 var session = require('express-session');
-var openamAgent = require('openam-agent');
+var openamAgent = require('@forgerock/openam-agent');
 var url = require('url');
 var randomstring = require("randomstring");
 var csrf = require('csurf');
@@ -536,9 +536,11 @@ var httpsServer = https.createServer(credentials, app);
 var PROVIDER_STR = "Provider";
 
 var io = require('socket.io')(httpsServer, {
-	cookie: false
+	cookie: false,
+	origins: fqdnUrl
 }); //path: '/TEST',
-io.set('origins', fqdnUrl);
+// io.set removed in socket.io 3.0. Origins now set in options during socket.io module inclusion.
+//io.set('origins', fqdnUrl);
 
 app.use(cors({
 	'origin': fqdnUrl
@@ -711,7 +713,8 @@ io.sockets.on('connection', function (socket) {
 							io.to(Number(vrsNum)).emit('fileListConsumer', (latestResult) );
 						});
 					}else{
-						console.log("ANother error");
+						console.log("Unkonwn error in get-file-list-agent");
+						console.log(results);
 					}
 				}
 			});
@@ -774,7 +777,8 @@ io.sockets.on('connection', function (socket) {
 							io.to(Number(vrsNum)).emit('fileListAgent', (latestResult) );
 						});
 					}else{
-						console.log("ANother error");
+						console.log("Unknown error in get-file-list-consumer");
+						console.log(results);
 					}
 				}
 			});
@@ -2019,15 +2023,15 @@ function insertCallDataRecord (eventType, vrs) {
 		var data = {"Timestamp": new Date(), "Event": eventType};
 		if (vrs != null) {
 			data.vrs = vrs;
-		}
 
-		console.log("INSERTING CALL DATA " + JSON.stringify(data, null, 2));
-		colCallData.insertOne(data, function(err, result) {
-			if(err){
-				console.log("Insert a call data record into calldata collection of MongoDB, error: " + err);
-				logger.debug("Insert a call data record into calldata collection of MongoDB, error: " + err);
-			}
-		});
+			console.log("INSERTING CALL DATA " + JSON.stringify(data, null, 2));
+			colCallData.insertOne(data, function(err, result) {
+				if(err){
+					console.log("Insert a call data record into calldata collection of MongoDB, error: " + err);
+					logger.debug("Insert a call data record into calldata collection of MongoDB, error: " + err);
+				}
+			});
+		}
 	}
 }
 
@@ -2065,9 +2069,6 @@ function handle_manager_event(evt) {
     case ('DialEnd'):
       // Make sure this is an ANSWER event only
       if (evt.dialstatus === 'ANSWER') {
-
-		insertCallDataRecord("Handled");
-		console.log("HANDLED calleridnum " + evt.calleridnum);
 
         logger.info('DialEnd / ANSWER: evt.context is: >' + evt.context + '< , evt.channel is: >' + evt.channel + '<');
 		logger.info("Event is " + JSON.stringify(evt, null, 2));
@@ -2107,9 +2108,6 @@ function handle_manager_event(evt) {
 			logger.info("No phone match, but this could be a WebRTC extension: " + extension[1] + ". leaving extension[1] alone to continue processing...");
 		  }
 
-		  //insertCallDataRecord("Web");
-		  //console.log("WEB EXTENSION[1] " + extension[1]);
-
           var destExtString = evt.destchannel;
 		  var destExtension = destExtString.split(/[\/,-]/);
           redisClient.hset(rConsumerToCsr, Number(extension[1]), Number(destExtension[1]));
@@ -2128,7 +2126,9 @@ function handle_manager_event(evt) {
             if (!err && vrsNum) {
               // Call new function
 			  logger.info('Calling vrsAndZenLookup with ' + vrsNum + ' and ' + destExtension[1]);
-			  console.log("HAVE VRS NUMBER " + vrsNum);
+			//   console.log("HAVE VRS NUMBER " + vrsNum);
+			//   console.log("INSERTING WEB CALL HANDLED");
+			  insertCallDataRecord("Handled", vrsNum);
 			  insertCallDataRecord("Web", vrsNum);
 
               //mapped consumer extension to a vrs num. so now we can finally pop
@@ -2162,6 +2162,9 @@ function handle_manager_event(evt) {
            * - Emit a missing-vrs message to the correct agent portal (we don't have VRS for the Linphone caller)
            * - Emit a new-caller-general to the correct agent portal
            */
+
+		  //console.log("INSERTING HARDWARE OR SOFTPHONE CALL HANDLED");
+		  insertCallDataRecord("Handled", evt.calleridnum);
 
           if (JSON.stringify(evt.channel).indexOf(PROVIDER_STR) !== -1) {
             // This is a Zphone or Sorenson call
@@ -2231,6 +2234,15 @@ function handle_manager_event(evt) {
             io.to(Number(agentExtension[1])).emit('missing-vrs', {});
             io.to(Number(agentExtension[1])).emit('new-caller-general', evt.context);
 
+            /** HOT FIX NOT IN GITHUB; MUST CARRY FORWARD */
+            if (evt.calleridnum) {
+              popZendesk(evt.destuniqueid, evt.calleridnum, agentExtension[1], agentExtension[1],"","","","");
+
+			  // Save handled call??? What is in calleridnum ?
+			  //insertCallDataRecord("Handled", evt.calleridnum);
+            }
+            /** HOT FIX NOT IN GITHUB; MUST CARRY FORWARD */
+
           }
         } else {
           // if we don't recognize the evt.context, then we will assume a web call (and allow chat)
@@ -2267,6 +2279,8 @@ function handle_manager_event(evt) {
               // Call new function
               logger.info('Calling vrsAndZenLookup with ' + vrsNum + ' and ' + destExtension[1]);
 
+			  insertCallDataRecord("Handled", vrsNum);
+
               //mapped consumer extension to a vrs num. so now we can finally pop
               popZendesk(evt.destuniqueid,vrsNum,destExtension[1],destExtension[1],"","","","");
 
@@ -2294,59 +2308,94 @@ function handle_manager_event(evt) {
 	  var extension = extString.split(/[\/,-]/);
 
       logger.info('HANGUP RECEIVED: evt.context:' + evt.context + ' , evt.channel:' + evt.channel);
+	  logger.info('HANGUP RECEIVED calleridnum: ' + evt.calleridnum);
 
       if ( evt.connectedlinenum == queuesComplaintNumber || evt.exten === queuesComplaintNumber ) {
         // Consumer portal ONLY! Zphone Complaint queue calls will go to the next if clause
-        logger.info('Processing Hangup from a Complaints queue call');
+		logger.info('Processing Hangup from a Complaints queue call');
+		logger.info('HANGUP RECEIVED COMPLAINTS QUEUE calleridnum: ' + evt.calleridnum);
 
-        if (extension[1].startsWith(PROVIDER_STR)) {
-          extension[1] = evt.calleridnum;
-          logger.info('Matched on ZVRS, setting extension[1] to ' + evt.calleridnum);
-        }
+        if (evt.context == 'from-internal' && evt.channelstatedesc == "Ringing") {
+            //this is a missed call from the consumer portal
+            var channelStr = evt.channel;
+            var agentExtension = (channelStr.split(/[\/,-]/))[1];
 
-        logger.info('Hangup extension number: ' + extension[1]);
+            logger.info('**********************************');
+            logger.info('**********************************');
+            logger.info('**********************************');
+            logger.info('**********************************');
+            logger.info('');
+            logger.info('Abandoned call for agent: ' + agentExtension);
+            logger.info('');
+            logger.info('**********************************');
+            logger.info('**********************************');
+            logger.info('**********************************');
+            logger.info('**********************************');
 
-        redisClient.hget(rConsumerExtensions, Number(extension[1]), function (err, reply) {
-          if (err) {
-            logger.error("Redis Error" + err);
-          } else if (reply) {
-            var val = JSON.parse(reply);
-            val.inuse = false;
-            redisClient.hset(rConsumerExtensions, Number(extension[1]), JSON.stringify(val));
-          }
-        });
-
-        logger.info('extensionToVrs contents:');
-        redisClient.hgetall(rExtensionToVrs, function (err, reply) {
-          for (var id in reply) {
-            logger.info(id + ' => ' + reply[id]);
-          }
-        });
-
-        redisClient.hexists(rExtensionToVrs, Number(extension[1]), function (err, reply) {
-          if (reply === 1) {
-            logger.info('extensionToVrsMap contains ' + extension[1]);
-          } else {
-            logger.info('extensionToVrsMap does not contain ' + extension[1]);
-          }
-        });
-
-        redisClient.hget(rExtensionToVrs, Number(extension[1]), function (err, vrsNum) {
-          if (!err && vrsNum) {
-            logger.info('Sending chat-leave for socket id ' + vrsNum);
-            io.to(Number(vrsNum)).emit('chat-leave', {
-              "vrs": vrsNum
+			//this agent(agentExtension) must now go to away status
+			console.log(agentExtension+ ' missed a call from the consumer portal');
+            io.to(Number(agentExtension)).emit('new-missed-call', {"max_missed":getConfigVal('missed_calls:max_missed_calls')}); //should send missed call number
+            redisClient.hget(rTokenMap, agentExtension, function (err, tokenMap) {
+              if (err) {
+                logger.error("Redis Error: " + err);
+              } else {
+                tokenMap = JSON.parse(tokenMap);
+                if (tokenMap !== null && tokenMap.token)
+                  redisClient.hset(rTokenMap, tokenMap.token, "MISSEDCALL");
+              }
             });
+        } else {
+			//regular consumer portal hangup
+			if (extension[1].startsWith(PROVIDER_STR)) {
+			extension[1] = evt.calleridnum;
+			logger.info('Matched on ZVRS, setting extension[1] to ' + evt.calleridnum);
+			}
 
-            // Remove the extension when we're finished
-            redisClient.hdel(rExtensionToVrs, Number(extension[1]));
-            redisClient.hdel(rExtensionToVrs, Number(vrsNum));
-          } else {
-            logger.error("Couldn't find VRS number in extensionToVrs map for extension ");
-          }
-        });
+			logger.info('Hangup extension number: ' + extension[1]);
+
+			redisClient.hget(rConsumerExtensions, Number(extension[1]), function (err, reply) {
+			if (err) {
+				logger.error("Redis Error" + err);
+			} else if (reply) {
+				var val = JSON.parse(reply);
+				val.inuse = false;
+				redisClient.hset(rConsumerExtensions, Number(extension[1]), JSON.stringify(val));
+			}
+			});
+
+			logger.info('extensionToVrs contents:');
+			redisClient.hgetall(rExtensionToVrs, function (err, reply) {
+			for (var id in reply) {
+				logger.info(id + ' => ' + reply[id]);
+			}
+			});
+
+			redisClient.hexists(rExtensionToVrs, Number(extension[1]), function (err, reply) {
+			if (reply === 1) {
+				logger.info('extensionToVrsMap contains ' + extension[1]);
+			} else {
+				logger.info('extensionToVrsMap does not contain ' + extension[1]);
+			}
+			});
+
+			redisClient.hget(rExtensionToVrs, Number(extension[1]), function (err, vrsNum) {
+			if (!err && vrsNum) {
+				logger.info('Sending chat-leave for socket id ' + vrsNum);
+				io.to(Number(vrsNum)).emit('chat-leave', {
+				"vrs": vrsNum
+				});
+
+				// Remove the extension when we're finished
+				redisClient.hdel(rExtensionToVrs, Number(extension[1]));
+				redisClient.hdel(rExtensionToVrs, Number(vrsNum));
+			} else {
+				logger.error("Couldn't find VRS number in extensionToVrs map for extension ");
+			}
+			});
+		}
       } else if (evt.context === 'Provider_General_Questions' || evt.context === 'General_Questions' || evt.context === 'Provider_Complaints' || evt.context === 'Complaints') {
         // Zphone option #4 or 5
+		logger.info('HANGUP Zphone option 4 or 5 calleridnum: ' + evt.calleridnum);
 
         var linphoneString = evt.channel;
         var linphoneExtension = linphoneString.split(/[\/,-]/);
@@ -2369,10 +2418,7 @@ function handle_manager_event(evt) {
         });
       } else if (evt.context === 'from-internal' && evt.connectedlinenum === queuesVideomailNumber) {
 		logger.info('Processing Hangup from a WebRTC Videomail call (Consumer hangup)');
-
-		//insertCallDataRecord("Videomail");
-
-        logger.info('VIDEOMAIL Hangup extension number: ' + evt.calleridnum);
+        logger.info('VIDEOMAIL WebRTC HANGUP calleridnum: ' + evt.calleridnum);
 
         redisClient.hget(rConsumerExtensions, Number(evt.calleridnum), function (err, reply) {
           if (err) {
@@ -2431,6 +2477,10 @@ function handle_manager_event(evt) {
           logger.info('**********************************');
           logger.info('**********************************');
 
+		  // calleridnum is for agent, connectedlinenum is for caller
+		  logger.info('HANGUP RECEIVED ABANDONED CALL calleridnum & : connectedlinenum' + evt.calleridnum + " connectedlinenum " + evt.connectedlinenum);
+		  insertCallDataRecord('Abandoned', evt.connectedlinenum);
+
           //this agent(agentExtension) must now go to away status
           io.to(Number(agentExtension)).emit('new-missed-call', {"max_missed":getConfigVal('missed_calls:max_missed_calls')}); //should send missed call number
           redisClient.hget(rTokenMap, agentExtension, function (err, tokenMap) {
@@ -2456,6 +2506,7 @@ function handle_manager_event(evt) {
       } else {
           //if we get here, it is a hangup that we are ignoring, probably because we don't need it
           logger.info('Not processing hangup.  evt string values... evt.context:' + evt.context + ' , evt.channel:' + evt.channel);
+		  logger.info('HANGUP RECEIVED IGNORING calleridnum: ' + evt.calleridnum);
       }
 
       break;
@@ -2641,11 +2692,10 @@ function handle_manager_event(evt) {
 		  let vrs;
 		  redisClient.hget(rExtensionToVrs, Number(ext), function (err, vrsNum) {
             if (!err && vrsNum) {
-			  console.log("ABANDONED HAVE VRS NUMBER " + vrsNum);
+			  logger.info('ABANDONED WebRTC VRS NUMBER ' + vrsNum);
 			  vrs = vrsNum;
 
-			  insertCallDataRecord("Abandoned", vrs);
-
+			  insertCallDataRecord('Abandoned', vrs);
 			}
 		  });
 
@@ -3979,6 +4029,7 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 		uploadMetadata.filepath = __dirname + '/' + req.file.path;
 		uploadMetadata.originalFilename = req.file.originalname;
 		uploadMetadata.filename = req.file.filename;
+		// 'encoding' is deprecated — since July 2015
 		uploadMetadata.encoding = req.file.encoding;
 		uploadMetadata.mimetype = req.file.mimetype;
 		uploadMetadata.size = req.file.size;

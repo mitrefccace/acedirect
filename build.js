@@ -6,6 +6,7 @@ var fs = require('fs');
 
 const CSS = [
     'bootstrap/dist/css/bootstrap.min.css',
+    'bootstrap/dist/css/bootstrap.min.css.map',
     'bootstrap-toggle/css/bootstrap-toggle.css',
     'font-awesome/css/font-awesome.min.css',
     'inputmask/css/inputmask.css',
@@ -13,6 +14,7 @@ const CSS = [
     'admin-lte/dist/css/skins/skin-blue.min.css',
     'admin-lte/dist/css/skins/skin-purple.min.css',
     'ionicons/dist/css/ionicons.min.css',
+    'ionicons/dist/css/ionicons.min.css.map',
     'gridstack/dist/gridstack.min.css',
     'datatables.net-bs/css/dataTables.bootstrap.min.css',
 
@@ -35,12 +37,13 @@ const JS = [
     'jquery/dist/jquery.min.js',
     'inputmask/dist/min/inputmask/inputmask.min.js',
     'inputmask/dist/min/inputmask/jquery.inputmask.min.js',
-    'jwt-decode/build/jwt-decode.min.js',
+    'jwt-decode/build/jwt-decode.js',
+    'jwt-decode/build/jwt-decode.js.map',
     'moment/moment.js',
     'admin-lte/dist/js/adminlte.min.js',
-    'jssip/dist/jssip.min.js',
     'admin-lte/plugins/jQueryUI/jquery-ui.min.js',
     'gridstack/dist/gridstack.min.js',
+    'gridstack/dist/gridstack.min.map',
     'gridstack/dist/gridstack.jQueryUI.min.js',
     'lodash/lodash.min.js',
     'datatables.net/js/jquery.dataTables.min.js',
@@ -124,7 +127,7 @@ function execCommand(cmd,wdir,expected,hint) {
         if (stdout !== expected) {
           console.log('  FAILED! Incorrect version: ' + stdout + '. expected: ' + expected);
           process.exit(99);
-        } 
+        }
       }
       resolve(stdout? stdout : stderr);
     });
@@ -150,19 +153,10 @@ async function go() {
   console.log('building...');
   s = await execCommand('rm -rf node_modules >/dev/null  # removing node_modules','.',null,null);
   s = await execCommand('npm install >/dev/null  # main install','.',null,null);
-  s = await execCommand('npm install >/dev/null  # jssip install','./node_modules/jssip',null,null);
-  s = await execCommand('gulp dist >/dev/null  # jssip build','./node_modules/jssip',null,null);
   s = await execCommand('rm -f public/assets/css/* public/assets/fonts/* public/assets/js/* public/assets/webfonts/* || true > /dev/null 2>&1 ','.',null,null);
   s = await execCommand('mkdir -p ../scripts  # init scripts','.',null,null);
   s = await execCommand('cp scripts/itrslookup.sh ../scripts/.','.',null,null);
   s = await execCommand('chmod 755 ../scripts/itrslookup.sh','.',null,null);
-
-  //PATCH jssip.js per our findings, rename to jssip.min.js, let build proceed from there
-  tempFile = '/tmp/ed' + secondsSinceEpoch + '.txt';
-  s = await execCommand('head -n 18197 node_modules/jssip/dist/jssip.js > ' + tempFile + '  # modifying jssip','.',null,null);
-  s = await execCommand('cat patches/jssip_patch.txt >> ' + tempFile ,'.',null,null);
-  s = await execCommand('tail -n 8168 node_modules/jssip/dist/jssip.js >> ' + tempFile,'.',null,null);
-  s = await execCommand('mv ' + tempFile + ' node_modules/jssip/dist/jssip.min.js  ','.',null,null);
 
   buildAssets();
   console.log();
@@ -172,4 +166,3 @@ async function go() {
 }
 
 go(); //MAIN
-

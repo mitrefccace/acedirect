@@ -12,7 +12,7 @@
 	<link rel="stylesheet" href="/assets/css/bootstrap.min.css">
 	<link rel="stylesheet" href="/assets/css/bootstrap-toggle.css">
 	<link rel="stylesheet" href="/assets/css/font-awesome.min.css">
-	
+
 	<link rel="stylesheet" href="/assets/css/ionicons.min.css">
 	<link rel="stylesheet" href="/assets/css/AdminLTE.min.css">
 	<link rel="stylesheet" href="/assets/css/skin-blue.min.css">
@@ -494,9 +494,10 @@
 									<button class="btn btn-primary" id="shareFileConsumer" onclick="shareFileConsumer()"
 										disabled>Send File</button><br>
 
-									<div class="btn-group">
-										<a class="btn btn-primary" id="downloadButton" target="_blank"
-											href="./downloadFile" disabled>Download File</a><br>
+									<div id="consumer-file-group" style="overflow: auto;height: 200px;display:none;margin-top:7px">
+										<span>Select the file to download:</span>
+										<ul class="list-group" id="consumer-file-list">
+										</ul>
 									</div>
 
 									<div class="alert alert-success" alert-dismissable id="fileSent"
@@ -508,7 +509,7 @@
 
 								</div>
 							</div>
-							
+
 						</div>
 						<div class="row">
 							<div class="col-xs-12">
@@ -524,7 +525,7 @@
 		</div>
 		<!-- /.content-wrapper -->
 
-		<% include ../partials/acedirect_footer %>
+		<%- include("../partials/acedirect_footer") %>
 
 		<!-- Control Sidebar -->
 
@@ -737,13 +738,11 @@
 	<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
 	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<script type="text/javascript" src="/assets/js/bootstrap.js"></script>
-	<script type="text/javascript" src="/assets/js/jwt-decode.min.js"></script>
+	<script type="text/javascript" src="/assets/js/jwt-decode.js"></script>
 	<script type="text/javascript" src='/assets/js/moment.js'></script>
 	<script type="text/javascript" src="/assets/js/adminlte.min.js"></script>
 	<script type="text/javascript" src="/assets/js/inputmask.min.js"></script>
 	<script type="text/javascript" src="/assets/js/jquery.inputmask.min.js"></script>
-	<script type="text/javascript" src="/assets/js/jssip.min.js"></script>
-	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js" integrity="sha512-90vH1Z83AJY9DmlWa8WkjkV79yfS2n2Oxhsi2dZbIv0nC4E6m5AbH8Nh156kkM7JePmqD6tcZsfad1ueoaovww==" crossorigin="anonymous"></script> -->
 	<script type="text/javascript" src="/assets/js/lodash.min.js"></script>
 	<script type="text/javascript" src="/assets/js/gridstack.min.js"></script>
 	<script type="text/javascript" src="/assets/js/gridstack.jQueryUI.min.js"></script>

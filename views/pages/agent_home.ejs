@@ -6,7 +6,7 @@
         /* prevents white bar from appearing */
         body:not(.modal-open){
             padding-right: 0px !important;
-        }       
+        }
 
         .modal-content.ui-resizable {
             overflow-y: scroll;
@@ -20,17 +20,17 @@
         .ui-resizable-se { cursor: se-resize; width: 20px; height: 20px; right: 0px; bottom: 0px;}
 
     </style>
-    <% include ../partials/agent_page_head %>
+    <%- include("../partials/agent_page_head") %>
 </head>
 
 <body class="hold-transition skin-purple sidebar-mini">
     <div class="wrapper">
         <header class="main-header">
-            <% include ../partials/agent_page_header %>
+            <%- include("../partials/agent_page_header") %>
         </header>
         <!-- Left side column. contains the logo and sidebar -->
         <aside class="main-sidebar">
-            <% include ../partials/agent_page_sidebar_main %>
+            <%- include("../partials/agent_page_sidebar_main") %>
         </aside>
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
@@ -51,7 +51,7 @@
                         <div class="grid-stack-item-content">
                             <!--div class="col-xs-12 col-sm-12 col-md-12 col-lg-9"-->
                             <!--<div class="box"> added the box class in the included file for collapse to work-->
-                                <% include ../partials/agent_box_video %>
+                                <%- include("../partials/agent_box_video") %>
                             <!--</div>-->
                             <!--/div-->
                         </div>
@@ -61,7 +61,7 @@
                         <div class="grid-stack-item-content">
                             <!--div class="col-xs-12 col-sm-12 col-md-12 col-lg-3"-->
                             <!--<div class="box"> added the box class in the included file for collapse to work-->
-                                <% include ../partials/agent_box_chat %>
+                                <%- include("../partials/agent_box_chat") %>
                             <!--</div>-->
                             <!--/div-->
                         </div>
@@ -71,7 +71,7 @@
                             <!--div class = "row" id = "scripts-and-details"-->
                             <!--div class="col-xs-12 col-sm-12 col-md-12 col-lg-6"-->
                             <div class="box">
-                                <% include ../partials/agent_box_scripts %>
+                                <%- include("../partials/agent_box_scripts") %>
                             </div>
                             <!--/div-->
                         </div>
@@ -80,7 +80,7 @@
                         <div class="grid-stack-item-content">
                             <!--div class="col-xs-12 col-sm-12 col-md-12 col-lg-6"-->
                             <div class="box">
-                                <% include ../partials/agent_box_call_details %>
+                                <%- include("../partials/agent_box_call_details") %>
                             </div>
                             <!--/div-->
                         </div>
@@ -91,7 +91,7 @@
         </div>
         <!-- /.content-wrapper -->
 
-        <% include ../partials/acedirect_footer %>
+        <%- include("../partials/acedirect_footer") %>
 
             <!-- Control Sidebar -->
             <aside id="ctrl-sidebar" class="control-sidebar control-sidebar-dark" style="width: 500px; right:-500px">
@@ -221,15 +221,15 @@
                                     <div>PC: alt+shortrcut</div>
                                     <div>Mac: ctrl+option+shortcut</div>
                                     <div><b>Click row to change shortcut</b></div>
-                                    <!-- 
+                                    <!--
                                     <button id="shortcut-up-btn" class="btn" href="javascript:void()" style="background-color: transparent; size: 0px;" name="UP_BTN" onclick="console.log(goUpTable())" accesskey="="></button>
                                     <button id="shortcut-down-btn" class="btn" href="javascript:void()" style="background-color: transparent; size: 0px;" name="DWN_BTN" onclick="console.log(goDownTable())" accesskey="-"></button>
                                     -->
                                     <tr>
                                         <th>Action&nbsp;&nbsp;&nbsp;</th>
                                         <th>Shortcut</th>
-                                        <th><button id="clear-shortcuts" class="btn btn-default" onclick="clearShortcuts()" name="Clear_Shortcuts">Clear</button> </th> 
-                                        <th><button id="reset-shortcuts" class="btn btn-default" onclick="resetShortcuts()" name="Reset_Shortcuts" >Reset</button> </th> 
+                                        <th><button id="clear-shortcuts" class="btn btn-default" onclick="clearShortcuts()" name="Clear_Shortcuts">Clear</button> </th>
+                                        <th><button id="reset-shortcuts" class="btn btn-default" onclick="resetShortcuts()" name="Reset_Shortcuts" >Reset</button> </th>
                                     </tr>
                                 </thead>
                                 <tbody id="shortcutsBody">
@@ -242,7 +242,7 @@
                 <!-- /.Tab panes -->
             </aside>
             <!-- /.control-sidebar -->
-            <!-- Add the sidebar's background. This div must be placed immediately after the control sidebar 
+            <!-- Add the sidebar's background. This div must be placed immediately after the control sidebar
             <div class="control-sidebar-bg" style="width:500px; right:-500px"></div>-->
 
     </div>
@@ -265,7 +265,7 @@
 
                     </h4>
 
-                </div>  
+                </div>
                 <div class="modal-footer">
                     <div class="btn-group" style="width: 100%;">
                         <button id="update-shortcut-btn" type="button" onclick="setShortcut( ($('#current-action').attr('value')), ($('#new-shortcut').val()) )" data-dismiss="modal" class="btn btn-success" style="width: 50%; height: 50px;">
@@ -273,7 +273,7 @@
                         <button id="close-shortcut-btn" type="button" data-dismiss="modal" class="btn btn-default" style="width: 50%; height: 50px;">
                             Close </button>
                     </div>
-                </div>     
+                </div>
             </div>
         </div>
     </div>
@@ -338,7 +338,7 @@
         </div>
     </div>
     <!-- Incoming Call Modal -->
-    <% include ../partials/agent_modal_wrapup %>
+    <%- include("../partials/agent_modal_wrapup") %>
         <!-- Incoming Call Modal -->
         <div id="myRingingModal" class="modal fade">
             <div class="modal-dialog modal-sm">
@@ -470,21 +470,21 @@
                           </a>
                         </li>
                       </ul>
-                      
+
 
                         <div class="tab-pane fade show active in" id="dialpad" role="tabpanel" aria-labelledby="dialpad-tab">
                             <div class="modal-body">
                                 <div id="callCard" class="card">
                                     <div class="container-fluid ">
-        
+
                                         <div id="call-controls">
-        
+
                                             <div id="button_menu_panel" class="center bottomspace" style="display: none">
                                                 <button class="button_menu" id="dial">
                                                     <img class="button-icon" src="/images/dial.png">
                                                 </button>
                                             </div>
-        
+
                                             <div class="phone" id="keypad">
                                                 <div class="input-group">
                                                     <input id="phone-number" type="text" class="form-control input-lg" placeholder="Enter a phone #" autofocus />
@@ -518,7 +518,7 @@
                                                     <div id="log"></div>
                                                 </div>
                                             </div>
-        
+
                                             <div class="center">
                                                 <button id="button-call">
                                                     <img class="button-icon" src="/images/call.png">
@@ -526,7 +526,7 @@
                                             </div>
                                             <div id="invalidNumber" hidden><span style="color:red"><br>The number you have entered is invalid.  Please check the number and try again.</span></div>
                                         </div>
-        
+
                                     </div>
                                 </div>
                             </div>
@@ -551,7 +551,7 @@
                         <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">...</div>
                     </div>
 
-                    
+
                     <div class="modal-footer">
                         <button id="dismiss-dialpad-btn" type="button" class="btn btn-default" onclick="closeDialpadModal()" data-dismiss="modal">Cancel</button>
                     </div>
@@ -591,10 +591,10 @@
                     <div class="modal-body text-center">
                         <h4 class="modal-title" id="outboundFailedBody"></h4>
 
-                    </div>  
+                    </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>      
+                    </div>
                 </div>
             </div>
      </div>
@@ -718,12 +718,12 @@
                                     <div class='btn-group'>
                                         <button class="btn btn-primary btn-flat" id="agent-chat-broadcast" data-toggle="dropdown"
                                         animation="true">Broadcast</button>
-                                        
+
                                         <div class="dropdown-menu dropdown-multicol dropdown-menu-right" id="confirm-broadcast"
                                             aria-labelledby="dropdownMenuButton" style="height:fit-content;width:fit-content;">
                                             <li role="presentation" class="dropdown-header">Confirm Broadcast</li>
                                         <li role="presentation" class="divider"></li>
-         
+
                                             <div class="dropdown-row" style="text-align: center; display: block;">
                                                 <button class="dropdown-item btn btn-success" type="button"
                                                     style="text-align: center;" onclick="sendBroadcast()">Confirm</button>
@@ -732,7 +732,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                        
+
                                     </div>
                                 </span>
                             </div>
@@ -763,7 +763,7 @@
 
         <div id="snackbar">Default Text</div>
 
-        <% include ../partials/agent_page_javascript %>
+        <%- include("../partials/agent_page_javascript") %>
 
 	<script>
 
@@ -807,7 +807,7 @@ function start_video(video) {
 			audio: true,
 			video: true
 		})
-        //navigator.mediaDevices.getUserMedia({ audio: false, video: true }) 
+        //navigator.mediaDevices.getUserMedia({ audio: false, video: true })
 		.then(function (stream) {
 			video.removeAttribute("hidden");
 			// Older browsers may not have srcObject

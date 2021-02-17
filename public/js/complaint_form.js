@@ -102,10 +102,7 @@ function clearScreen() {
 
 	$('#modalWrapup').modal('hide');
 
-	// clear file share elements
-	$('#downloadButton').attr('disabled', true);
-	$('#downloadButton').html('Download File');
-	$('#downloadButton').attr('href', './downloadFile');
+	clearDownloadList();
 	$('#fileInput').val('');
 	$('#fileSent').hide();
 }
@@ -464,21 +461,13 @@ function connect_socket() {
 						logout("An Error Occurred: " + JSON.stringify(reason));
 					}
 				}).on('fileListConsumer', function(data){
-					console.log("Consumer got file list");
-					console.log(data);
 					$('#fileSent').hide();
-					$("#downloadButton").removeAttr('disabled');
-					$('#downloadButton').html(data.original_filename);
-					$('#downloadButton').attr({'class': 'btn btn-primary', 'target':'_blank', 'href': './downloadFile?id=' + data.id + '">' + data.original_filename });
-					console.log( $('#downloadButton').attr('href') );					
+					addFileToDownloadList(data);   
 				}).on('fileListAgent', function(data) {
 					//file sent confirmation
 					console.log('file successfully sent');
 					$('#fileSent').show();
 					$('#fileInput').val('');
-					$('#downloadButton').html('Download File');
-					$('#downloadButton').attr('href', './downloadFile');
-					$('#downloadButton').attr('disabled', 'true');
 				}).on('screenshareResponse', function(data){
 					console.log("screen request received " + data.permission);
 					if(data.permission == true){
@@ -941,7 +930,17 @@ function logout(msg) {
 	window.location.href = './logout';
 }
 
-console.log('Consumer language for this session is ', sessionStorage.consumerLanguage);
+function addFileToDownloadList(data) {
+	$("#consumer-file-group").show();
+	$('#consumer-file-list').append(
+		$('<li class="list-group-item">').append('<a target="_blank" href="./downloadFile?id=' + data.id + '">' + data.original_filename + '</a>')
+	);  
+}
+
+function clearDownloadList() {
+	$('#consumer-file-list').empty();  
+	$("#consumer-file-group").hide();
+}
 
 
 

@@ -248,12 +248,11 @@
                 </a>
             </li>
 
-            <li>
-                <a id="downloadFileShare" >
-                    <i class="fa fa-download"></i>
-                    <span target="_blank"  href="./downloadFile" id="downloadButton"  disabled>Download File</span>
-                </a>
-            </li>
+            <div id="agent-file-group" style="overflow: auto;height: 200px;display:none;margin-top:7px;color:white">
+                <span>Select the file to download:</span>	
+                <ul class="list-group" id="agent-file-list">
+                </ul>
+            </div>
 
             <li>
                 <div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>

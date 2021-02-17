@@ -124,7 +124,7 @@ function connect_socket() {
 				loadCallHistory();
 
 				updateShortcutTable();
-				
+
 				//update the version and year in the footer
 				socket.on('adversion', function (data) {
 					$('#ad-version').text(data.version);
@@ -155,9 +155,9 @@ function connect_socket() {
                                         }
 
 					console.log('signaling_url: ' + signaling_url);
-										
+
 				        acekurento = new ACEKurento({acekurentoSignalingUrl: signaling_url  });
-	
+
 					acekurento.remoteStream = document.getElementById('remoteView');
 					acekurento.selfStream = document.getElementById('selfView');
 
@@ -223,7 +223,7 @@ function connect_socket() {
 					console.log('Sent a get-videomail event');
 
 					// Initialize agent language to English
-					console.log('Initializing agent language to English')
+					console.log('Initializing agent language to English');
 					socket.emit('set-agent-language', {
 						"language":'en',
 						"extension": extensionMe
@@ -264,7 +264,7 @@ function connect_socket() {
 				}).on('typing-clear', function (data) {
 					debugtxt('typing-clear', data);
 					if ($("#displayname").val() !== data.displayname) {
-						$("#chat-messages").remove($("#rtt-typing"));					
+						$("#chat-messages").remove($("#rtt-typing"));
 						$('#rtt-typing').html('').removeClass("direct-chat-text");
 					}
 				}).on('new-caller-general', function (endpoint_type) { // a new general caller has connected
@@ -296,7 +296,7 @@ function connect_socket() {
 					}
 				}).on('chat-message-new', function (data) {
 					debugtxt('chat-message-new', data);
-					
+
 					//Translate incoming message
 					var localLanguage = $('#language-select').val();
 					console.log('Selected language is ' + $('#language-select').val());
@@ -311,7 +311,7 @@ function connect_socket() {
 					//console.log('translated', data)
 					newChatMessage(data);
 				}).on('translate-language-error', function (error){
-					console.error('Translation error:', error)		
+					console.error('Translation error:', error);
 				}).on('script-data', function (data) {
 					debugtxt('script-data', data);
 					for (var i in data.data) {
@@ -368,10 +368,10 @@ function connect_socket() {
 						$('#availableAgents').append(
 							"<tr><td>Name</td>" +
 							"<td>Extension</td>" +
-							"<td>Status</td>" + 
+							"<td>Status</td>" +
 							"<td>Multi-Party Invite</td>"+
 							"<td>Chat</td></tr>"
-						)
+						);
 						for (var i = 0; i < data.agents.length; i++) {
 							var statusTxt, sColor, queues = "";
 							var sBlinking = false;
@@ -445,8 +445,8 @@ function connect_socket() {
 								"name": data.agents[i].name,
 								"extension": data.agents[i].extension,
 								"queues": queues,
-								"multipartyInvite" : (data.agents[i].status == 'READY' && $('#user-status').text() == 'In Call' && $("#agentname-sidebar").text() != data.agents[i].name) 
-								? "<Button class=\"demo-btn\" onClick=multipartyinvite(" + data.agents[i].extension + ")><i class=\"fa fa-users\"></i></Button>" 
+								"multipartyInvite" : (data.agents[i].status == 'READY' && $('#user-status').text() == 'In Call' && $("#agentname-sidebar").text() != data.agents[i].name)
+								? "<Button class=\"demo-btn\" onClick=multipartyinvite(" + data.agents[i].extension + ")><i class=\"fa fa-users\"></i></Button>"
 								: "<Button class=\"secondary\" disabled><i class=\"fa fa-users\"></i></Button>",
 								"chat": '<Button class=\"demo-btn\" onClick="showChatMessage(\'' + data.agents[i].extension + '\',\'' + data.agents[i].name + '\')"><i class=\"fa fa-comments\"></i></Button>'
 							});
@@ -454,11 +454,11 @@ function connect_socket() {
 								"<tr><td>" + data.agents[i].name + "</td>" +
 								"<td>" + data.agents[i].extension + "</td>" +
 								"<td>" + $(statusDiv).html() + "</td>"
-							)
+							);
 							if(data.agents[i].status == "READY" && $('#user-status').text() == 'In Call' && $('agentname-sidebar').text() != data.agents[i].name){
 								$('#availableAgents').append(
 									"<td><Button class=\"btn btn-default\" onClick=multipartyinvite(" + data.agents[i].extension + ")>Invite to Call</Button></td></tr>"
-								)
+								);
 							}else{
 								$('#availableAgents').append("</tr>");
 							}
@@ -508,7 +508,7 @@ function connect_socket() {
 				}).on('outbound-answered', function (data) {
 					debugtxt('outbound-answered', data);
 					$('#modalOutboundCall').modal('hide');
-					console.log("ANSWER -- Option 2: Added asterisk AMI event listener to catch outboud answers. Good: fires when asterisk detects the call has been answered. Bad: not sure what happens if call is never answered. Not sure about multiparty calls.")
+					console.log("ANSWER -- Option 2: Added asterisk AMI event listener to catch outboud answers. Good: fires when asterisk detects the call has been answered. Bad: not sure what happens if call is never answered. Not sure about multiparty calls.");
 					//setTimeout(() => {
 					//	calibrateVideo(2000);
 					//}, 1000);
@@ -575,20 +575,11 @@ function connect_socket() {
 					console.log("The agents are " + JSON.stringify(data));
 				}).on('fileListAgent', function(data){
 					$('#fileSent').hide();
-					//document.getElementById("downloadButton").className = "demo-btn"
-					document.getElementById("downloadButton").disabled = false;
-					$('#downloadButton').html('');
-					$('#downloadButton').css('cursor', 'pointer');
-					$('#downloadButton').append('<a id="downloadFileID" class="demo-btn mb-3" target="_blank" href="./downloadFile?id=' + data.id + '">' + data.original_filename +'</a><br>');
-					console.log($('#downloadFileID').attr('href'));
+					addFileToAgentDownloadList(data);
 				}).on('fileListConsumer', function(data) {
 					//file confirmation
 					$('#fileSent').show();
 					$('#fileInput').val('');
-					$('#downloadFileID').remove();
-					$('#downloadButton').html('Download File');
-					$('#downloadButton').attr('disabled', 'true');
-					$('#downloadButton').css('cursor', 'not-allowed');
 				}).on('screenshareRequest', function(data){
 					//$('#screenshareButtons').show()
 					$('#screenshareRequest').modal({
@@ -620,7 +611,7 @@ function connect_socket() {
 
 								if (isNewChat) {
 									tempSavedMessages.push([]);
-									tempSavedMessages[tempSavedMessages.length-1].push(data);							
+									tempSavedMessages[tempSavedMessages.length-1].push(data);
 								}
 							}
 							$('#agent-chat-list').html('');
@@ -630,12 +621,12 @@ function connect_socket() {
 								var lastmsg = tempSavedMessages[i][tempSavedMessages[i].length-1];
 
 								addChat(lastmsg.displayname,lastmsg.timestamp, lastmsg.message,lastmsg.senderext, false);
-								$('#unread-chat-count').html(tempSavedMessages.length)
+								$('#unread-chat-count').html(tempSavedMessages.length);
 							}
 							count++;
 						}
-					
-					} else {				
+
+					} else {
 						if (!agentChatOpen || $('#agent-ext').html() != data.senderext){
 							showAlert('info', 'New message from ' + data.displayname);
 							getMyChats();
@@ -659,7 +650,7 @@ function connect_socket() {
 						var msgsender = document.createElement('span');
 						var msgtime = document.createElement('span');
 						var msgtext = document.createElement('div');
-						
+
 						if ((data.senderext) == data.destext) {
 							// sending message to themselves
 							socket.emit('chat-read', {'ext': data.senderext, 'destext':extensionMe});
@@ -687,7 +678,7 @@ function connect_socket() {
 					}
 				}).on('agent-typing-clear', function (data) {
 					if ($('#chatHeader').html() == data.displayname && $('#chatHeader').html() != $('#agentname-sidebar').html()) {
-						$("#agent-chat-messages").remove($("#agent-rtt-typing"));					
+						$("#agent-chat-messages").remove($("#agent-rtt-typing"));
 						$('#agent-rtt-typing').html('').removeClass("direct-chat-text");
 					}
 				}).on('broadcast', function(data) {
@@ -716,7 +707,7 @@ function connect_socket() {
 
 									if (isNewChat) {
 										tempSavedMessages.push([]);
-										tempSavedMessages[tempSavedMessages.length-1].push(data);								
+										tempSavedMessages[tempSavedMessages.length-1].push(data);
 									}
 								}
 
@@ -725,9 +716,9 @@ function connect_socket() {
 								for (var i = 0; i < tempSavedMessages.length; i++) {
 									//populate the chat list with the last element of each convo
 									var lastmsg = tempSavedMessages[i][tempSavedMessages[i].length-1];
-									
+
 									addChat(lastmsg.displayname,lastmsg.timestamp, lastmsg.message,lastmsg.senderext, false);
-									$('#unread-chat-count').html(tempSavedMessages.length)
+									$('#unread-chat-count').html(tempSavedMessages.length);
 								}
 								count++;
 							}
@@ -736,7 +727,7 @@ function connect_socket() {
 					} else {
 						//update the db with the recipient's name
 						socket.emit('update-broadcast-name', {'destext': extensionMe, 'senderext':data.senderext, 'name': $('#agentname-sidebar').text(), 'sendername':data.displayname, 'time':data.timeSent});
-					
+
 						data.destext = extensionMe;
 
 						//check is the chat window is the same window
@@ -756,7 +747,7 @@ function connect_socket() {
 							var msgtime = document.createElement('span');
 							var msgtext = document.createElement('div');
 							socket.emit('chat-read', {'ext': data.senderext, 'destext':extensionMe});
-							
+
 							if ((data.senderext) == extensionMe) {
 								// receiving own broadcast
 								showAlert('info', 'Successfully sent broadcast');
@@ -903,7 +894,7 @@ $('#chatsend').submit(function (evt) {
 	var vrs = $('#callerPhone').val();
 	var date = moment();
 	var timestamp = date.format("D MMM h:mm a");
-	
+
 	//var language = 'en';
 	var language = $('#language-select').val();
 	console.log('Sending translated text with language', language);
@@ -992,7 +983,7 @@ function addEmoji(emoji) {
 	var vrs = $('#callerPhone').val();
 
 	value = value+emoji;
-	$('#newchatmessage').val(value);	
+	$('#newchatmessage').val(value);
 
 	socket.emit('chat-typing', {
 		"displayname": displayname,
@@ -1091,15 +1082,13 @@ function inCallADComplaints(endpoint_type) {
 		disable_chat_buttons();
 		$("#newchatmessage").attr("placeholder", "Chat disabled for Provider endpoints");
 		$('#remoteView').css('object-fit', ' contain');
-		
+
 		//disable filesharing buttons
 		document.getElementById("fileInput").disabled = true;
-		document.getElementById("sendFileButton").className = "btn btn-primary"
+		document.getElementById("sendFileButton").className = "btn btn-primary";
 		document.getElementById("sendFileButton").disabled = true;
 		document.getElementById("sendFileButton").removeAttribute('style');
-		document.getElementById("downloadButton").className = "btn btn-primary"
-		document.getElementById("downloadButton").disabled = true;
-		document.getElementById("downloadButton").removeAttribute('style');
+		clearAgentDownloadList();
 
 	} else { //should be webrtc
 		endpoint = "webrtc";
@@ -1131,13 +1120,10 @@ function inCallADGeneral(endpoint_type) {
 
 		//disable file sharing buttons
 		document.getElementById("fileInput").disabled = true;
-		document.getElementById("sendFileButton").className = "btn btn-primary"
+		document.getElementById("sendFileButton").className = "btn btn-primary";
 		document.getElementById("sendFileButton").disabled = true;
 		document.getElementById("sendFileButton").removeAttribute('style');
-		document.getElementById("downloadButton").className = "btn btn-primary"
-		document.getElementById("downloadButton").disabled = true;
-		document.getElementById("downloadButton").removeAttribute('style');
-
+		clearAgentDownloadList();
 	} else { //should be webrtc
 		endpoint = "webrtc";
 		enable_chat_buttons();
@@ -1215,8 +1201,7 @@ function clearScreen() {
 	$('#modalOutboundCall').modal('hide');
 
 	// clear file share elements
-	$('#downloadFileID').remove();
-	$('#downloadButton').html('Download File');
+	clearAgentDownloadList();
 	$('#fileInput').val('');
 	$('#fileSent').hide();
 }
@@ -1408,7 +1393,7 @@ function newChatMessage(data) {
 		$(msgblock).addClass("direct-chat-msg").appendTo($("#chat-messages"));
 
 	}
-	$("#chat-messages").scrollTop($("#chat-messages")[0].scrollHeight); 
+	$("#chat-messages").scrollTop($("#chat-messages")[0].scrollHeight);
 }
 
 
@@ -1531,7 +1516,7 @@ function updateVideomailTable(data) {
                 //convert videomail received time to client browser timezone
 		var vidReceived = data[i].received;
                 const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-                vidReceived = new Date(vidReceived).toLocaleString('en-US', { timeZone: tz }); 
+                vidReceived = new Date(vidReceived).toLocaleString('en-US', { timeZone: tz });
 
 		var vidDuration = data[i].video_duration;
 		var vidStatus = data[i].status;
@@ -1609,10 +1594,10 @@ function showVideoMailTab() {
 		$('#clear-shortcuts').attr("accesskey", '');
 		$('#reset-shortcuts').attr("accesskey", '');
 		updateShortcutTable();
-		
+
 		$('#agents-tab').removeClass('active');
 		$('#videomail-tab').removeClass('active');
-		
+
 	} else {
 		// sidebar is opening, re-add the tab shortcuts
 		$('#videomail-tab').attr("accesskey", 'm');
@@ -1625,7 +1610,7 @@ function showVideoMailTab() {
 				$('.nav-tabs a[href="#control-sidebar-agents-tab"]').removeClass('active');
 
 				$('#agents-tab').removeClass('active');
-				
+
 			}
 		}
 		$('.nav-tabs a[href="#control-sidebar-videomail-tab"]').tab('show');
@@ -1676,7 +1661,7 @@ function showAgentsTab() {
 		if ($('#videomail-tab').hasClass('active')) {
 			if (document.getElementById("ctrl-sidebar").hasAttribute('control-sidebar-open')) {
 				$('.nav-tabs a[href="#control-sidebar-agents-tab"]').removeClass('active');
-				$('#videomail-tab').removeClass('active')
+				$('#videomail-tab').removeClass('active');
 
 			}
 		}
@@ -1757,7 +1742,7 @@ function toggle_videomail_buttons(make_visible) {
 
 //Exit videomail view and return to call view
 function exitVideomail() {
-	stopVideomail()
+	stopVideomail();
 	document.getElementById("persistCameraCheck").disabled = false;
 	if (document.getElementById("persistCameraCheck").checked == true) {
 		enable_persist_view();
@@ -1872,7 +1857,7 @@ seekBar.addEventListener("mousedown", function() {
 // Play the video when the seek handle is dropped
 seekBar.addEventListener("mouseup", function() {
 	//remoteView.play();
-	play_video()
+	play_video();
 });
 
 // Event listener for the full-screen button
@@ -1992,13 +1977,13 @@ function transferCallModal() {
 	$('#modalCallTransfer').modal({
 		backdrop: 'static',
 		keyboard: false
-	})
+	});
 }
 
 function showChatMessage(ext, destname) {
 	agentChatOpen = true;
 	getMyChats();
-	
+
 	//socket call to announce chat between the two callers
 	socket.emit('check-agent-chat-status', {"destext":ext, "senderext": extensionMe});
 
@@ -2035,7 +2020,7 @@ function showChatMessage(ext, destname) {
 				if (tempSavedMessages[i][0].senderext == ext) {
 					removeChatList(tempSavedMessages[i][0].displayname);
 					var numOfMessages = tempSavedMessages[i].length;
-				
+
 					for(var j = 0; j < numOfMessages; j++){
 						var msg = tempSavedMessages[i][j].message;
 						var displayname = tempSavedMessages[i][j].displayname;
@@ -2049,7 +2034,7 @@ function showChatMessage(ext, destname) {
 						var msgsender = document.createElement('span');
 						var msgtime = document.createElement('span');
 						var msgtext = document.createElement('div');
-					
+
 						$(msgsender).addClass("direct-chat-name pull-left").html(displayname).appendTo(msginfo);
 						$(msgtime).addClass("direct-chat-timestamp pull-right").html(timestamp).appendTo(msginfo);
 						$(msginfo).addClass("direct-chat-info clearfix").appendTo(msgblock);
@@ -2061,7 +2046,7 @@ function showChatMessage(ext, destname) {
 							$('#agentnewchatmessage').focus();
 
 							tempSavedMessages.splice(i, 1);
-							$('#unread-chat-count').html(tempSavedMessages.length)
+							$('#unread-chat-count').html(tempSavedMessages.length);
 
 							if (tempSavedMessages == undefined || tempSavedMessages == '') {
 								tempSavedMessages = [[]];
@@ -2073,22 +2058,22 @@ function showChatMessage(ext, destname) {
 									</li>'
 								);
 							}
-						}	
+						}
 					}
 				}
 			}
 		}
 	}
- 
+
 	var count=0;
-	
+
 	socket.on('begin-agent-chat', function() {
 		if (count == 0) {
 			console.log('beginning new chat with ' +destname);
 			count++;
 		}
 	});
-	
+
 	socket.on('continue-agent-chat', function(data) {
 		if (count == 0) {
 			console.log('continuing chatting with ' +destname);
@@ -2098,7 +2083,7 @@ function showChatMessage(ext, destname) {
 			}
 			count++;
 		}
-	})
+	});
 }
 
 $('#agent-chat-content').on('resize', function() {
@@ -2149,7 +2134,7 @@ function loadAgentChats(destExt, selfExt) {
 					var msgsender = document.createElement('span');
 					var msgtime = document.createElement('span');
 					var msgtext = document.createElement('div');
-					
+
 					if (data[i].senderext === selfExt) {
 						$(msgsender).addClass("direct-chat-name pull-right").html(displayname).appendTo(msginfo);
 						$(msgtime).addClass("direct-chat-timestamp pull-left").html(timestamp).appendTo(msginfo);
@@ -2199,7 +2184,7 @@ function addEmojiAgentChat(emoji) {
 	var ext = $('#agent-ext').html();
 
 	value = value+emoji;
-	$('#agentnewchatmessage').val(value);	
+	$('#agentnewchatmessage').val(value);
 
 	socket.emit('agent-chat-typing', {
 		"displayname": displayname,
@@ -2301,7 +2286,7 @@ function populateChats(lastMessages) {
 
 	//sort the messages so the most recent message is on top
 	lastMessages = lastMessages.sort((a, b) => {return b.timeSent - a.timeSent;});
-	
+
 	hasUnreadAgentChats = false;
 	unreadAgentChats = 0;
 
@@ -2315,7 +2300,7 @@ function populateChats(lastMessages) {
 			var message = lastMessages[i].message;
 			var ext = lastMessages[i].senderext;
 			var opened= lastMessages[i].hasBeenOpened;
-			
+
 			if (lastMessages[i].displayname == $('#agentname-sidebar').html() && lastMessages[i].displayname != lastMessages[i].destname) {
 				name = lastMessages[i].destname;
 				ext = lastMessages[i].destext;
@@ -2532,7 +2517,7 @@ function disallowScreenShare(){
 
 //Functionality for fileshare
 function ShareFile(){
-	if (agentStatus == 'IN_CALL' && document.getElementById("fileInput").files[0]) { 
+	if (agentStatus == 'IN_CALL' && document.getElementById("fileInput").files[0]) {
 		console.log("Sending file " + document.getElementById("fileInput").files[0]);
 		var vrs = $('#callerPhone').val();
 		var formData = new FormData();
@@ -2605,7 +2590,7 @@ function changeTabs(id){
 		$('#contact-tab').hide();
 		$('#callHistoryBody').show();
 		$("#callhistory").height(600);
-		
+
 		//pressing esc closes the modal
 		$(document).on('keyup.close-dialpad',function (evt) {
 			if (evt.keyCode == 27) {
@@ -2618,7 +2603,7 @@ function changeTabs(id){
 		let buttonPosition=1;
 		let buttonTestID = 'callback-btn' + buttonPosition;
 		$('#'+buttonTestID).css('border', '5px solid black');
-		
+
 		$(document).on('keydown.scroll',function (evt) {
 			let scrollPosition= ( $('#callhistory').scrollTop() ); //current height of modal
 
@@ -2636,8 +2621,8 @@ function changeTabs(id){
 					//do nothing
 				} else {
 					$('#'+buttonTestID).css('border', 'none');
-					
-					buttonPosition++; 
+
+					buttonPosition++;
 					buttonTestID = 'callback-btn' + buttonPosition;
 					$('#'+buttonTestID).css('border', '5px solid black');
 				}
@@ -2651,10 +2636,10 @@ function changeTabs(id){
 					//do nothing
 				} else {
 					$('#'+buttonTestID).css('border', 'none');
-					
-					buttonPosition--; 
+
+					buttonPosition--;
 					buttonTestID = 'callback-btn' + buttonPosition;
-					$('#'+buttonTestID).css('border', '5px solid black');					
+					$('#'+buttonTestID).css('border', '5px solid black');
 				}
 			}
 		});
@@ -2688,7 +2673,7 @@ function loadCallHistory(){
 	socket.on('returnCallHistory', function(result){
 
                 $("#callHistoryBody").html("");
-  
+
                 var count_recs = 0;
 		for(var i = result.length - 1; i >= 0; i--){
                         count_recs++;
@@ -2703,7 +2688,7 @@ function loadCallHistory(){
 						'<th>' + result[i].callerNumber + '</th>' +
 						'<th>' + result[i].direction + '</th>' +
 						'<th>' + result[i].duration + '</th>' +
-						'<th>' + endpointType + '</th>' + 
+						'<th>' + endpointType + '</th>' +
 						'<th>' + result[i].callDate + '</th>' +
 						'<th><button class=\"demo-btn\" onclick="outbound_call(\'' + result[i].callerNumber + '\')" id=\'callback-btn' + count_recs + '\'><i class="fa fa-phone-square"></i></button></th>' +
 					"</tr>"
@@ -2749,7 +2734,8 @@ var options = {
 	cellHeight: 40,
 	verticalMargin: 10
 };
-var grid = $('.grid-stack').gridstack(options);
+//var grid = $('.grid-stack').gridstack(options);
+var grid = GridStack.init(options);
 
 var serializedGridData = [];
 var loadingGridLayout = false;
@@ -2777,7 +2763,7 @@ function saveGridLayout() {
 function loadGridLayout(layout) {
 	sessionStorage.layout = JSON.stringify(layout);
 	loadingGridLayout = true;
-	var grid = $('.grid-stack').data('gridstack');
+	//var grid = $('.grid-stack').data('gridstack');
 	grid.batchUpdate();
 
 	layout.forEach(function (el) {
@@ -2791,7 +2777,9 @@ function loadGridLayout(layout) {
 }
 resizeVideo();
 resizeChat();
-$('.grid-stack').on('change', function (event, items) {
+
+//$('.grid-stack').on('change', function (event, items) {
+grid.on('change', function (event, items) {
 	if (!loadingGridLayout) {
 		saveGridLayout();
 	}
@@ -2842,6 +2830,9 @@ function resetLayout() {
 		"height": 10
 	}];
 	loadGridLayout(defaultLayout);
+	if (!loadingGridLayout) {
+		saveGridLayout();
+	}
 	resizeVideo();
 	resizeChat();
 }
@@ -2878,7 +2869,7 @@ $("#modalChangeShortcut").keyup(function(event) {
 	}
 });
 
-/* click on a row in the shortcuts table to customize shortcut 
+/* click on a row in the shortcuts table to customize shortcut
 *	CANNOT CUSTOMIZE SIDEBAR TAB SHORTCUTS
 */
 $('#shortcutsBody').on('click','tr',function() {
@@ -2919,7 +2910,7 @@ $('#shortcutsBody').on('click','tr',function() {
 		$('#modalChangeShortcut').on('shown.bs.modal', function() {
 			$('#new-shortcut').focus();
 		});
-	
+
 		$('#current-action').html(clickedValue);
 		$('#current-action').attr("value", clickedID);
 		$('#new-shortcut').val(currentShortcut);
@@ -2967,7 +2958,7 @@ function setShortcut(task, shortcut) {
 	}
 }
 /**
- * 
+ *
  * @param {string} task task id
  */
 function getShortcut(task) {
@@ -2978,7 +2969,7 @@ function updateShortcutTable() {
 	//populate table from db
 	//use default to populate anything not in db
 	console.log("UPDATE SHORTCUTS");
-	
+
 	//array of all elements with an accesskey
 	var taskArray = $("[accesskey]").map(function(){
 		return $(this).attr('id');
@@ -2989,13 +2980,13 @@ function updateShortcutTable() {
 	socket.emit('get-shortcuts');
 	socket.on('receive-shortcuts', function(data) {
 		$('#shortcutsTable tbody').html("");
-		
+
 		for(let i = 0; i < tableLength; i++){
 			for (let j = 0; j < data.length; j++){
 				//console.log('comparing ' +taskArray[i]+ ' to ' +data[j].task);
 				if (taskArray[i] == data[j].task) {
 					//console.log(taskArray[i] + ' in database');
-					$('#'+taskArray[i]).attr("accesskey", data[j].shortcut); 
+					$('#'+taskArray[i]).attr("accesskey", data[j].shortcut);
 					break;
 				}
 			}
@@ -3004,9 +2995,9 @@ function updateShortcutTable() {
 
 			$('#shortcutsBody').append(
 				"<tr><th>" +taskValue+ "</th>" +
-				"<td>" + getShortcut(taskArray[i]).toUpperCase() + "</td>"		
-			);			
-			$('#shortcutsBody').append("<br>"); //spaces the elements 
+				"<td>" + getShortcut(taskArray[i]).toUpperCase() + "</td>"
+			);
+			$('#shortcutsBody').append("<br>"); //spaces the elements
 		}
 		$('#shortcutsTable').append($('#shortcutsBody'));
 	});
@@ -3014,8 +3005,8 @@ function updateShortcutTable() {
 
 /**
  * Check if the shortcut is already in use.
- * 
- * Returns true if shortcut is in use, false if not 
+ *
+ * Returns true if shortcut is in use, false if not
  * @param {string} task	element's shortcut we are changing
  * @param {string} shortcut not case sensitive
  */
@@ -3076,7 +3067,7 @@ function clearShortcuts() {
 	updateShortcutTable();
 }
 
-function resetShortcuts() {	
+function resetShortcuts() {
 	socket.emit('reset-shortcuts');
 
 	console.log('reseting shortcuts');
@@ -3086,7 +3077,7 @@ function resetShortcuts() {
 
 	var reachedTabs = false;
 	reachedButtons = false;
-	
+
 	for (var i = 0; i < taskArray.length; i++) {
 		if (taskArray[i] == 'agents-tab' || taskArray[i] == "videomail-tab" || taskArray[i] == "shortcuts-tab") {
 			//do nothing
@@ -3095,7 +3086,7 @@ function resetShortcuts() {
 			//do nothing
 			reachedButtons = true;
 		} else {
-			//calling setShortcuts crashes acedirect 
+			//calling setShortcuts crashes acedirect
 			if (reachedTabs) {
 				//originalShortcuts doesn't store the sidebar tabs' shortcuts
 				//so we skip over them
@@ -3120,4 +3111,16 @@ function collapseVideoBox() {
 function collapseChatBox() {
     console.log('collapse chat box');
     $('#userchat').attr('style', "background-color:white;"); //removes the background when collapsing the box
+}
+
+function clearAgentDownloadList() {
+	$('#agent-file-list').empty();
+	$("#agent-file-group").hide();
+}
+
+function addFileToAgentDownloadList(data) {
+	$("#agent-file-group").show();
+	$('#agent-file-list').append(
+		$('<li class="list-group-item">').append('<a target="_blank" style="color:black" href="./downloadFile?id=' + data.id + '">' + data.original_filename + '</a>')
+	);
 }
