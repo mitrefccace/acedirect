@@ -23,6 +23,38 @@ var mysql = require('mysql');
 var MongoClient = require('mongodb').MongoClient;
 var dbConnection = null;
 var dbconn = null;
+
+// Clam AV
+const NodeClam = require('clamscan');
+const ClamScan = new NodeClam().init({
+    remove_infected: true, // If true, removes infected files
+    quarantine_infected: false, // False: Don't quarantine, Path: Moves files to this place.
+    scan_log: null, // Path to a writeable log file to write scan results into
+    debug_mode: true ,// Whether or not to log info/debug/error msgs to the console
+    file_list: null, // path to file containing list of files to scan (for scan_files method)
+    scan_recursively: true, // If true, deep scan folders recursively
+    clamscan: {
+        path: '/usr/bin/clamscan', // Path to clamscan binary on your server
+        db: null, // Path to a custom virus definition database
+        scan_archives: true, // If true, scan archives (ex. zip, rar, tar, dmg, iso, etc...)
+        active: true // If true, this module will consider using the clamscan binary
+    },
+    clamdscan: {
+        socket: false, // Socket file for connecting via TCP
+        host: false, // IP of host to connect to TCP interface
+        port: false, // Port of host to use when connecting via TCP interface
+        timeout: 60000, // Timeout for scanning files
+        local_fallback: true, // Do no fail over to binary-method of scanning
+        path: '/usr/bin/clamdscan', // Path to the clamdscan binary on your server
+        config_file: null, // Specify config file if it's in an unusual place
+        multiscan: true, // Scan using all available cores! Yay!
+        reload_db: false, // If true, will re-load the DB on every call (slow)
+        active: true,// If true, this module will consider using the clamdscan binary
+        bypass_test: false, // Check to see if socket is available when applicable
+    },
+    preference: 'clamdscan' // If clamdscan is found and active, it will be used by default
+});
+
 //For fileshare
 //var upload = multer();
 
@@ -2296,7 +2328,6 @@ function handle_manager_event(evt) {
           });
           //tell CSR portal that a complaints queue call has connected
           io.to(Number(destExtension[1])).emit('new-caller-complaints', evt.context);
-
         }
       }
 
@@ -2310,7 +2341,11 @@ function handle_manager_event(evt) {
       logger.info('HANGUP RECEIVED: evt.context:' + evt.context + ' , evt.channel:' + evt.channel);
 	  logger.info('HANGUP RECEIVED calleridnum: ' + evt.calleridnum);
 
-      if ( evt.connectedlinenum == queuesComplaintNumber || evt.exten === queuesComplaintNumber ) {
+	  if (evt.context === 'Provider_Videomail') {
+		console.log("VIDOEMAIL evt: " +  JSON.stringify(evt, null, 2));
+		insertCallDataRecord("Videomail", evt.calleridnum);
+	  }
+      else if ( evt.connectedlinenum == queuesComplaintNumber || evt.exten === queuesComplaintNumber ) {
         // Consumer portal ONLY! Zphone Complaint queue calls will go to the next if clause
 		logger.info('Processing Hangup from a Complaints queue call');
 		logger.info('HANGUP RECEIVED COMPLAINTS QUEUE calleridnum: ' + evt.calleridnum);
@@ -2394,7 +2429,9 @@ function handle_manager_event(evt) {
 			});
 		}
       } else if (evt.context === 'Provider_General_Questions' || evt.context === 'General_Questions' || evt.context === 'Provider_Complaints' || evt.context === 'Complaints') {
-        // Zphone option #4 or 5
+        // This Provider context check for this block of code may be obsolete.
+		// Not call transfer
+		// Zphone option #4 or 5
 		logger.info('HANGUP Zphone option 4 or 5 calleridnum: ' + evt.calleridnum);
 
         var linphoneString = evt.channel;
@@ -2448,7 +2485,7 @@ function handle_manager_event(evt) {
         redisClient.hget(rExtensionToVrs, Number(evt.calleridnum), function (err, vrsNum) {
           if (!err && vrsNum) {
 
-			console.log("VIDOEMAIL evt: " +  JSON.stringify(evt, null, 2));
+			console.log("VIDOEMAIL WebRTC evt: " +  JSON.stringify(evt, null, 2));
 			insertCallDataRecord("Videomail", vrsNum);
 
             // Remove the extension when we're finished
@@ -2681,39 +2718,39 @@ function handle_manager_event(evt) {
       }
 	  break;
 
-      //sent by asterisk when a caller leaves the queue before they were connected
-      case('QueueCallerAbandon'):
-      	var data = {"position": evt.position, "extension": evt.calleridnum, "queue": evt.queue};
-		  sendEmit('queue-caller-abandon',data);
+	//sent by asterisk when a caller leaves the queue before they were connected
+	case('QueueCallerAbandon'):
+		var data = {"position": evt.position, "extension": evt.calleridnum, "queue": evt.queue};
+		sendEmit('queue-caller-abandon',data);
 
-		  console.log("ABANDONED evt: " +  JSON.stringify(evt, null, 2));
+		console.log("ABANDONED evt: " +  JSON.stringify(evt, null, 2));
 
-		  let ext = evt.calleridnum;
-		  let vrs;
-		  redisClient.hget(rExtensionToVrs, Number(ext), function (err, vrsNum) {
-            if (!err && vrsNum) {
-			  logger.info('ABANDONED WebRTC VRS NUMBER ' + vrsNum);
-			  vrs = vrsNum;
+		let ext = evt.calleridnum;
+		let vrs;
+		redisClient.hget(rExtensionToVrs, Number(ext), function (err, vrsNum) {
+			if (!err && vrsNum) {
+				logger.info('ABANDONED WebRTC VRS NUMBER ' + vrsNum);
+				vrs = vrsNum;
 
-			  insertCallDataRecord('Abandoned', vrs);
+				insertCallDataRecord('Abandoned', vrs);
 			}
-		  });
+		});
 
-      	break;
-      //sent by asterisk when a caller joins the queue
-      case('QueueCallerJoin'):
-      	if(evt.queue === "ComplaintsQueue") complaint_queue_count = evt.count;
-      	if(evt.queue === "GeneralQuestionsQueue") general_queue_count = evt.count;
-      	var data = {"position": evt.position, "extension": evt.calleridnum, "queue": evt.queue, "count": evt.count};
-      	sendEmit('queue-caller-join',data);
-      	break;
-      //sent by aasterisk a caller leaves the queue (either by abandoning or being connected)
-      case('QueueCallerLeave'):
-      	if(evt.queue === "ComplaintsQueue") complaint_queue_count = evt.count;
-      	if(evt.queue === "GeneralQuestionsQueue") general_queue_count = evt.count;
-      	var data = {"position": evt.position, "extension": evt.calleridnum,"queue": evt.queue, "count": evt.count};
-      	sendEmit('queue-caller-leave',data);
-      	break;
+	break;
+	//sent by asterisk when a caller joins the queue
+	case('QueueCallerJoin'):
+		if(evt.queue === "ComplaintsQueue") complaint_queue_count = evt.count;
+		if(evt.queue === "GeneralQuestionsQueue") general_queue_count = evt.count;
+		var data = {"position": evt.position, "extension": evt.calleridnum, "queue": evt.queue, "count": evt.count};
+		sendEmit('queue-caller-join',data);
+		break;
+	//sent by aasterisk a caller leaves the queue (either by abandoning or being connected)
+	case('QueueCallerLeave'):
+		if(evt.queue === "ComplaintsQueue") complaint_queue_count = evt.count;
+		if(evt.queue === "GeneralQuestionsQueue") general_queue_count = evt.count;
+		var data = {"position": evt.position, "extension": evt.calleridnum,"queue": evt.queue, "count": evt.count};
+		sendEmit('queue-caller-leave',data);
+		break;
 
     default:
       logger.warn('AMI unhandled event: ' + evt.event);
@@ -4006,6 +4043,10 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 
 	console.log("Uploaded by " + uploadedBy);
 	console.log("SESSION " + JSON.stringify(req.session));
+
+
+	
+	
 	if(uploadedBy){
 		console.log("Valid agent " + uploadedBy);
 		let uploadMetadata = {};
@@ -4033,21 +4074,49 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 		uploadMetadata.encoding = req.file.encoding;
 		uploadMetadata.mimetype = req.file.mimetype;
 		uploadMetadata.size = req.file.size;
-		request({
-			method: 'POST',
-			url: 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port') + '/storeFileInfo',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: uploadMetadata,
-			json: true
-		}, function (error, response, data) {
-			if (error) {
-				res.status(500).send("Error");
-			} else {
-				res.status(200).send("Success");
+
+		ClamScan.then(async clamscan => {
+			try {
+				console.log('scanning', uploadMetadata.filepath, 'as', require("os").userInfo().username, fs.existsSync(uploadMetadata.filepath));
+		 
+				// You can re-use the `clamscan` object as many times as you want
+				// const version = await clamscan.get_version();
+				// console.log(`ClamAV Version: ${version}`);
+				
+				const {is_infected, file, viruses} = await clamscan.is_infected(uploadMetadata.filepath);
+				if (is_infected) {
+					console.log(`${req.file.originalname} is infected with ${viruses}!`);
+					res.status(400).send("Error scanning file i");
+				}
+				else {
+					console.log(`${req.file.originalname} passed inspection!`);
+					request({
+						method: 'POST',
+						url: 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port') + '/storeFileInfo',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: uploadMetadata,
+						json: true
+					}, function (error, response, data) {
+						if (error) {
+							res.status(500).send("Error");
+						} else {
+							res.status(200).send("Success");
+						}
+					});
+				}
+			} catch (err) {
+				// Handle any errors raised by the code in the try block
+				console.log('Error using Clam AV:', err)
+				res.status(400).send("Error scanning file");
 			}
+		}).catch(err => {
+			// Handle errors that may have occurred during initialization
+			console.log('Error initializing Clam AV:', err)
+			res.status(400).send("Error scanning file");
 		});
+		
 	}else{
 		console.log("Not valid agent");
 		res.status(403).send("Unauthorized");

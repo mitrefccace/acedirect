@@ -932,8 +932,9 @@ function logout(msg) {
 
 function addFileToDownloadList(data) {
 	$("#consumer-file-group").show();
-	$('#consumer-file-list').append(
-		$('<li class="list-group-item">').append('<a target="_blank" href="./downloadFile?id=' + data.id + '">' + data.original_filename + '</a>')
+	$('#consumer-file-list ').append(
+		$('<li class="list-group-item btn-primary btn btn-flat">')
+		.append('<a style="color:white" target="_blank" href="./downloadFile?id=' + data.id + '">' + data.original_filename + '</a>')
 	);  
 }
 

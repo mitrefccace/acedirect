@@ -1,0 +1,45 @@
+<div class="box" id="filebox">
+    <div class="box-header with-border" id="filebox-header">
+        <i class="fa fa-file"></i>
+        <h3 class="box-title">File Sharing</h3>
+        <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse" onclick="collapseFilesBox()">
+                <i class="fa fa-minus"></i>
+            </button>
+        </div>
+    </div>
+    <div class="box-body">
+        <p>
+            <a id="sidebar-fileShare" class="cap-setting config-hide nav-item">
+                <span>
+                    <input type="file" id="fileInput" name="fileInput" class="form-control-file"  disabled>
+                </span>
+            </a>
+        </p>
+        <p >
+            <a id="sidebar-fileShare" name="fileShare">
+                <i class="fa fa-paperclip"></i>
+                <span id="sendFileButton" onclick="ShareFile()" disabled>Send File</span>
+            </a>
+        </p>
+
+        <div id="agent-file-group" style="overflow: auto;height: 200px;display:none;margin-top:7px; margin-left: 2px; margin-right: 2px;color:white">
+            <span>Select the file to download:</span>	
+            <ul class="list-group" id="agent-file-list">
+            </ul>
+        </div>
+        
+    </div>
+    <div class="box-footer" id="chat-footer">
+        <div class="row">
+            <div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
+                <span class="close" onclick="$('#fileSent').hide();" style="text-decoration:none">×</span>
+                <strong>Success!</strong>  File Sent
+            </div>
+            <div class="alert alert-danger"  alert-dismissable id="fileSentError" style="margin-top: 10px;" hidden>
+                <span class="close" onclick="$('#fileSentError').hide();" style="text-decoration:none">×</span>
+                <strong>Error!</strong>  Error sending file
+            </div>
+        </div>
+    </div>
+</div>
